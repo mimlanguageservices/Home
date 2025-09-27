@@ -491,8 +491,11 @@ class StudentFileManager {
         try {
             console.log('📤 Checking for changes to push to GitHub...');
 
+            // Use parent directory (git repo root) instead of Students subdirectory
+            const gitRepoDir = path.join(this.studentsDir, '..');
+
             // Check if there are any changes
-            const status = execSync('git status --porcelain', { encoding: 'utf8', cwd: this.studentsDir });
+            const status = execSync('git status --porcelain', { encoding: 'utf8', cwd: gitRepoDir });
 
             if (!status.trim()) {
                 console.log('📊 No changes to push to GitHub');
@@ -502,16 +505,16 @@ class StudentFileManager {
             console.log('📝 Changes detected, pushing to GitHub...');
 
             // Add all changes
-            execSync('git add .', { cwd: this.studentsDir });
+            execSync('git add .', { cwd: gitRepoDir });
 
             // Create commit with timestamp
             const timestamp = new Date().toLocaleString();
             const commitMessage = `Auto-sync update: ${timestamp} - Student files updated from Google Sheets`;
 
-            execSync(`git commit -m "${commitMessage}"`, { cwd: this.studentsDir });
+            execSync(`git commit -m "${commitMessage}"`, { cwd: gitRepoDir });
 
             // Push to GitHub
-            execSync('git push', { cwd: this.studentsDir });
+            execSync('git push', { cwd: gitRepoDir });
 
             console.log('✅ Successfully pushed changes to GitHub');
             return true;
