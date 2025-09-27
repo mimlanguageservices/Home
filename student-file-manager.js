@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const { execSync } = require('child_process');
 
 class StudentFileManager {
     constructor() {
@@ -484,6 +485,44 @@ class StudentFileManager {
     }
 
     /**
+     * Push changes to GitHub repository
+     */
+    async pushToGitHub() {
+        try {
+            console.log('📤 Checking for changes to push to GitHub...');
+
+            // Check if there are any changes
+            const status = execSync('git status --porcelain', { encoding: 'utf8', cwd: this.studentsDir });
+
+            if (!status.trim()) {
+                console.log('📊 No changes to push to GitHub');
+                return false;
+            }
+
+            console.log('📝 Changes detected, pushing to GitHub...');
+
+            // Add all changes
+            execSync('git add .', { cwd: this.studentsDir });
+
+            // Create commit with timestamp
+            const timestamp = new Date().toLocaleString();
+            const commitMessage = `Auto-sync update: ${timestamp} - Student files updated from Google Sheets`;
+
+            execSync(`git commit -m "${commitMessage}"`, { cwd: this.studentsDir });
+
+            // Push to GitHub
+            execSync('git push', { cwd: this.studentsDir });
+
+            console.log('✅ Successfully pushed changes to GitHub');
+            return true;
+
+        } catch (error) {
+            console.error('❌ Failed to push to GitHub:', error.message);
+            return false;
+        }
+    }
+
+    /**
      * Watch for changes and auto-sync (polling method)
      */
     startAutoSync(intervalMinutes = 5) {
@@ -493,6 +532,9 @@ class StudentFileManager {
             try {
                 console.log(`\n⏰ Auto-sync triggered at ${new Date().toLocaleTimeString()}`);
                 await this.syncAllFiles();
+
+                // Push changes to GitHub if any were made
+                await this.pushToGitHub();
             } catch (error) {
                 console.error('❌ Auto-sync failed:', error.message);
             }
