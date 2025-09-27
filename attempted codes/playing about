@@ -1,0 +1,1406 @@
+doc<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Banality of Evil - MIM Language Services</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FFFFFF;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #34495E;
+            padding: 15px 30px;
+            border-bottom: 3px solid #F1C40F;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #FFFFFF;
+            font-size: 2.7rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .header .website a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 1.35rem;
+            font-weight: 500;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 90px);
+        }
+
+        .navigation {
+            width: 250px;
+            background: #34495E;
+            padding: 20px;
+            border-right: 3px solid #F1C40F;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: #FFFFFF;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            color: #34495E;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .nav-item:hover {
+            background: #3498db;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            background: #F1C40F;
+            color: #34495E;
+            border-color: #F1C40F;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 30px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #34495E;
+            margin-bottom: 20px;
+            font-size: 2.7rem;
+            font-weight: 700;
+        }
+
+        /* Discussion Section */
+        .discussion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr 1fr 1fr;
+            gap: 20px;
+            height: calc(100% - 120px);
+        }
+
+        .discussion-header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .actual-image {
+            width: 300px;
+            height: 200px;
+            border: 3px solid #34495E;
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);
+        }
+
+        .discussion-question {
+            background: #FFFFFF;
+            border: 2px solid #3498db;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(52, 73, 94, 0.1);
+        }
+
+        .discussion-question h3 {
+            color: #34495E;
+            margin-bottom: 10px;
+            font-size: 1.65rem;
+        }
+
+        .discussion-question p {
+            color: #34495E;
+            line-height: 1.6;
+            font-size: 1.2rem;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            background: #FFFFFF;
+            border: 2px solid #3498db;
+            color: #3498db;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .page-btn.active {
+            background: #3498db;
+            color: #FFFFFF;
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: #FFFFFF;
+            border: 2px solid #34495E;
+            border-radius: 10px;
+            padding: 30px;
+            overflow: auto;
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #34495E;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .reading-page h3 {
+            color: #34495E;
+            margin-bottom: 15px;
+            margin-top: 25px;
+            font-size: 1.8rem;
+        }
+
+        .vocab-link {
+            background: #3498db;
+            color: #FFFFFF;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: background 0.3s ease;
+            position: relative;
+            font-size: 1.2rem;
+        }
+
+        .vocab-link:hover {
+            background: #2980b9;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: #FFFFFF;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 400px;
+            margin: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-word {
+            color: #34495E;
+            font-size: 2.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #F1C40F;
+            padding-bottom: 5px;
+        }
+
+        .popup-definition {
+            color: #34495E;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1.35rem;
+        }
+
+        .popup-close {
+            background: #F1C40F;
+            color: #34495E;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            float: right;
+            font-size: 1.2rem;
+        }
+
+        .popup-close:hover {
+            background: #f39c12;
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(52, 73, 94, 0.1);
+            padding: 20px;
+        }
+
+        .flashcard-front {
+            background: #FFFFFF;
+            color: #34495E;
+        }
+
+        .flashcard-back {
+            background: #3498db;
+            color: #FFFFFF;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2.1rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.4;
+            text-align: center;
+            font-size: 1.65rem;
+        }
+
+        .flashcard-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            opacity: 0.7;
+        }
+
+        .flashcard:hover .flashcard-inner {
+            box-shadow: 0 8px 16px rgba(52, 73, 94, 0.2);
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #34495E;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #F1C40F;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: #FFFFFF;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-question h3 {
+            color: #34495E;
+            margin-bottom: 30px;
+            font-size: 2.1rem;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px 20px;
+            border: 3px solid #34495E;
+            border-radius: 8px;
+            font-size: 1.8rem;
+            text-align: center;
+            margin: 20px auto;
+            display: block;
+            font-weight: 600;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .quiz-input.correct {
+            border-color: #27AE60;
+            background: #D5FDCB;
+        }
+
+        .quiz-input.incorrect {
+            border-color: #E74C3C;
+            background: #FADBD8;
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 20px;
+            background: #FFFFFF;
+            border: 3px solid #34495E;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #34495E;
+            font-size: 1.35rem;
+        }
+
+        .choice:hover {
+            background: #F1C40F;
+            border-color: #F1C40F;
+        }
+
+        .choice input[type="radio"] {
+            display: none;
+        }
+
+        .choice.selected {
+            background: #3498db;
+            color: #FFFFFF;
+            border-color: #3498db;
+        }
+
+        .choice.correct {
+            background: #27AE60;
+            color: #FFFFFF;
+            border-color: #27AE60;
+        }
+
+        .choice.incorrect {
+            background: #E74C3C;
+            color: #FFFFFF;
+            border-color: #E74C3C;
+        }
+
+        .check-button {
+            background: #F1C40F;
+            color: #34495E;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.65rem;
+            font-weight: 700;
+            margin: 20px auto;
+            display: block;
+            transition: transform 0.2s ease;
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: #34495E;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .nav-btn:hover {
+            background: #3498db;
+        }
+
+        .nav-btn:disabled {
+            background: #BDC3C7;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .feedback.correct {
+            background: #D5FDCB;
+            color: #1B5E20;
+            border: 2px solid #27AE60;
+        }
+
+        .feedback.incorrect {
+            background: #FADBD8;
+            color: #B71C1C;
+            border: 2px solid #E74C3C;
+        }
+
+        .results-summary {
+            background: #FFFFFF;
+            border: 3px solid #F1C40F;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .results-summary h3 {
+            color: #34495E;
+            font-size: 2.4rem;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 3.75rem;
+            font-weight: 700;
+            color: #F1C40F;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elements for sound effects -->
+    <audio id="flipSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>The Banality of Evil</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23e9ecef' stroke='%2334495e' stroke-width='2' rx='8'/%3E%3Cpath d='M30 25 L90 25 L85 35 L35 35 Z' fill='%2334495e'/%3E%3Cpath d='M25 40 L95 40 L90 50 L30 50 Z' fill='%2334495e'/%3E%3Cpath d='M35 55 L85 55 L80 65 L40 65 Z' fill='%2334495e'/%3E%3Ccircle cx='20' cy='15' r='3' fill='%23E74C3C'/%3E%3Ccircle cx='100' cy='15' r='3' fill='%23E74C3C'/%3E%3Ctext x='60' y='45' text-anchor='middle' fill='%23F1C40F' font-size='8' font-weight='bold'%3EEvil%3C/text%3E%3C/svg%3E" alt="Philosophy Image" class="header-image">
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section -->
+            <div class="section active" id="discussion">
+                <h2>Discussion: Understanding Evil and Ordinary People</h2>
+                <div class="discussion-grid">
+                    <div class="discussion-header">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f8f9fa' stroke='%2334495e' stroke-width='2' rx='10'/%3E%3Cpath d='M50 50 L250 50 L245 70 L55 70 Z' fill='%2334495e'/%3E%3Cpath d='M40 90 L260 90 L255 110 L45 110 Z' fill='%2334495e'/%3E%3Cpath d='M60 130 L240 130 L235 150 L65 150 Z' fill='%2334495e'/%3E%3Ccircle cx='25' cy='25' r='8' fill='%23E74C3C'/%3E%3Ccircle cx='275' cy='25' r='8' fill='%23E74C3C'/%3E%3Ctext x='150' y='35' text-anchor='middle' fill='%23F1C40F' font-size='14' font-weight='bold'%3EHannah Arendt%3C/text%3E%3Ctext x='150' y='180' text-anchor='middle' fill='%2334495e' font-size='12'%3EPhilosopher & Political Theorist%3C/text%3E%3C/svg%3E" alt="Hannah Arendt Portrait" class="actual-image">
+                    </div>
+                    
+                    <div class="discussion-question">
+                        <h3>Nature of Evil</h3>
+                        <p>Do you believe evil people are born evil or made evil by circumstances? Can ordinary people commit terrible acts?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>Following Orders</h3>
+                        <p>Is "I was just following orders" ever a valid excuse? When should people refuse to obey authority?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>Bureaucracy and Responsibility</h3>
+                        <p>How can bureaucratic systems make people less responsible for their actions? Have you experienced this?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>Modern Applications</h3>
+                        <p>Where do you see examples of "the banality of evil" in today's world? How can we prevent it?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading: Hannah Arendt and The Banality of Evil</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingPage(1, this)">Eichmann's Trial</button>
+                        <button class="page-btn" onclick="showReadingPage(2, this)">Arendt's Theory</button>
+                        <button class="page-btn" onclick="showReadingPage(3, this)">Modern Implications</button>
+                        <button class="page-btn" onclick="showReadingPage(4, this)">Critical Thinking</button>
+                    </div>
+
+                    <div class="reading-page active" id="reading-page-1">
+                        <h3>The Eichmann Trial and a Disturbing Reality</h3>
+                        <p>
+                            In 1961, Adolf Eichmann stood trial in Jerusalem for crimes against humanity. As one of the key architects of the Holocaust, many expected to see a monster - a personification of pure evil. Instead, what emerged was something far more unsettling: a <span class="vocab-link" onclick="showPopup('banal', 'Lacking originality or excitement; dull and ordinary')">banal</span>, ordinary <span class="vocab-link" onclick="showPopup('bureaucratic', 'Following rules and procedures excessively, often without thinking')">bureaucratic</span> official who seemed more like a dull clerk than a sadistic mastermind.
+                        </p>
+                        <p>
+                            Eichmann's defense was simple: he was merely following orders within a <span class="vocab-link" onclick="showPopup('totalitarianism', 'A system of government that demands total obedience and controls every aspect of life')">totalitarian</span> system. He claimed no personal hatred toward Jews and described his work with the <span class="vocab-link" onclick="showPopup('diligence', 'Careful and persistent effort in work or duties')">diligence</span> of a dutiful civil servant. This was not the dramatic confrontation with evil that many had anticipated, but rather a mundane administrative discussion about logistics and procedures.
+                        </p>
+                        <p>
+                            Philosopher Hannah Arendt, who covered the trial for The New Yorker, was struck by this contradiction. How could such horrific crimes be committed by someone who appeared so unremarkable? Eichmann seemed to lack the dramatic malevolence that people associated with such <span class="vocab-link" onclick="showPopup('atrocious', 'Extremely cruel or shocking; horrifying')">atrocious</span> acts. He was not a psychopath or a fanatic, but rather a man who had surrendered his capacity for independent thought.
+                        </p>
+                        <p>
+                            The trial revealed how easily ordinary individuals could become complicit in evil when they operated within systems that discouraged critical thinking. Eichmann's apparent normality was precisely what made his crimes so terrifying - it suggested that such evil was not the exclusive domain of monsters, but could emerge from the most mundane bureaucratic processes.
+                        </p>
+                    </div>
+
+                    <div class="reading-page" id="reading-page-2">
+                        <h3>Arendt's Revolutionary Theory</h3>
+                        <p>
+                            Hannah Arendt coined the phrase "the banality of evil" to describe what she witnessed during Eichmann's trial. Her theory challenged conventional understanding of evil as something dramatic and intentional. Instead, she argued that the most dangerous evil often emerges from thoughtlessness - from people who simply stop thinking and questioning their actions.
+                        </p>
+                        <p>
+                            According to Arendt, Eichmann's evil lay not in malicious intent but in his complete abdication of moral responsibility. He had become a cog in a vast bureaucratic machine, following a <span class="vocab-link" onclick="showPopup('regimen', 'A systematic plan or set of rules to be followed')">regimen</span> of procedures without considering their moral implications. This thoughtlessness, she argued, could make ordinary people capable of extraordinary evil.
+                        </p>
+                        <p>
+                            The concept suggests that evil does not require hatred, ideology, or even conscious malice. It can result from the simple failure to think, to question, to take moral responsibility for one's actions. In totalitarian systems, this thoughtlessness is systematically cultivated, creating conditions where normal people can participate in atrocities without fully comprehending the horror of their actions.
+                        </p>
+                        <p>
+                            Arendt's theory was controversial because it removed the comfortable distance between "us" and "them." If evil could be banal and thoughtless rather than intentionally malicious, then anyone might be susceptible under the right circumstances. This realization <span class="vocab-link" onclick="showPopup('alienates', 'Causes someone to feel isolated or estranged from others')">alienates</span> people from their assumptions about human nature and moral certainty.
+                        </p>
+                        <p>
+                            The banality of evil explains how genocide and other mass atrocities can occur without requiring a population of sadists or psychopaths. Instead, it requires only a sufficient number of people willing to stop thinking critically about their role in larger systems of harm. This makes Arendt's insight both profound and deeply unsettling for modern societies.
+                        </p>
+                    </div>
+
+                    <div class="reading-page" id="reading-page-3">
+                        <h3>Contemporary Relevance and Applications</h3>
+                        <p>
+                            Arendt's concept of the banality of evil remains strikingly relevant in contemporary society. We can observe similar patterns in modern bureaucracies, corporations, and institutions where individuals participate in harmful systems while maintaining their sense of personal innocence through compartmentalization and thoughtlessness.
+                        </p>
+                        <p>
+                            Consider corporate executives who implement policies leading to environmental destruction or financial ruin for ordinary people. Many of these individuals do not see themselves as evil but rather as professionals following standard business practices. Their <span class="vocab-link" onclick="showPopup('inhibitions', 'Factors that restrain or prevent someone from acting')">inhibitions</span> about causing harm are gradually eroded through bureaucratic processes that distance them from the consequences of their decisions.
+                        </p>
+                        <p>
+                            Social media platforms provide another example, where content moderators and algorithm designers make decisions that can spread misinformation, promote hatred, or undermine democratic processes. Often, these individuals are not motivated by malicious intent but are simply following company protocols or technical specifications without considering the broader social implications of their work.
+                        </p>
+                        <p>
+                            The banality of evil also manifests in how societies respond to systemic injustices such as poverty, racism, or climate change. Many people recognize these as serious problems but feel comfortable maintaining their current lifestyle because their individual contribution seems negligible within the larger system. This diffusion of responsibility allows collective harm to continue through individual inaction rather than active malice.
+                        </p>
+                        <p>
+                            Understanding this concept is crucial for recognizing how ordinary people can become complicit in harmful systems. It emphasizes the importance of maintaining critical thinking, moral reflection, and personal responsibility even within large, complex organizations. The lesson is not that all bureaucrats or professionals are evil, but that systems can be structured in ways that make thoughtlessness and moral abdication dangerously easy.
+                        </p>
+                    </div>
+
+                    <div class="reading-page" id="reading-page-4">
+                        <h3>The Importance of Critical Thinking</h3>
+                        <p>
+                            Arendt believed that the primary defense against the banality of evil was the cultivation of critical thinking and moral reflection. She argued that thinking - in the sense of questioning, examining, and judging our actions - is fundamentally a moral activity that prevents us from becoming thoughtless participants in harmful systems.
+                        </p>
+                        <p>
+                            This type of thinking requires courage because it often means questioning authority, challenging conventional wisdom, and accepting personal responsibility for difficult moral decisions. In bureaucratic or totalitarian contexts, such thinking can be professionally or personally dangerous, which is why systems of power often work to discourage it through various forms of social and institutional pressure.
+                        </p>
+                        <p>
+                            Education plays a crucial role in developing this capacity for critical thinking. However, Arendt distinguished between education that simply transmits information or technical skills and education that develops judgment and moral reasoning. The former can actually contribute to the banality of evil by creating highly competent specialists who never question the broader purposes of their expertise.
+                        </p>
+                        <p>
+                            The concept also highlights the importance of diverse perspectives and open dialogue in society. When people are isolated within echo chambers or institutional silos, they are more likely to lose touch with the human consequences of their actions. Exposure to different viewpoints and direct contact with those affected by our decisions can help maintain the moral imagination necessary to prevent thoughtless participation in harmful systems.
+                        </p>
+                        <p>
+                            Ultimately, Arendt's insight suggests that preventing evil requires not just good intentions but active, ongoing moral engagement with the world around us. It demands that we regularly examine our roles in larger systems, question the assumptions underlying our work and social participation, and maintain empathy for those who might be harmed by our actions or inaction. This is challenging work, but it may be the price of maintaining our humanity in complex modern societies.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Key Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Core Terms 1</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Core Terms 2</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Banal</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Lacking originality or excitement; dull and ordinary</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Totalitarianism</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A system of government that demands total obedience and controls every aspect of life</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Atrocious</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Extremely cruel or shocking; horrifying</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Bureaucratic</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Following rules and procedures excessively, often without thinking</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Diligence</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Careful and persistent effort in work or duties</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Alienates</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Causes someone to feel isolated or estranged from others</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Regimen</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A systematic plan or set of rules to be followed</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Inhibitions</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Factors that restrain or prevent someone from acting</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="section" id="quiz">
+                <h2>Interactive Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuestion()" id="prevBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuestion()" id="nextBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Question 1 -->
+                    <div class="quiz-page active" id="quiz-page-1">
+                        <div class="quiz-question">
+                            <h3>Who coined the phrase "the banality of evil"?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q1" value="A">
+                                    Adolf Eichmann
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q1" value="B">
+                                    Hannah Arendt
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q1" value="C">
+                                    The New York Times
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q1" value="D">
+                                    The Jerusalem Court
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(1, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-1" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="quiz-page" id="quiz-page-2">
+                        <div class="quiz-question">
+                            <h3>Complete the sentence: "Something that is _____ lacks originality and is dull and ordinary."</h3>
+                            <input type="text" class="quiz-input" id="answer-2" placeholder="Enter the missing word">
+                            <button class="check-button" onclick="checkTextAnswer(2, 'banal')">Check Answer</button>
+                            <div class="feedback" id="feedback-2" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="quiz-page" id="quiz-page-3">
+                        <div class="quiz-question">
+                            <h3>According to Arendt, what was the main cause of Eichmann's evil?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q3" value="A">
+                                    His hatred of Jewish people
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q3" value="B">
+                                    His thoughtlessness and lack of critical thinking
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q3" value="C">
+                                    His psychopathic personality
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q3" value="D">
+                                    His fanatical ideology
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(3, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-3" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="quiz-page" id="quiz-page-4">
+                        <div class="quiz-question">
+                            <h3>What does "totalitarianism" mean?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q4" value="A">
+                                    A democratic system with many parties
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q4" value="B">
+                                    A system demanding total obedience and controlling every aspect of life
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q4" value="C">
+                                    A system with limited government power
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q4" value="D">
+                                    A system based on individual freedom
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(4, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-4" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="quiz-page" id="quiz-page-5">
+                        <div class="quiz-question">
+                            <h3>Complete: "His work with great _____ means he showed careful and persistent effort."</h3>
+                            <input type="text" class="quiz-input" id="answer-5" placeholder="Enter the missing word">
+                            <button class="check-button" onclick="checkTextAnswer(5, 'diligence')">Check Answer</button>
+                            <div class="feedback" id="feedback-5" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div class="quiz-page" id="quiz-page-6">
+                        <div class="quiz-question">
+                            <h3>What does it mean when someone "alienates" others?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q6" value="A">
+                                    They bring people closer together
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q6" value="B">
+                                    They cause others to feel isolated or estranged
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q6" value="C">
+                                    They help people understand each other
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q6" value="D">
+                                    They give people confidence
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(6, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-6" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 7 -->
+                    <div class="quiz-page" id="quiz-page-7">
+                        <div class="quiz-question">
+                            <h3>A "regimen" is:</h3>
+                            <input type="text" class="quiz-input" id="answer-7" placeholder="A systematic plan or set of...">
+                            <button class="check-button" onclick="checkTextAnswer(7, 'rules')">Check Answer</button>
+                            <div class="feedback" id="feedback-7" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 8 -->
+                    <div class="quiz-page" id="quiz-page-8">
+                        <div class="quiz-question">
+                            <h3>According to the text, what is the main defense against the banality of evil?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q8" value="A">
+                                    Following orders more carefully
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q8" value="B">
+                                    Critical thinking and moral reflection
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q8" value="C">
+                                    Avoiding all bureaucratic systems
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q8" value="D">
+                                    Trusting authority figures completely
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(8, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-8" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Results Page -->
+                    <div class="quiz-page" id="quiz-results">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalScore">0/8</div>
+                            <p>Excellent work! You've completed The Banality of Evil quiz.</p>
+                            <button class="check-button" onclick="restartQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Popup -->
+    <div class="popup-overlay" id="vocabPopup">
+        <div class="popup-content">
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+            <button class="popup-close" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentQuizPage = 1;
+        let totalQuizPages = 8;
+        let quizAnswers = {};
+        let correctAnswers = 0;
+
+        // Navigation functions
+        function showSection(sectionName, element) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function showReadingPage(pageNum, element) {
+            // Hide all reading pages
+            const pages = document.querySelectorAll('.reading-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all page buttons
+            const buttons = document.querySelectorAll('.reading-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById('reading-page-' + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function showVocabPage(pageNum, element) {
+            // Hide all vocab pages
+            const pages = document.querySelectorAll('.vocab-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all page buttons
+            const buttons = document.querySelectorAll('.vocab-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // Flashcard function with sound effect
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            
+            // Play sound effect
+            const flipSound = document.getElementById('flipSound');
+            if (flipSound) {
+                flipSound.currentTime = 0; // Reset to start
+                flipSound.play().catch(e => {
+                    // Handle any audio play errors silently
+                    console.log('Audio playback failed:', e);
+                });
+            }
+        }
+
+        // Vocabulary popup functions
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz functions
+        function selectChoice(element, value) {
+            // Remove selected class from all choices in this question
+            const choices = element.parentNode.querySelectorAll('.choice');
+            choices.forEach(choice => choice.classList.remove('selected'));
+            
+            // Add selected class to clicked choice
+            element.classList.add('selected');
+            
+            // Actually check the radio button
+            const radioInput = element.querySelector('input[type="radio"]');
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        }
+
+        function checkAnswer(questionNum, correctAnswer) {
+            const selectedChoice = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            const feedback = document.getElementById(`feedback-${questionNum}`);
+            const choices = document.querySelectorAll(`input[name="q${questionNum}"]`);
+            
+            if (!selectedChoice) {
+                alert('Please select an answer first!');
+                return;
+            }
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            
+            if (selectedChoice.value === correctAnswer) {
+                feedback.textContent = 'Correct! Well done!';
+                feedback.className = 'feedback correct';
+                quizAnswers[questionNum] = true;
+                
+                // Play correct answer sound effect
+                const correctSound = document.getElementById('correctSound');
+                if (correctSound) {
+                    correctSound.currentTime = 0; // Reset to start
+                    correctSound.play().catch(e => {
+                        // Handle any audio play errors silently
+                        console.log('Correct sound playback failed:', e);
+                    });
+                }
+                
+                // Mark correct answer
+                choices.forEach(choice => {
+                    const choiceDiv = choice.parentNode;
+                    if (choice.value === correctAnswer) {
+                        choiceDiv.classList.add('correct');
+                    }
+                });
+            } else {
+                feedback.textContent = 'Incorrect. Try again!';
+                feedback.className = 'feedback incorrect';
+                quizAnswers[questionNum] = false;
+                
+                // Mark answers
+                choices.forEach(choice => {
+                    const choiceDiv = choice.parentNode;
+                    if (choice.value === correctAnswer) {
+                        choiceDiv.classList.add('correct');
+                    } else if (choice.checked) {
+                        choiceDiv.classList.add('incorrect');
+                    }
+                });
+            }
+            
+            updateProgress();
+        }
+
+        function checkTextAnswer(questionNum, correctAnswer) {
+            const userAnswer = document.getElementById(`answer-${questionNum}`).value.trim();
+            const feedback = document.getElementById(`feedback-${questionNum}`);
+            const input = document.getElementById(`answer-${questionNum}`);
+            
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+            
+            feedback.style.display = 'block';
+            
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                feedback.textContent = 'Correct! Well done!';
+                feedback.className = 'feedback correct';
+                input.classList.add('correct');
+                quizAnswers[questionNum] = true;
+                
+                // Play correct answer sound effect
+                const correctSound = document.getElementById('correctSound');
+                if (correctSound) {
+                    correctSound.currentTime = 0; // Reset to start
+                    correctSound.play().catch(e => {
+                        // Handle any audio play errors silently
+                        console.log('Correct sound playback failed:', e);
+                    });
+                }
+            } else {
+                feedback.textContent = `Incorrect. The correct answer is: ${correctAnswer}`;
+                feedback.className = 'feedback incorrect';
+                input.classList.add('incorrect');
+                quizAnswers[questionNum] = false;
+            }
+            
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answeredQuestions = Object.keys(quizAnswers).length;
+            const progressPercent = (answeredQuestions / totalQuizPages) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            if (answeredQuestions === totalQuizPages) {
+                setTimeout(() => {
+                    showResults();
+                }, 2000);
+            }
+        }
+
+        function showResults() {
+            correctAnswers = Object.values(quizAnswers).filter(answer => answer).length;
+            document.getElementById('finalScore').textContent = `${correctAnswers}/${totalQuizPages}`;
+            
+            // Hide all quiz pages
+            const pages = document.querySelectorAll('.quiz-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show results
+            document.getElementById('quiz-results').classList.add('active');
+        }
+
+        function nextQuestion() {
+            if (currentQuizPage < totalQuizPages) {
+                document.getElementById(`quiz-page-${currentQuizPage}`).classList.remove('active');
+                currentQuizPage++;
+                document.getElementById(`quiz-page-${currentQuizPage}`).classList.add('active');
+                updateNavButtons();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuizPage > 1) {
+                document.getElementById(`quiz-page-${currentQuizPage}`).classList.remove('active');
+                currentQuizPage--;
+                document.getElementById(`quiz-page-${currentQuizPage}`).classList.add('active');
+                updateNavButtons();
+            }
+        }
+
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = (currentQuizPage === 1);
+            nextBtn.disabled = (currentQuizPage === totalQuizPages);
+        }
+
+        function restartQuiz() {
+            // Reset all variables
+            currentQuizPage = 1;
+            quizAnswers = {};
+            correctAnswers = 0;
+            
+            // Reset progress bar
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // Hide results and show first question
+            document.getElementById('quiz-results').classList.remove('active');
+            document.getElementById('quiz-page-1').classList.add('active');
+            
+            // Reset all inputs and feedback
+            const inputs = document.querySelectorAll('.quiz-input');
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('correct', 'incorrect');
+            });
+            
+            const feedbacks = document.querySelectorAll('.feedback');
+            feedbacks.forEach(feedback => {
+                feedback.style.display = 'none';
+            });
+            
+            const choices = document.querySelectorAll('.choice');
+            choices.forEach(choice => {
+                choice.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            const radioInputs = document.querySelectorAll('input[type="radio"]');
+            radioInputs.forEach(radio => {
+                radio.checked = false;
+            });
+            
+            updateNavButtons();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavButtons();
+            
+            // Close popup when clicking outside
+            document.getElementById('vocabPopup').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePopup();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

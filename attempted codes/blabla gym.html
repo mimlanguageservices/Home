@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Vocabulary</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-left h1 {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .website {
+            color: #6366f1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .header-image {
+            height: 40px;
+            width: auto;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 90px);
+        }
+
+        .navigation {
+            width: 200px;
+            background: #374151;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-item {
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #d1d5db;
+            border: none;
+            background: none;
+            text-align: left;
+            border-radius: 0;
+        }
+
+        .nav-item:hover {
+            background: #4b5563;
+            color: #ffffff;
+        }
+
+        .nav-item.active {
+            background: #6366f1;
+            color: #ffffff;
+        }
+
+        .content {
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .section {
+            display: none;
+            height: 100%;
+            padding: 40px;
+            background: #ffffff;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            color: #374151;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        /* Discussion Section - Slideshow */
+        .discussion-presentation {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .presentation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        .slide-counter {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+            background: #f3f4f6;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .presentation-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: #4f46e5;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slides-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1000px;
+            align-items: center;
+        }
+
+        .slide-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide-image img {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
+        }
+
+        .slide-text h3 {
+            color: #374151;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .slide-text p {
+            color: #6b7280;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .slide-text ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .slide-text li {
+            color: #6b7280;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .slide-text li:before {
+            content: "•";
+            color: #6366f1;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .indicator.active,
+        .indicator:hover {
+            background: #6366f1;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            height: calc(100% - 100px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .level-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+        }
+
+        .level-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #6b7280;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 20px;
+            margin-right: 8px;
+        }
+
+        .level-btn.active,
+        .level-btn:hover {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .sub-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+        }
+
+        .sub-btn {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            color: #6b7280;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 400;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border-radius: 16px;
+            margin-right: 6px;
+        }
+
+        .sub-btn.active,
+        .sub-btn:hover {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .reading-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .reading-level {
+            display: none;
+        }
+
+        .reading-level.active {
+            display: block;
+        }
+
+        .reading-page {
+            display: none;
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-content h3 {
+            color: #374151;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .reading-content p {
+            color: #4b5563;
+            line-height: 1.7;
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .vocab-link {
+            background: #6366f1;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        .vocab-link:hover {
+            background: #4f46e5;
+        }
+
+        /* Video Section */
+        .video-container {
+            height: calc(100% - 80px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Video Discussions */
+        .video-discussions-container {
+            height: calc(100% - 80px);
+            overflow-y: auto;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .video-discussions-container h3 {
+            color: #374151;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .discussion-question-block {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #6366f1;
+        }
+
+        .discussion-question-block h4 {
+            color: #374151;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .discussion-question-block p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            height: calc(100% - 80px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vocab-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+        }
+
+        .page-btn {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #6b7280;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 20px;
+            margin-right: 8px;
+        }
+
+        .page-btn.active,
+        .page-btn:hover {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .flashcard {
+            background: #ffffff;
+            border-radius: 8px;
+            height: 180px;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard-front,
+        .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+            background: #6366f1;
+            color: white;
+        }
+
+        .flashcard-term {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .flashcard-hint {
+            color: #6b7280;
+            font-size: 0.8rem;
+        }
+
+        .flashcard-definition {
+            font-size: 1rem;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            height: calc(100% - 80px);
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+        }
+
+        .question {
+            background: #f9fafb;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .question h3 {
+            color: #374151;
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .choice {
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            padding: 12px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choice:hover {
+            border-color: #6366f1;
+            background: #f0f4ff;
+        }
+
+        .choice.selected {
+            border-color: #6366f1;
+            background: #f0f4ff;
+        }
+
+        .quiz-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .check-button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .check-button:hover {
+            background: #4f46e5;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 20px;
+            color: #374151;
+        }
+
+        /* Writing Section */
+        .writing-container {
+            height: calc(100% - 80px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .writing-content h3 {
+            color: #374151;
+            font-size: 1.6rem;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .writing-content p {
+            color: #6b7280;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        /* Popup */
+        .vocab-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .popup-word {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+
+        .popup-definition {
+            font-size: 1rem;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .close-popup {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 16px;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .navigation {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 0;
+            }
+
+            .slide-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elements for sound effects -->
+    <audio id="flipSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>Gym Vocabulary</h1>
+            <div class="website">mimlanguageservices</div>
+        </div>
+        <div style="background: #f97316; color: white; padding: 8px 16px; font-weight: bold; font-size: 1.2rem;">MIM</div>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussion</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section -->
+            <div class="section active" id="discussion">
+                <h2>Discussion: Fitness and Exercise</h2>
+                <div class="discussion-presentation">
+                    <div class="presentation-header">
+                        <div class="slide-counter">Slide <span id="currentSlide">1</span> of <span id="totalSlides">10</span></div>
+                        <div class="presentation-controls">
+                            <button class="nav-btn" onclick="previousSlide()" id="prevSlideBtn">Previous</button>
+                            <button class="nav-btn" onclick="nextSlide()" id="nextSlideBtn">Next</button>
+                        </div>
+                    </div>
+                    
+                    <div class="slides-container">
+                        <!-- Slide 1: Gym Experience -->
+                        <div class="slide active" id="slide-1">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop&crop=center" alt="Modern Gym Interior with Equipment" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Gym Experience</h3>
+                                    <p>Have you ever been to a gym? What equipment did you see there?</p>
+                                    <ul>
+                                        <li>What machines or exercises looked interesting to you?</li>
+                                        <li>Which equipment seemed intimidating?</li>
+                                        <li>How did the gym atmosphere feel?</li>
+                                        <li>What was your first impression?</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: Exercise Preferences -->
+                        <div class="slide" id="slide-2">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Exercise Preferences</h3>
+                                    <p>Do you prefer cardio exercises or strength training? Why do different people enjoy different types of exercise?</p>
+                                    <ul>
+                                        <li>Benefits of cardio vs strength training</li>
+                                        <li>Personal preferences and body types</li>
+                                        <li>Goals that influence exercise choice</li>
+                                        <li>How to find what you enjoy most</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Fitness Goals -->
+                        <div class="slide" id="slide-3">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Fitness Goals</h3>
+                                    <p>What are some healthy reasons people exercise? How would you describe your ideal fitness routine?</p>
+                                    <ul>
+                                        <li>Setting realistic and achievable goals</li>
+                                        <li>Health benefits beyond appearance</li>
+                                        <li>Mental health and exercise connection</li>
+                                        <li>Long-term vs short-term objectives</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: Group vs Individual -->
+                        <div class="slide" id="slide-4">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Group vs Individual Exercise</h3>
+                                    <p>Some people prefer exercising alone, while others like group classes. Which do you prefer and why?</p>
+                                    <ul>
+                                        <li>Benefits of exercising alone vs in groups</li>
+                                        <li>How social support affects motivation</li>
+                                        <li>Which environment helps you focus better</li>
+                                        <li>Examples of solo vs group activities</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 5: Exercise Motivation -->
+                        <div class="slide" id="slide-5">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Exercise Motivation</h3>
+                                    <p>What motivates you to exercise regularly? How do you overcome exercise barriers?</p>
+                                    <ul>
+                                        <li>Finding internal vs external motivation</li>
+                                        <li>Dealing with time constraints</li>
+                                        <li>Overcoming mental barriers</li>
+                                        <li>Creating sustainable habits</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 6: Gym Culture -->
+                        <div class="slide" id="slide-6">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Gym Culture and Etiquette</h3>
+                                    <p>What are some important rules or customs in gyms? How can beginners feel more comfortable?</p>
+                                    <ul>
+                                        <li>Basic gym etiquette and manners</li>
+                                        <li>Equipment sharing and cleaning</li>
+                                        <li>Asking for help and spotting</li>
+                                        <li>Building confidence as a beginner</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 7: Home vs Gym Workouts -->
+                        <div class="slide" id="slide-7">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Home vs Gym Workouts</h3>
+                                    <p>What are the advantages and disadvantages of working out at home versus at a gym?</p>
+                                    <ul>
+                                        <li>Cost comparison and budget considerations</li>
+                                        <li>Equipment availability and variety</li>
+                                        <li>Motivation and distraction factors</li>
+                                        <li>Convenience and scheduling flexibility</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 8: Fitness Technology -->
+                        <div class="slide" id="slide-8">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Fitness Technology</h3>
+                                    <p>How do fitness apps, trackers, and technology help with exercise? Do you use any fitness technology?</p>
+                                    <ul>
+                                        <li>Fitness apps and their benefits</li>
+                                        <li>Wearable devices and tracking progress</li>
+                                        <li>Online workout videos and classes</li>
+                                        <li>Technology motivation vs traditional methods</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 9: Injury Prevention -->
+                        <div class="slide" id="slide-9">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Injury Prevention and Safety</h3>
+                                    <p>How can people exercise safely and avoid injuries? What should beginners know about proper form?</p>
+                                    <ul>
+                                        <li>Importance of warming up and cooling down</li>
+                                        <li>Learning proper form and technique</li>
+                                        <li>Recognizing body signals and limits</li>
+                                        <li>When to seek professional guidance</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 10: Fitness Lifestyle -->
+                        <div class="slide" id="slide-10">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" alt="Discussion Topic Image" />
+                                </div>
+                                <div class="slide-text">
+                                    <h3>Fitness as a Lifestyle</h3>
+                                    <p>How can exercise become a natural part of daily life? What role does fitness play in overall wellbeing?</p>
+                                    <ul>
+                                        <li>Making fitness a sustainable habit</li>
+                                        <li>Balancing exercise with work and family</li>
+                                        <li>Fitness influence on sleep and energy</li>
+                                        <li>Building a supportive fitness community</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator active" onclick="goToSlide(1)"></span>
+                        <span class="indicator" onclick="goToSlide(2)"></span>
+                        <span class="indicator" onclick="goToSlide(3)"></span>
+                        <span class="indicator" onclick="goToSlide(4)"></span>
+                        <span class="indicator" onclick="goToSlide(5)"></span>
+                        <span class="indicator" onclick="goToSlide(6)"></span>
+                        <span class="indicator" onclick="goToSlide(7)"></span>
+                        <span class="indicator" onclick="goToSlide(8)"></span>
+                        <span class="indicator" onclick="goToSlide(9)"></span>
+                        <span class="indicator" onclick="goToSlide(10)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading: Understanding Fitness</h2>
+                <div class="reading-container">
+                    <div class="level-nav">
+                        <button class="level-btn active" onclick="showLevel('A2', this)">A2 Level</button>
+                        <button class="level-btn" onclick="showLevel('B1', this)">B1 Level</button>
+                        <button class="level-btn" onclick="showLevel('B2', this)">B2 Level</button>
+                    </div>
+
+                    <div class="sub-nav">
+                        <button class="sub-btn active" onclick="showReadingPage('A2', 1, this)">Introduction</button>
+                        <button class="sub-btn" onclick="showReadingPage('A2', 2, this)">Gym Equipment</button>
+                        <button class="sub-btn" onclick="showReadingPage('A2', 3, this)">Exercise Types</button>
+                        <button class="sub-btn" onclick="showReadingPage('A2', 4, this)">Safety Tips</button>
+                    </div>
+                    
+                    <div class="reading-content">
+                        <!-- A2 Level -->
+                        <div class="reading-level active" id="A2">
+                            <!-- Page 1 -->
+                            <div class="reading-page active" id="A2-page-1">
+                                <h3>What is a Gym?</h3>
+                                <p>A <span class="vocab-link" onclick="showPopup('gym', 'A place with exercise equipment and fitness classes')">gym</span> is a place where people go to exercise. At the gym, you can find many different types of <span class="vocab-link" onclick="showPopup('equipment', 'Tools and machines used for exercise')">equipment</span> for working out.</p>
+                                
+                                <p>Most gyms have <span class="vocab-link" onclick="showPopup('cardio machines', 'Exercise machines that improve heart health')">cardio machines</span> like <span class="vocab-link" onclick="showPopup('treadmill', 'A machine for running or walking in place')">treadmills</span> and <span class="vocab-link" onclick="showPopup('bikes', 'Stationary bikes for cardio exercise')">stationary bicycles</span>. These machines help improve your heart health.</p>
+                                
+                                <p>People also use <span class="vocab-link" onclick="showPopup('weights', 'Heavy objects used for strength training')">weights</span> to build muscle strength. Many gyms have <span class="vocab-link" onclick="showPopup('personal trainers', 'Fitness professionals who help with workouts')">personal trainers</span> who can help you learn how to exercise safely.</p>
+                            </div>
+
+                            <!-- Page 2 -->
+                            <div class="reading-page" id="A2-page-2">
+                                <h3>Common Gym Equipment</h3>
+                                <p><span class="vocab-link" onclick="showPopup('dumbbells', 'Small weights held in each hand')">Dumbbells</span> are small weights that you hold in your hands. They come in different sizes and weights. Beginners usually start with lighter weights.</p>
+                                
+                                <p>A <span class="vocab-link" onclick="showPopup('bench', 'A padded platform for exercises')">bench</span> is used for many exercises. You can lie on it or sit on it while lifting weights. <span class="vocab-link" onclick="showPopup('barbells', 'Long bars with weights on each end')">Barbells</span> are long bars with weights on both ends.</p>
+                                
+                                <p>For cardio exercise, many people use the <span class="vocab-link" onclick="showPopup('elliptical', 'A low-impact cardio machine')">elliptical machine</span>. This machine is easier on your joints than running.</p>
+                            </div>
+
+                            <!-- Page 3 -->
+                            <div class="reading-page" id="A2-page-3">
+                                <h3>Types of Exercise</h3>
+                                <p>There are two main types of exercise: <span class="vocab-link" onclick="showPopup('cardio', 'Exercise that improves heart and lung health')">cardio</span> and <span class="vocab-link" onclick="showPopup('strength training', 'Exercise using weights or resistance')">strength training</span>.</p>
+                                
+                                <p>Cardio exercises make your heart beat faster. Examples include running, walking, and cycling. These exercises help you burn calories and improve your <span class="vocab-link" onclick="showPopup('endurance', 'The ability to exercise for long periods')">endurance</span>.</p>
+                                
+                                <p>Strength training helps build muscle. Common exercises include <span class="vocab-link" onclick="showPopup('push-ups', 'Bodyweight exercise for upper body')">push-ups</span>, <span class="vocab-link" onclick="showPopup('squats', 'Lower body exercise')">squats</span>, and lifting weights.</p>
+                            </div>
+
+                            <!-- Page 4 -->
+                            <div class="reading-page" id="A2-page-4">
+                                <h3>Exercise Safety</h3>
+                                <p>Before exercising, it's important to do a <span class="vocab-link" onclick="showPopup('warm-up', 'Light exercise done before main workout')">warm-up</span>. This prepares your body for exercise and helps prevent injuries.</p>
+                                
+                                <p>After your workout, you should do <span class="vocab-link" onclick="showPopup('stretching', 'Exercises to improve flexibility')">stretching</span> exercises. Stretching helps your muscles relax and improves <span class="vocab-link" onclick="showPopup('flexibility', 'The range of motion in joints')">flexibility</span>.</p>
+                                
+                                <p>Always listen to your body. If something hurts, stop exercising. Regular exercise helps you stay healthy and feel good, but safety comes first.</p>
+                            </div>
+                        </div>
+
+                        <!-- B1 Level -->
+                        <div class="reading-level" id="B1">
+                            <div class="reading-page active" id="B1-page-1">
+                                <h3>The Benefits of Regular Exercise</h3>
+                                <p>Regular <span class="vocab-link" onclick="showPopup('physical activity', 'Any form of exercise or movement')">physical activity</span> is essential for maintaining good health. <span class="vocab-link" onclick="showPopup('cardiovascular', 'Related to heart and blood vessels')">Cardiovascular</span> exercises like running, swimming, and cycling improve heart health and increase endurance.</p>
+                                
+                                <p>Strength training with barbells and resistance machines helps build muscle mass and bone density. Many people work with a personal trainer to learn proper <span class="vocab-link" onclick="showPopup('technique', 'The correct way to perform an exercise')">technique</span> and avoid injuries.</p>
+                                
+                                <p>A balanced <span class="vocab-link" onclick="showPopup('fitness routine', 'A planned schedule of exercises')">fitness routine</span> should include both cardio and strength exercises, along with flexibility work. Setting realistic <span class="vocab-link" onclick="showPopup('fitness goals', 'Specific targets for health and exercise')">fitness goals</span> helps maintain <span class="vocab-link" onclick="showPopup('motivation', 'The drive to continue exercising')">motivation</span>.</p>
+                            </div>
+                        </div>
+
+                        <!-- B2 Level -->
+                        <div class="reading-level" id="B2">
+                            <div class="reading-page active" id="B2-page-1">
+                                <h3>Exercise Physiology and Performance</h3>
+                                <p>Understanding <span class="vocab-link" onclick="showPopup('exercise physiology', 'The study of how the body responds to exercise')">exercise physiology</span> can significantly enhance workout effectiveness. <span class="vocab-link" onclick="showPopup('high-intensity', 'Very demanding exercise requiring maximum effort')">High-intensity interval training</span> (HIIT) has gained popularity due to its efficiency in burning calories and improving <span class="vocab-link" onclick="showPopup('metabolic rate', 'The speed at which the body burns calories')">metabolic rate</span>.</p>
+                                
+                                <p><span class="vocab-link" onclick="showPopup('progressive overload', 'Gradually increasing exercise difficulty')">Progressive overload</span> is a fundamental principle where you gradually increase the intensity, duration, or frequency of exercise. This methodology ensures continuous improvement and prevents <span class="vocab-link" onclick="showPopup('plateaus', 'Periods where progress stops')">training plateaus</span>.</p>
+                                
+                                <p>Modern fitness incorporates <span class="vocab-link" onclick="showPopup('biomechanics', 'The study of body movement and mechanics')">biomechanical</span> analysis to optimize performance. <span class="vocab-link" onclick="showPopup('functional training', 'Exercise that mimics daily life movements')">Functional training</span> focuses on movements that translate to real-world activities.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Gym Equipment Guide</h2>
+                <div class="video-container">
+                    <iframe 
+                        src="https://www.youtube.com/embed/m1UF4RgGoY0?start=115&end=322&autoplay=0&rel=0" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- Video Discussion Section -->
+            <div class="section" id="video-discussions">
+                <h2>Video Discussion Questions</h2>
+                <div class="video-discussions-container">
+                    <h3>Video Discussion Questions</h3>
+                    
+                    <div class="discussion-question-block">
+                        <h4>1. Equipment Categories</h4>
+                        <p>The video shows three main categories of gym equipment: cardio machines, strength training machines, and free weights. Which category interests you most and why?</p>
+                    </div>
+                    
+                    <div class="discussion-question-block">
+                        <h4>2. Safety Considerations</h4>
+                        <p>What safety tips did you notice in the video? Why is it important to learn proper form before using gym equipment?</p>
+                    </div>
+                    
+                    <div class="discussion-question-block">
+                        <h4>3. Beginner-Friendly Equipment</h4>
+                        <p>Which pieces of equipment shown in the video seem most suitable for beginners? How can beginners learn proper form before attempting advanced exercises?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Gym Vocabulary Flashcards</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Exercises</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Cardio Equipment</button>
+                        <button class="page-btn" onclick="showVocabPage(3, this)">Weight Equipment</button>
+                    </div>
+
+                    <!-- Exercises Page -->
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Push-ups</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Bodyweight exercise where you push your body up from the ground</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Squats</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Lower body exercise where you lower and raise your body by bending your knees</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Lunges</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Exercise where you step forward and lower your body by bending both knees</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Planks</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Core strengthening exercise where you hold a straight position like a wooden plank</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cardio Equipment Page -->
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Treadmill</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A machine with a moving belt for running or walking in place</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Elliptical</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A low-impact cardio machine that simulates running without joint stress</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Stationary Bike</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">An exercise bike that stays in one place for indoor cycling workouts</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Rowing Machine</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A machine that simulates rowing a boat for full-body cardio exercise</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weight Equipment Page -->
+                    <div class="vocab-page" id="vocab-page-3">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Dumbbells</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Small weights held in each hand for strength training exercises</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Barbell</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A long bar with weights on each end used for heavy lifting exercises</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Kettlebell</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A cast iron weight with a handle used for dynamic strength and cardio exercises</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Weight Bench</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A padded platform used for supporting the body during weight lifting exercises</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="section" id="quiz">
+                <h2>Interactive Quiz</h2>
+                <div class="quiz-container">
+                    <div id="quiz-content">
+                        <!-- Quiz questions will be generated by JavaScript -->
+                    </div>
+                    <button class="check-button" onclick="checkAnswers()">Check Answers</button>
+                    <div class="score-display" id="scoreDisplay"></div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>Writing Exercise</h2>
+                <div class="writing-container">
+                    <div class="writing-content">
+                        <h3>Writing Exercise</h3>
+                        <p>Write a 150-word paragraph describing a fitness routine for a friend or family member. Use at least 8 vocabulary words from this lesson.</p>
+                        <p><strong>Include:</strong></p>
+                        <p>• What equipment they should use<br>
+                        • What exercises they should do<br>
+                        • Your fitness goals</p>
+                        <p><em>Complete this exercise on paper or in your notebook.</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Popup -->
+    <div class="vocab-popup" id="vocabPopup">
+        <div class="popup-content">
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+            <button class="close-popup" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlideNumber = 1;
+        let currentReadingLevel = 'A2';
+        const totalSlides = 10;
+
+        // Navigation Functions
+        function showSection(sectionName, element) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            element.classList.add('active');
+        }
+
+        // Discussion Slideshow Functions
+        function nextSlide() {
+            if (currentSlideNumber < totalSlides) {
+                goToSlide(currentSlideNumber + 1);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlideNumber > 1) {
+                goToSlide(currentSlideNumber - 1);
+            }
+        }
+
+        function goToSlide(slideNumber) {
+            // Hide current slide
+            document.getElementById(`slide-${currentSlideNumber}`).classList.remove('active');
+            document.querySelectorAll('.indicator')[currentSlideNumber - 1].classList.remove('active');
+            
+            // Show new slide
+            currentSlideNumber = slideNumber;
+            document.getElementById(`slide-${currentSlideNumber}`).classList.add('active');
+            document.querySelectorAll('.indicator')[currentSlideNumber - 1].classList.add('active');
+            
+            // Update counter
+            document.getElementById('currentSlide').textContent = currentSlideNumber;
+            
+            // Update button states
+            document.getElementById('prevSlideBtn').disabled = currentSlideNumber === 1;
+            document.getElementById('nextSlideBtn').disabled = currentSlideNumber === totalSlides;
+        }
+
+        // Reading Level Functions
+        function showLevel(level, element) {
+            // Hide all levels
+            const levels = document.querySelectorAll('.reading-level');
+            levels.forEach(lvl => lvl.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.level-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected level
+            document.getElementById(level).classList.add('active');
+            element.classList.add('active');
+            
+            currentReadingLevel = level;
+            
+            // Update sub-navigation
+            updateSubNavigation(level);
+        }
+
+        function updateSubNavigation(level) {
+            const subNav = document.querySelector('.sub-nav');
+            const subButtons = ['Introduction', 'Gym Equipment', 'Exercise Types', 'Safety Tips'];
+            
+            subNav.innerHTML = '';
+            subButtons.forEach((title, index) => {
+                const button = document.createElement('button');
+                button.className = `sub-btn ${index === 0 ? 'active' : ''}`;
+                button.textContent = title;
+                button.onclick = () => showReadingPage(level, index + 1, button);
+                subNav.appendChild(button);
+            });
+            
+            // Show first page by default
+            showReadingPage(level, 1, subNav.children[0]);
+        }
+
+        function showReadingPage(level, pageNum, element) {
+            // Hide all pages for current level
+            const pages = document.querySelectorAll(`#${level} .reading-page`);
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from sub-nav buttons
+            const buttons = document.querySelectorAll('.sub-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            const targetPage = document.getElementById(`${level}-page-${pageNum}`);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // Vocabulary Functions
+        function showVocabPage(pageNum, element) {
+            const pages = document.querySelectorAll('.vocab-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            
+            const flipSound = document.getElementById('flipSound');
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => {
+                    console.log('Audio playback failed:', e);
+                });
+            }
+        }
+
+        // Vocabulary Popup Functions
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz Functions
+        const quizQuestions = [
+            {
+                type: 'multiple',
+                question: 'What is a treadmill used for?',
+                choices: ['Lifting weights', 'Running or walking', 'Stretching', 'Swimming'],
+                correct: 1
+            },
+            {
+                type: 'multiple',
+                question: 'Which exercise targets the core muscles?',
+                choices: ['Bicep curls', 'Planks', 'Leg press', 'Shoulder press'],
+                correct: 1
+            },
+            {
+                type: 'fill',
+                question: 'Small weights held in each hand are called ________.',
+                answer: 'dumbbells'
+            },
+            {
+                type: 'multiple',
+                question: 'What should you do before exercising?',
+                choices: ['Cool down', 'Warm up', 'Stretch only', 'Lift heavy weights'],
+                correct: 1
+            },
+            {
+                type: 'fill',
+                question: 'A ________ is a machine with a moving belt for running.',
+                answer: 'treadmill'
+            }
+        ];
+
+        function generateQuiz() {
+            const quizContent = document.getElementById('quiz-content');
+            quizContent.innerHTML = '';
+            
+            quizQuestions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                
+                if (question.type === 'multiple') {
+                    questionDiv.innerHTML = `
+                        <h3>Question ${index + 1}</h3>
+                        <p>${question.question}</p>
+                        <div class="choices">
+                            ${question.choices.map((choice, i) => 
+                                `<div class="choice" onclick="selectChoice(this, ${index}, ${i})">${choice}</div>`
+                            ).join('')}
+                        </div>
+                    `;
+                } else {
+                    questionDiv.innerHTML = `
+                        <h3>Question ${index + 1}</h3>
+                        <p>${question.question}</p>
+                        <input type="text" class="quiz-input" id="fill-${index}" placeholder="Enter your answer">
+                    `;
+                }
+                
+                quizContent.appendChild(questionDiv);
+            });
+        }
+
+        function selectChoice(element, questionIndex, choiceIndex) {
+            // Remove selection from other choices in this question
+            const questionDiv = element.closest('.question');
+            const choices = questionDiv.querySelectorAll('.choice');
+            choices.forEach(choice => choice.classList.remove('selected'));
+            
+            // Select this choice
+            element.classList.add('selected');
+            element.dataset.questionIndex = questionIndex;
+            element.dataset.choiceIndex = choiceIndex;
+        }
+
+        function checkAnswers() {
+            let score = 0;
+            const totalQuestions = quizQuestions.length;
+            
+            // Check multiple choice questions
+            const selectedChoices = document.querySelectorAll('.choice.selected');
+            selectedChoices.forEach(choice => {
+                const questionIndex = parseInt(choice.dataset.questionIndex);
+                const choiceIndex = parseInt(choice.dataset.choiceIndex);
+                
+                if (quizQuestions[questionIndex].correct === choiceIndex) {
+                    score++;
+                    choice.style.background = '#d4edda';
+                    choice.style.borderColor = '#28a745';
+                } else {
+                    choice.style.background = '#f8d7da';
+                    choice.style.borderColor = '#dc3545';
+                }
+            });
+            
+            // Check fill-in-the-blank questions
+            quizQuestions.forEach((question, index) => {
+                if (question.type === 'fill') {
+                    const input = document.getElementById(`fill-${index}`);
+                    if (input) {
+                        const answer = input.value.toLowerCase().trim();
+                        if (answer === question.answer.toLowerCase()) {
+                            score++;
+                            input.style.borderColor = '#28a745';
+                            input.style.background = '#d4edda';
+                        } else {
+                            input.style.borderColor = '#dc3545';
+                            input.style.background = '#f8d7da';
+                        }
+                    }
+                }
+            });
+            
+            const percentage = Math.round((score / totalQuestions) * 100);
+            document.getElementById('scoreDisplay').innerHTML = 
+                `Your Score: ${score}/${totalQuestions} (${percentage}%)`;
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            generateQuiz();
+            goToSlide(1);
+            updateSubNavigation('A2');
+            
+            // Click outside popup to close
+            const vocabPopup = document.getElementById('vocabPopup');
+            if (vocabPopup) {
+                vocabPopup.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closePopup();
+                    }
+                });
+            }
+        });
+
+        // Keyboard navigation for slideshow
+        document.addEventListener('keydown', function(event) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (event.key === 'ArrowRight' || event.key === ' ') {
+                    nextSlide();
+                    event.preventDefault();
+                } else if (event.key === 'ArrowLeft') {
+                    previousSlide();
+                    event.preventDefault();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
