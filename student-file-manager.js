@@ -19,20 +19,20 @@ class StudentFileManager {
 
         // Column mapping based on the Google Sheets structure
         this.columnMap = {
-            ASSIGNED_TEACHER: 0,    // Column A
+            ASSIGNED_TEACHER: 0,    // Column A (unused)
             STUDENT_NAME: 1,        // Column B (key field for HTML creation)
-            CONTRACT: 2,            // Column C
-            WORKPLACE: 3,           // Column D
-            EMAIL: 4,               // Column E
-            PHONE: 5,               // Column F
-            IMAGE_URL: 6,           // Column G
-            ROLE: 7,                // Column H
-            CLASS_LINK: 8,          // Column I
-            WHATSAPP: 9,            // Column J
-            LEVEL: 10,              // Column K
-            VOCABULARY_URL: 11,     // Column L (moved from M to L)
-            FINISHED_ACTIVITIES: 12, // Column M (moved from N to M)
-            LEARNING_OBJECTIVE: 13  // Column N (moved from L to N)
+            CONTRACT: 2,            // Column C (unused)
+            WORKPLACE: 5,           // Column F
+            FINISHED_ACTIVITIES: 4, // Column E (URLs for finished activities tab - reverse order)
+            ROLE: 6,                // Column G
+            NATIONALITY: 7,         // Column H
+            LOCATION: 8,            // Column I
+            EMAIL: 9,               // Column J (contains mailto function)
+            WHATSAPP: 10,           // Column K (WhatsApp number - prepend https://wa.me/)
+            IMAGE_URL: 11,          // Column L (Profile Picture)
+            CLASS_LINK: 12,         // Column M (Class Link on Contact Teacher Page)
+            VOCABULARY_URL: 13,     // Column N (keeping for vocabulary tab)
+            LEARNING_OBJECTIVE: 14  // Column O (keeping for learning objectives)
         };
 
         this.existingFiles = new Set();
