@@ -228,6 +228,11 @@ class StudentFileManager {
         // Process vocabulary URL to hide Google Sheets UI
         const processedVocabularyUrl = this.processVocabularyUrl(student.vocabularyUrl);
 
+        console.log(`🔍 DEBUG createPlaceholders for ${student.name}:`);
+        console.log(`  - student.level: "${student.level}"`);
+        console.log(`  - student.vocabularyUrl: "${student.vocabularyUrl}"`);
+        console.log(`  - processedVocabularyUrl: "${processedVocabularyUrl}"`);
+
         return {
             '{{STUDENT_NAME}}': student.name,
             '{{STUDENT_PHOTO}}': student.imageUrl,
