@@ -666,7 +666,7 @@ Examples:
                     break;
 
                 case 'auto':
-                    const minutes = parseInt(args[1]) || 5;
+                    const minutes = parseInt(args[1]) || 1;
                     await manager.syncAllFiles(); // Initial sync
                     manager.startAutoSync(minutes);
                     break;
