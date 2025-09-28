@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enshittification - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Section */
+        .discussion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr 1fr 1fr;
+            gap: 25px;
+            height: calc(100% - 120px);
+        }
+
+        .discussion-header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .actual-image {
+            width: 300px;
+            height: 200px;
+            border: none;
+            border-radius: 16px;
+            margin: 0 auto 20px;
+            object-fit: cover;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .discussion-question {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .discussion-question:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .discussion-question h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .discussion-question p {
+            color: #4a5568;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 280px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .flashcard-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+            color: #a0aec0;
+            opacity: 0.8;
+        }
+
+        .flashcard:hover .flashcard-inner {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* NEW QUIZ SYSTEM STYLES */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .quiz-input.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .quiz-input.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice input[type="radio"] {
+            display: none;
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.correct {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.incorrect {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .check-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: rgba(160, 174, 192, 0.5);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-weight: 500;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        /* Video Section */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 15px;
+            justify-content: center;
+        }
+
+        /* Video Discussions Section */
+        .video-discussions-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+
+            .header .website a {
+                font-size: 1rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+                margin-top: 15px;
+            }
+
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 20px 15px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                background: rgba(45, 55, 72, 0.95);
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 120px;
+                margin: 5px;
+                font-size: 0.95rem;
+                padding: 12px 16px;
+                border-radius: 20px;
+            }
+
+            .content {
+                height: auto;
+                overflow: visible;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .section {
+                padding: 25px 15px;
+                height: auto;
+                overflow: visible;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .discussion-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                height: auto;
+            }
+
+            .discussion-header {
+                order: -1;
+                padding: 20px;
+            }
+
+            .actual-image {
+                width: 250px;
+                height: 150px;
+                margin: 0 auto 15px;
+                border-radius: 12px;
+            }
+
+            .discussion-question {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .discussion-question h3 {
+                font-size: 1.3rem;
+            }
+
+            .discussion-question p {
+                font-size: 1rem;
+            }
+
+            .reading-container {
+                height: auto;
+            }
+
+            .reading-nav, .reading-subnav {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .page-btn {
+                font-size: 0.95rem;
+                padding: 10px 16px;
+                flex: 1;
+                min-width: 100px;
+                border-radius: 20px;
+            }
+
+            .reading-page {
+                height: auto;
+                overflow: visible;
+                max-height: none;
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            .reading-page h3 {
+                font-size: 1.5rem;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+                line-height: 1.7;
+            }
+
+            .vocab-container {
+                height: auto;
+            }
+
+            .vocab-nav {
+                gap: 8px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                height: auto;
+            }
+
+            .flashcard {
+                height: 200px;
+            }
+
+            .flashcard-front, .flashcard-back {
+                border-radius: 16px;
+            }
+
+            .flashcard-term {
+                font-size: 1.7rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.3rem;
+            }
+
+            .flashcard-hint {
+                font-size: 1rem;
+            }
+
+            .quiz-container {
+                height: auto;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .quiz-nav {
+                justify-content: center;
+            }
+
+            .nav-btn {
+                font-size: 1rem;
+                padding: 10px 20px;
+                border-radius: 20px;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+                margin: 0 10px;
+                border-radius: 16px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.6rem;
+                margin-bottom: 25px;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                max-width: 100%;
+            }
+
+            .choice {
+                font-size: 1.1rem;
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .quiz-input {
+                font-size: 1.3rem;
+                max-width: 100%;
+                padding: 15px 20px;
+                border-radius: 20px;
+            }
+
+            .check-button {
+                font-size: 1.3rem;
+                padding: 15px 30px;
+                margin: 20px auto;
+                border-radius: 20px;
+            }
+
+            .feedback {
+                font-size: 1rem;
+                margin: 20px 10px;
+                border-radius: 10px;
+            }
+
+            .results-summary {
+                padding: 30px 20px;
+                margin: 0 10px;
+                border-radius: 16px;
+            }
+
+            .results-summary h3 {
+                font-size: 1.8rem;
+            }
+
+            .score {
+                font-size: 3rem;
+            }
+
+            .popup-content {
+                margin: 15px;
+                padding: 30px 25px;
+                max-width: 90%;
+                border-radius: 16px;
+            }
+
+            .popup-word {
+                font-size: 1.6rem;
+            }
+
+            .popup-definition {
+                font-size: 1.1rem;
+            }
+
+            .popup-close {
+                border-radius: 20px;
+            }
+
+            .vocab-link {
+                font-size: 1rem;
+                padding: 3px 8px;
+                display: inline-block;
+                margin: 1px;
+                border-radius: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .nav-item {
+                font-size: 0.85rem;
+                padding: 10px 12px;
+                min-width: 100px;
+            }
+
+            .section {
+                padding: 20px 12px;
+            }
+
+            .section h2 {
+                font-size: 1.6rem;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard {
+                height: 180px;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+
+            .reading-page {
+                padding: 20px 15px;
+            }
+
+            .discussion-question {
+                padding: 18px;
+            }
+
+            .actual-image {
+                width: 200px;
+                height: 120px;
+            }
+
+            .quiz-input {
+                font-size: 1.2rem;
+                padding: 12px 16px;
+            }
+
+            .check-button {
+                font-size: 1.2rem;
+                padding: 12px 25px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .nav-item,
+            .choice,
+            .flashcard,
+            .vocab-link,
+            .check-button,
+            .page-btn {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .vocab-link {
+                min-height: 32px;
+                line-height: 1.2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elements for sound effects -->
+    <audio id="flipSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>Enshittification</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="openWritingForm(this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section -->
+            <div class="section active" id="discussion">
+                <h2>Discussion: Platform Degradation</h2>
+                <div class="discussion-grid">
+                    <div class="discussion-header">
+                        <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Digital Platform Decline" class="actual-image">
+                    </div>
+                    
+                    <div class="discussion-question">
+                        <h3>Platform Experience</h3>
+                        <p>Think about a social media platform or app you've used for several years. How has your experience changed? Have you noticed more advertisements, altered algorithms, or features that seem designed to keep you engaged longer?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>Business Model Impact</h3>
+                        <p>Why do you think platforms prioritize attracting users first, then businesses, before finally extracting maximum value? What does this pattern reveal about how digital businesses operate in competitive markets?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>User Response</h3>
+                        <p>When platforms become frustrating or manipulative, what options do users have? Have you ever stopped using a platform because it became too difficult or annoying to use? What made you switch?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>Regulation and Solutions</h3>
+                        <p>Should governments regulate how digital platforms operate? What role should competition, user education, or alternative platforms play in preventing the enshittification of digital services?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading: Understanding Enshittification</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('B1', this)">B1 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
+                    </div>
+                    
+                    <!-- Sub-navigation for each level -->
+                    <div class="reading-subnav" id="reading-subnav">
+                        <button class="page-btn active" onclick="showReadingPage(1, this)">Platform Changes</button>
+                        <button class="page-btn" onclick="showReadingPage(2, this)">The Three Stages</button>
+                        <button class="page-btn" onclick="showReadingPage(3, this)">Real Examples</button>
+                        <button class="page-btn" onclick="showReadingPage(4, this)">User Impact</button>
+                    </div>
+
+                    <!-- B1 Level Reading Pages -->
+                    <div class="reading-level" id="B1-level">
+                        <div class="reading-page active" id="B1-page-1">
+                            <h3>Why My Favorite Apps Got Worse</h3>
+                            <p>
+                                My name is Alex, and I've been using social media and online platforms for over ten years. Recently, I've noticed that many of my favorite apps and websites have become much more difficult to use. At first, I thought it was just me, but then I learned about something called <span class="vocab-link" onclick="showPopup('enshittification', 'The process of digital platforms becoming worse over time')">enshittification</span>.
+                            </p>
+                            <p>
+                                This word was created by a technology writer named Cory Doctorow. He noticed that many <span class="vocab-link" onclick="showPopup('digital platforms', 'Online services like social media sites and apps')">digital platforms</span> follow the same pattern: they start great, but then slowly become terrible. The word "enshittification" uses strong language to describe how users feel when their favorite services get much worse.
+                            </p>
+                            <p>
+                                For example, I remember when Facebook was simple and clean. I could see posts from my friends in the order they were posted. Now, the <span class="vocab-link" onclick="showPopup('algorithm', 'Computer program that decides what content users see')">algorithm</span> decides what I see, and there are advertisements everywhere. The platform has become much more focused on keeping me engaged and making money than helping me connect with friends.
+                            </p>
+                            <p>
+                                The same thing happened with YouTube. When I first started using it, there were very few ads and creators could easily make money from their videos. Now there are multiple <span class="vocab-link" onclick="showPopup('ad breaks', 'Interruptions in videos to show advertisements')">ad breaks</span> in each video, and many creators struggle to earn money because the rules keep changing.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-2">
+                            <h3>How Platforms Change in Three Steps</h3>
+                            <p>
+                                According to Doctorow, enshittification happens in three clear stages. Understanding these stages helps explain why so many platforms follow the same pattern of getting worse over time.
+                            </p>
+                            <p>
+                                <strong>Stage 1: Attract Users</strong><br>
+                                In the beginning, platforms focus completely on <span class="vocab-link" onclick="showPopup('user experience', 'How easy and enjoyable a service is to use')">user experience</span>. They offer great features for free and make their services as attractive as possible. The goal is to get as many people as possible to start using the platform. Instagram started this way – it was just a simple way to share photos with friends.
+                            </p>
+                            <p>
+                                <strong>Stage 2: Attract Businesses</strong><br>
+                                Once the platform has millions of users, it starts focusing on businesses and advertisers. Companies want to reach all those users, so they're willing to pay for <span class="vocab-link" onclick="showPopup('advertising space', 'Places on websites or apps where ads can be shown')">advertising space</span>. The platform begins changing its features to help businesses reach customers, even if this makes the experience less enjoyable for regular users.
+                            </p>
+                            <p>
+                                <strong>Stage 3: Extract Maximum Value</strong><br>
+                                Finally, the platform stops caring about users or businesses and focuses only on making as much money as possible. They increase ad prices, reduce the quality of their service, and make it harder for people to leave. At this point, both users and businesses are unhappy, but the platform has become so powerful that it's difficult to find alternatives.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-3">
+                            <h3>Examples from Popular Platforms</h3>
+                            <p>
+                                Let me share some specific examples of how platforms I use have changed over the years. These changes show enshittification in action.
+                            </p>
+                            <p>
+                                <strong>Facebook/Meta:</strong><br>
+                                When I first joined Facebook, it was just a way to connect with university friends. The <span class="vocab-link" onclick="showPopup('news feed', 'Stream of posts from friends and pages you follow')">news feed</span> showed posts in chronological order, and there were almost no advertisements. Today, the algorithm decides what I see, most posts are from pages rather than friends, and there are ads everywhere. I also get constant notifications trying to make me use the app more often.
+                            </p>
+                            <p>
+                                <strong>YouTube:</strong><br>
+                                YouTube used to have just one short ad before some videos. Now there are often two ads at the beginning, ads in the middle of videos, and ads at the end. The platform also promotes videos that keep people watching for longer periods, even if the content isn't very good. Many <span class="vocab-link" onclick="showPopup('content creators', 'People who make videos, posts, or other online content')">content creators</span> complain that the platform's changes have made it harder for them to reach their audience.
+                            </p>
+                            <p>
+                                <strong>Amazon:</strong><br>
+                                Amazon started as a simple online bookstore with great customer service and competitive prices. While it still offers convenience, the site is now full of <span class="vocab-link" onclick="showPopup('sponsored products', 'Items that companies pay extra to promote in search results')">sponsored products</span>, fake reviews, and complex return policies. It's become much harder to find genuine product reviews or the best deals.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-4">
+                            <h3>How This Affects Our Daily Lives</h3>
+                            <p>
+                                Enshittification doesn't just make apps more annoying – it actually changes how we live and communicate. When platforms become focused on <span class="vocab-link" onclick="showPopup('engagement metrics', 'Measurements of how much users interact with content')">engagement metrics</span> rather than user satisfaction, it affects our relationships and mental health.
+                            </p>
+                            <p>
+                                For example, social media algorithms now promote content that makes people angry or emotional because these posts get more comments and shares. This means we see more negative news and controversial opinions, which can make us feel more stressed and divided from other people.
+                            </p>
+                            <p>
+                                The constant notifications and <span class="vocab-link" onclick="showPopup('infinite scroll', 'Website design that loads new content continuously as you scroll down')">infinite scroll</span> features are designed to be addictive. Many people find it difficult to stop using these platforms, even when they're no longer enjoying the experience. This can interfere with work, sleep, and personal relationships.
+                            </p>
+                            <p>
+                                Understanding enshittification helps us make better decisions about which platforms to use and how to use them. We can look for alternative services, adjust our privacy settings, and be more conscious about how these platforms are designed to influence our behavior. Most importantly, we can demand better from the companies that provide these services.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level Reading Pages -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-page active" id="B2-page-1">
+                            <h3>The Systematic Degradation of Digital Services</h3>
+                            <p>
+                                The term "enshittification" was coined by journalist and activist Cory Doctorow to describe the predictable decline of digital platforms. This phenomenon reflects a fundamental tension between <span class="vocab-link" onclick="showPopup('shareholder value', 'Profits and returns generated for company investors')">shareholder value</span> and user experience that has become endemic across the technology sector.
+                            </p>
+                            <p>
+                                Unlike traditional businesses that must maintain quality to retain customers, digital platforms benefit from <span class="vocab-link" onclick="showPopup('network effects', 'When a service becomes more valuable as more people use it')">network effects</span> that create natural monopolies. Once a platform achieves dominance, users find it difficult to leave because their friends, family, and professional networks are already established there.
+                            </p>
+                            <p>
+                                This market position allows platforms to gradually degrade their services while maintaining their user base. The process typically involves <span class="vocab-link" onclick="showPopup('dark patterns', 'Design techniques that manipulate users into actions they did not intend')">dark patterns</span> – deliberately deceptive user interfaces that prioritize company goals over user preferences.
+                            </p>
+                            <p>
+                                The enshittification process reveals how <span class="vocab-link" onclick="showPopup('surveillance capitalism', 'Business model based on collecting and monetizing personal data')">surveillance capitalism</span> operates in practice. Platforms extract value not just from direct payments, but from the detailed behavioral data they collect about their users, which becomes increasingly valuable as the user base grows.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-2">
+                            <h3>The Three-Stage Decline Model</h3>
+                            <p>
+                                Doctorow's analysis identifies a consistent pattern across multiple platform types, from social media to e-commerce to content streaming. This predictable sequence suggests that enshittification isn't accidental but rather an inevitable result of how platform businesses are structured and funded.
+                            </p>
+                            <p>
+                                <strong>Stage One: User Acquisition</strong><br>
+                                During the initial phase, platforms operate at a loss to build <span class="vocab-link" onclick="showPopup('market share', 'Percentage of total market controlled by a company')">market share</span>. They offer superior services, intuitive interfaces, and generous terms to both users and content creators. This strategy requires significant venture capital investment but is essential for achieving the critical mass needed for network effects to take hold.
+                            </p>
+                            <p>
+                                <strong>Stage Two: Business Customer Focus</strong><br>
+                                Once user growth plateaus, platforms shift their attention to <span class="vocab-link" onclick="showPopup('monetization strategies', 'Methods for generating revenue from users or services')">monetization strategies</span>. They introduce advertising, promote paid content, and develop tools that help businesses reach consumers. User experience begins to deteriorate as the platform optimizes for advertiser needs rather than user preferences.
+                            </p>
+                            <p>
+                                <strong>Stage Three: Value Extraction</strong><br>
+                                In the final stage, platforms exploit their <span class="vocab-link" onclick="showPopup('market dominance', 'Controlling position that limits competition and user choice')">market dominance</span> to maximize short-term profits. They reduce service quality, increase prices for business customers, and implement features designed to increase user engagement at the expense of user well-being. Both users and business customers become dissatisfied, but switching costs and lack of viable alternatives keep them locked in.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-3">
+                            <h3>Case Studies in Platform Decline</h3>
+                            <p>
+                                Examining specific examples of enshittification helps illustrate how this process manifests across different types of digital services. Each case study reveals slightly different mechanisms but follows the same general pattern of initial attraction followed by gradual degradation.
+                            </p>
+                            <p>
+                                <strong>Social Media Transformation:</strong><br>
+                                Facebook exemplifies classic enshittification through its evolution from a college networking tool to a complex <span class="vocab-link" onclick="showPopup('engagement optimization', 'Designing features to maximize time spent on platform')">engagement optimization</span> machine. The introduction of algorithmic feeds prioritized content that generated strong emotional responses, leading to increased polarization and misinformation. The platform's data collection practices have expanded dramatically, creating privacy concerns that didn't exist in its early years.
+                            </p>
+                            <p>
+                                <strong>Video Platform Evolution:</strong><br>
+                                YouTube's transformation demonstrates how creator-focused platforms can turn against their content producers. While initially offering generous revenue sharing and simple monetization, the platform now implements complex, often arbitrary <span class="vocab-link" onclick="showPopup('content moderation', 'Policies and systems for controlling what users can post')">content moderation</span> policies that creators struggle to navigate. The increase in ad frequency and the introduction of premium subscriptions have fundamentally altered the viewing experience.
+                            </p>
+                            <p>
+                                <strong>E-commerce Degradation:</strong><br>
+                                Amazon's marketplace shows how enshittification affects commerce platforms. The integration of sponsored products into search results makes it difficult to find the best deals, while the proliferation of <span class="vocab-link" onclick="showPopup('review manipulation', 'Fake or paid reviews that mislead customers')">review manipulation</span> undermines consumer trust. The platform now functions more as an advertising medium than a neutral marketplace.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-4">
+                            <h3>Societal Implications and Future Outlook</h3>
+                            <p>
+                                The widespread nature of enshittification raises important questions about digital infrastructure and its role in modern society. As these platforms become essential for communication, commerce, and information access, their degradation affects not just individual users but entire communities and democratic processes.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('digital divide', 'Gap between those with and without access to modern technology')">Digital divide</span> issues become more pronounced when platforms prioritize profit over accessibility. Features that once made services inclusive are removed or placed behind paywalls, effectively excluding users who cannot pay for premium access.
+                            </p>
+                            <p>
+                                The concentration of digital power in the hands of a few large platforms creates <span class="vocab-link" onclick="showPopup('systemic risks', 'Threats that could affect entire economic or social systems')">systemic risks</span> for information flow and economic activity. When these platforms change their policies or algorithms, the effects ripple through society, affecting everything from small business marketing to political discourse.
+                            </p>
+                            <p>
+                                Potential solutions include stronger antitrust enforcement, data portability requirements, and support for <span class="vocab-link" onclick="showPopup('decentralized alternatives', 'Platforms not controlled by single companies or organizations')">decentralized alternatives</span>. However, the path forward requires balancing innovation incentives with user protection, a challenge that policymakers around the world are still struggling to address effectively.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level Reading Pages -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-page active" id="C1-page-1">
+                            <h3>The Political Economy of Platform Capitalism</h3>
+                            <p>
+                                Enshittification represents a manifestation of deeper structural contradictions within contemporary <span class="vocab-link" onclick="showPopup('platform capitalism', 'Economic system where digital platforms control market interactions')">platform capitalism</span>. The phenomenon illuminates how venture capital funding models, regulatory capture, and market concentration interact to systematically degrade digital services over time.
+                            </p>
+                            <p>
+                                The underlying logic of platform businesses creates perverse incentives that almost inevitably lead to service degradation. Platforms must simultaneously serve multiple stakeholder groups with conflicting interests: users who want free, high-quality services; advertisers who want access to user attention and data; and investors who demand exponential growth and eventual profitability.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Regulatory capture', 'When industries influence the agencies meant to regulate them')">Regulatory capture</span> compounds these problems by ensuring that platforms can operate with minimal oversight during their growth phases. By the time regulators attempt to intervene, platforms have achieved such market dominance that meaningful competition becomes nearly impossible without dramatic structural reforms.
+                            </p>
+                            <p>
+                                The enshittification process also reflects the broader tension between <span class="vocab-link" onclick="showPopup('use value', 'Practical benefit something provides to users')">use value</span> and exchange value in digital commodities. While platforms initially prioritize use value to attract users, the imperative for capital accumulation ultimately subordinates user needs to profit maximization, resulting in the systematic degradation of service quality.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-2">
+                            <h3>Algorithmic Manipulation and Behavioral Economics</h3>
+                            <p>
+                                The enshittification process relies heavily on sophisticated applications of behavioral economics and <span class="vocab-link" onclick="showPopup('algorithmic governance', 'Using computer algorithms to make decisions about user behavior')">algorithmic governance</span>. Platforms exploit cognitive biases and psychological vulnerabilities to maintain user engagement even as service quality deteriorates.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Variable ratio reinforcement', 'Reward schedule that creates addictive behavior patterns')">Variable ratio reinforcement</span> schedules, borrowed from gambling psychology, are embedded throughout platform design. Features like infinite scroll, push notifications, and algorithmic content curation create addiction-like engagement patterns that persist even when users become consciously dissatisfied with the service.
+                            </p>
+                            <p>
+                                The opacity of algorithmic systems enables platforms to gradually modify user behavior without explicit consent or awareness. <span class="vocab-link" onclick="showPopup('Nudge architecture', 'Environmental design that influences behavior without restricting choice')">Nudge architecture</span> becomes increasingly manipulative as platforms prioritize engagement metrics over user autonomy or well-being.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Data asymmetry', 'Unequal access to information between parties in a relationship')">Data asymmetry</span> between platforms and users creates fundamental power imbalances. Platforms possess comprehensive behavioral profiles that enable precise manipulation, while users lack visibility into how their data is collected, processed, or used to influence their decisions.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-3">
+                            <h3>Network Effects and Lock-in Mechanisms</h3>
+                            <p>
+                                The durability of enshittified platforms depends on sophisticated <span class="vocab-link" onclick="showPopup('switching costs', 'Expenses or difficulties involved in changing to alternative service')">switching costs</span> and network effects that create artificial barriers to competition. These mechanisms enable platforms to degrade service quality while maintaining market position.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Metcalfe\\'s Law', 'Network\\'s value increases exponentially with number of connected users')">Metcalfe's Law</span> suggests that network value increases exponentially with user adoption, but enshittification reveals how this relationship can be exploited. Once platforms achieve critical mass, they can extract value from network effects while simultaneously degrading the experience that initially created those effects.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Data portability', 'Ability to transfer personal data between different services')">Data portability</span> limitations create additional lock-in effects. Users accumulate digital assets – social connections, content libraries, purchase histories – that become difficult or impossible to transfer to alternative platforms. This creates switching costs that persist even when users become deeply dissatisfied with service quality.
+                            </p>
+                            <p>
+                                The phenomenon of <span class="vocab-link" onclick="showPopup('envelopment strategy', 'Expanding into adjacent markets using existing platform advantages')">envelopment strategy</span> further entrenches dominant platforms. By expanding into adjacent services and integrating them with core offerings, platforms create complex ecosystems that increase switching costs and reduce the viability of specialized competitors.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-4">
+                            <h3>Regulatory Responses and Democratic Implications</h3>
+                            <p>
+                                The enshittification phenomenon poses fundamental challenges to democratic governance and market regulation. Traditional antitrust frameworks, designed for industrial-era monopolies, prove inadequate for addressing the complex dynamics of platform-mediated markets.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Interoperability mandates', 'Legal requirements for systems to work together across platforms')">Interoperability mandates</span> represent one promising regulatory approach, potentially reducing switching costs and enabling meaningful competition. However, implementation requires sophisticated technical standards and ongoing oversight that many regulatory bodies lack the capacity to provide effectively.
+                            </p>
+                            <p>
+                                The concept of <span class="vocab-link" onclick="showPopup('digital rights', 'Fundamental protections for individuals in digital environments')">digital rights</span> emerges as platforms become essential infrastructure for civic participation. When enshittified platforms control access to information, social connection, and economic opportunity, service degradation becomes a broader question of social justice and democratic participation.
+                            </p>
+                            <p>
+                                Alternative organizational models, including <span class="vocab-link" onclick="showPopup('platform cooperatives', 'Digitally-mediated services owned and governed by users')">platform cooperatives</span> and public digital infrastructure, offer potential pathways beyond the enshittification cycle. However, scaling these alternatives requires addressing fundamental questions about funding, governance, and technological capacity that remain largely unresolved.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Cory Doctorow on Enshittification</h2>
+                <div class="video-container">
+                    <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                        <div style="width: 95%; max-width: 1000px; position: relative; padding-bottom: 56.25%; height: 0;">
+                            <iframe 
+                                src="https://www.youtube.com/embed/JOSqHPnqoIA?end=132" 
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <h2>Video Discussions</h2>
+                <div class="video-discussions-container">
+                    <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 100%;">
+                        <div style="width: 100%; max-width: 900px; background: #f8f9fa; padding: 40px; border-radius: 10px; border: 2px solid #3498db; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.1);">
+                            <h3 style="color: #34495E; margin-bottom: 25px; font-size: 2.2rem; text-align: center;">Video Discussion Questions</h3>
+                            <div style="color: #34495E; line-height: 1.8; font-size: 1.3rem;">
+                                <div style="background: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3498db;">
+                                    <p style="margin: 0;"><strong>1. Personal Experience:</strong> Doctorow explains how platforms decay over time. Can you identify a platform you use that has followed this pattern? What specific changes have you noticed in its functionality or user experience?</p>
+                                </div>
+                                <div style="background: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #F1C40F;">
+                                    <p style="margin: 0;"><strong>2. Business Model Analysis:</strong> According to the video, why do platforms prioritize users first, then businesses, then extraction? What role does competition play in this process? Do you think this pattern is inevitable?</p>
+                                </div>
+                                <div style="background: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #E74C3C;">
+                                    <p style="margin: 0;"><strong>3. Regulatory Solutions:</strong> Doctorow discusses various potential solutions to enshittification. Which approaches seem most promising to you? What challenges might prevent these solutions from being implemented effectively?</p>
+                                </div>
+                                <div style="background: #FFFFFF; padding: 20px; border-radius: 8px; border-left: 4px solid #27AE60;">
+                                    <p style="margin: 0;"><strong>4. Future Implications:</strong> How might enshittification affect society if it continues unchecked? What responsibility do users have to resist manipulative platform design, and what systemic changes might be necessary?</p>
+                                </div>
+                            </div>
+                            <div style="margin-top: 30px; padding: 20px; background: #34495E; border-radius: 8px; color: #FFFFFF; text-align: center;">
+                                <p style="margin: 0; font-size: 1.1rem; font-weight: 500;">💻 <strong>Discussion Tip:</strong> Pay attention to technical terms like "switching costs," "network effects," and "regulatory capture." These concepts are key to understanding how digital markets function.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Enshittification Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Basic Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Platform Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(3, this)">Advanced Concepts</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Enshittification</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">The process of digital platforms becoming worse over time</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Algorithm</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Computer program that decides what content users see</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Digital Platform</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Online services like social media sites and apps</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">User Experience</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">How easy and enjoyable a service is to use</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Content Creator</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">People who make videos, posts, or other online content</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Engagement</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">How much users interact with content or platforms</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Network Effects</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">When a service becomes more valuable as more people use it</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Monetization</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Methods for generating revenue from users or services</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Dark Patterns</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Design techniques that manipulate users into unwanted actions</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Switching Costs</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Expenses or difficulties involved in changing to alternative service</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Market Dominance</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Controlling position that limits competition and user choice</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Data Mining</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Extracting valuable information from large amounts of user data</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-3">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Surveillance Capitalism</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Business model based on collecting and monetizing personal data</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Regulatory Capture</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">When industries influence the agencies meant to regulate them</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Platform Capitalism</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Economic system where digital platforms control market interactions</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Interoperability</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Ability for different systems to work together effectively</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Digital Rights</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Fundamental protections for individuals in digital environments</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Algorithmic Governance</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Using computer algorithms to make decisions about user behavior</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
+            <div class="section" id="quiz">
+                <h2>Enshittification Vocabulary Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header" id="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div style="text-align: center; margin-bottom: 10px;">
+                                <span id="questionCounter" style="font-size: 1.2rem; font-weight: 600; color: #2d3748;">Question 1 of 10</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quizProgressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Quiz Questions Container -->
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be dynamically generated here -->
+                    </div>
+
+                    <!-- Results Page -->
+                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalQuizScore">0/10</div>
+                            <p>Well done! You've completed the Enshittification vocabulary quiz.</p>
+                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Popup -->
+    <div class="popup-overlay" id="vocabPopup">
+        <div class="popup-content">
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+            <button class="popup-close" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentReadingLevel = 'B1';
+        
+        // New Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        // Vocabulary Database from Flashcards
+        const vocabularyDatabase = [
+            { 
+                term: "Enshittification", 
+                definition: "The process of digital platforms becoming worse over time", 
+                sentences: ["The _____ of social media platforms has frustrated many users.", "Twitter's recent changes are a clear example of _____.", "_____ describes how platforms prioritize profits over user experience."] 
+            },
+            { 
+                term: "Algorithm", 
+                definition: "Computer program that decides what content users see", 
+                sentences: ["The _____ determines which posts appear in your feed.", "Social media _____ often prioritize engagement over relevance.", "Changes to the _____ can dramatically affect user experience."] 
+            },
+            { 
+                term: "Digital Platform", 
+                definition: "Online services like social media sites and apps", 
+                sentences: ["Facebook is the world's largest social media _____.", "Many _____ follow similar patterns of decline.", "The _____ initially offered free services to attract users."] 
+            },
+            { 
+                term: "User Experience", 
+                definition: "How easy and enjoyable a service is to use", 
+                sentences: ["The _____ has deteriorated significantly over the years.", "Good _____ should prioritize user needs over profits.", "Platforms often sacrifice _____ to increase revenue."] 
+            },
+            { 
+                term: "Content Creator", 
+                definition: "People who make videos, posts, or other online content", 
+                sentences: ["Many _____ struggle with changing platform policies.", "The _____ complained about reduced reach.", "YouTube has thousands of professional _____."] 
+            },
+            { 
+                term: "Engagement", 
+                definition: "How much users interact with content or platforms", 
+                sentences: ["Platforms design features to maximize user _____.", "High _____ doesn't always mean high satisfaction.", "The algorithm prioritizes content that generates _____."] 
+            },
+            { 
+                term: "Network Effects", 
+                definition: "When a service becomes more valuable as more people use it", 
+                sentences: ["Facebook benefits from strong _____.", "_____ make it difficult for competitors to challenge dominant platforms.", "The platform's _____ create barriers for users wanting to switch."] 
+            },
+            { 
+                term: "Monetization", 
+                definition: "Methods for generating revenue from users or services", 
+                sentences: ["The platform's _____ strategy focuses on advertising.", "Aggressive _____ often degrades user experience.", "_____ becomes the priority once user growth slows."] 
+            },
+            { 
+                term: "Dark Patterns", 
+                definition: "Design techniques that manipulate users into unwanted actions", 
+                sentences: ["The website uses _____ to make cancellation difficult.", "_____ deceive users into sharing more data.", "Regulators are cracking down on _____ in app design."] 
+            },
+            { 
+                term: "Switching Costs", 
+                definition: "Expenses or difficulties involved in changing to alternative service", 
+                sentences: ["High _____ keep users locked into platforms they dislike.", "Social networks create _____ through friend connections.", "The platform deliberately increases _____ to retain users."] 
+            },
+            { 
+                term: "Market Dominance", 
+                definition: "Controlling position that limits competition and user choice", 
+                sentences: ["Google's _____ in search is nearly impossible to challenge.", "_____ allows platforms to degrade services without losing users.", "The company achieved _____ through aggressive acquisition strategies."] 
+            },
+            { 
+                term: "Data Mining", 
+                definition: "Extracting valuable information from large amounts of user data", 
+                sentences: ["The platform profits from _____ user behavior patterns.", "_____ reveals detailed insights about consumer preferences.", "Privacy advocates worry about extensive _____ practices."] 
+            },
+            { 
+                term: "Surveillance Capitalism", 
+                definition: "Business model based on collecting and monetizing personal data", 
+                sentences: ["_____ treats personal information as a commodity.", "The book criticizes the rise of _____.", "_____ creates profit from monitoring human behavior."] 
+            },
+            { 
+                term: "Regulatory Capture", 
+                definition: "When industries influence the agencies meant to regulate them", 
+                sentences: ["_____ explains why tech companies face minimal oversight.", "The phenomenon of _____ weakens consumer protection.", "Critics argue that _____ prevents effective platform regulation."] 
+            },
+            { 
+                term: "Platform Capitalism", 
+                definition: "Economic system where digital platforms control market interactions", 
+                sentences: ["_____ has transformed how businesses operate.", "The rise of _____ concentrates economic power.", "_____ creates new forms of market control."] 
+            },
+            { 
+                term: "Interoperability", 
+                definition: "Ability for different systems to work together effectively", 
+                sentences: ["Lack of _____ traps users in single ecosystems.", "_____ would allow data transfer between platforms.", "Regulators are considering mandating _____ for social networks."] 
+            },
+            { 
+                term: "Digital Rights", 
+                definition: "Fundamental protections for individuals in digital environments", 
+                sentences: ["The campaign advocates for stronger _____.", "_____ include privacy and data portability protections.", "Platform power threatens basic _____."] 
+            },
+            { 
+                term: "Algorithmic Governance", 
+                definition: "Using computer algorithms to make decisions about user behavior", 
+                sentences: ["_____ determines what content users can see.", "The platform exercises _____ through automated moderation.", "_____ can create bias and unfair treatment."] 
+            }
+        ];
+
+        // Generate wrong answers for multiple choice
+        function generateWrongAnswers(correctTerm) {
+            const wrongAnswers = [];
+            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
+            
+            for (let item of shuffledVocab) {
+                if (item.term !== correctTerm && wrongAnswers.length < 3) {
+                    wrongAnswers.push(item.definition);
+                }
+            }
+            return wrongAnswers;
+        }
+
+        // Generate a random quiz question
+        function generateQuizQuestion(questionNum) {
+            const vocabItem = vocabularyDatabase[Math.floor(Math.random() * vocabularyDatabase.length)];
+            const questionType = Math.random() < 0.5 ? 'multiple-choice' : 'fill-blank';
+            
+            if (questionType === 'multiple-choice') {
+                // Multiple choice: What does [term] mean?
+                const wrongAnswers = generateWrongAnswers(vocabItem.term);
+                const allAnswers = [vocabItem.definition, ...wrongAnswers];
+                const shuffledAnswers = allAnswers.sort(() => Math.random() - 0.5);
+                const correctIndex = shuffledAnswers.indexOf(vocabItem.definition);
+                
+                return {
+                    type: 'multiple-choice',
+                    question: `What does "${vocabItem.term}" mean?`,
+                    answers: shuffledAnswers,
+                    correctAnswer: correctIndex,
+                    correctTerm: vocabItem.term
+                };
+            } else {
+                // Fill in the blank
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, 3) + '...';
+                
+                return {
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                };
+            }
+        }
+
+        // Initialize new quiz system
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            
+            // Generate 10 random questions
+            for (let i = 1; i <= totalQuizQuestions; i++) {
+                quizQuestions.push(generateQuizQuestion(i));
+            }
+            
+            // Create HTML for all questions
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        // Generate HTML for quiz questions
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+                
+                if (q.type === 'multiple-choice') {
+                    questionDiv.innerHTML = `
+                        <div class="quiz-question">
+                            <h3>${q.question}</h3>
+                            <div class="multiple-choice">
+                                ${q.answers.map((answer, idx) => `
+                                    <div class="choice" onclick="selectQuizChoice(this, ${idx}, ${questionNum})">
+                                        <input type="radio" name="quiz_q${questionNum}" value="${idx}">
+                                        ${answer}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                            <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                        </div>
+                    `;
+                } else {
+                    questionDiv.innerHTML = `
+                        <div class="quiz-question">
+                            <h3>${q.question}</h3>
+                            <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}">
+                            <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                            <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                        </div>
+                    `;
+                }
+                
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // Select choice in multiple choice question
+        function selectQuizChoice(element, choiceIndex, questionNum) {
+            const choices = element.parentNode.querySelectorAll('.choice');
+            choices.forEach(choice => choice.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            const radioInput = element.querySelector('input[type="radio"]');
+            if (radioInput) radioInput.checked = true;
+        }
+
+        // Check quiz answer
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            
+            let isCorrect = false;
+            
+            if (question.type === 'multiple-choice') {
+                const selectedChoice = document.querySelector(`input[name="quiz_q${questionNum}"]:checked`);
+                if (!selectedChoice) {
+                    alert('Please select an answer first!');
+                    return;
+                }
+                
+                const selectedIndex = parseInt(selectedChoice.value);
+                isCorrect = selectedIndex === question.correctAnswer;
+                
+                // Mark answers visually
+                const choices = document.querySelectorAll(`#quiz-question-${questionNum} .choice`);
+                choices.forEach((choice, index) => {
+                    if (index === question.correctAnswer) {
+                        choice.classList.add('correct');
+                    } else if (index === selectedIndex && !isCorrect) {
+                        choice.classList.add('incorrect');
+                    }
+                });
+                
+            } else {
+                const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+                const userAnswer = userInput.value.trim().toLowerCase();
+                
+                if (!userAnswer) {
+                    alert('Please enter an answer first!');
+                    return;
+                }
+                
+                isCorrect = userAnswer === question.correctAnswer || 
+                           userAnswer === question.correctAnswer.replace(/[-\s]/g, '');
+                
+                userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+            }
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' : 
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+            
+            // Store answer
+            userQuizAnswers[questionNum] = isCorrect;
+            if (isCorrect) quizScore++;
+            
+            // Disable button
+            checkButton.disabled = true;
+            checkButton.style.opacity = '0.6';
+            
+            // Play sound effect if correct
+            if (isCorrect) {
+                const correctSound = new Audio('https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3');
+                correctSound.play().catch(e => console.log('Audio playbook failed:', e));
+            }
+            
+            updateQuizProgress();
+            
+            // Auto-advance after 2 seconds
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        // Show specific quiz question
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+            
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) currentQ.classList.add('active');
+            
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        // Next question
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        // Previous question
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        function updateQuizProgress() {
+            const counter = document.getElementById('questionCounter');
+            const progressBar = document.getElementById('quizProgressFill');
+            
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+            
+            if (progressBar) {
+                const progressPercent = ((currentQuizQuestion - 1) / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+            
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        function showQuizResults() {
+            const questionsContainer = document.getElementById('quiz-questions-container');
+            const resultsPage = document.getElementById('quiz-results-page');
+            const finalScore = document.getElementById('finalQuizScore');
+            const quizHeader = document.getElementById('quiz-header');
+            
+            if (questionsContainer) questionsContainer.style.display = 'none';
+            if (resultsPage) resultsPage.style.display = 'flex';
+            if (quizHeader) quizHeader.style.display = 'none';
+            
+            if (finalScore) {
+                finalScore.textContent = `${quizScore}/${totalQuizQuestions}`;
+            }
+        }
+
+        function restartVocabQuiz() {
+            const questionsContainer = document.getElementById('quiz-questions-container');
+            const resultsPage = document.getElementById('quiz-results-page');
+            const quizHeader = document.getElementById('quiz-header');
+            
+            if (questionsContainer) questionsContainer.style.display = 'block';
+            if (resultsPage) resultsPage.style.display = 'none';
+            if (quizHeader) quizHeader.style.display = 'flex';
+            
+            initializeVocabQuiz();
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the quiz system
+            initializeVocabQuiz();
+            
+            // Close popup when clicking outside
+            const vocabPopup = document.getElementById('vocabPopup');
+            if (vocabPopup) {
+                vocabPopup.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closePopup();
+                    }
+                });
+            }
+        });
+
+        // Update progress
+        function updateQuizProgress() {
+            const counter = document.getElementById('questionCounter');
+            const progressBar = document.getElementById('quizProgressFill');
+            
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+            
+            if (progressBar) {
+                const progressPercent = ((currentQuizQuestion - 1) / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        // Update navigation buttons
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+            
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        // Show quiz results
+        function showQuizResults() {
+            const questionsContainer = document.getElementById('quiz-questions-container');
+            const resultsPage = document.getElementById('quiz-results-page');
+            const finalScore = document.getElementById('finalQuizScore');
+            const quizHeader = document.getElementById('quiz-header');
+            
+            questionsContainer.style.display = 'none';
+            resultsPage.style.display = 'flex';
+            quizHeader.style.display = 'none';
+            
+            if (finalScore) {
+                finalScore.textContent = `${quizScore}/${totalQuizQuestions}`;
+            }
+        }
+
+        // Restart quiz
+        function restartVocabQuiz() {
+            const questionsContainer = document.getElementById('quiz-questions-container');
+            const resultsPage = document.getElementById('quiz-results-page');
+            const quizHeader = document.getElementById('quiz-header');
+            
+            // Reset display
+            questionsContainer.style.display = 'block';
+            resultsPage.style.display = 'none';
+            quizHeader.style.display = 'flex';
+            
+            // Reinitialize quiz
+            initializeVocabQuiz();
+        }
+
+        // Navigation functions
+        function showSection(sectionName, element) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function openWritingForm(element) {
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // Open Google Forms in new tab
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSdeZRNbdsfcdnjVyc9U6GCJTjmiU6aPOwagAqDykKN5b_PA5w/viewform?usp=header', '_blank');
+            
+            // Remove active class after a short delay to show it was clicked
+            setTimeout(() => {
+                if (element) {
+                    element.classList.remove('active');
+                }
+                // Reset to discussion tab as default
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            }, 300);
+        }
+
+        function showReadingLevel(level, element) {
+            // Hide all reading levels
+            const levels = document.querySelectorAll('.reading-level');
+            levels.forEach(levelDiv => levelDiv.style.display = 'none');
+            
+            // Remove active class from all level buttons
+            const buttons = document.querySelectorAll('.reading-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected level
+            document.getElementById(level + '-level').style.display = 'block';
+            currentReadingLevel = level;
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // Reset subnav to first page
+            showReadingPage(1, document.querySelectorAll('.reading-subnav .page-btn')[0]);
+        }
+
+        function showReadingPage(pageNum, element) {
+            // Hide all reading pages in current level
+            const pages = document.querySelectorAll(`#${currentReadingLevel}-level .reading-page`);
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all subnav buttons
+            const buttons = document.querySelectorAll('.reading-subnav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(`${currentReadingLevel}-page-` + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function showVocabPage(pageNum, element) {
+            // Hide all vocab pages
+            const pages = document.querySelectorAll('.vocab-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all page buttons
+            const buttons = document.querySelectorAll('.vocab-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // Flashcard function with sound effect
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            
+            // Play sound effect
+            const flipSound = document.getElementById('flipSound');
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => {
+                    console.log('Audio playback failed:', e);
+                });
+            }
+        }
+
+        // Vocabulary popup functions
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz(); // Initialize the new vocabulary-based quiz
+            
+            // Close popup when clicking outside
+            document.getElementById('vocabPopup').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePopup();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

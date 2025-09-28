@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header .subtitle {
+            color: #4a5568;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            min-height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Quiz Container Styles */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .quiz-progress {
+            flex: 1;
+            margin: 0 30px;
+            text-align: center;
+        }
+
+        .progress-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        /* Question Card Styles */
+        .question-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-title {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        .question-text {
+            color: #4a5568;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Multiple Choice Styles */
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .choice {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+            text-align: left;
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.correct {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.incorrect {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        /* Fill-in-blank Styles */
+        .fill-blank-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .fill-blank-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .fill-blank-input.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .fill-blank-input.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        /* Essay Styles */
+        .essay-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .essay-prompt {
+            background: rgba(102, 126, 234, 0.05);
+            border-left: 4px solid #667eea;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .essay-textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            resize: vertical;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .essay-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .word-count {
+            text-align: right;
+            margin-top: 10px;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #2d3748;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        /* Feedback Styles */
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-weight: 500;
+            text-align: center;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .feedback.info {
+            background: rgba(102, 126, 234, 0.1);
+            color: #4c51bf;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        /* Results Styles */
+        .results-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        .performance-badge {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+
+        .performance-excellent {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .performance-good {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+
+        .performance-needs-improvement {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 20px 15px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 120px;
+                margin: 5px;
+                font-size: 0.95rem;
+                padding: 12px 16px;
+            }
+
+            .section {
+                padding: 25px 15px;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .choices-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .question-card {
+                padding: 25px 20px;
+            }
+
+            .question-title {
+                font-size: 1.5rem;
+            }
+
+            .essay-textarea {
+                min-height: 300px;
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio element for correct answer sound effect -->
+    <audio id="correctSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="header">
+        <div>
+            <h1>Interactive Quiz Platform</h1>
+            <div class="subtitle">Test Your Knowledge with Multiple Question Types</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('multiple-choice', this)">Multiple Choice</div>
+            <div class="nav-item" onclick="showSection('fill-blank', this)">Fill in the Blank</div>
+            <div class="nav-item" onclick="showSection('essay', this)">Essay Writing</div>
+            <div class="nav-item" onclick="showSection('results', this)">Results & Progress</div>
+        </div>
+
+        <div class="content">
+            <!-- Multiple Choice Quiz Section -->
+            <div class="section active" id="multiple-choice">
+                <h2>Multiple Choice Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <button class="btn btn-secondary" onclick="previousMCQuestion()" id="prevMCBtn">Previous</button>
+                        <div class="quiz-progress">
+                            <div class="progress-text" id="mcProgressText">Question 1 of 10</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="mcProgressFill"></div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="nextMCQuestion()" id="nextMCBtn">Next</button>
+                    </div>
+                    
+                    <div id="mc-questions-container">
+                        <!-- Questions will be dynamically generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fill in the Blank Quiz Section -->
+            <div class="section" id="fill-blank">
+                <h2>Fill in the Blank Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <button class="btn btn-secondary" onclick="previousFBQuestion()" id="prevFBBtn">Previous</button>
+                        <div class="quiz-progress">
+                            <div class="progress-text" id="fbProgressText">Question 1 of 8</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="fbProgressFill"></div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="nextFBQuestion()" id="nextFBBtn">Next</button>
+                    </div>
+                    
+                    <div id="fb-questions-container">
+                        <!-- Questions will be dynamically generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Essay Writing Section -->
+            <div class="section" id="essay">
+                <h2>Essay Writing Exercise</h2>
+                <div class="essay-container">
+                    <div class="essay-prompt">
+                        <h3 style="color: #2d3748; margin-bottom: 15px; font-size: 1.5rem;">Essay Prompt</h3>
+                        <p style="color: #4a5568; font-size: 1.1rem; line-height: 1.6; margin-bottom: 15px;">
+                            Technology has dramatically changed how we communicate, work, and learn in the 21st century. 
+                            Some argue that these changes have improved our quality of life, while others believe they have 
+                            created new problems and challenges.
+                        </p>
+                        <p style="color: #4a5568; font-size: 1.1rem; line-height: 1.6; font-weight: 500;">
+                            <strong>Write a 500-800 word essay</strong> discussing both the positive and negative impacts of modern technology 
+                            on society. Support your arguments with specific examples and conclude with your personal perspective 
+                            on whether technology's benefits outweigh its drawbacks.
+                        </p>
+                    </div>
+                    
+                    <textarea 
+                        class="essay-textarea" 
+                        id="essay-text" 
+                        placeholder="Begin your essay here..."
+                        oninput="updateWordCount()"
+                    ></textarea>
+                    
+                    <div class="word-count" id="word-count">Word count: 0</div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="saveEssayDraft()">Save Draft</button>
+                        <button class="btn btn-primary" onclick="submitEssay()">Submit Essay</button>
+                    </div>
+                    
+                    <div id="essay-feedback" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="section" id="results">
+                <h2>Quiz Results & Progress</h2>
+                <div class="results-container">
+                    <div class="question-card">
+                        <h3 style="color: #2d3748; margin-bottom: 25px; font-size: 2rem;">Your Performance Summary</h3>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                            <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.3);">
+                                <h4 style="color: #2d3748; margin-bottom: 10px;">Multiple Choice</h4>
+                                <div class="score-display" style="font-size: 2.5rem;" id="mc-score-display">--/10</div>
+                                <div id="mc-performance-badge"></div>
+                            </div>
+                            
+                            <div style="background: rgba(102, 126, 234, 0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(102, 126, 234, 0.3);">
+                                <h4 style="color: #2d3748; margin-bottom: 10px;">Fill in the Blank</h4>
+                                <div class="score-display" style="font-size: 2.5rem;" id="fb-score-display">--/8</div>
+                                <div id="fb-performance-badge"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(102, 126, 234, 0.05); padding: 25px; border-radius: 12px; border-left: 4px solid #667eea; margin-bottom: 30px;">
+                            <h4 style="color: #2d3748; margin-bottom: 15px;">Essay Status</h4>
+                            <div id="essay-status">No essay submitted yet</div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-secondary" onclick="resetAllQuizzes()">Reset All Quizzes</button>
+                            <button class="btn btn-primary" onclick="downloadResults()">Download Results</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz Data
+        const multipleChoiceQuestions = [
+            {
+                question: "What is the capital of France?",
+                choices: ["London", "Berlin", "Paris", "Madrid"],
+                correct: 2
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                choices: ["Venus", "Mars", "Jupiter", "Saturn"],
+                correct: 1
+            },
+            {
+                question: "What is the largest mammal in the world?",
+                choices: ["African Elephant", "Blue Whale", "Giraffe", "Polar Bear"],
+                correct: 1
+            },
+            {
+                question: "Who painted the Mona Lisa?",
+                choices: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
+                correct: 2
+            },
+            {
+                question: "What is the chemical symbol for gold?",
+                choices: ["Go", "Gd", "Au", "Ag"],
+                correct: 2
+            },
+            {
+                question: "Which year did World War II end?",
+                choices: ["1944", "1945", "1946", "1947"],
+                correct: 1
+            },
+            {
+                question: "What is the smallest country in the world?",
+                choices: ["Monaco", "Vatican City", "San Marino", "Liechtenstein"],
+                correct: 1
+            },
+            {
+                question: "Which element has the atomic number 1?",
+                choices: ["Helium", "Hydrogen", "Lithium", "Carbon"],
+                correct: 1
+            },
+            {
+                question: "What is the longest river in the world?",
+                choices: ["Amazon River", "Nile River", "Mississippi River", "Yangtze River"],
+                correct: 1
+            },
+            {
+                question: "Who wrote 'Romeo and Juliet'?",
+                choices: ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+                correct: 1
+            }
+        ];
+
+        const fillBlankQuestions = [
+            {
+                sentence: "The _____ is the powerhouse of the cell.",
+                answer: "mitochondria",
+                hint: "mito..."
+            },
+            {
+                sentence: "Water boils at _____ degrees Celsius.",
+                answer: "100",
+                hint: "three digits"
+            },
+            {
+                sentence: "The first President of the United States was George _____.",
+                answer: "washington",
+                hint: "wash..."
+            },
+            {
+                sentence: "Shakespeare wrote the play '_____' about a Danish prince.",
+                answer: "hamlet",
+                hint: "ham..."
+            },
+            {
+                sentence: "The chemical formula for water is _____.",
+                answer: "h2o",
+                hint: "H2..."
+            },
+            {
+                sentence: "The Great Wall of _____ is one of the Seven Wonders of the World.",
+                answer: "china",
+                hint: "chi..."
+            },
+            {
+                sentence: "Albert _____ developed the theory of relativity.",
+                answer: "einstein",
+                hint: "ein..."
+            },
+            {
+                sentence: "The _____ is the largest ocean on Earth.",
+                answer: "pacific",
+                hint: "pac..."
+            }
+        ];
+
+        // Quiz State
+        let currentMCQuestion = 0;
+        let currentFBQuestion = 0;
+        let mcAnswers = [];
+        let fbAnswers = [];
+        let mcScore = 0;
+        let fbScore = 0;
+
+        // Audio function
+        function playCorrectSound() {
+            try {
+                const correctSound = document.getElementById('correctSound');
+                if (correctSound) {
+                    correctSound.currentTime = 0;
+                    
+                    // Create a promise-based approach for better browser compatibility
+                    const playPromise = correctSound.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log('Sound played successfully');
+                        }).catch(error => {
+                            console.log('Audio playback failed:', error);
+                            // Fallback: try to enable audio on next user interaction
+                            document.addEventListener('click', enableAudio, { once: true });
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('Audio error:', error);
+            }
+        }
+
+        function enableAudio() {
+            const correctSound = document.getElementById('correctSound');
+            if (correctSound) {
+                correctSound.load();
+            }
+        }
+
+        // Initialize quizzes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMultipleChoice();
+            initializeFillBlank();
+            updateResults();
+            
+            // Enable audio on first user interaction
+            document.addEventListener('click', enableAudio, { once: true });
+        });
+
+        // Navigation functions
+        function showSection(sectionName, element) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+
+            // Update results if showing results section
+            if (sectionName === 'results') {
+                updateResults();
+            }
+        }
+
+        // Multiple Choice Quiz Functions
+        function initializeMultipleChoice() {
+            const container = document.getElementById('mc-questions-container');
+            container.innerHTML = '';
+            
+            multipleChoiceQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+                questionDiv.id = `mc-question-${index}`;
+                questionDiv.style.display = index === 0 ? 'block' : 'none';
+                
+                questionDiv.innerHTML = `
+                    <div class="question-title">Question ${index + 1}</div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="choices-grid">
+                        ${q.choices.map((choice, idx) => `
+                            <div class="choice" onclick="selectMCChoice(${index}, ${idx}, this)">
+                                ${choice}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="checkMCAnswer(${index})" id="mc-check-${index}">Check Answer</button>
+                    </div>
+                    <div id="mc-feedback-${index}" style="display: none;"></div>
+                `;
+                
+                container.appendChild(questionDiv);
+            });
+            
+            updateMCProgress();
+        }
+
+        function selectMCChoice(questionIndex, choiceIndex, element) {
+            const choices = element.parentNode.querySelectorAll('.choice');
+            choices.forEach(choice => choice.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            mcAnswers[questionIndex] = choiceIndex;
+        }
+
+        function checkMCAnswer(questionIndex) {
+            const question = multipleChoiceQuestions[questionIndex];
+            const userAnswer = mcAnswers[questionIndex];
+            
+            if (userAnswer === undefined) {
+                alert('Please select an answer first!');
+                return;
+            }
+            
+            const isCorrect = userAnswer === question.correct;
+            const feedback = document.getElementById(`mc-feedback-${questionIndex}`);
+            const checkButton = document.getElementById(`mc-check-${questionIndex}`);
+            const choices = document.querySelectorAll(`#mc-question-${questionIndex} .choice`);
+            
+            // Mark correct/incorrect choices
+            choices.forEach((choice, index) => {
+                if (index === question.correct) {
+                    choice.classList.add('correct');
+                } else if (index === userAnswer && !isCorrect) {
+                    choice.classList.add('incorrect');
+                }
+            });
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' : 
+                `Incorrect. The correct answer is: ${question.choices[question.correct]}`;
+            
+            // Update score and play sound
+            if (isCorrect && !checkButton.disabled) {
+                mcScore++;
+                playCorrectSound();
+            }
+            
+            // Disable button
+            checkButton.disabled = true;
+            checkButton.textContent = 'Answered';
+            
+            updateMCProgress();
+        }
+
+        function nextMCQuestion() {
+            if (currentMCQuestion < multipleChoiceQuestions.length - 1) {
+                document.getElementById(`mc-question-${currentMCQuestion}`).style.display = 'none';
+                currentMCQuestion++;
+                document.getElementById(`mc-question-${currentMCQuestion}`).style.display = 'block';
+                updateMCProgress();
+            }
+        }
+
+        function previousMCQuestion() {
+            if (currentMCQuestion > 0) {
+                document.getElementById(`mc-question-${currentMCQuestion}`).style.display = 'none';
+                currentMCQuestion--;
+                document.getElementById(`mc-question-${currentMCQuestion}`).style.display = 'block';
+                updateMCProgress();
+            }
+        }
+
+        function updateMCProgress() {
+            const progressText = document.getElementById('mcProgressText');
+            const progressFill = document.getElementById('mcProgressFill');
+            const prevBtn = document.getElementById('prevMCBtn');
+            const nextBtn = document.getElementById('nextMCBtn');
+            
+            progressText.textContent = `Question ${currentMCQuestion + 1} of ${multipleChoiceQuestions.length}`;
+            progressFill.style.width = `${((currentMCQuestion) / multipleChoiceQuestions.length) * 100}%`;
+            
+            prevBtn.disabled = currentMCQuestion === 0;
+            nextBtn.disabled = currentMCQuestion === multipleChoiceQuestions.length - 1;
+        }
+
+        // Fill in the Blank Quiz Functions
+        function initializeFillBlank() {
+            const container = document.getElementById('fb-questions-container');
+            container.innerHTML = '';
+            
+            fillBlankQuestions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+                questionDiv.id = `fb-question-${index}`;
+                questionDiv.style.display = index === 0 ? 'block' : 'none';
+                
+                questionDiv.innerHTML = `
+                    <div class="question-title">Question ${index + 1}</div>
+                    <div class="question-text">${q.sentence}</div>
+                    <input type="text" class="fill-blank-input" id="fb-input-${index}" placeholder="${q.hint}">
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="checkFBAnswer(${index})" id="fb-check-${index}">Check Answer</button>
+                    </div>
+                    <div id="fb-feedback-${index}" style="display: none;"></div>
+                `;
+                
+                container.appendChild(questionDiv);
+            });
+            
+            updateFBProgress();
+        }
+
+        function checkFBAnswer(questionIndex) {
+            const question = fillBlankQuestions[questionIndex];
+            const input = document.getElementById(`fb-input-${questionIndex}`);
+            const userAnswer = input.value.trim().toLowerCase();
+            
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+            
+            const isCorrect = userAnswer === question.answer.toLowerCase();
+            const feedback = document.getElementById(`fb-feedback-${questionIndex}`);
+            const checkButton = document.getElementById(`fb-check-${questionIndex}`);
+            
+            // Mark input
+            input.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' : 
+                `Incorrect. The correct answer is: ${question.answer}`;
+            
+            // Update score and play sound
+            if (isCorrect && !checkButton.disabled) {
+                fbScore++;
+                playCorrectSound();
+            }
+            
+            // Disable button
+            checkButton.disabled = true;
+            checkButton.textContent = 'Answered';
+            input.disabled = true;
+            
+            updateFBProgress();
+        }
+
+        function nextFBQuestion() {
+            if (currentFBQuestion < fillBlankQuestions.length - 1) {
+                document.getElementById(`fb-question-${currentFBQuestion}`).style.display = 'none';
+                currentFBQuestion++;
+                document.getElementById(`fb-question-${currentFBQuestion}`).style.display = 'block';
+                updateFBProgress();
+            }
+        }
+
+        function previousFBQuestion() {
+            if (currentFBQuestion > 0) {
+                document.getElementById(`fb-question-${currentFBQuestion}`).style.display = 'none';
+                currentFBQuestion--;
+                document.getElementById(`fb-question-${currentFBQuestion}`).style.display = 'block';
+                updateFBProgress();
+            }
+        }
+
+        function updateFBProgress() {
+            const progressText = document.getElementById('fbProgressText');
+            const progressFill = document.getElementById('fbProgressFill');
+            const prevBtn = document.getElementById('prevFBBtn');
+            const nextBtn = document.getElementById('nextFBBtn');
+            
+            progressText.textContent = `Question ${currentFBQuestion + 1} of ${fillBlankQuestions.length}`;
+            progressFill.style.width = `${((currentFBQuestion) / fillBlankQuestions.length) * 100}%`;
+            
+            prevBtn.disabled = currentFBQuestion === 0;
+            nextBtn.disabled = currentFBQuestion === fillBlankQuestions.length - 1;
+        }
+
+        // Essay Functions
+        function updateWordCount() {
+            const textarea = document.getElementById('essay-text');
+            const wordCount = document.getElementById('word-count');
+            const words = textarea.value.trim().split(/\s+/).filter(word => word.length > 0);
+            wordCount.textContent = `Word count: ${words.length}`;
+        }
+
+        function saveEssayDraft() {
+            const essayText = document.getElementById('essay-text').value;
+            localStorage.setItem('essayDraft', essayText);
+            
+            const feedback = document.getElementById('essay-feedback');
+            feedback.style.display = 'block';
+            feedback.className = 'feedback info';
+            feedback.textContent = 'Draft saved successfully!';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 3000);
+        }
+
+        function submitEssay() {
+            const essayText = document.getElementById('essay-text').value.trim();
+            const words = essayText.split(/\s+/).filter(word => word.length > 0);
+            
+            if (words.length < 100) {
+                alert('Your essay should be at least 100 words long.');
+                return;
+            }
+            
+            localStorage.setItem('submittedEssay', essayText);
+            localStorage.setItem('essaySubmissionDate', new Date().toLocaleString());
+            
+            const feedback = document.getElementById('essay-feedback');
+            feedback.style.display = 'block';
+            feedback.className = 'feedback correct';
+            feedback.innerHTML = `
+                <strong>Essay submitted successfully!</strong><br>
+                Word count: ${words.length}<br>
+                Submitted: ${new Date().toLocaleString()}
+            `;
+            
+            updateResults();
+        }
+
+        // Results Functions
+        function updateResults() {
+            // Update MC score
+            const mcScoreDisplay = document.getElementById('mc-score-display');
+            const mcBadge = document.getElementById('mc-performance-badge');
+            mcScoreDisplay.textContent = `${mcScore}/${multipleChoiceQuestions.length}`;
+            
+            const mcPercentage = (mcScore / multipleChoiceQuestions.length) * 100;
+            if (mcPercentage >= 80) {
+                mcBadge.innerHTML = '<div class="performance-badge performance-excellent">Excellent</div>';
+            } else if (mcPercentage >= 60) {
+                mcBadge.innerHTML = '<div class="performance-badge performance-good">Good</div>';
+            } else {
+                mcBadge.innerHTML = '<div class="performance-badge performance-needs-improvement">Needs Improvement</div>';
+            }
+            
+            // Update FB score
+            const fbScoreDisplay = document.getElementById('fb-score-display');
+            const fbBadge = document.getElementById('fb-performance-badge');
+            fbScoreDisplay.textContent = `${fbScore}/${fillBlankQuestions.length}`;
+            
+            const fbPercentage = (fbScore / fillBlankQuestions.length) * 100;
+            if (fbPercentage >= 80) {
+                fbBadge.innerHTML = '<div class="performance-badge performance-excellent">Excellent</div>';
+            } else if (fbPercentage >= 60) {
+                fbBadge.innerHTML = '<div class="performance-badge performance-good">Good</div>';
+            } else {
+                fbBadge.innerHTML = '<div class="performance-badge performance-needs-improvement">Needs Improvement</div>';
+            }
+            
+            // Update essay status
+            const essayStatus = document.getElementById('essay-status');
+            const submittedEssay = localStorage.getItem('submittedEssay');
+            const submissionDate = localStorage.getItem('essaySubmissionDate');
+            
+            if (submittedEssay) {
+                const words = submittedEssay.split(/\s+/).filter(word => word.length > 0);
+                essayStatus.innerHTML = `
+                    <div style="color: #2f855a; font-weight: 500;">Essay submitted</div>
+                    <div style="color: #4a5568; font-size: 0.9rem;">
+                        Word count: ${words.length} | Submitted: ${submissionDate}
+                    </div>
+                `;
+            } else {
+                essayStatus.innerHTML = '<div style="color: #a0aec0;">No essay submitted yet</div>';
+            }
+        }
+
+        function resetAllQuizzes() {
+            if (confirm('Are you sure you want to reset all quizzes? This will clear all your progress.')) {
+                // Reset state
+                currentMCQuestion = 0;
+                currentFBQuestion = 0;
+                mcAnswers = [];
+                fbAnswers = [];
+                mcScore = 0;
+                fbScore = 0;
+                
+                // Clear essay
+                document.getElementById('essay-text').value = '';
+                localStorage.removeItem('essayDraft');
+                localStorage.removeItem('submittedEssay');
+                localStorage.removeItem('essaySubmissionDate');
+                
+                // Re-initialize
+                initializeMultipleChoice();
+                initializeFillBlank();
+                updateWordCount();
+                updateResults();
+                
+                alert('All quizzes have been reset!');
+            }
+        }
+
+        function downloadResults() {
+            const results = {
+                multipleChoice: {
+                    score: mcScore,
+                    total: multipleChoiceQuestions.length,
+                    percentage: Math.round((mcScore / multipleChoiceQuestions.length) * 100)
+                },
+                fillBlank: {
+                    score: fbScore,
+                    total: fillBlankQuestions.length,
+                    percentage: Math.round((fbScore / fillBlankQuestions.length) * 100)
+                },
+                essay: {
+                    submitted: localStorage.getItem('submittedEssay') ? true : false,
+                    submissionDate: localStorage.getItem('essaySubmissionDate') || 'Not submitted'
+                },
+                generatedDate: new Date().toLocaleString()
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(results, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "quiz_results.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Load saved essay draft on page load
+        window.addEventListener('load', function() {
+            const savedDraft = localStorage.getItem('essayDraft');
+            if (savedDraft && !localStorage.getItem('submittedEssay')) {
+                document.getElementById('essay-text').value = savedDraft;
+                updateWordCount();
+            }
+        });
+    </script>
+</body>
+</html>

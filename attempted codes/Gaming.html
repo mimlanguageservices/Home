@@ -1,0 +1,2204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Language - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Section */
+        .discussion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr 1fr 1fr;
+            gap: 25px;
+            height: calc(100% - 120px);
+        }
+
+        .discussion-header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .actual-image {
+            width: 300px;
+            height: 200px;
+            border: none;
+            border-radius: 16px;
+            margin: 0 auto 20px;
+            object-fit: cover;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .discussion-question {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .discussion-question:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .discussion-question h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .discussion-question p {
+            color: #4a5568;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 280px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .flashcard-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+            color: #a0aec0;
+            opacity: 0.8;
+        }
+
+        .flashcard:hover .flashcard-inner {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .quiz-input.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .quiz-input.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice input[type="radio"] {
+            display: none;
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.correct {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.incorrect {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: rgba(160, 174, 192, 0.5);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-weight: 500;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+
+            .header .website a {
+                font-size: 1rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+                margin-top: 15px;
+            }
+
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 20px 15px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                background: rgba(45, 55, 72, 0.95);
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 120px;
+                margin: 5px;
+                font-size: 0.95rem;
+                padding: 12px 16px;
+                border-radius: 20px;
+            }
+
+            .content {
+                height: auto;
+                overflow: visible;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .section {
+                padding: 25px 15px;
+                height: auto;
+                overflow: visible;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .discussion-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                height: auto;
+            }
+
+            .discussion-header {
+                order: -1;
+                padding: 20px;
+            }
+
+            .actual-image {
+                width: 250px;
+                height: 150px;
+                margin: 0 auto 15px;
+                border-radius: 12px;
+            }
+
+            .discussion-question {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .discussion-question h3 {
+                font-size: 1.3rem;
+            }
+
+            .discussion-question p {
+                font-size: 1rem;
+            }
+
+            .reading-container {
+                height: auto;
+            }
+
+            .reading-nav, .reading-subnav {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .page-btn {
+                font-size: 0.95rem;
+                padding: 10px 16px;
+                flex: 1;
+                min-width: 100px;
+                border-radius: 20px;
+            }
+
+            .reading-page {
+                height: auto;
+                overflow: visible;
+                max-height: none;
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            .reading-page h3 {
+                font-size: 1.5rem;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+                line-height: 1.7;
+            }
+
+            .vocab-container {
+                height: auto;
+            }
+
+            .vocab-nav {
+                gap: 8px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                height: auto;
+            }
+
+            .flashcard {
+                height: 200px;
+            }
+
+            .flashcard-front, .flashcard-back {
+                border-radius: 16px;
+            }
+
+            .flashcard-term {
+                font-size: 1.7rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.3rem;
+            }
+
+            .flashcard-hint {
+                font-size: 1rem;
+            }
+
+            .quiz-container {
+                height: auto;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .quiz-nav {
+                justify-content: center;
+            }
+
+            .nav-btn {
+                font-size: 1rem;
+                padding: 10px 20px;
+                border-radius: 20px;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+                margin: 0 10px;
+                border-radius: 16px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.6rem;
+                margin-bottom: 25px;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                max-width: 100%;
+            }
+
+            .choice {
+                font-size: 1.1rem;
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .quiz-input {
+                font-size: 1.3rem;
+                max-width: 100%;
+                padding: 15px 20px;
+                border-radius: 20px;
+            }
+
+            .check-button {
+                font-size: 1.3rem;
+                padding: 15px 30px;
+                margin: 20px auto;
+                border-radius: 20px;
+            }
+
+            .feedback {
+                font-size: 1rem;
+                margin: 20px 10px;
+                border-radius: 10px;
+            }
+
+            .results-summary {
+                padding: 30px 20px;
+                margin: 0 10px;
+                border-radius: 16px;
+            }
+
+            .results-summary h3 {
+                font-size: 1.8rem;
+            }
+
+            .score {
+                font-size: 3rem;
+            }
+
+            .popup-content {
+                margin: 15px;
+                padding: 30px 25px;
+                max-width: 90%;
+                border-radius: 16px;
+            }
+
+            .popup-word {
+                font-size: 1.6rem;
+            }
+
+            .popup-definition {
+                font-size: 1.1rem;
+            }
+
+            .popup-close {
+                border-radius: 20px;
+            }
+
+            .vocab-link {
+                font-size: 1rem;
+                padding: 3px 8px;
+                display: inline-block;
+                margin: 1px;
+                border-radius: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .nav-item {
+                font-size: 0.85rem;
+                padding: 10px 12px;
+                min-width: 100px;
+            }
+
+            .section {
+                padding: 20px 12px;
+            }
+
+            .section h2 {
+                font-size: 1.6rem;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard {
+                height: 180px;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+
+            .reading-page {
+                padding: 20px 15px;
+            }
+
+            .discussion-question {
+                padding: 18px;
+            }
+
+            .actual-image {
+                width: 200px;
+                height: 120px;
+            }
+
+            .quiz-input {
+                font-size: 1.2rem;
+                padding: 12px 16px;
+            }
+
+            .check-button {
+                font-size: 1.2rem;
+                padding: 12px 25px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .nav-item,
+            .choice,
+            .flashcard,
+            .vocab-link,
+            .check-button,
+            .page-btn {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .vocab-link {
+                min-height: 32px;
+                line-height: 1.2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elements for sound effects -->
+    <audio id="flipSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>Gaming Language</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="openWritingForm(this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section -->
+            <div class="section active" id="discussion">
+                <h2>Discussion: Gaming Culture and Language</h2>
+                <div class="discussion-grid">
+                    <div class="discussion-header">
+                        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&h=600&fit=crop&crop=center" alt="Gaming Setup" class="actual-image">
+                    </div>
+                    
+                    <div class="discussion-question">
+                        <h3>Gaming Experience</h3>
+                        <p>What types of video games do you enjoy playing? Have you ever played online games with people from other countries? How did you communicate?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>Gaming Vocabulary</h3>
+                        <p>Do you know any gaming terms in English? Which gaming words do you think are most important for international communication?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>Learning Through Gaming</h3>
+                        <p>Can video games help people learn English? What are the advantages and disadvantages of using games for language learning?</p>
+                    </div>
+
+                    <div class="discussion-question">
+                        <h3>Gaming Communities</h3>
+                        <p>Have you ever been part of a gaming community or clan? How important is it to understand gaming slang to participate in these groups?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading: Understanding Gaming Language</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('B1', this)">B1 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
+                    </div>
+                    
+                    <!-- Sub-navigation for each level -->
+                    <div class="reading-subnav" id="reading-subnav">
+                        <button class="page-btn active" onclick="showReadingPage(1, this)">Gaming Basics</button>
+                        <button class="page-btn" onclick="showReadingPage(2, this)">Common Terms</button>
+                        <button class="page-btn" onclick="showReadingPage(3, this)">Online Gaming</button>
+                        <button class="page-btn" onclick="showReadingPage(4, this)">Gaming Culture</button>
+                    </div>
+
+                    <!-- B1 Level Reading Pages -->
+                    <div class="reading-level" id="B1-level">
+                        <div class="reading-page active" id="B1-page-1">
+                            <h3>My First Week as a Gamer</h3>
+                            <p>
+                                My name is Alex, and I want to tell you about my first week playing online games. I was a complete <span class="vocab-link" onclick="showPopup('noob', 'A beginner or new player')">noob</span> when I started, but now I understand gamer language much better!
+                            </p>
+                            <p>
+                                On Monday, my friend Jake introduced me to "Fantasy Quest Online." When I first <span class="vocab-link" onclick="showPopup('spawned', 'Appeared in the game world')">spawned</span> into the game world, I was amazed by the beautiful graphics. Jake explained that I needed to complete <span class="vocab-link" onclick="showPopup('quests', 'Missions or tasks given by the game')">quests</span> to <span class="vocab-link" onclick="showPopup('level up', 'Advance to the next level')">level up</span> my character.
+                            </p>
+                            <p>
+                                Tuesday was frustrating because of <span class="vocab-link" onclick="showPopup('lag', 'Delay between action and game response')">lag</span>. Every time I tried to attack an enemy, there was a three-second delay! Jake told me this was normal during peak hours when many players are online.
+                            </p>
+                            <p>
+                                By Wednesday, I discovered what <span class="vocab-link" onclick="showPopup('grinding', 'Doing repetitive tasks to improve character')">grinding</span> meant. To get better armor, I had to kill the same monsters over and over again. It was boring, but Jake said, "Welcome to gaming! Sometimes you have to <span class="vocab-link" onclick="showPopup('farm', 'Collect items repeatedly')">farm</span> for hours to get what you want."
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-2">
+                            <h3>Learning Common Gaming Terms</h3>
+                            <p>
+                                Thursday was exciting because we fought our first <span class="vocab-link" onclick="showPopup('boss', 'Very powerful enemy at end of level')">boss</span>! The Dragon King was incredibly <span class="vocab-link" onclick="showPopup('OP', 'Overpowered; too strong')">OP</span> – it killed our entire team in thirty seconds. Jake laughed and said, "Don't worry, even experienced players die to this boss. We need better <span class="vocab-link" onclick="showPopup('loot', 'Items collected after winning battles')">loot</span> and higher levels."
+                            </p>
+                            <p>
+                                On Friday, I met some <span class="vocab-link" onclick="showPopup('NPCs', 'Non-Player Characters controlled by computer')">NPCs</span> who gave me important information about the game world. One NPC taught me about <span class="vocab-link" onclick="showPopup('buffs', 'Temporary improvements to character abilities')">buffs</span> – special magic that makes your character stronger temporarily.
+                            </p>
+                            <p>
+                                The weekend was when I really improved. Jake taught me about <span class="vocab-link" onclick="showPopup('PvP', 'Player versus Player battles')">PvP</span> (Player vs Player) battles. At first, I kept losing because other players accused me of <span class="vocab-link" onclick="showPopup('camping', 'Staying in one spot waiting for enemies')">camping</span> – hiding in corners and waiting for them.
+                            </p>
+                            <p>
+                                Now I understand why people love gaming. Yes, sometimes you have to grind for hours, and yes, lag can be annoying. But the teamwork, the challenge of fighting bosses, and the excitement of finding rare loot make it all worth it!
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-3">
+                            <h3>Online Gaming Communication</h3>
+                            <p>
+                                One funny moment happened when Jake went <span class="vocab-link" onclick="showPopup('AFK', 'Away From Keyboard - not actively playing')">AFK</span> during a boss fight. He said, "I'll be right back," but didn't return for twenty minutes! Our team had to fight without him. When he came back, we were all laughing about how we survived.
+                            </p>
+                            <p>
+                                Sunday was almost a disaster. During an important team battle, my little brother started watching videos on our internet, causing terrible lag. I was so angry that I almost <span class="vocab-link" onclick="showPopup('rage quit', 'Leave game angrily after losing')">rage quit</span>, but Jake calmed me down. "Every gamer deals with technical problems," he said.
+                            </p>
+                            <p>
+                                I learned that communication is very important in online games. Players use special words to talk quickly. For example, when someone says "rez me," they want you to bring their character back to life. When they say "behind you," an enemy is attacking from behind.
+                            </p>
+                            <p>
+                                Gaming taught me that learning a language takes practice. Just like in games, you start as a <span class="vocab-link" onclick="showPopup('beginner', 'Someone who is just starting')">beginner</span>, but with time and effort, you become experienced. Gaming English is now part of my vocabulary!
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-4">
+                            <h3>Gaming Culture and Community</h3>
+                            <p>
+                                After my first week of gaming, I realized that games create their own culture. Gamers have special ways of speaking, acting, and helping each other. This culture exists in many languages, but English gaming terms are used worldwide.
+                            </p>
+                            <p>
+                                I noticed that experienced players often help <span class="vocab-link" onclick="showPopup('newbies', 'New players')">newbies</span> learn the game. They share tips, give free items, and explain difficult concepts. However, some players can be impatient with beginners who make mistakes.
+                            </p>
+                            <p>
+                                Gaming communities often have their own rules and <span class="vocab-link" onclick="showPopup('etiquette', 'Proper behavior and manners')">etiquette</span>. For example, it's considered rude to take items that other players dropped. It's also important to communicate with your team and not play selfishly.
+                            </p>
+                            <p>
+                                Learning gaming English helped me connect with players from around the world. We could work together, share strategies, and have fun together, even though we spoke different native languages. Gaming really is a universal language!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level Reading Pages -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-page active" id="B2-page-1">
+                            <h3>The Evolution of Gaming Language</h3>
+                            <p>
+                                The digital gaming revolution has created a unique <span class="vocab-link" onclick="showPopup('lexicon', 'Specialized vocabulary of a particular field')">lexicon</span> that transcends geographical and cultural boundaries. This specialized vocabulary has evolved from the practical need for rapid, efficient communication during <span class="vocab-link" onclick="showPopup('real-time', 'Happening immediately without delay')">real-time</span> gameplay, where split-second decisions can determine victory or defeat.
+                            </p>
+                            <p>
+                                Gaming terminology serves multiple functions beyond mere communication. It creates a sense of community identity, establishes <span class="vocab-link" onclick="showPopup('hierarchy', 'System of ranking people or things')">hierarchy</span> based on skill and experience, and provides <span class="vocab-link" onclick="showPopup('efficient', 'Working well without wasting time or resources')">efficient</span> shortcuts for complex concepts. Terms like "meta" refer to the most effective strategies currently dominating competitive play, while "cheese" describes unconventional tactics that exploit game mechanics.
+                            </p>
+                            <p>
+                                The <span class="vocab-link" onclick="showPopup('proliferation', 'Rapid increase in numbers')">proliferation</span> of gaming language has been accelerated by streaming platforms and social media, where professional gamers and <span class="vocab-link" onclick="showPopup('influencers', 'People with ability to affect others\' opinions')">influencers</span> popularize new terms and expressions. This has created a dynamic, constantly evolving linguistic ecosystem that adapts to new games, updates, and player innovations.
+                            </p>
+                            <p>
+                                Understanding gaming terminology has become essential for anyone seeking to participate meaningfully in online gaming communities. The language serves as both a practical tool and a cultural <span class="vocab-link" onclick="showPopup('gateway', 'Means of access or entry')">gateway</span>, enabling players to demonstrate their knowledge and earn respect within these digital societies.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-2">
+                            <h3>Competitive Gaming and Professional Terminology</h3>
+                            <p>
+                                The emergence of <span class="vocab-link" onclick="showPopup('esports', 'Electronic sports - competitive video gaming')">esports</span> as a legitimate competitive arena has introduced a more sophisticated layer of gaming vocabulary. Professional players and analysts use precise terminology to describe complex strategies, character abilities, and tactical situations that casual gamers might overlook.
+                            </p>
+                            <p>
+                                Terms like "DPS" (Damage Per Second) have evolved from simple measurements to role definitions in team-based games. A "DPS player" specializes in dealing maximum damage, while "tanks" absorb enemy attacks and "supports" provide healing and <span class="vocab-link" onclick="showPopup('utility', 'Usefulness for a specific purpose')">utility</span>. This role-based vocabulary reflects the increasing complexity and strategic depth of modern multiplayer games.
+                            </p>
+                            <p>
+                                The concept of "micro" and "macro" gameplay demonstrates how gaming language can <span class="vocab-link" onclick="showPopup('encapsulate', 'Express concisely; summarize')">encapsulate</span> complex ideas efficiently. Micro refers to precise, small-scale actions like accurate aiming or perfect timing, while macro encompasses broader strategic decisions like resource management and positioning.
+                            </p>
+                            <p>
+                                Professional gaming has also introduced borrowed terminology from traditional sports and military strategy. Terms like "draft," "rotation," and "flanking" have been adapted to fit digital contexts, creating a hybrid vocabulary that bridges different competitive domains and makes gaming more accessible to mainstream audiences.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-3">
+                            <h3>Social Dynamics in Online Gaming</h3>
+                            <p>
+                                Online gaming environments serve as complex social ecosystems where language plays a crucial role in establishing relationships, resolving conflicts, and maintaining community standards. The anonymous nature of online interaction has led to unique communication patterns and behavioral norms that differ significantly from face-to-face social interactions.
+                            </p>
+                            <p>
+                                The phenomenon of "<span class="vocab-link" onclick="showPopup('toxicity', 'Harmful or destructive behavior')">toxicity</span>" in gaming communities has prompted discussions about digital citizenship and the responsibility of platforms to moderate user behavior. Terms like "griefing" (deliberately disrupting other players' enjoyment) and "trolling" have entered mainstream vocabulary, reflecting broader concerns about online behavior.
+                            </p>
+                            <p>
+                                Conversely, positive gaming interactions have generated their own vocabulary of cooperation and <span class="vocab-link" onclick="showPopup('camaraderie', 'Friendship and trust between people')">camaraderie</span>. Terms like "carry" (helping weaker players succeed), "coaching," and "mentoring" demonstrate how gaming communities can foster supportive relationships and skill development.
+                            </p>
+                            <p>
+                                The social aspects of gaming language extend beyond individual interactions to encompass community building and cultural exchange. International gaming servers create opportunities for cross-cultural communication, where players must navigate linguistic differences while working toward common goals, making gaming a unique form of digital <span class="vocab-link" onclick="showPopup('diplomacy', 'Management of international relations')">diplomacy</span>.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-4">
+                            <h3>The Future of Gaming Communication</h3>
+                            <p>
+                                As gaming technology continues to advance, the language of gaming evolves to accommodate new forms of interaction and gameplay mechanics. Virtual reality, augmented reality, and artificial intelligence are introducing novel concepts that require fresh vocabulary and communication strategies.
+                            </p>
+                            <p>
+                                The integration of voice communication and AI-assisted translation tools is breaking down language barriers in international gaming communities. However, the cultural and contextual <span class="vocab-link" onclick="showPopup('nuances', 'Subtle differences in expression or meaning')">nuances</span> of gaming language remain challenging for automated systems to interpret accurately.
+                            </p>
+                            <p>
+                                Emerging technologies like haptic feedback and <span class="vocab-link" onclick="showPopup('biometric', 'Related to measurement of biological data')">biometric</span> monitoring are creating new categories of gaming terminology related to physical sensation and emotional state. Terms describing "haptic gaming" and "physiological feedback" are becoming more common as these technologies mature.
+                            </p>
+                            <p>
+                                The future of gaming language will likely be shaped by the increasing <span class="vocab-link" onclick="showPopup('convergence', 'Coming together of different things')">convergence</span> of gaming with other digital experiences, including social media, education, and professional training. This convergence suggests that gaming vocabulary will continue to influence and be influenced by broader technological and cultural developments, making it an essential component of digital literacy in the 21st century.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level Reading Pages -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-page active" id="C1-page-1">
+                            <h3>The Linguistic Anthropology of Digital Gaming</h3>
+                            <p>
+                                The phenomenon of gaming language represents a fascinating case study in contemporary linguistic evolution, demonstrating how technological innovation can catalyze the emergence of entirely new <span class="vocab-link" onclick="showPopup('vernaculars', 'Language spoken by ordinary people in a region')">vernaculars</span>. This digital patois has transcended its utilitarian origins to become a sophisticated system of cultural signification, embodying values, hierarchies, and social dynamics unique to virtual environments.
+                            </p>
+                            <p>
+                                The <span class="vocab-link" onclick="showPopup('etymology', 'Study of the origin of words')">etymology</span> of gaming terminology reveals a complex process of linguistic borrowing, metaphorical extension, and semantic innovation. Terms like "spawn" derive from biological reproduction, "farming" from agriculture, and "camping" from military tactics, yet their gaming applications have developed <span class="vocab-link" onclick="showPopup('connotations', 'Ideas suggested by a word beyond its literal meaning')">connotations</span> and usage patterns entirely divorced from their original contexts.
+                            </p>
+                            <p>
+                                The rapid <span class="vocab-link" onclick="showPopup('dissemination', 'Spread of information widely')">dissemination</span> and standardization of gaming vocabulary across linguistic boundaries challenges traditional models of language change. Unlike historical processes of lexical diffusion, which typically required centuries to achieve cross-cultural penetration, gaming terminology can achieve global currency within months or even weeks of its initial emergence.
+                            </p>
+                            <p>
+                                This phenomenon raises intriguing questions about the future of linguistic diversity in an increasingly connected world. While gaming language promotes global communication, it also represents a form of linguistic <span class="vocab-link" onclick="showPopup('hegemony', 'Dominance of one group over others')">hegemony</span>, with English-derived terms dominating even in non-English speaking gaming communities, potentially marginalizing indigenous gaming vocabularies and cultural practices.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-2">
+                            <h3>Cognitive and Pedagogical Implications</h3>
+                            <p>
+                                The acquisition of gaming vocabulary presents unique challenges and opportunities for second language learners, as it requires mastery not only of lexical items but also of cultural contexts, pragmatic conventions, and community-specific discourse patterns. This multimodal learning environment engages various cognitive processes simultaneously, potentially enhancing language acquisition through embodied, contextual learning experiences.
+                            </p>
+                            <p>
+                                Research in psycholinguistics suggests that gaming environments may provide optimal conditions for vocabulary acquisition due to their high-stakes, emotionally engaging contexts. The immediate feedback mechanisms inherent in gaming create powerful associations between linguistic forms and their pragmatic functions, potentially accelerating the transition from explicit to <span class="vocab-link" onclick="showPopup('implicit', 'Not directly expressed; understood')">implicit</span> knowledge.
+                            </p>
+                            <p>
+                                However, the specialized nature of gaming discourse also presents potential limitations. The <span class="vocab-link" onclick="showPopup('register', 'Variety of language used in particular social contexts')">register</span> specificity of gaming vocabulary may not transfer effectively to other domains of language use, potentially creating learners with highly developed gaming competence but limited general proficiency. This raises questions about the <span class="vocab-link" onclick="showPopup('transferability', 'Ability to apply knowledge in new situations')">transferability</span> of domain-specific language skills.
+                            </p>
+                            <p>
+                                The collaborative nature of multiplayer gaming also provides opportunities for peer-to-peer language learning, where native and non-native speakers engage in authentic communicative tasks with shared objectives. This natural scaffolding environment may be particularly beneficial for developing pragmatic competence and cultural awareness, skills often difficult to acquire in traditional classroom settings.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-3">
+                            <h3>Sociocultural Power Dynamics</h3>
+                            <p>
+                                The gaming community's relationship with language extends beyond mere communication to encompass complex issues of identity construction, social stratification, and cultural capital. Mastery of gaming vocabulary serves as a form of <span class="vocab-link" onclick="showPopup('gatekeeping', 'Controlling access to something')">gatekeeping</span>, determining who can participate meaningfully in community discourse and who remains marginalized as perpetual outsiders.
+                            </p>
+                            <p>
+                                The phenomenon of "linguistic passing" in gaming communities, where players adopt native-like gaming discourse to mask their novice status or non-native speaker identity, reflects broader societal tensions around authenticity, performance, and belonging. This performative aspect of gaming language use highlights its function as more than mere communication tool—it becomes a marker of cultural <span class="vocab-link" onclick="showPopup('authenticity', 'Quality of being genuine')">authenticity</span> and community membership.
+                            </p>
+                            <p>
+                                Gender dynamics within gaming communities manifest linguistically through gendered terms, expectations about communicative styles, and differential treatment based on perceived gender identity. The <span class="vocab-link" onclick="showPopup('androcentric', 'Centered on or emphasizing male perspectives')">androcentric</span> nature of much gaming vocabulary reflects historical male dominance in gaming culture, though evolving community demographics are gradually challenging these linguistic patterns.
+                            </p>
+                            <p>
+                                The international nature of gaming communities creates unique opportunities for linguistic and cultural exchange, but also potential for miscommunication and cultural conflict. The adoption of English gaming terminology by non-native speakers sometimes occurs without full understanding of cultural <span class="vocab-link" onclick="showPopup('subtext', 'Underlying meaning not explicitly stated')">subtext</span>, leading to unintended offense or misunderstanding in cross-cultural gaming interactions.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-4">
+                            <h3>Technological Determinism and Linguistic Innovation</h3>
+                            <p>
+                                The relationship between technological affordances and linguistic innovation in gaming environments exemplifies broader questions about technological determinism in language change. Each new gaming platform, interface design, or mechanical innovation necessitates corresponding lexical adaptations, creating a dynamic feedback loop between technology and language.
+                            </p>
+                            <p>
+                                The emergence of blockchain gaming and non-fungible tokens (NFTs) in gaming has introduced an entirely new vocabulary subset, including terms like "minting," "gas fees," and "tokenomics." This rapid linguistic adaptation demonstrates the gaming community's remarkable capacity for lexical innovation and <span class="vocab-link" onclick="showPopup('assimilation', 'Process of taking in and understanding information')">assimilation</span> of technical concepts.
+                            </p>
+                            <p>
+                                Virtual and augmented reality gaming platforms are pushing the boundaries of traditional gaming vocabulary, requiring new terms to describe spatial relationships, embodied interactions, and <span class="vocab-link" onclick="showPopup('proprioceptive', 'Related to body position and movement awareness')">proprioceptive</span> experiences. This evolution suggests that gaming language will continue expanding to accommodate increasingly sophisticated and immersive technological experiences.
+                            </p>
+                            <p>
+                                The potential integration of artificial intelligence and machine learning into gaming experiences raises questions about human-AI linguistic interaction within gaming contexts. As AI entities become more sophisticated conversational partners, gaming communities may need to develop new vocabulary and pragmatic conventions for human-AI communication, further expanding the linguistic complexity of digital gaming environments and challenging traditional notions of communicative <span class="vocab-link" onclick="showPopup('agency', 'Capacity to act independently')">agency</span> in virtual spaces.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Gaming English Explained</h2>
+                <div class="video-container" style="display: flex; flex-direction: column; height: calc(100% - 120px); padding: 15px; justify-content: center;">
+                    <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                        <div style="width: 95%; max-width: 1000px; position: relative; padding-bottom: 56.25%; height: 0;">
+                            <iframe 
+                                src="https://www.youtube.com/embed/aoa29OmTl4s?start=33" 
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <h2>Video Discussions</h2>
+                <div class="video-discussions-container" style="display: flex; flex-direction: column; height: calc(100% - 120px); padding: 30px; overflow-y: auto;">
+                    <div style="display: flex; flex-direction: column; justify-content: flex-start; align-items: center; min-height: 100%;">
+                        <div style="width: 100%; max-width: 900px; background: #f8f9fa; padding: 40px; border-radius: 10px; border: 2px solid #3498db; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.1);">
+                            <h3 style="color: #34495E; margin-bottom: 25px; font-size: 2.2rem; text-align: center;">Video Discussion Questions</h3>
+                            <div style="color: #34495E; line-height: 1.8; font-size: 1.3rem;">
+                                <div style="background: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3498db;">
+                                    <p style="margin: 0;"><strong>1. Class Preferences:</strong> The video discusses different character classes like Barbarian, Crusader, and Tempest. Which type of gaming character do you prefer: melee fighters who get close to enemies, or ranged attackers who fight from a distance? Why?</p>
+                                </div>
+                                <div style="background: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #F1C40F;">
+                                    <p style="margin: 0;"><strong>2. PvP vs PvE:</strong> The video mentions PvP (Player vs Player) and PvE (Player vs Environment) gameplay. Do you prefer competing against other players or completing quests and fighting computer-controlled enemies? What are the advantages of each?</p>
+                                </div>
+                                <div style="background: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #E74C3C;">
+                                    <p style="margin: 0;"><strong>3. Gaming Meta and Balance:</strong> The narrator explains how some classes get "nerfed" (made weaker) or become stronger over time. Why do you think game developers need to constantly balance different characters? How does this affect the gaming community?</p>
+                                </div>
+                                <div style="background: #FFFFFF; padding: 20px; border-radius: 8px; border-left: 4px solid #27AE60;">
+                                    <p style="margin: 0;"><strong>4. Personal vs Optimal Choices:</strong> The video creator emphasizes choosing a class that fits your playstyle rather than just picking the "best" one. In gaming or life, when is it better to choose what you enjoy over what might be most successful?</p>
+                                </div>
+                            </div>
+                            <div style="margin-top: 30px; padding: 20px; background: #34495E; border-radius: 8px; color: #FFFFFF; text-align: center;">
+                                <p style="margin: 0; font-size: 1.1rem; font-weight: 500;">🎮 <strong>Discussion Tip:</strong> Pay attention to gaming terms like "tanky," "farming," "meta," and "builds" in the video. These terms are commonly used across many different games and gaming communities.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Key Gaming Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Basic Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Advanced Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(3, this)">Action Terms</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Noob</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A beginner or new player</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">OP</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Overpowered; too strong compared to others</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Spawn</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">To appear in the game world</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Lag</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Delay between action and game response</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">NPC</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Non-Player Character (controlled by computer)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Boss</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Very powerful enemy at end of level</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Buff</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">To make something stronger</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Nerf</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">To make something weaker</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Loot</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Items collected after winning battles</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">AFK</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Away From Keyboard (not actively playing)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Camping</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Staying in one spot waiting for enemies</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Quest</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Mission or task given by the game</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-3">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Grind</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Do repetitive tasks to improve character</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Farm</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Collect items repeatedly</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Level Up</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Advance to the next level</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Rage Quit</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Leave game angrily after losing</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">PvP</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Player versus Player battles</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Respawn</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Come back to life in the game</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="section" id="quiz">
+                <h2>Interactive Gaming Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuestion()" id="prevBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuestion()" id="nextBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Question 1 -->
+                    <div class="quiz-page active" id="quiz-page-1">
+                        <div class="quiz-question">
+                            <h3>What does "noob" mean in gaming?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q1" value="A">
+                                    An expert player
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q1" value="B">
+                                    A beginner or new player
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q1" value="C">
+                                    A game character
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q1" value="D">
+                                    A gaming device
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(1, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-1" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="quiz-page" id="quiz-page-2">
+                        <div class="quiz-question">
+                            <h3>Complete the sentence: "The boss is too _____! It's impossible to defeat!"</h3>
+                            <input type="text" class="quiz-input" id="answer-2" placeholder="Enter the missing word">
+                            <button class="check-button" onclick="checkTextAnswer(2, 'OP|op|overpowered')">Check Answer</button>
+                            <div class="feedback" id="feedback-2" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="quiz-page" id="quiz-page-3">
+                        <div class="quiz-question">
+                            <h3>What does "AFK" stand for?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q3" value="A">
+                                    Always FightingKunai
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q3" value="B">
+                                    Away From Keyboard
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q3" value="C">
+                                    After First Kill
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q3" value="D">
+                                    All For Kingdom
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(3, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-3" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="quiz-page" id="quiz-page-4">
+                        <div class="quiz-question">
+                            <h3>What does "lag" mean in gaming?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q4" value="A">
+                                    Running very fast
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q4" value="B">
+                                    Delay between action and game response
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q4" value="C">
+                                    Winning a game easily
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q4" value="D">
+                                    Collecting rare items
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(4, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-4" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="quiz-page" id="quiz-page-5">
+                        <div class="quiz-question">
+                            <h3>Complete: "I need to _____ these monsters for their coins."</h3>
+                            <input type="text" class="quiz-input" id="answer-5" placeholder="Enter the missing word">
+                            <button class="check-button" onclick="checkTextAnswer(5, 'farm|grind')">Check Answer</button>
+                            <div class="feedback" id="feedback-5" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div class="quiz-page" id="quiz-page-6">
+                        <div class="quiz-question">
+                            <h3>What is "camping" in gaming?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q6" value="A">
+                                    Going on outdoor adventures
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q6" value="B">
+                                    Staying in one spot waiting for enemies
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q6" value="C">
+                                    Setting up a base
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q6" value="D">
+                                    Sleeping in the game
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(6, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-6" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 7 -->
+                    <div class="quiz-page" id="quiz-page-7">
+                        <div class="quiz-question">
+                            <h3>Complete: "I just _____ and reached level 25!"</h3>
+                            <input type="text" class="quiz-input" id="answer-7" placeholder="Enter the missing phrase">
+                            <button class="check-button" onclick="checkTextAnswer(7, 'leveled up|levelled up')">Check Answer</button>
+                            <div class="feedback" id="feedback-7" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question 8 -->
+                    <div class="quiz-page" id="quiz-page-8">
+                        <div class="quiz-question">
+                            <h3>What is an NPC?</h3>
+                            <div class="multiple-choice">
+                                <div class="choice" onclick="selectChoice(this, 'A')">
+                                    <input type="radio" name="q8" value="A">
+                                    New Player Character
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'B')">
+                                    <input type="radio" name="q8" value="B">
+                                    Non-Player Character
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'C')">
+                                    <input type="radio" name="q8" value="C">
+                                    No Problem Character
+                                </div>
+                                <div class="choice" onclick="selectChoice(this, 'D')">
+                                    <input type="radio" name="q8" value="D">
+                                    Next Player Coming
+                                </div>
+                            </div>
+                            <button class="check-button" onclick="checkAnswer(8, 'B')">Check Answer</button>
+                            <div class="feedback" id="feedback-8" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Results Page -->
+                    <div class="quiz-page" id="quiz-results">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalScore">0/8</div>
+                            <p>Great work! You've completed the Gaming Language quiz.</p>
+                            <button class="check-button" onclick="restartQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Popup -->
+    <div class="popup-overlay" id="vocabPopup">
+        <div class="popup-content">
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+            <button class="popup-close" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentQuizPage = 1;
+        let totalQuizPages = 8;
+        let quizAnswers = {};
+        let correctAnswers = 0;
+        let currentReadingLevel = 'B1';
+
+        // Navigation functions
+        function showSection(sectionName, element) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function openWritingForm(element) {
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // Open Google Forms in new tab
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSdeZRNbdsfcdnjVyc9U6GCJTjmiU6aPOwagAqDykKN5b_PA5w/viewform?usp=header', '_blank');
+            
+            // Remove active class after a short delay to show it was clicked
+            setTimeout(() => {
+                if (element) {
+                    element.classList.remove('active');
+                }
+                // Reset to discussion tab as default
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            }, 300);
+        }
+
+        function showReadingLevel(level, element) {
+            // Hide all reading levels
+            const levels = document.querySelectorAll('.reading-level');
+            levels.forEach(levelDiv => levelDiv.style.display = 'none');
+            
+            // Remove active class from all level buttons
+            const buttons = document.querySelectorAll('.reading-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected level
+            document.getElementById(level + '-level').style.display = 'block';
+            currentReadingLevel = level;
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // Reset subnav to first page
+            showReadingPage(1, document.querySelectorAll('.reading-subnav .page-btn')[0]);
+        }
+
+        function showReadingPage(pageNum, element) {
+            // Hide all reading pages in current level
+            const pages = document.querySelectorAll(`#${currentReadingLevel}-level .reading-page`);
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all subnav buttons
+            const buttons = document.querySelectorAll('.reading-subnav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(`${currentReadingLevel}-page-` + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function showVocabPage(pageNum, element) {
+            // Hide all vocab pages
+            const pages = document.querySelectorAll('.vocab-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all page buttons
+            const buttons = document.querySelectorAll('.vocab-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // Flashcard function with sound effect
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            
+            // Play sound effect
+            const flipSound = document.getElementById('flipSound');
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => {
+                    console.log('Audio playback failed:', e);
+                });
+            }
+        }
+
+        // Vocabulary popup functions
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz functions
+        function selectChoice(element, value) {
+            // Remove selected class from all choices in this question
+            const choices = element.parentNode.querySelectorAll('.choice');
+            choices.forEach(choice => choice.classList.remove('selected'));
+            
+            // Add selected class to clicked choice
+            element.classList.add('selected');
+            
+            // Actually check the radio button
+            const radioInput = element.querySelector('input[type="radio"]');
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        }
+
+        function checkAnswer(questionNum, correctAnswer) {
+            const selectedChoice = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            const feedback = document.getElementById(`feedback-${questionNum}`);
+            const choices = document.querySelectorAll(`input[name="q${questionNum}"]`);
+            
+            if (!selectedChoice) {
+                alert('Please select an answer first!');
+                return;
+            }
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            
+            if (selectedChoice.value === correctAnswer) {
+                feedback.textContent = 'Correct! Well done!';
+                feedback.className = 'feedback correct';
+                quizAnswers[questionNum] = true;
+                
+                // Play correct answer sound effect
+                const correctSound = document.getElementById('correctSound');
+                if (correctSound) {
+                    correctSound.currentTime = 0;
+                    correctSound.play().catch(e => {
+                        console.log('Correct sound playback failed:', e);
+                    });
+                }
+                
+                // Mark correct answer
+                choices.forEach(choice => {
+                    const choiceDiv = choice.parentNode;
+                    if (choice.value === correctAnswer) {
+                        choiceDiv.classList.add('correct');
+                    }
+                });
+            } else {
+                feedback.textContent = 'Incorrect. Try again!';
+                feedback.className = 'feedback incorrect';
+                quizAnswers[questionNum] = false;
+                
+                // Mark answers
+                choices.forEach(choice => {
+                    const choiceDiv = choice.parentNode;
+                    if (choice.value === correctAnswer) {
+                        choiceDiv.classList.add('correct');
+                    } else if (choice.checked) {
+                        choiceDiv.classList.add('incorrect');
+                    }
+                });
+            }
+            
+            updateProgress();
+        }
+
+        function checkTextAnswer(questionNum, correctAnswer) {
+            const userAnswer = document.getElementById(`answer-${questionNum}`).value.trim();
+            const feedback = document.getElementById(`feedback-${questionNum}`);
+            const input = document.getElementById(`answer-${questionNum}`);
+            
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+            
+            feedback.style.display = 'block';
+            
+            // Check for multiple acceptable answers
+            const acceptableAnswers = correctAnswer.toLowerCase().split('|');
+            const isCorrect = acceptableAnswers.some(answer => 
+                userAnswer.toLowerCase() === answer || 
+                userAnswer.toLowerCase().replace(/[-\s]/g, '') === answer.replace(/[-\s]/g, '')
+            );
+            
+            if (isCorrect) {
+                feedback.textContent = 'Correct! Well done!';
+                feedback.className = 'feedback correct';
+                input.classList.add('correct');
+                quizAnswers[questionNum] = true;
+                
+                // Play correct answer sound effect
+                const correctSound = document.getElementById('correctSound');
+                if (correctSound) {
+                    correctSound.currentTime = 0;
+                    correctSound.play().catch(e => {
+                        console.log('Correct sound playback failed:', e);
+                    });
+                }
+            } else {
+                feedback.textContent = `Incorrect. The correct answer is: ${correctAnswer.split('|')[0]}`;
+                feedback.className = 'feedback incorrect';
+                input.classList.add('incorrect');
+                quizAnswers[questionNum] = false;
+            }
+            
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answeredQuestions = Object.keys(quizAnswers).length;
+            const progressPercent = (answeredQuestions / totalQuizPages) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            if (answeredQuestions === totalQuizPages) {
+                setTimeout(() => {
+                    showResults();
+                }, 2000);
+            }
+        }
+
+        function showResults() {
+            correctAnswers = Object.values(quizAnswers).filter(answer => answer).length;
+            document.getElementById('finalScore').textContent = `${correctAnswers}/${totalQuizPages}`;
+            
+            // Hide all quiz pages
+            const pages = document.querySelectorAll('.quiz-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show results
+            document.getElementById('quiz-results').classList.add('active');
+        }
+
+        function nextQuestion() {
+            if (currentQuizPage < totalQuizPages) {
+                document.getElementById(`quiz-page-${currentQuizPage}`).classList.remove('active');
+                currentQuizPage++;
+                document.getElementById(`quiz-page-${currentQuizPage}`).classList.add('active');
+                updateNavButtons();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuizPage > 1) {
+                document.getElementById(`quiz-page-${currentQuizPage}`).classList.remove('active');
+                currentQuizPage--;
+                document.getElementById(`quiz-page-${currentQuizPage}`).classList.add('active');
+                updateNavButtons();
+            }
+        }
+
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = (currentQuizPage === 1);
+            nextBtn.disabled = (currentQuizPage === totalQuizPages);
+        }
+
+        function restartQuiz() {
+            // Reset all variables
+            currentQuizPage = 1;
+            quizAnswers = {};
+            correctAnswers = 0;
+            
+            // Reset progress bar
+            document.getElementById('progressFill').style.width = '0%';
+            
+            // Hide results and show first question
+            document.getElementById('quiz-results').classList.remove('active');
+            document.getElementById('quiz-page-1').classList.add('active');
+            
+            // Reset all inputs and feedback
+            const inputs = document.querySelectorAll('.quiz-input');
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('correct', 'incorrect');
+            });
+            
+            const feedbacks = document.querySelectorAll('.feedback');
+            feedbacks.forEach(feedback => {
+                feedback.style.display = 'none';
+            });
+            
+            const choices = document.querySelectorAll('.choice');
+            choices.forEach(choice => {
+                choice.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            const radioInputs = document.querySelectorAll('input[type="radio"]');
+            radioInputs.forEach(radio => {
+                radio.checked = false;
+            });
+            
+            updateNavButtons();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNavButtons();
+            
+            // Close popup when clicking outside
+            document.getElementById('vocabPopup').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePopup();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
