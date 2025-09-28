@@ -532,7 +532,7 @@ class StudentFileManager {
     /**
      * Watch for changes and auto-sync (polling method)
      */
-    startAutoSync(intervalMinutes = 5) {
+    startAutoSync(intervalMinutes = 1) {
         console.log(`🔄 Starting auto-sync every ${intervalMinutes} minutes...`);
 
         const interval = setInterval(async () => {
