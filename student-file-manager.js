@@ -524,8 +524,8 @@ class StudentFileManager {
 
             execSync(`git commit -m "${commitMessage}"`, { cwd: this.studentsDir });
 
-            // Push to GitHub
-            execSync('git push', { cwd: this.studentsDir });
+            // Push to GitHub Students repository
+            execSync('git push students master', { cwd: this.studentsDir });
 
             console.log('✅ Successfully pushed changes to GitHub');
             return true;
