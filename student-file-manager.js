@@ -257,7 +257,10 @@ class StudentFileManager {
      * Process vocabulary URL to hide Google Sheets UI elements
      */
     processVocabularyUrl(vocabularyUrl) {
+        console.log(`🔍 DEBUG processVocabularyUrl INPUT: "${vocabularyUrl}"`);
+
         if (!vocabularyUrl || !vocabularyUrl.trim()) {
+            console.log(`🔍 DEBUG processVocabularyUrl OUTPUT: "" (empty input)`);
             return '';
         }
 
@@ -281,15 +284,19 @@ class StudentFileManager {
                 url.searchParams.set('widget', 'true');          // Widget mode
                 url.searchParams.set('single', 'true');          // Single sheet view
 
-                return url.toString();
+                const result = url.toString();
+                console.log(`🔍 DEBUG processVocabularyUrl OUTPUT: "${result}"`);
+                return result;
             } catch (error) {
                 // If URL parsing fails, return original URL
                 console.warn('Failed to process vocabulary URL:', error);
+                console.log(`🔍 DEBUG processVocabularyUrl OUTPUT: "${vocabularyUrl}" (error fallback)`);
                 return vocabularyUrl;
             }
         }
 
         // If not a Google Sheets URL, return as-is
+        console.log(`🔍 DEBUG processVocabularyUrl OUTPUT: "${vocabularyUrl}" (not Google Sheets)`);
         return vocabularyUrl;
     }
 
