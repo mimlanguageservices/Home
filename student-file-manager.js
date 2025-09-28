@@ -400,9 +400,18 @@ class StudentFileManager {
     replacePlaceholders(template, placeholders) {
         let result = template;
 
+        console.log('🔍 DEBUG replacePlaceholders - Starting replacement...');
         for (const [placeholder, value] of Object.entries(placeholders)) {
+            if (placeholder.includes('VOCABULARY_URL') || placeholder.includes('LEVEL')) {
+                console.log(`🔍 DEBUG Replacing "${placeholder}" with "${value}"`);
+            }
             const regex = new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g');
             result = result.replace(regex, value || '');
+        }
+
+        // Check if VOCABULARY_URL is in the result
+        if (result.includes('{{VOCABULARY_URL}}')) {
+            console.log('🔍 DEBUG WARNING: {{VOCABULARY_URL}} still found in result after replacement!');
         }
 
         return result;
