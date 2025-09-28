@@ -131,6 +131,7 @@ class StudentFileManager {
                 whatsapp: columns[this.columnMap.WHATSAPP] || '',
                 nationality: columns[this.columnMap.NATIONALITY] || '',
                 location: columns[this.columnMap.LOCATION] || '',
+                level: columns[this.columnMap.LEVEL] || '', // Column N - Student CEFR Level
                 learningObjective: columns[this.columnMap.LEARNING_OBJECTIVE] || '',
                 vocabularyUrl: columns[this.columnMap.VOCABULARY_URL] || '',
                 finishedActivities: columns[this.columnMap.FINISHED_ACTIVITIES] || '',
