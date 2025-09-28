@@ -119,7 +119,6 @@ class StudentFileManager {
             if (!studentName || !studentName.trim()) continue;
 
             const rawVocabUrl = columns[this.columnMap.VOCABULARY_URL] || '';
-            console.log(`🔍 DEBUG: Student "${studentName}" - Column P (index ${this.columnMap.VOCABULARY_URL}): "${rawVocabUrl}"`);
 
             const student = {
                 assignedTeacher: columns[this.columnMap.ASSIGNED_TEACHER] || '',
@@ -228,12 +227,7 @@ class StudentFileManager {
         // Process vocabulary URL to hide Google Sheets UI
         const processedVocabularyUrl = this.processVocabularyUrl(student.vocabularyUrl);
 
-        console.log(`🔍 DEBUG createPlaceholders for ${student.name}:`);
-        console.log(`  - student.level: "${student.level}"`);
-        console.log(`  - student.vocabularyUrl: "${student.vocabularyUrl}"`);
-        console.log(`  - processedVocabularyUrl: "${processedVocabularyUrl}"`);
-
-        return {
+        const placeholders = {
             '{{STUDENT_NAME}}': student.name,
             '{{STUDENT_PHOTO}}': student.imageUrl,
             '{{ASSIGNED_TEACHER}}': student.assignedTeacher,
@@ -256,16 +250,16 @@ class StudentFileManager {
             '{{NATIONALITY}}': student.nationality || '',
             '{{LOCATION}}': student.location || ''
         };
+
+        console.log(`🔍 DEBUG ${student.name} - VOCABULARY_URL placeholder: "${placeholders['{{VOCABULARY_URL}}']}" | LEVEL placeholder: "${placeholders['{{LEVEL}}']}"`)
+        return placeholders;
     }
 
     /**
      * Process vocabulary URL to hide Google Sheets UI elements
      */
     processVocabularyUrl(vocabularyUrl) {
-        console.log(`🔍 DEBUG processVocabularyUrl INPUT: "${vocabularyUrl}"`);
-
         if (!vocabularyUrl || !vocabularyUrl.trim()) {
-            console.log(`🔍 DEBUG processVocabularyUrl OUTPUT: "" (empty input)`);
             return '';
         }
 
@@ -289,19 +283,15 @@ class StudentFileManager {
                 url.searchParams.set('widget', 'true');          // Widget mode
                 url.searchParams.set('single', 'true');          // Single sheet view
 
-                const result = url.toString();
-                console.log(`🔍 DEBUG processVocabularyUrl OUTPUT: "${result}"`);
-                return result;
+                return url.toString();
             } catch (error) {
                 // If URL parsing fails, return original URL
                 console.warn('Failed to process vocabulary URL:', error);
-                console.log(`🔍 DEBUG processVocabularyUrl OUTPUT: "${vocabularyUrl}" (error fallback)`);
                 return vocabularyUrl;
             }
         }
 
         // If not a Google Sheets URL, return as-is
-        console.log(`🔍 DEBUG processVocabularyUrl OUTPUT: "${vocabularyUrl}" (not Google Sheets)`);
         return vocabularyUrl;
     }
 
@@ -400,18 +390,9 @@ class StudentFileManager {
     replacePlaceholders(template, placeholders) {
         let result = template;
 
-        console.log('🔍 DEBUG replacePlaceholders - Starting replacement...');
         for (const [placeholder, value] of Object.entries(placeholders)) {
-            if (placeholder.includes('VOCABULARY_URL') || placeholder.includes('LEVEL')) {
-                console.log(`🔍 DEBUG Replacing "${placeholder}" with "${value}"`);
-            }
             const regex = new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g');
             result = result.replace(regex, value || '');
-        }
-
-        // Check if VOCABULARY_URL is in the result
-        if (result.includes('{{VOCABULARY_URL}}')) {
-            console.log('🔍 DEBUG WARNING: {{VOCABULARY_URL}} still found in result after replacement!');
         }
 
         return result;
