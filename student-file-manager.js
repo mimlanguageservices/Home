@@ -31,8 +31,8 @@ class StudentFileManager {
             EMAIL: 9,               // Column J (contains mailto function)
             WHATSAPP: 10,           // Column K (WhatsApp number - prepend https://wa.me/)
             IMAGE_URL: 11,          // Column L (Profile Picture)
-            FINISHED_ACTIVITIES_M: 12, // Column M (Alternative finished activities)
-            CLASS_LINK: 13,         // Column N (Class Link on Contact Teacher Page)
+            CLASS_LINK: 12,         // Column M (Class Link on Contact Teacher Page)
+            FINISHED_ACTIVITIES_M: 13, // Column N (Alternative finished activities - unused)
             LEARNING_OBJECTIVE: 14, // Column O (Learning Objectives)
             VOCABULARY_URL: 15      // Column P (Vocabulary URL for tab with Google Sheets clipping)
         };
