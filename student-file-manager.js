@@ -670,6 +670,7 @@ Examples:
             switch (command) {
                 case 'sync':
                     await manager.syncAllFiles();
+                    await manager.pushToGitHub();
                     break;
 
                 case 'auto':
