@@ -118,6 +118,9 @@ class StudentFileManager {
             const studentName = columns[this.columnMap.STUDENT_NAME];
             if (!studentName || !studentName.trim()) continue;
 
+            const rawVocabUrl = columns[this.columnMap.VOCABULARY_URL] || '';
+            console.log(`🔍 DEBUG: Student "${studentName}" - Column P (index ${this.columnMap.VOCABULARY_URL}): "${rawVocabUrl}"`);
+
             const student = {
                 assignedTeacher: columns[this.columnMap.ASSIGNED_TEACHER] || '',
                 name: studentName.trim(),
@@ -133,7 +136,7 @@ class StudentFileManager {
                 location: columns[this.columnMap.LOCATION] || '',
                 level: columns[this.columnMap.LEVEL] || '', // Column N - Student CEFR Level
                 learningObjective: columns[this.columnMap.LEARNING_OBJECTIVE] || '',
-                vocabularyUrl: columns[this.columnMap.VOCABULARY_URL] || '',
+                vocabularyUrl: rawVocabUrl,
                 finishedActivities: columns[this.columnMap.FINISHED_ACTIVITIES] || '',
                 fileName: this.generateFileName(studentName.trim())
             };
