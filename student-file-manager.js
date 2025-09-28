@@ -121,14 +121,6 @@ class StudentFileManager {
 
             const rawVocabUrl = columns[this.columnMap.VOCABULARY_URL] || '';
 
-            // Debug: Log column values for first student
-            if (studentName.includes('Georgi')) {
-                console.log(`DEBUG for ${studentName}:`);
-                console.log(`  Column M (index 12): "${columns[12]}" <- should be Teams URL`);
-                console.log(`  Column N (index 13): "${columns[13]}" <- should be class ID like C1`);
-                console.log(`  Column O (index 14): "${columns[14]}"`);
-                console.log(`  CLASS_LINK mapping (index ${this.columnMap.CLASS_LINK}): "${columns[this.columnMap.CLASS_LINK]}"`);
-            }
 
             const student = {
                 assignedTeacher: columns[this.columnMap.ASSIGNED_TEACHER] || '',
