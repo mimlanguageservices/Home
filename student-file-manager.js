@@ -251,7 +251,6 @@ class StudentFileManager {
             '{{LOCATION}}': student.location || ''
         };
 
-        console.log(`🔍 DEBUG ${student.name} - VOCABULARY_URL placeholder: "${placeholders['{{VOCABULARY_URL}}']}" | LEVEL placeholder: "${placeholders['{{LEVEL}}']}"`)
         return placeholders;
     }
 
