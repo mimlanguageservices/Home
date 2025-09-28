@@ -36,6 +36,7 @@ class StudentFileManager {
         };
 
         this.existingFiles = new Set();
+        this.protectedFolders = ['PROTECTED_WORKSPACE', 'working classes', 'attempted codes'];
         this.scanExistingFiles();
     }
 
@@ -423,6 +424,12 @@ class StudentFileManager {
         try {
             const fileName = this.generateFileName(studentName);
             const filePath = path.join(this.studentsDir, fileName);
+
+            // SAFETY CHECK: Only delete student page files
+            if (!fileName.endsWith('-Page.html')) {
+                console.log(`🛡️  PROTECTED: Refusing to delete non-student file: ${fileName}`);
+                return false;
+            }
 
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
