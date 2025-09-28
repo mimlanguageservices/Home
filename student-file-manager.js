@@ -31,8 +31,8 @@ class StudentFileManager {
             EMAIL: 9,               // Column J (contains mailto function)
             WHATSAPP: 10,           // Column K (WhatsApp number - prepend https://wa.me/)
             IMAGE_URL: 11,          // Column L (Profile Picture)
-            FINISHED_ACTIVITIES_M: 12, // Column M (Alternative finished activities - unused)
-            CLASS_LINK: 13,         // Column N (Class Link on Contact Teacher Page)
+            CLASS_LINK: 12,         // Column M (Class Link on Contact Teacher Page - actual URLs)
+            CLASS_IDENTIFIER: 13,   // Column N (Class identifier like C1, C2, etc.)
             LEARNING_OBJECTIVE: 14, // Column O (Learning Objectives)
             VOCABULARY_URL: 15      // Column P (Vocabulary URL for tab with Google Sheets clipping)
         };
@@ -124,8 +124,8 @@ class StudentFileManager {
             // Debug: Log column values for first student
             if (studentName.includes('Georgi')) {
                 console.log(`DEBUG for ${studentName}:`);
-                console.log(`  Column M (index 12): "${columns[12]}"`);
-                console.log(`  Column N (index 13): "${columns[13]}"`);
+                console.log(`  Column M (index 12): "${columns[12]}" <- should be Teams URL`);
+                console.log(`  Column N (index 13): "${columns[13]}" <- should be class ID like C1`);
                 console.log(`  Column O (index 14): "${columns[14]}"`);
                 console.log(`  CLASS_LINK mapping (index ${this.columnMap.CLASS_LINK}): "${columns[this.columnMap.CLASS_LINK]}"`);
             }
