@@ -31,8 +31,9 @@ class StudentFileManager {
             WHATSAPP: 10,           // Column K (WhatsApp number - prepend https://wa.me/)
             IMAGE_URL: 11,          // Column L (Profile Picture)
             CLASS_LINK: 12,         // Column M (Class Link on Contact Teacher Page)
-            VOCABULARY_URL: 13,     // Column N (keeping for vocabulary tab)
-            LEARNING_OBJECTIVE: 14  // Column O (keeping for learning objectives)
+            LEVEL: 13,              // Column N (Student CEFR Level)
+            LEARNING_OBJECTIVE: 14, // Column O (Learning Objectives)
+            VOCABULARY_URL: 15      // Column P (Vocabulary URL for tab with Google Sheets clipping)
         };
 
         this.existingFiles = new Set();
