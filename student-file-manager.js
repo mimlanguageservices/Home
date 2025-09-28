@@ -17,7 +17,7 @@ class StudentFileManager {
         this.templatePath = path.join(__dirname, 'Template.html');
         this.studentsDir = __dirname;
 
-        // Column mapping based on the Google Sheets structure - FINAL CORRECTION
+        // Column mapping based on the Google Sheets structure - CORRECTED VOCABULARY URL
         this.columnMap = {
             ASSIGNED_TEACHER: 0,    // Column A (unused)
             STUDENT_NAME: 1,        // Column B (key field for HTML creation)
@@ -31,9 +31,10 @@ class StudentFileManager {
             EMAIL: 9,               // Column J (contains mailto function)
             WHATSAPP: 10,           // Column K (WhatsApp number - prepend https://wa.me/)
             IMAGE_URL: 11,          // Column L (Profile Picture)
-            VOCABULARY_URL: 12,     // Column M (Vocabulary URL for tab with Google Sheets clipping)
+            FINISHED_ACTIVITIES_M: 12, // Column M (Alternative finished activities)
             CLASS_LINK: 13,         // Column N (Class Link on Contact Teacher Page)
-            LEARNING_OBJECTIVE: 14  // Column O (Learning Objectives)
+            LEARNING_OBJECTIVE: 14, // Column O (Learning Objectives)
+            VOCABULARY_URL: 15      // Column P (Vocabulary URL for tab with Google Sheets clipping)
         };
 
         this.existingFiles = new Set();
