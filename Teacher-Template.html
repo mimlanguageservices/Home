@@ -557,7 +557,12 @@
             <div class="section" id="students">
                 <h2>Current Students</h2>
                 <div class="students-container">
-                    <!-- Students Navigation -->
+                    <div class="students-nav" id="students-nav">
+                        <!-- Platform tabs will be generated here -->
+                    </div>
+                    <div id="students-content-container">
+                        <!-- Student cards will be generated here -->
+                    </div>
                     <div class="students-nav" id="students-nav">
                         <!-- Platform buttons will be dynamically generated -->
                     </div>
@@ -598,7 +603,7 @@
         function initializePage() {
             // Set header information
             document.getElementById('header-title').textContent = TEACHER_CONFIG.headerTitle;
-            document.getElementById('website-link').textContent = new URL(TEACHER_CONFIG.websiteUrl).hostname;
+            document.getElementById('website-link').textContent = TEACHER_CONFIG.websiteUrl;
             document.getElementById('website-link').href = TEACHER_CONFIG.websiteUrl;
             document.getElementById('logo-link').href = TEACHER_CONFIG.websiteUrl;
             document.getElementById('header-logo').src = TEACHER_CONFIG.websiteLogo;
@@ -640,10 +645,30 @@
             const navContainer = document.getElementById('students-nav');
             const contentContainer = document.getElementById('students-content-container');
             
+            if (!navContainer || !contentContainer) return;
+            
             navContainer.innerHTML = '';
             contentContainer.innerHTML = '';
             
+            if (!TEACHER_CONFIG.platforms || TEACHER_CONFIG.platforms.length === 0) {
+                contentContainer.innerHTML = '<div class="students-grid"><div class="info-message">No platforms configured</div></div>';
+                return;
+            }
+            
             TEACHER_CONFIG.platforms.forEach((platform, index) => {
+                // Create navigation button
+                const btn = document.createElement('button');
+                btn.className = 'page-btn' + (index === 0 ? ' active' : '');
+                btn.textContent = platform;
+                btn.onclick = () => showStudentsPlatform(platform, btn);
+                navContainer.appendChild(btn);
+                
+                // Create content container
+                const contentDiv = document.createElement('div');
+                contentDiv.id = `students-content-${platform}`;
+                contentDiv.className = 'students-content' + (index === 0 ? ' active' : '');
+                contentContainer.appendChild(contentDiv);
+            });
                 // Create navigation button
                 const btn = document.createElement('div');
                 btn.className = 'page-btn' + (index === 0 ? ' active' : '');
@@ -872,6 +897,28 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Students platform navigation
+        function showStudentsPlatform(platformId, element) {
+            // Hide all platform contents
+            document.querySelectorAll('.students-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected platform content
+            const targetContent = document.getElementById(`students-content-${platformId}`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+            
+            // Update navigation highlighting
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (element) {
+                element.classList.add('active');
+            }
         }
 
         // Show error message if data loading fails
