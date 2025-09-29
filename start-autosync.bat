@@ -7,8 +7,8 @@ echo Starting Student File Manager Auto-Sync...
 REM Change to the project directory
 cd /d "C:\Users\admin\PC Files\02 Work\01 Jerome\01 English Teaching\09 Coding"
 
-REM Start the auto-sync with 5-minute intervals
+REM Start the auto-sync with 2-minute intervals
 REM The script will run minimized to avoid cluttering the desktop
-node student-file-manager.js auto 5
+node student-file-manager.js auto 2
 
 pause
