@@ -230,6 +230,14 @@
             gap: 8px;
             justify-content: center;
             margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .student-buttons.three-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 0 8px;
         }
 
         .student-btn {
@@ -245,6 +253,11 @@
             flex: 1;
             min-width: 70px;
             white-space: nowrap;
+        }
+
+        .three-buttons .student-btn {
+            width: 100%;
+            min-width: 0;
         }
 
         .student-btn:hover {
@@ -412,14 +425,24 @@
                 return;
             }
 
-            container.innerHTML = platformStudents.map(student => `
-                <div class="student-card" onclick="window.open('${student['C'] || '#'}', '_blank')">
-                    <img src="${student['L'] || `https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}`}" 
-                         alt="${student['B'] || 'Unknown'}" 
-                         class="student-picture"
-                         onerror="this.src='https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}'"
-                    >
-                    <div class="student-name">${student['B'] || 'Unknown Student'}</div>
+            container.innerHTML = platformStudents.map(student => {
+                const isLinked = platform === 'Linked';
+                const buttonsHtml = isLinked ? `
+                    <div class="student-buttons ${isLinked ? 'three-buttons' : ''}">
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['K'] || '#'}', '_blank')">
+                            WhatsApp
+                        </button>
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['M'] || '#'}', '_blank')">
+                            Call
+                        </button>
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['Q'] || '#'}', '_blank')">
+                            Timesheets
+                        </button>
+                    </div>
+                ` : `
                     <div class="student-buttons">
                         <button class="student-btn" 
                                 onclick="event.stopPropagation(); window.open('${student['K'] || '#'}', '_blank')">
@@ -430,8 +453,20 @@
                             Call
                         </button>
                     </div>
-                </div>
-            `).join('');
+                `;
+
+                return `
+                    <div class="student-card" onclick="window.open('${student['C'] || '#'}', '_blank')">
+                        <img src="${student['L'] || `https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}`}" 
+                             alt="${student['B'] || 'Unknown'}" 
+                             class="student-picture"
+                             onerror="this.src='https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}'"
+                        >
+                        <div class="student-name">${student['B'] || 'Unknown Student'}</div>
+                        ${buttonsHtml}
+                    </div>
+                `;
+            }).join('');
         }
 
         // Load student data from Google Sheets
