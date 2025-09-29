@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="wi        .platform-btn.active {
+            background: #667eea;
+            color: #ffffff;
+            border-color: transparent;
+        }vice-width, initial-scale=1.0">
     <title>Jerome Meadows - MIM Language Services</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -513,8 +517,13 @@
             <!-- Students Section -->
             <div class="section" id="students">
                 <h2>Current Students</h2>
-                <div class="students-container">
-                    <!-- Students Navigation -->
+                <div class="students-nav">
+                    <button class="platform-btn active" onclick="showPlatform('mim-students', this)">MIM</button>
+                    <button class="platform-btn" onclick="showPlatform('linked-students', this)">Linked</button>
+                    <button class="platform-btn" onclick="showPlatform('italki-students', this)">Italki</button>
+                    <button class="platform-btn" onclick="showPlatform('preply-students', this)">Preply</button>
+                </div>
+                <div class="platform-content">
                     <div class="students-nav">
                         <div class="page-btn active" onclick="showStudentsPlatform('mim', this)">MIM</div>
                         <div class="page-btn" onclick="showStudentsPlatform('linked', this)">Linked</div>
@@ -708,8 +717,8 @@
 
                     if (students.length === 0) {
                         container.innerHTML = `
-                            <div style="text-align: center; color: #666; font-size: 1.1rem; grid-column: 1 / -1; padding: 40px;">
-                                <p>No ${contractType} students currently assigned.</p>
+                            <div style="text-align: center; color: #666; font-size: 1.1rem; padding: 40px;">
+                                <p>No ${platform} students currently assigned.</p>
                             </div>
                         `;
                     } else {
