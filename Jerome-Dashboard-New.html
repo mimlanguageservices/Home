@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Previous head and style content remains the same -->
+<head>
+    <!-- Previous content -->
+</head>
+<body>
+    <!-- Previous header and container structure remains the same -->
+    <script>
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1e2ppEZlcrZENPHMMyIAtNxqCvqHnxCl_FuR3NUX046I/export?format=csv';
+        let studentsData = [];
+
+        // Load student data from Google Sheets
+        async function loadStudentsData() {
+            try {
+                console.log('Fetching data from:', SHEET_URL);
+                const response = await fetch(SHEET_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const text = await response.text();
+                console.log('Received data:', text.substring(0, 200)); // Show first 200 chars
+                
+                // Split into lines and remove empty ones
+                const lines = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+                
+                // Convert CSV to array of objects
+                studentsData = lines.slice(1).map(line => {
+                    // Handle quoted values properly
+                    const values = [];
+                    let currentValue = '';
+                    let insideQuotes = false;
+                    
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        if (char === '"') {
+                            insideQuotes = !insideQuotes;
+                        } else if (char === ',' && !insideQuotes) {
+                            values.push(currentValue.replace(/"/g, '').trim());
+                            currentValue = '';
+                        } else {
+                            currentValue += char;
+                        }
+                    }
+                    values.push(currentValue.replace(/"/g, '').trim());
+                    
+                    // Create object with letter keys
+                    const rowData = {};
+                    values.forEach((value, index) => {
+                        rowData[String.fromCharCode(65 + index)] = value;
+                    });
+                    return rowData;
+                });
+
+                console.log('Loaded data:', studentsData); // Debug log
+                
+                // Show MIM platform by default if on students section
+                if (document.querySelector('.section#students.active')) {
+                    const mimBtn = document.querySelector('.platform-btn[data-platform="MIM"]');
+                    if (mimBtn) {
+                        showPlatform('MIM', mimBtn);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading student data:', error);
+                document.querySelector('.students-grid').innerHTML = `
+                    <div class="empty-message">
+                        Error loading student data. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        // Show platform students
+        function showPlatform(platform, element) {
+            // Update platform buttons
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            const container = document.querySelector('.students-grid');
+            
+            // Filter students by both platform and teacher (Jerome)
+            const platformStudents = studentsData.filter(student => {
+                const isCorrectPlatform = student['D']?.trim().toUpperCase() === platform.toUpperCase();
+                const isJeromeStudent = student['A']?.trim().toLowerCase() === 'jerome';
+                return isCorrectPlatform && isJeromeStudent;
+            });
+
+            if (platformStudents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        No ${platform} students currently assigned to Jerome.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = platformStudents.map(student => {
+                const isLinked = platform === 'Linked';
+                const buttonsHtml = isLinked ? `
+                    <div class="student-buttons ${isLinked ? 'three-buttons' : ''}">
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['K'] || '#'}', '_blank')">
+                            WhatsApp
+                        </button>
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['M'] || '#'}', '_blank')">
+                            Call
+                        </button>
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['Q'] || '#'}', '_blank')">
+                            Timesheets
+                        </button>
+                    </div>
+                ` : `
+                    <div class="student-buttons">
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['K'] || '#'}', '_blank')">
+                            WhatsApp
+                        </button>
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['M'] || '#'}', '_blank')">
+                            Call
+                        </button>
+                    </div>
+                `;
+
+                return `
+                    <div class="student-card" onclick="window.open('${student['C'] || '#'}', '_blank')">
+                        <img src="${student['L'] || `https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}`}" 
+                             alt="${student['B'] || 'Unknown'}" 
+                             class="student-picture"
+                             onerror="this.src='https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}'"
+                        >
+                        <div class="student-name">${student['B'] || 'Unknown Student'}</div>
+                        ${buttonsHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Rest of your existing code...
+
+    </script>
+</body>
+</html>
