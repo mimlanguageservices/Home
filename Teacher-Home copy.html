@@ -667,12 +667,16 @@
 
         // Populate students tabs with dynamic data
         function populateStudentsTabs() {
-            const contractMapping = {
-                'MIM': 'mim-students',
-                'Linked': 'linked-students',
-                'Italki': 'italki-students',
-                'Preply': 'preply-students'
-            };
+            // Get unique platforms from Column D
+            const platforms = [...new Set(studentsData
+                .map(student => student['D'])
+                .filter(Boolean))];  // Remove empty/null values
+
+            // Create tab IDs for each platform
+            const contractMapping = {};
+            platforms.forEach(platform => {
+                contractMapping[platform] = platform.toLowerCase().replace(/\s+/g, '-') + '-students';
+            });
 
             // Clear existing content
             Object.values(contractMapping).forEach(tabId => {
@@ -682,15 +686,15 @@
                 }
             });
 
-            // Group students by contract type
+            // Group students by platform (Column D)
             const groupedStudents = {};
             studentsData.forEach(student => {
-                if (student['Student Name'] && student['Student Name'].trim()) {
-                    const contract = student['Contract'] || 'Other';
-                    if (!groupedStudents[contract]) {
-                        groupedStudents[contract] = [];
+                if (student['B'] && student['B'].trim()) {  // Check if student name exists
+                    const platform = student['D'] || 'Other';  // Use Column D for platform
+                    if (!groupedStudents[platform]) {
+                        groupedStudents[platform] = [];
                     }
-                    groupedStudents[contract].push(student);
+                    groupedStudents[platform].push(student);
                 }
             });
 
@@ -717,25 +721,18 @@
 
         // Create student card HTML
         function createStudentCard(student) {
-            const name = student['Student Name'] || 'Unknown Student';
-            const workplace = student['Workplace or Studies'] || '';
-            const imageUrl = student['Image Url'] || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80';
-            const role = student['Role'] || '';
-            const classLink = student['Class Link'] || '';
-            const whatsapp = student['Whatsapp'] || '';
-            const level = student['Level'] || '';
+            const name = student['B'] || 'Unknown Student';  // Column B - Student Name
+            const profileLink = student['C'] || '#';  // Column C - Profile Link
+            const whatsappLink = student['K'] || '#';  // Column K - Whatsapp
+            const callLink = student['M'] || '#';  // Column M - Call
 
             return `
-                <div class="student-card" onclick="openStudentProfile('${name}')">
-                    <img src="${imageUrl}" alt="${name}" class="student-picture" onerror="this.src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'">
-                    <div class="student-name">${name}</div>
-                    <div class="student-status">${role || workplace}</div>
-                    ${level ? `<div class="student-status" style="font-weight: 600; color: #4c51bf;">Level: ${level}</div>` : ''}
+                <div class="student-card" onclick="window.open('${profileLink}', '_blank')">
+                    <img src="https://via.placeholder.com/80x80?text=${encodeURIComponent(name.charAt(0))}" alt="${name}" class="student-picture">
+                    <h3 class="student-name">${name}</h3>
                     <div class="student-buttons">
-                        <button class="student-btn" onclick="openStudentLink('${name}', 'timesheet')" data-student="${name}" data-type="timesheet">Timesheet</button>
-                        <button class="student-btn" onclick="openStudentLink('${name}', 'vocabulary')" data-student="${name}" data-type="vocabulary">Vocabulary</button>
-                        ${classLink ? `<button class="student-btn" onclick="window.open('${classLink}', '_blank'); event.stopPropagation();" data-type="call">Call</button>` : ''}
-                        ${whatsapp ? `<button class="student-btn" onclick="window.open('${whatsapp}', '_blank'); event.stopPropagation();" data-type="whatsapp">WhatsApp</button>` : ''}
+                        <button class="student-btn" onclick="event.stopPropagation(); window.open('${whatsappLink}', '_blank')">Whatsapp</button>
+                        <button class="student-btn" onclick="event.stopPropagation(); window.open('${callLink}', '_blank')">Call</button>
                     </div>
                 </div>
             `;
