@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerome's Profile - MIM Language Services</title>
+    <style>
+        /* Keeping all the original styles from Teacher-Home.html */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px 40px 40px 40px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .students-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .students-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .platform-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .platform-btn.active, .platform-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .student-card {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .student-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .student-picture {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 10px;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .student-name {
+            color: #2d3748;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .student-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .student-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 70px;
+            white-space: nowrap;
+        }
+
+        .student-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #4a5568;
+            font-size: 1.1rem;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .navigation {
+                width: 100%;
+                height: auto;
+                padding: 15px 10px;
+                display: flex;
+                overflow-x: auto;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                background: rgba(45, 55, 72, 0.95);
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 80px;
+                margin: 5px;
+                font-size: 0.9rem;
+                padding: 12px 16px;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .content {
+                height: auto;
+                overflow-y: auto;
+            }
+
+            .section {
+                padding: 20px 10px;
+            }
+
+            .students-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Jerome's Profile</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="https://www.mimlanguageservices.com/" target="_blank">
+                <img src="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png" alt="MIM Language Services" class="header-image">
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('home', this)">Home</div>
+            <div class="nav-item" onclick="showSection('students', this)">Students</div>
+            <div class="nav-item" onclick="showSection('invoicing', this)">Invoicing</div>
+            <div class="nav-item" onclick="showSection('work', this)">Call</div>
+        </div>
+
+        <div class="content">
+            <!-- Home Section -->
+            <div class="section active" id="home">
+                <h2>Teacher Dashboard</h2>
+                <div class="main-content">
+                    <div class="profile-card">
+                        <!-- Profile content will go here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Section -->
+            <div class="section" id="students">
+                <h2>Current Students</h2>
+                <div class="students-section">
+                    <div class="students-nav">
+                        <button class="platform-btn active" onclick="showPlatform('MIM', this)">MIM</button>
+                        <button class="platform-btn" onclick="showPlatform('Linked', this)">Linked</button>
+                        <button class="platform-btn" onclick="showPlatform('Italki', this)">Italki</button>
+                        <button class="platform-btn" onclick="showPlatform('Preply', this)">Preply</button>
+                    </div>
+                    <div id="mim-container" class="students-grid">
+                        <!-- Students will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoicing Section -->
+            <div class="section" id="invoicing">
+                <h2>Invoicing</h2>
+                <!-- Invoicing content -->
+            </div>
+
+            <!-- Work Section -->
+            <div class="section" id="work">
+                <h2>Call</h2>
+                <!-- Work content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Student data variables
+        let studentsData = [];
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1dG7H6DZCWeU5hhTJbIkzkE3IXZB_AKPiEvXM5pl6G-U/gviz/tq?tqx=out:csv';
+
+        // Load student data from Google Sheets
+        async function loadStudentsData() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const csvText = await response.text();
+                const { headers, data } = parseCSV(csvText);
+                studentsData = data;
+                
+                // Show MIM students by default
+                showPlatform('MIM', document.querySelector('.platform-btn.active'));
+            } catch (error) {
+                console.error('Error loading student data:', error);
+                document.getElementById('mim-container').innerHTML = `
+                    <div class="empty-message">
+                        Error loading student data. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        // Parse CSV data with proper handling of quoted fields
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const result = [];
+            const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    const values = parseCSVLine(line);
+                    const row = {};
+                    for (let j = 0; j < headers.length; j++) {
+                        const colLetter = String.fromCharCode(65 + j);
+                        row[colLetter] = values[j].trim();
+                    }
+                    result.push(row);
+                }
+            }
+            
+            return { headers, data: result };
+        }
+
+        function parseCSVLine(line) {
+            const values = [];
+            let currentValue = '';
+            let insideQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    insideQuotes = !insideQuotes;
+                } else if (char === ',' && !insideQuotes) {
+                    values.push(currentValue.replace(/"/g, ''));
+                    currentValue = '';
+                } else {
+                    currentValue += char;
+                }
+            }
+            
+            values.push(currentValue.replace(/"/g, ''));
+            return values;
+        }
+
+        // Show selected section
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        // Show platform students
+        function showPlatform(platform, element) {
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            const container = document.getElementById('mim-container');
+            const platformStudents = studentsData.filter(student => student['D'] === platform);
+
+            if (platformStudents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        No ${platform} students currently assigned.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = platformStudents.map(student => {
+                const name = student['B'];
+                const profileUrl = student['C'];
+                const whatsappUrl = student['K'];
+                const callUrl = student['M'];
+                
+                return `
+                    <div class="student-card" onclick="window.open('${profileUrl}', '_blank')">
+                        <img src="https://via.placeholder.com/60x60?text=${name.charAt(0)}" 
+                             alt="${name}" class="student-picture">
+                        <div class="student-name">${name}</div>
+                        <div class="student-buttons">
+                            <button class="student-btn" 
+                                    onclick="event.stopPropagation(); window.open('${whatsappUrl}', '_blank')">
+                                WhatsApp
+                            </button>
+                            <button class="student-btn" 
+                                    onclick="event.stopPropagation(); window.open('${callUrl}', '_blank')">
+                                Call
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', loadStudentsData);
+    </script>
+</body>
+</html>
