@@ -362,18 +362,128 @@
         </div>
     </div>
 
-    <script src="dashboard-manager-new.js"></script>
     <script>
-        // Initialize Dashboard Manager
-        const dashboardManager = new DashboardManager();
-        
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            dashboardManager.initialize().then(() => {
-                console.log('Dashboard initialized successfully');
-            }).catch(error => {
-                console.error('Failed to initialize dashboard:', error);
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1dG7H6DZCWeU5hhTJbIkzkE3IXZB_AKPiEvXM5pl6G-U/gviz/tq?tqx=out:csv';
+        let studentsData = [];
+
+        // Show selected section
+        function showSection(sectionId, element) {
+            // Hide all sections and deactivate all nav items
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
             });
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected section and activate nav item
+            document.getElementById(sectionId).classList.add('active');
+            element.classList.add('active');
+
+            // If showing students section, show MIM platform by default
+            if (sectionId === 'students') {
+                const mimBtn = document.querySelector('.platform-btn[data-platform="MIM"]');
+                if (mimBtn) {
+                    showPlatform('MIM', mimBtn);
+                }
+            }
+        }
+
+        // Show selected platform
+        function showPlatform(platform, element) {
+            // Update button states
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            // Filter and display students
+            const container = document.querySelector('.students-grid');
+            const platformStudents = studentsData.filter(student => 
+                student['D'] && student['D'].trim().toUpperCase() === platform.toUpperCase()
+            );
+
+            if (platformStudents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-message">
+                        No ${platform} students currently assigned.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = platformStudents.map(student => `
+                <div class="student-card" onclick="window.open('${student['C'] || '#'}', '_blank')">
+                    <img src="https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}" 
+                         alt="${student['B'] || 'Unknown'}" class="student-picture">
+                    <div class="student-name">${student['B'] || 'Unknown Student'}</div>
+                    <div class="student-buttons">
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['K'] || '#'}', '_blank')">
+                            WhatsApp
+                        </button>
+                        <button class="student-btn" 
+                                onclick="event.stopPropagation(); window.open('${student['M'] || '#'}', '_blank')">
+                            Call
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load student data from Google Sheets
+        async function loadStudentsData() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const csvText = await response.text();
+                const lines = csvText.split('\n').map(line => line.trim()).filter(Boolean);
+                
+                studentsData = lines.slice(1).map(line => {
+                    const values = line.split(',').map(val => val.trim().replace(/"/g, ''));
+                    const row = {};
+                    for (let i = 0; i < values.length; i++) {
+                        row[String.fromCharCode(65 + i)] = values[i];
+                    }
+                    return row;
+                });
+
+                // Show MIM platform by default if on students section
+                if (document.querySelector('.section#students.active')) {
+                    const mimBtn = document.querySelector('.platform-btn[data-platform="MIM"]');
+                    if (mimBtn) {
+                        showPlatform('MIM', mimBtn);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading student data:', error);
+                document.querySelector('.students-grid').innerHTML = `
+                    <div class="empty-message">
+                        Error loading student data. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        // Add click handlers to navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set up navigation handlers
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.onclick = (e) => {
+                    const sectionId = e.target.getAttribute('data-section');
+                    if (sectionId) showSection(sectionId, e.target);
+                };
+            });
+
+            // Set up platform button handlers
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    const platform = e.target.getAttribute('data-platform');
+                    if (platform) showPlatform(platform, e.target);
+                };
+            });
+
+            // Load student data
+            loadStudentsData();
         });
     </script>
 </body>
