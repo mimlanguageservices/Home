@@ -872,31 +872,6 @@
                     </div>
                 </div>
             `;
-            const workplace = student['Workplace or Studies'] || '';
-            const imageUrl = student['Image Url'] || 'https://via.placeholder.com/150x150?text=Student';
-            const role = student['Role'] || '';
-            const classLink = student['Class Link'] || '';
-            const whatsapp = student['Whatsapp'] || '';
-            const level = student['Level'] || '';
-            const vocabularyUrl = student['Vocabulary URL'] || '';
-            
-            // Generate student profile URL
-            const studentFileName = name.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-') + '-Page.html';
-            const profileUrl = TEACHER_CONFIG.githubPagesUrl + studentFileName;
-
-            return `
-                <div class="student-card" onclick="window.open('${profileUrl}', '_blank')">
-                    <img src="${imageUrl}" alt="${name}" class="student-picture" onerror="this.src='https://via.placeholder.com/150x150?text=Student'">
-                    <div class="student-name">${name}</div>
-                    <div class="student-status">${role || workplace}</div>
-                    ${level ? `<div class="student-status" style="font-weight: 600; color: #4c51bf;">Level: ${level}</div>` : ''}
-                    <div class="student-buttons">
-                        ${vocabularyUrl ? `<button class="student-btn" onclick="window.open('${vocabularyUrl}', '_blank'); event.stopPropagation();">Vocabulary</button>` : ''}
-                        ${classLink ? `<button class="student-btn" onclick="window.open('${classLink}', '_blank'); event.stopPropagation();">Call</button>` : ''}
-                        ${whatsapp ? `<button class="student-btn" onclick="window.open('https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}', '_blank'); event.stopPropagation();">WhatsApp</button>` : ''}
-                    </div>
-                </div>
-            `;
         }
 
         // Show error message if data loading fails
@@ -919,9 +894,20 @@
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => section.classList.remove('active'));
 
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
             // Remove active class from all nav items
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
+
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
 
             // Show selected section and mark nav item as active
             document.getElementById(sectionId).classList.add('active');
