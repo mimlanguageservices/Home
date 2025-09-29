@@ -501,8 +501,8 @@
                 work: { show: true, label: 'Call' }
             },
             
-            // Student Platforms - Add or remove as needed
-            platforms: ['MIM', 'Linked', 'Italki', 'Preply'],
+            // Student Platforms - Will be populated from Column D
+            platforms: [], // This will be populated from the sheet
             
             // GitHub Pages Base URL for student profiles (if applicable)
             githubPagesUrl: 'https://mimlanguageservices.github.io/Students/'
@@ -818,7 +818,21 @@
 
         // Create student card HTML
         function createStudentCard(student) {
-            const name = student['Student Name'] || 'Unknown Student';
+            const name = student['B'] || 'Unknown Student'; // Column B - Student Name
+            const profileLink = student['C'] || '#'; // Column C - Profile Link
+            const whatsapp = student['K'] || '#'; // Column K - Whatsapp
+            const callLink = student['M'] || '#'; // Column M - Call Link
+            
+            return `
+                <div class="student-card" onclick="window.open('${profileLink}', '_blank')">
+                    <img src="https://via.placeholder.com/80x80?text=${encodeURIComponent(name.charAt(0))}" alt="${name}" class="student-picture">
+                    <h3 class="student-name">${name}</h3>
+                    <div class="student-buttons">
+                        <button class="student-btn" onclick="event.stopPropagation(); window.open('${whatsapp}', '_blank')">Whatsapp</button>
+                        <button class="student-btn" onclick="event.stopPropagation(); window.open('${callLink}', '_blank')">Call</button>
+                    </div>
+                </div>
+            `;
             const workplace = student['Workplace or Studies'] || '';
             const imageUrl = student['Image Url'] || 'https://via.placeholder.com/150x150?text=Student';
             const role = student['Role'] || '';
