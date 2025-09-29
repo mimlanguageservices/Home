@@ -679,6 +679,24 @@
             }
             
             try {
+                const response = await fetch(TEACHER_CONFIG.sheetUrl);
+                const csvText = await response.text();
+                const { headers, data } = parseCSV(csvText);
+                
+                // Get unique platforms from Column D
+                const platforms = [...new Set(data.map(row => row['D']).filter(Boolean))];
+                TEACHER_CONFIG.platforms = platforms;
+                
+                studentsData = data;
+                updateStudentCounts();
+                generateStudentPlatforms(); // Regenerate platform tabs
+                populateStudentsTabs();
+            } catch (error) {
+                showConfigurationError();
+                return;
+            }
+            
+            try {
                 // Convert Google Sheets URL to CSV export format
                 const sheetId = TEACHER_CONFIG.sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/)[1];
                 const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
@@ -785,9 +803,30 @@
                 }
             });
 
-            // Group students by contract type
+            // Group students by platform (Column D)
             const groupedStudents = {};
             studentsData.forEach(student => {
+                const platform = student['D'] || 'Other';
+                if (!groupedStudents[platform]) {
+                    groupedStudents[platform] = [];
+                }
+                groupedStudents[platform].push(student);
+            });
+
+            // Populate each platform tab
+            TEACHER_CONFIG.platforms.forEach(platform => {
+                const container = document.querySelector(`#students-content-${platform}`);
+                if (container && groupedStudents[platform]) {
+                    const studentsHTML = groupedStudents[platform]
+                        .map(student => createStudentCard(student))
+                        .join('');
+                    container.innerHTML = `
+                        <div class="students-grid">
+                            ${studentsHTML}
+                        </div>
+                    `;
+                }
+            });
                 if (student['Student Name'] && student['Student Name'].trim()) {
                     const contract = student['Contract'] || 'Other';
                     if (!groupedStudents[contract]) {
@@ -820,7 +859,7 @@
         function createStudentCard(student) {
             const name = student['B'] || 'Unknown Student'; // Column B - Student Name
             const profileLink = student['C'] || '#'; // Column C - Profile Link
-            const whatsapp = student['K'] || '#'; // Column K - Whatsapp
+            const whatsappLink = student['K'] || '#'; // Column K - Whatsapp
             const callLink = student['M'] || '#'; // Column M - Call Link
             
             return `
@@ -828,7 +867,7 @@
                     <img src="https://via.placeholder.com/80x80?text=${encodeURIComponent(name.charAt(0))}" alt="${name}" class="student-picture">
                     <h3 class="student-name">${name}</h3>
                     <div class="student-buttons">
-                        <button class="student-btn" onclick="event.stopPropagation(); window.open('${whatsapp}', '_blank')">Whatsapp</button>
+                        <button class="student-btn" onclick="event.stopPropagation(); window.open('${whatsappLink}', '_blank')">Whatsapp</button>
                         <button class="student-btn" onclick="event.stopPropagation(); window.open('${callLink}', '_blank')">Call</button>
                     </div>
                 </div>
