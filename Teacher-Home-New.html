@@ -385,21 +385,18 @@
         </div>
     </div>
 
+    <script src="dashboard-manager.js"></script>
     <script>
-        // Student data variables
-        let studentsData = [];
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1dG7H6DZCWeU5hhTJbIkzkE3IXZB_AKPiEvXM5pl6G-U/gviz/tq?tqx=out:csv';
-
+        // Initialize Dashboard Manager
+        const dashboardManager = new DashboardManager();
+        
         // Load student data from Google Sheets
         async function loadStudentsData() {
             try {
-                const response = await fetch(SHEET_URL);
-                const csvText = await response.text();
-                const { headers, data } = parseCSV(csvText);
-                studentsData = data;
-                
-                // Show MIM students by default
-                showPlatform('MIM', document.querySelector('.platform-btn.active'));
+                const success = await dashboardManager.initialize();
+                if (!success) {
+                    throw new Error('Failed to initialize dashboard');
+                }
             } catch (error) {
                 console.error('Error loading student data:', error);
                 document.getElementById('mim-container').innerHTML = `
@@ -473,43 +470,12 @@
                 btn.classList.remove('active');
             });
             element.classList.add('active');
-
-            const container = document.getElementById('mim-container');
-            const platformStudents = studentsData.filter(student => student['D'] === platform);
-
-            if (platformStudents.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-message">
-                        No ${platform} students currently assigned.
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = platformStudents.map(student => {
-                const name = student['B'];
-                const profileUrl = student['C'];
-                const whatsappUrl = student['K'];
-                const callUrl = student['M'];
-                
-                return `
-                    <div class="student-card" onclick="window.open('${profileUrl}', '_blank')">
-                        <img src="https://via.placeholder.com/60x60?text=${name.charAt(0)}" 
-                             alt="${name}" class="student-picture">
-                        <div class="student-name">${name}</div>
-                        <div class="student-buttons">
-                            <button class="student-btn" 
-                                    onclick="event.stopPropagation(); window.open('${whatsappUrl}', '_blank')">
-                                WhatsApp
-                            </button>
-                            <button class="student-btn" 
-                                    onclick="event.stopPropagation(); window.open('${callUrl}', '_blank')">
-                                Call
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            
+            dashboardManager.showPlatform(platform);
+            
+            // Debug information
+            console.log(`Showing platform: ${platform}`);
+            dashboardManager.validatePlatformData();
         }
 
         // Initialize when page loads
