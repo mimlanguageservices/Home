@@ -492,10 +492,10 @@
 
     <div class="container">
         <div class="navigation">
-            <div class="nav-item active" onclick="showSection('home', this)">Home</div>
-            <div class="nav-item" onclick="showSection('students', this)">Students</div>
-            <div class="nav-item" onclick="showSection('invoicing', this)">Invoicing</div>
-            <div class="nav-item" onclick="showSection('work', this)">Call</div>
+            <div class="nav-item active" data-section="home">Home</div>
+            <div class="nav-item" data-section="students">Students</div>
+            <div class="nav-item" data-section="invoicing">Invoicing</div>
+            <div class="nav-item" data-section="work">Call</div>
         </div>
 
         <div class="content">
@@ -592,12 +592,10 @@
         </div>
     </div>
 
+    <script src="dashboard-manager.js"></script>
     <script>
-        // Student data variables
-        let studentsData = [];
-                const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1e2ppEZlcrZENPHMMyIAtNxqCvqHnxCl_FuR3NUX046I/gviz/tq?tqx=out:csv';
-
-        // Load student data from Google Sheets
+        // Initialize Dashboard Manager
+        const dashboardManager = new DashboardManager();        // Load student data from Google Sheets
         async function loadStudentsData() {
             try {
                 const response = await fetch(SHEET_URL);

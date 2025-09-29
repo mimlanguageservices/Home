@@ -2,12 +2,8 @@ class DashboardManager {
     constructor() {
         this.SHEET_URL = 'https://docs.google.com/spreadsheets/d/1dG7H6DZCWeU5hhTJbIkzkE3IXZB_AKPiEvXM5pl6G-U/gviz/tq?tqx=out:csv';
         this.studentsData = [];
-        this.platformContainers = {
-            'MIM': 'mim-container',
-            'Linked': 'linked-container',
-            'Italki': 'italki-container',
-            'Preply': 'preply-container'
-        };
+        this.platforms = ['MIM', 'Linked', 'Italki', 'Preply'];
+        this.activeSection = 'home';
     }
 
     async initialize() {
