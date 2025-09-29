@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TEACHER_NAME}} - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .website a:hover {
+            color: #553c9a;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border: 4px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .teacher-name {
+            color: #2d3748;
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .teacher-title {
+            color: #4a5568;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-label {
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .students-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .students-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: center;
+            padding: 0 40px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .page-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #2d3748;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .students-content {
+            display: none;
+            padding: 0 40px 40px;
+        }
+
+        .students-content.active {
+            display: block;
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .student-card {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .student-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .student-picture {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .student-name {
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .student-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .student-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .student-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .navigation {
+                width: 100px;
+            }
+
+            .nav-item {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .profile-card {
+                padding: 20px;
+            }
+
+            .students-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1 id="header-title">Teacher Dashboard</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com" id="website-link" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="#" id="logo-link" target="_blank">
+                <img src="" alt="MIM Language Services" id="header-logo" class="header-image">
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="navigation" id="navigation">
+            <!-- Navigation items will be dynamically generated -->
+        </div>
+
+        <div class="content">
+            <!-- Home Section -->
+            <div class="section active" id="home">
+                <h2>Welcome!</h2>
+                <div class="main-content">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <img src="#" alt="Profile Picture" class="profile-picture" id="profile-pic">
+                            <h3 class="teacher-name" id="teacher-name">Teacher Name</h3>
+                            <p class="teacher-title" id="teacher-title">English Teacher</p>
+                        </div>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <div class="info-label">Total Students</div>
+                                <div class="info-value" id="total-students">0</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Active Classes</div>
+                                <div class="info-value" id="active-classes">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Section -->
+            <div class="section" id="students">
+                <h2>Current Students</h2>
+                <div class="students-container">
+                    <div class="students-nav" id="students-nav">
+                        <!-- Platform tabs will be generated here -->
+                    </div>
+                    <div id="students-content-container">
+                        <!-- Student cards will be generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoicing Section -->
+            <div class="section" id="invoicing">
+                <h2>Invoicing</h2>
+                <div class="main-content">
+                    <!-- Invoicing content will be added here -->
+                </div>
+            </div>
+
+            <!-- Call Section -->
+            <div class="section" id="work">
+                <h2>Call</h2>
+                <div class="main-content">
+                    <!-- Call content will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TEACHER CONFIGURATION
+        const TEACHER_CONFIG = {
+            // Basic Information
+            teacherName: '{{TEACHER_NAME}}',
+            teacherTitle: '{{TEACHER_TITLE}}',
+            headerTitle: "Teacher Dashboard",
+            
+            // Website Information
+            websiteUrl: 'https://www.mimlanguageservices.com',
+            websiteLogo: 'https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png',
+            
+            // Profile Image
+            profileImage: '{{PROFILE_IMAGE_URL}}',
+            
+            // Tab Configuration
+            tabs: {
+                home: { show: true, label: 'Home' },
+                students: { show: true, label: 'Students' },
+                invoicing: { show: true, label: 'Invoicing' },
+                work: { show: true, label: 'Call' }
+            },
+            
+            // Student Platforms - Will be populated from Column D
+            platforms: [], // Will be populated from the sheet
+            
+            // Google Sheet URL
+            sheetUrl: '{{GOOGLE_SHEET_URL}}'
+        };
+
+        // Initialize page with teacher configuration
+        function initializePage() {
+            // Set header information
+            document.getElementById('header-title').textContent = TEACHER_CONFIG.headerTitle;
+            document.getElementById('website-link').textContent = TEACHER_CONFIG.websiteUrl;
+            document.getElementById('website-link').href = TEACHER_CONFIG.websiteUrl;
+            document.getElementById('logo-link').href = TEACHER_CONFIG.websiteUrl;
+            document.getElementById('header-logo').src = TEACHER_CONFIG.websiteLogo;
+            
+            // Set profile information
+            document.getElementById('profile-pic').src = TEACHER_CONFIG.profileImage || 'https://via.placeholder.com/120x120?text=Photo';
+            document.getElementById('teacher-name').textContent = TEACHER_CONFIG.teacherName;
+            document.getElementById('teacher-title').textContent = TEACHER_CONFIG.teacherTitle;
+            
+            // Set page title
+            document.title = `${TEACHER_CONFIG.teacherName} - MIM Language Services`;
+            
+            // Generate navigation
+            generateNavigation();
+        }
+
+        // Generate navigation based on configuration
+        function generateNavigation() {
+            const nav = document.getElementById('navigation');
+            nav.innerHTML = '';
+            
+            Object.keys(TEACHER_CONFIG.tabs).forEach((tabKey, index) => {
+                const tab = TEACHER_CONFIG.tabs[tabKey];
+                if (tab.show) {
+                    const navItem = document.createElement('div');
+                    navItem.className = 'nav-item' + (index === 0 ? ' active' : '');
+                    navItem.textContent = tab.label;
+                    navItem.onclick = () => showSection(tabKey, navItem);
+                    nav.appendChild(navItem);
+                }
+            });
+        }
+
+        // Generate student platform tabs and content areas
+        function generateStudentPlatforms() {
+            const navContainer = document.getElementById('students-nav');
+            const contentContainer = document.getElementById('students-content-container');
+            
+            if (!navContainer || !contentContainer) return;
+            
+            navContainer.innerHTML = '';
+            contentContainer.innerHTML = '';
+            
+            if (!TEACHER_CONFIG.platforms || TEACHER_CONFIG.platforms.length === 0) {
+                contentContainer.innerHTML = '<div class="students-grid"><div class="info-message">No platforms configured</div></div>';
+                return;
+            }
+            
+            TEACHER_CONFIG.platforms.forEach((platform, index) => {
+                // Create navigation button
+                const btn = document.createElement('button');
+                btn.className = 'page-btn' + (index === 0 ? ' active' : '');
+                btn.textContent = platform;
+                btn.onclick = () => showStudentsPlatform(platform, btn);
+                navContainer.appendChild(btn);
+                
+                // Create content container
+                const contentDiv = document.createElement('div');
+                contentDiv.id = `students-content-${platform}`;
+                contentDiv.className = 'students-content' + (index === 0 ? ' active' : '');
+                contentContainer.appendChild(contentDiv);
+            });
+        }
+
+        // Create student card HTML
+        function createStudentCard(student) {
+            const name = student['B'] || 'Unknown Student'; // Column B - Student Name
+            const profileLink = student['C'] || '#'; // Column C - Profile Link
+            const whatsappLink = student['K'] || '#'; // Column K - Whatsapp
+            const callLink = student['M'] || '#'; // Column M - Call Link
+            
+            return `
+                <div class="student-card" onclick="window.open('${profileLink}', '_blank')">
+                    <img src="https://via.placeholder.com/80x80?text=${encodeURIComponent(name.charAt(0))}" alt="${name}" class="student-picture">
+                    <h3 class="student-name">${name}</h3>
+                    <div class="student-buttons">
+                        <button class="student-btn" onclick="event.stopPropagation(); window.open('${whatsappLink}', '_blank')">Whatsapp</button>
+                        <button class="student-btn" onclick="event.stopPropagation(); window.open('${callLink}', '_blank')">Call</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load student data from Google Sheets
+        async function loadStudentsData() {
+            if (!TEACHER_CONFIG.sheetUrl || TEACHER_CONFIG.sheetUrl === '{{GOOGLE_SHEET_URL}}') {
+                showConfigurationError();
+                return;
+            }
+            
+            try {
+                const response = await fetch(TEACHER_CONFIG.sheetUrl);
+                const csvText = await response.text();
+                const { headers, data } = parseCSV(csvText);
+                
+                // Get unique platforms from Column D
+                const platforms = [...new Set(data.map(row => row['D']).filter(Boolean))];
+                TEACHER_CONFIG.platforms = platforms;
+                
+                studentsData = data;
+                updateStudentCounts();
+                generateStudentPlatforms();
+                populateStudentsTabs();
+            } catch (error) {
+                showStudentsError();
+                console.error('Error loading student data:', error);
+            }
+        }
+
+        // Parse CSV data
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const headers = {};
+            const headerLine = lines[0].split(',');
+            
+            // Create a mapping of column letters to indices
+            headerLine.forEach((header, index) => {
+                const columnLetter = String.fromCharCode(65 + index); // A = 65 in ASCII
+                headers[columnLetter] = index;
+            });
+            
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values.length > 1) { // Skip empty lines
+                    const row = {};
+                    Object.keys(headers).forEach(col => {
+                        row[col] = values[headers[col]] || '';
+                    });
+                    data.push(row);
+                }
+            }
+            
+            return { headers, data };
+        }
+
+        // Parse CSV line handling quotes
+        function parseCSVLine(line) {
+            const values = [];
+            let value = '';
+            let inQuotes = false;
+            
+            for (let char of line) {
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    values.push(value.trim());
+                    value = '';
+                } else {
+                    value += char;
+                }
+            }
+            values.push(value.trim());
+            
+            return values;
+        }
+
+        // Show configuration error
+        function showConfigurationError() {
+            const contentContainer = document.getElementById('students-content-container');
+            if (contentContainer) {
+                contentContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #d32f2f;">
+                        <p>Please configure the Google Sheet URL in the teacher configuration.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Show students error
+        function showStudentsError() {
+            const contentContainer = document.getElementById('students-content-container');
+            if (contentContainer) {
+                contentContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #d32f2f;">
+                        <p>Error loading student data. Please try again later.</p>
+                        <button onclick="loadStudentsData()" style="margin-top: 20px; padding: 10px 20px;">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Update student counts on home page
+        function updateStudentCounts() {
+            const totalStudents = studentsData.filter(s => s['B'] && s['B'].trim()).length;
+            document.getElementById('total-students').textContent = totalStudents;
+            
+            const activeClasses = studentsData.filter(s => s['M'] && s['M'].trim()).length;
+            document.getElementById('active-classes').textContent = activeClasses;
+        }
+
+        // Populate students tabs with student data
+        function populateStudentsTabs() {
+            const groupedStudents = {};
+            
+            // Group students by platform (Column D)
+            studentsData.forEach(student => {
+                const platform = student['D'] || 'Other';
+                if (!groupedStudents[platform]) {
+                    groupedStudents[platform] = [];
+                }
+                groupedStudents[platform].push(student);
+            });
+
+            // Update each platform's content
+            TEACHER_CONFIG.platforms.forEach(platform => {
+                const container = document.getElementById(`students-content-${platform}`);
+                if (container && groupedStudents[platform]) {
+                    const studentsHTML = groupedStudents[platform]
+                        .map(student => createStudentCard(student))
+                        .join('');
+                        
+                    container.innerHTML = `<div class="students-grid">${studentsHTML}</div>`;
+                }
+            });
+        }
+
+        // Navigation functionality
+        function showSection(sectionId, element) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
+            
+            // Update navigation highlighting
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // Students platform navigation
+        function showStudentsPlatform(platformId, element) {
+            // Hide all platform contents
+            document.querySelectorAll('.students-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show selected platform content
+            const content = document.getElementById(`students-content-${platformId}`);
+            if (content) {
+                content.classList.add('active');
+            }
+            
+            // Update navigation highlighting
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // Initialize the page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            loadStudentsData();
+        });
+    </script>
+</body>
+</html>

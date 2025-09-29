@@ -956,10 +956,18 @@
                 element.classList.add('active');
             }
 
-            // Show selected section and mark nav item as active
-            document.getElementById(sectionId).classList.add('active');
-            element.classList.add('active');
+            // Show selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
         }
+
+        // Initialize the page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            loadStudentsData();
+        });
 
         // Students platform navigation
         function showStudentsPlatform(platformId, element) {
