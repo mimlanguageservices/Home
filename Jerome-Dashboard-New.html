@@ -1,14 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Previous head and style content remains the same -->
 <head>
-    <!-- Previous content -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .platform-tabs {
+            margin-bottom: 20px;
+        }
+        .platform-tabs button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .platform-tabs button.active {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+        #students-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .student-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
-    <!-- Previous header and container structure remains the same -->
+        <div class="container">
+        <div class="platform-tabs">
+            <button onclick="filterByPlatform('ALL')" class="active">ALL</button>
+            <button onclick="filterByPlatform('WHATSAPP')">WHATSAPP</button>
+            <button onclick="filterByPlatform('LINKED')">LINKED</button>
+            <button onclick="filterByPlatform('ZOOM')">ZOOM</button>
+        </div>
+        <div id="students-container"></div>
+    </div>
     <script>
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1e2ppEZlcrZENPHMMyIAtNxqCvqHnxCl_FuR3NUX046I/export?format=csv';
+
+        function showError(message) {
+            const container = document.getElementById('students-container');
+            if (container) {
+                container.innerHTML = `<div class="error-message" style="color: red; padding: 20px;">${message}</div>`;
+            } else {
+                console.error('Container not found:', message);
+            }
+        }
+
         let studentsData = [];
+        let currentPlatform = 'ALL';
 
         // Load student data from Google Sheets
         async function loadStudentsData() {
@@ -47,7 +97,67 @@
                     values.push(currentValue.replace(/"/g, '').trim());
                     
                     // Create object with letter keys
+                    const columnKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
                     const rowData = {};
+                    values.forEach((value, index) => {
+                        if (index < columnKeys.length) {
+                            rowData[columnKeys[index]] = value;
+                        }
+                    });
+                    return rowData;
+                });
+                
+                // Filter for Jerome's students and display them
+                displayStudents();
+            } catch (error) {
+                console.error('Error loading student data:', error);
+                showError(`Failed to load student data: ${error.message}`);
+            }
+        }
+
+        function displayStudents() {
+            const container = document.getElementById('students-container');
+            if (!container) {
+                console.error('Students container not found');
+                return;
+            }
+
+            // Filter students for Jerome and current platform
+            const filtered = studentsData.filter(student => {
+                const isJeromeStudent = student['A']?.toLowerCase() === 'jerome';
+                const matchesPlatform = currentPlatform === 'ALL' || student['D']?.toUpperCase() === currentPlatform;
+                return isJeromeStudent && matchesPlatform;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px;">No students found</div>';
+                return;
+            }
+
+            // Create student cards
+            const cards = filtered.map(student => `
+                <div class="student-card">
+                    <h3>${student['B'] || 'No Name'}</h3>
+                    <p>Platform: ${student['D'] || 'Not specified'}</p>
+                    ${student['K'] ? `<p>WhatsApp: ${student['K']}</p>` : ''}
+                    ${student['L'] ? `<img src="${student['L']}" alt="Profile" style="max-width: 100px;">` : ''}
+                </div>
+            `).join('');
+
+            container.innerHTML = cards;
+        }
+
+        function filterByPlatform(platform) {
+            currentPlatform = platform;
+            // Update active button
+            document.querySelectorAll('.platform-tabs button').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === platform);
+            });
+            displayStudents();
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadStudentsData);
                     values.forEach((value, index) => {
                         rowData[String.fromCharCode(65 + index)] = value;
                     });
