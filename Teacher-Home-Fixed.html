@@ -363,7 +363,7 @@
     </div>
 
     <script>
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1e2ppEZlcrZENPHMMyIAtNxqCvqHnxCl_FuR3NUX046I/gviz/tq?tqx=out:csv';
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1e2ppEZlcrZENPHMMyIAtNxqCvqHnxCl_FuR3NUX046I/export?format=csv';
         let studentsData = [];
 
         // Show selected section
@@ -414,8 +414,11 @@
 
             container.innerHTML = platformStudents.map(student => `
                 <div class="student-card" onclick="window.open('${student['C'] || '#'}', '_blank')">
-                    <img src="https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}" 
-                         alt="${student['B'] || 'Unknown'}" class="student-picture">
+                    <img src="${student['L'] || `https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}`}" 
+                         alt="${student['B'] || 'Unknown'}" 
+                         class="student-picture"
+                         onerror="this.src='https://via.placeholder.com/60x60?text=${encodeURIComponent(student['B']?.charAt(0) || '?')}'"
+                    >
                     <div class="student-name">${student['B'] || 'Unknown Student'}</div>
                     <div class="student-buttons">
                         <button class="student-btn" 
@@ -434,20 +437,40 @@
         // Load student data from Google Sheets
         async function loadStudentsData() {
             try {
-                const response = await fetch(SHEET_URL);
+                // Modify URL to get CSV format
+                const csvUrl = 'https://docs.google.com/spreadsheets/d/1e2ppEZlcrZENPHMMyIAtNxqCvqHnxCl_FuR3NUX046I/export?format=csv';
+                const response = await fetch(csvUrl);
                 const text = await response.text();
                 
-                // Parse the returned JSON-like response
-                const jsonData = JSON.parse(text.substr(47).slice(0, -2));
-                const rows = jsonData.table.rows;
+                // Split into lines and remove empty ones
+                const lines = text.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
                 
-                // Extract the data from the rows
-                studentsData = rows.map(row => {
-                    const values = row.c.map(cell => cell ? (cell.v || '') : '');
+                // Convert CSV to array of objects
+                studentsData = lines.slice(1).map(line => {
+                    // Handle quoted values properly
+                    const values = [];
+                    let currentValue = '';
+                    let insideQuotes = false;
+                    
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        if (char === '"') {
+                            insideQuotes = !insideQuotes;
+                        } else if (char === ',' && !insideQuotes) {
+                            values.push(currentValue.replace(/"/g, '').trim());
+                            currentValue = '';
+                        } else {
+                            currentValue += char;
+                        }
+                    }
+                    values.push(currentValue.replace(/"/g, '').trim());
+                    
+                    // Create object with letter keys
                     const rowData = {};
-                    // Map columns to letters (A=0, B=1, etc.)
                     values.forEach((value, index) => {
-                        rowData[String.fromCharCode(65 + index)] = String(value).trim();
+                        rowData[String.fromCharCode(65 + index)] = value;
                     });
                     return rowData;
                 });
