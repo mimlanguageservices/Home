@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Piracy - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .slide-image-only {
+            padding: 0;
+        }
+
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            max-width: 50%;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .slide-text-section-left ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .slide-text-section-left li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        .slide-image-section-right {
+            width: 45%;
+            max-width: 50%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -60px;
+        }
+
+        .slide-arrow.next {
+            right: -60px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 80px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .reading-level {
+            flex: 1;
+            position: relative;
+            height: 100%;
+            min-height: 500px;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .reading-page p {
+            color: #4a5568;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Vocabulary Section */
+        .vocabulary-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .vocab-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .vocab-word {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .vocab-type {
+            font-size: 0.9rem;
+            color: #667eea;
+            font-style: italic;
+        }
+
+        .vocab-definition {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .vocab-example {
+            font-size: 0.95rem;
+            color: #718096;
+            font-style: italic;
+            padding-left: 15px;
+            border-left: 3px solid #667eea;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>Digital Piracy's Return</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="navigation">
+            <div class="nav-item active" onclick="showSection('vocabulary')">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('reading')">Reading</div>
+            <div class="nav-item" onclick="showSection('discussion')">Discussion</div>
+            <div class="nav-item" onclick="showSection('activity')">Activity</div>
+        </nav>
+
+        <main class="content">
+            <section id="vocabulary" class="section active">
+                <h2>Essential Vocabulary</h2>
+                <div class="vocabulary-container">
+                    <div class="vocab-card">
+                        <div class="vocab-word">Fragmentation</div>
+                        <div class="vocab-type">noun</div>
+                        <div class="vocab-definition">The division of something into separate parts or segments.</div>
+                        <div class="vocab-example">"The streaming market's fragmentation has led to increased costs for consumers."</div>
+                    </div>
+                    <div class="vocab-card">
+                        <div class="vocab-word">Subscription fatigue</div>
+                        <div class="vocab-type">noun phrase</div>
+                        <div class="vocab-definition">Exhaustion or frustration from managing multiple streaming subscriptions.</div>
+                        <div class="vocab-example">"Many viewers are experiencing subscription fatigue from juggling too many services."</div>
+                    </div>
+                    <div class="vocab-card">
+                        <div class="vocab-word">Geo-blocking</div>
+                        <div class="vocab-type">noun</div>
+                        <div class="vocab-definition">The practice of restricting access to content based on the user's location.</div>
+                        <div class="vocab-example">"Due to geo-blocking, the show was not available in their country."</div>
+                    </div>
+                    <div class="vocab-card">
+                        <div class="vocab-word">Password crackdown</div>
+                        <div class="vocab-type">noun phrase</div>
+                        <div class="vocab-definition">Strict measures taken to prevent password sharing among users.</div>
+                        <div class="vocab-example">"Netflix's password crackdown affected millions of accounts worldwide."</div>
+                    </div>
+                    <div class="vocab-card">
+                        <div class="vocab-word">Content exodus</div>
+                        <div class="vocab-type">noun phrase</div>
+                        <div class="vocab-definition">The mass departure of shows and movies from one streaming platform to another.</div>
+                        <div class="vocab-example">"The content exodus from Netflix has frustrated many loyal subscribers."</div>
+                    </div>
+                    <div class="vocab-card">
+                        <div class="vocab-word">Streaming wars</div>
+                        <div class="vocab-type">noun phrase</div>
+                        <div class="vocab-definition">The intense competition between streaming services for subscribers and content.</div>
+                        <div class="vocab-example">"The streaming wars have led to increased prices for consumers."</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="reading" class="section">
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('beginner')">Beginner</button>
+                        <button class="page-btn" onclick="showReadingLevel('intermediate')">Intermediate</button>
+                        <button class="page-btn" onclick="showReadingLevel('advanced')">Advanced</button>
+                    </div>
+
+                    <div class="reading-level" id="beginner">
+                        <div class="reading-page active">
+                            <h3>Why People Are Returning to Piracy</h3>
+                            <p>More people are turning to piracy these days. This is happening because streaming services are becoming more expensive and complicated. In the past, most people used Netflix for their shows and movies. Now, there are many different streaming services.</p>
+                            <p>Each service costs money every month. If you want to watch all your favorite shows, you might need four or five different services. This can cost as much as old cable TV! Also, these services don't let people share passwords anymore. This makes it even more expensive for families.</p>
+                            <p>Some shows keep moving between different services. One month a show is on Netflix, the next month it's on Disney+. This makes people frustrated. They don't know where to find their favorite shows.</p>
+                        </div>
+                    </div>
+
+                    <div class="reading-level" id="intermediate" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>The Rise of Digital Piracy in the Streaming Age</h3>
+                            <p>The streaming industry is experiencing an unexpected trend: the return of digital piracy. This resurgence comes at a time when streaming services are becoming increasingly fragmented and expensive. What was once a simple choice between a few platforms has evolved into a complex ecosystem of numerous services.</p>
+                            <p>Several factors are driving this trend. First, the cost of maintaining multiple subscriptions has skyrocketed. Many households now find themselves paying for 4-5 different services to access all their desired content. Additionally, recent password-sharing crackdowns have eliminated a common way for families and friends to share costs.</p>
+                            <p>Content availability has become another significant issue. Shows and movies frequently migrate between platforms, disappear without warning, or become geo-blocked in certain regions. This unpredictability has led to what industry experts call "subscription fatigue," where viewers feel overwhelmed by the complexity of accessing their favorite content.</p>
+                        </div>
+                    </div>
+
+                    <div class="reading-level" id="advanced" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>The Economic Paradox of Digital Streaming and Piracy Resurgence</h3>
+                            <p>The digital streaming landscape is experiencing a paradoxical evolution: while the industry's fragmentation was intended to create more choice and competition, it has inadvertently catalyzed a resurgence in digital piracy. This phenomenon represents a fascinating case study in consumer behavior and market dynamics, where the proliferation of choice has led to decreased accessibility.</p>
+                            <p>The current market structure, characterized by intense competition among numerous streaming platforms, has created an economically untenable situation for consumers. The aggregate cost of maintaining multiple subscriptions, combined with aggressive password-sharing restrictions and geographical content limitations, has effectively reconstructed the same barriers that streaming services originally sought to eliminate.</p>
+                            <p>Industry analysts are observing a direct correlation between market fragmentation and increased piracy rates. The data suggests that consumers are not primarily motivated by cost avoidance, but rather by the desire for a streamlined, comprehensive content solution. This represents a critical failure in the industry's current business model, where the pursuit of platform exclusivity has undermined the fundamental value proposition of streaming services.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="discussion" class="section">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <div class="discussion-slide active slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Cost Factor</h3>
+                                <p>Streaming services have become increasingly expensive. Let's discuss:</p>
+                                <ul>
+                                    <li>How many streaming services do you subscribe to?</li>
+                                    <li>What is your total monthly spending on streaming?</li>
+                                    <li>Do you share any subscriptions with family or friends?</li>
+                                    <li>How do you feel about recent price increases?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1607968565043-36af90dde238" alt="Streaming services logos">
+                            </div>
+                        </div>
+
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Content Availability</h3>
+                                <p>Shows often move between different platforms. Consider:</p>
+                                <ul>
+                                    <li>Have you lost access to a show you were watching?</li>
+                                    <li>How do you track where shows are available?</li>
+                                    <li>What do you do when content isn't available in your region?</li>
+                                    <li>How has this affected your viewing habits?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37" alt="Searching for content">
+                            </div>
+                        </div>
+
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Password Sharing</h3>
+                                <p>Streaming services are cracking down on account sharing:</p>
+                                <ul>
+                                    <li>How has this affected you or people you know?</li>
+                                    <li>Do you think these restrictions are fair?</li>
+                                    <li>What alternatives have people found?</li>
+                                    <li>How should companies handle family sharing?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7" alt="Password security">
+                            </div>
+                        </div>
+
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Future of Streaming</h3>
+                                <p>The streaming landscape continues to evolve:</p>
+                                <ul>
+                                    <li>What changes would improve the current system?</li>
+                                    <li>Would you prefer one unified service?</li>
+                                    <li>How much would you pay for an "all-in-one" service?</li>
+                                    <li>What role should advertising play?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1535016120720-40c646be5580" alt="Future of streaming">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="slide-arrow prev" onclick="changeSlide(-1)">❮</button>
+                    <button class="slide-arrow next" onclick="changeSlide(1)">❯</button>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(0)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="activity" class="section">
+                <h2>Group Activities</h2>
+                <div class="activity-content">
+                    <div class="activity-card">
+                        <h3>Design Your Ideal Streaming Service</h3>
+                        <p>Work in groups to create a proposal for a new streaming service that would prevent piracy:</p>
+                        <ul>
+                            <li>Determine pricing structure</li>
+                            <li>Design sharing policies</li>
+                            <li>Plan content strategy</li>
+                            <li>Consider regional availability</li>
+                        </ul>
+                        <p>Present your proposal to the class and discuss its viability.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if(item.textContent.toLowerCase().includes(sectionId.toLowerCase())) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        function showReadingLevel(level) {
+            document.querySelectorAll('.reading-level').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById(level).style.display = 'block';
+
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.textContent.toLowerCase() === level.toLowerCase()) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function updateSlides() {
+            document.querySelectorAll('.discussion-slide').forEach((slide, index) => {
+                slide.classList.remove('active');
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.indicator-dot').forEach((dot, index) => {
+                dot.classList.remove('active');
+                if(index === currentSlide) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            currentSlide = (currentSlide + direction + slides.length) % slides.length;
+            updateSlides();
+        }
+
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            updateSlides();
+        }
+    </script>
+</body>
+</html>
