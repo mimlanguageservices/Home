@@ -15,7 +15,7 @@ class StudentFileManager {
     constructor() {
         this.sheetsId = '1e2ppEZlcrZENPHMMyIAtNxqCvqHnxCl_FuR3NUX046I';
         this.templatePath = path.join(__dirname, 'Template.html');
-        this.studentsDir = path.join(__dirname, 'Student Roster');
+        this.studentsDir = path.join(__dirname, 'Student-Roster');
 
         // Column mapping based on the Google Sheets structure - CORRECTED VOCABULARY URL
         this.columnMap = {
