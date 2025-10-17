@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1-16: Adjectives - Order & Agreement</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background: white;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 30px 80px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 25px 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -70px;
+        }
+
+        .slide-arrow.next {
+            right: -70px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        .slide h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .explanation-box {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 0;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .explanation-box h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .explanation-box p {
+            color: #2d3748;
+            line-height: 1.5;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .rule-box {
+            background: #e3f2fd;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .rule-box h4 {
+            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .rule-box p {
+            font-size: 1rem;
+            color: #2d3748;
+            margin: 5px 0;
+        }
+
+        .yes-no {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #4299e1;
+            color: white;
+        }
+
+        .auxiliary {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #48bb78;
+            color: white;
+        }
+
+        .subject {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #9f7aea;
+            color: white;
+        }
+
+        .verb {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #ed64a6;
+            color: white;
+        }
+
+        .example-box {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+
+        .example-box p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #2d3748;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .note-box strong {
+            color: #856404;
+            font-size: 1rem;
+        }
+
+        .note-box p {
+            color: #856404;
+            margin-top: 5px;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .exercise-container {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 10px;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .exercise-container h3 {
+            color: #764ba2;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 0;
+        }
+
+        .question-box p {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 18px;
+            margin: 8px 0;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 15px 5px 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .feedback {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: 500;
+            font-size: 1.05rem;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+            display: block;
+        }
+
+        ul {
+            margin-left: 25px;
+            line-height: 1.6;
+        }
+
+        li {
+            margin: 6px 0;
+            font-size: 1.05rem;
+            color: #2d3748;
+        }
+
+        li strong {
+            color: #667eea;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        .explanation-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .explanation-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .explanation-box::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .explanation-box::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+
+        .formula-box {
+            background: #e6fffa;
+            border: 2px solid #319795;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .grid-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .grid-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .grid-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .reading-text {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.9;
+            margin: 15px 0;
+            border: 2px solid #e2e8f0;
+        }
+
+        .reading-text p {
+            margin: 12px 0;
+        }
+
+        .highlight-question {
+            background: #bee3f8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .highlight-answer {
+            background: #c6f6d5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .example-sentence {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>A1-16: Adjectives - Order & Agreement</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">mimlanguageservices</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="ESL Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('explanation', this)">Explanation</div>
+            <div class="nav-item" onclick="showSection('examples', this)">Examples</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('media', this)">Media</div>
+            <div class="nav-item" onclick="showSection('practice', this)">Practice</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Explanation Section -->
+            <div class="section active" id="explanation">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="explanation">
+                            <h2>Welcome to Adjectives!</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.2rem; text-align: center; margin: 20px 0;">
+                                    Today we will learn about <span class="verb">ADJECTIVES</span> in English!
+                                </p>
+                                <p style="font-size: 1.1rem; text-align: center;">
+                                    Adjectives describe nouns and tell us about their quality, size, age, color, and more.
+                                </p>
+                                <div class="formula-box">
+                                    <span class="verb">Adjective(s)</span> + <span class="subject">Noun</span>
+                                </div>
+                                <p style="text-align: center; font-size: 1.1rem;">
+                                    Example: a <strong>beautiful big old red Italian silk</strong> scarf
+                                </p>
+                                <div class="rule-box">
+                                    <h4>What are adjectives?</h4>
+                                    <p>Adjectives are words that describe or modify nouns. They give more information about size, shape, age, color, origin, or material.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Adjective Order (OSASCOMP)</h2>
+                            <div class="explanation-box">
+                                <h3>When using multiple adjectives, follow this order:</h3>
+
+                                <div class="formula-box">
+                                    <strong>O</strong>pinion - <strong>S</strong>ize - <strong>A</strong>ge - <strong>S</strong>hape - <strong>C</strong>olor - <strong>O</strong>rigin - <strong>M</strong>aterial - <strong>P</strong>urpose
+                                </div>
+
+                                <table class="comparison-table">
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Examples</th>
+                                        <th>Example Sentence</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Opinion</strong></td>
+                                        <td>beautiful, ugly, nice, good</td>
+                                        <td>a <strong>beautiful</strong> dress</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Size</strong></td>
+                                        <td>big, small, large, tiny</td>
+                                        <td>a <strong>big</strong> house</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Age</strong></td>
+                                        <td>old, young, new, ancient</td>
+                                        <td>an <strong>old</strong> car</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Shape</strong></td>
+                                        <td>round, square, long, thin</td>
+                                        <td>a <strong>round</strong> table</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Color</strong></td>
+                                        <td>red, blue, green, black</td>
+                                        <td>a <strong>red</strong> apple</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Origin</strong></td>
+                                        <td>Italian, Chinese, French</td>
+                                        <td>an <strong>Italian</strong> restaurant</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Material</strong></td>
+                                        <td>wooden, plastic, silk, metal</td>
+                                        <td>a <strong>wooden</strong> chair</td>
+                                    </tr>
+                                </table>
+
+                                <div class="rule-box">
+                                    <h4>Memory Tip:</h4>
+                                    <p>Remember: OSASCOMP - Opinion, Size, Age, Shape, Color, Origin, Material, Purpose</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Adjective Order Examples</h2>
+                            <div class="explanation-box">
+                                <h3>Applying the OSASCOMP rule:</h3>
+
+                                <div class="example-box">
+                                    <p><strong>Example 1:</strong></p>
+                                    <div class="example-sentence">
+                                        a <span class="verb">beautiful</span> <span class="auxiliary">big</span> <span class="subject">old</span> <span class="yes-no">red</span> <span style="background:#f6ad55;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Italian</span> <span style="background:#805ad5;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">silk</span> scarf
+                                    </div>
+                                    <p style="margin-top: 10px;">Opinion → Size → Age → Color → Origin → Material</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p><strong>Example 2:</strong></p>
+                                    <div class="example-sentence">
+                                        a <span class="verb">lovely</span> <span class="auxiliary">small</span> <span class="yes-no">blue</span> <span style="background:#805ad5;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">plastic</span> toy
+                                    </div>
+                                    <p style="margin-top: 10px;">Opinion → Size → Color → Material</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p><strong>Example 3:</strong></p>
+                                    <div class="example-sentence">
+                                        an <span class="verb">expensive</span> <span class="subject">new</span> <span class="yes-no">black</span> <span style="background:#f6ad55;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">German</span> car
+                                    </div>
+                                    <p style="margin-top: 10px;">Opinion → Age → Color → Origin</p>
+                                </div>
+
+                                <div class="note-box">
+                                    <strong>Note:</strong>
+                                    <p>You don't always need all categories! Use only the adjectives that are necessary to describe the noun.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Adjective Agreement</h2>
+                            <div class="explanation-box">
+                                <h3>Adjectives in English DO NOT change for plural nouns</h3>
+
+                                <div class="formula-box">
+                                    Adjectives stay the SAME for singular and plural nouns
+                                </div>
+
+                                <table class="comparison-table">
+                                    <tr>
+                                        <th>Singular</th>
+                                        <th>Plural</th>
+                                        <th>Rule</th>
+                                    </tr>
+                                    <tr>
+                                        <td>a <strong>red</strong> car</td>
+                                        <td>two <strong>red</strong> cars</td>
+                                        <td>✓ Adjective stays the same</td>
+                                    </tr>
+                                    <tr>
+                                        <td>a <strong>big</strong> house</td>
+                                        <td>three <strong>big</strong> houses</td>
+                                        <td>✓ No -s on adjective</td>
+                                    </tr>
+                                    <tr>
+                                        <td>a <strong>beautiful</strong> flower</td>
+                                        <td>many <strong>beautiful</strong> flowers</td>
+                                        <td>✓ Adjective never changes</td>
+                                    </tr>
+                                </table>
+
+                                <div class="rule-box">
+                                    <h4>Important Rule:</h4>
+                                    <p>✓ a red apple → red apples (CORRECT)<br>
+                                    ✗ a red apple → reds apples (WRONG - Never add -s to adjectives!)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Position of Adjectives</h2>
+                            <div class="explanation-box">
+                                <h3>Adjectives usually come BEFORE the noun</h3>
+
+                                <div class="formula-box">
+                                    <span class="verb">Adjective</span> + <span class="subject">Noun</span>
+                                </div>
+
+                                <div class="example-box">
+                                    <p><strong>Correct Position:</strong></p>
+                                    <div class="example-sentence">✓ a <strong>beautiful</strong> house</div>
+                                    <div class="example-sentence">✓ an <strong>expensive</strong> car</div>
+                                    <div class="example-sentence">✓ a <strong>happy</strong> child</div>
+                                </div>
+
+                                <div class="example-box">
+                                    <p><strong>Adjectives after "to be":</strong></p>
+                                    <p>Adjectives can also come after the verb "to be" (am/is/are)</p>
+                                    <div class="example-sentence">The house <strong>is beautiful</strong>.</div>
+                                    <div class="example-sentence">The car <strong>is expensive</strong>.</div>
+                                    <div class="example-sentence">The child <strong>is happy</strong>.</div>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>Remember:</h4>
+                                    <p>• Before noun: a beautiful house<br>
+                                    • After "to be": The house is beautiful<br>
+                                    • Both are correct!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Common Mistakes with Adjectives</h2>
+                            <div class="explanation-box">
+                                <h3>❌ Mistake 1: Adding -s to adjectives (plural agreement)</h3>
+                                <div class="example-box">
+                                    <p>❌ <del>three reds cars</del> → ✅ three <strong>red</strong> cars</p>
+                                    <p>❌ <del>many bigs houses</del> → ✅ many <strong>big</strong> houses</p>
+                                </div>
+
+                                <h3>❌ Mistake 2: Wrong adjective order</h3>
+                                <div class="example-box">
+                                    <p>❌ <del>a red big car</del> → ✅ a <strong>big red</strong> car (size before color)</p>
+                                    <p>❌ <del>an Italian beautiful dress</del> → ✅ a <strong>beautiful Italian</strong> dress (opinion before origin)</p>
+                                </div>
+
+                                <h3>❌ Mistake 3: Adjective after noun (English is NOT like Spanish/French)</h3>
+                                <div class="example-box">
+                                    <p>❌ <del>a car red</del> → ✅ a <strong>red car</strong></p>
+                                    <p>❌ <del>a house big</del> → ✅ a <strong>big house</strong></p>
+                                </div>
+
+                                <h3>❌ Mistake 4: Using "very" between adjectives</h3>
+                                <div class="example-box">
+                                    <p>❌ <del>a big very red car</del> → ✅ a <strong>very big red</strong> car</p>
+                                    <p>Note: "very" modifies ONE adjective, not multiple!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="explanation-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(6)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Examples Section -->
+            <div class="section" id="examples">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="examples">
+                            <h2>Adjective Combinations</h2>
+                            <div class="explanation-box">
+                                <h3>Multiple adjectives describing nouns:</h3>
+
+                                <div class="example-box">
+                                    <p><strong>Describing Cars:</strong></p>
+                                    <div class="example-sentence">
+                                        a <span class="verb">beautiful</span> <span class="auxiliary">big</span> <span class="subject">old</span> <span class="yes-no">red</span> <span style="background:#f6ad55;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Italian</span> sports car
+                                    </div>
+                                    <div class="example-sentence">
+                                        an <span class="verb">expensive</span> <span class="auxiliary">small</span> <span class="subject">new</span> <span class="yes-no">black</span> <span style="background:#f6ad55;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">German</span> car
+                                    </div>
+                                </div>
+
+                                <div class="example-box">
+                                    <p><strong>Describing Houses:</strong></p>
+                                    <div class="example-sentence">
+                                        a <span class="verb">lovely</span> <span class="auxiliary">large</span> <span class="subject">old</span> <span style="background:#805ad5;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">brick</span> house
+                                    </div>
+                                    <div class="example-sentence">
+                                        a <span class="verb">nice</span> <span class="auxiliary">small</span> <span class="subject">new</span> <span class="yes-no">white</span> <span style="background:#805ad5;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">wooden</span> house
+                                    </div>
+                                </div>
+
+                                <div class="example-box">
+                                    <p><strong>Describing Clothes:</strong></p>
+                                    <div class="example-sentence">
+                                        a <span class="verb">beautiful</span> <span class="auxiliary">long</span> <span class="yes-no">blue</span> <span style="background:#805ad5;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">silk</span> dress
+                                    </div>
+                                    <div class="example-sentence">
+                                        an <span class="verb">ugly</span> <span class="auxiliary">big</span> <span class="yes-no">brown</span> <span style="background:#805ad5;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">wool</span> sweater
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="examples">
+                            <h2>Describing Objects</h2>
+                            <div class="explanation-box">
+                                <h3>Using adjectives to describe everyday objects:</h3>
+
+                                <div class="grid-examples">
+                                    <div class="grid-card">
+                                        <strong>In the Kitchen:</strong><br><br>
+                                        a large round wooden table<br>
+                                        a small sharp metal knife<br>
+                                        a beautiful old Chinese vase<br>
+                                        some clean white ceramic plates
+                                    </div>
+                                    <div class="grid-card">
+                                        <strong>In the Bedroom:</strong><br><br>
+                                        a comfortable big soft bed<br>
+                                        a small square black clock<br>
+                                        a beautiful antique wooden dresser<br>
+                                        some thick warm cotton blankets
+                                    </div>
+                                </div>
+
+                                <div class="grid-examples">
+                                    <div class="grid-card">
+                                        <strong>In the Living Room:</strong><br><br>
+                                        a comfortable old leather sofa<br>
+                                        a modern flat-screen TV<br>
+                                        a beautiful green Persian rug<br>
+                                        some small decorative glass vases
+                                    </div>
+                                    <div class="grid-card">
+                                        <strong>In the Office:</strong><br><br>
+                                        a heavy old metal filing cabinet<br>
+                                        a new black plastic keyboard<br>
+                                        a large rectangular glass desk<br>
+                                        some expensive German pens
+                                    </div>
+                                </div>
+
+                                <div class="note-box">
+                                    <strong>Notice:</strong>
+                                    <p>All adjectives follow the OSASCOMP order and stay the same (no -s) even with plural nouns!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="examples">
+                            <h2>Describing People</h2>
+                            <div class="explanation-box">
+                                <h3>Using adjectives to describe people:</h3>
+
+                                <div class="example-box">
+                                    <p><strong>Physical Appearance:</strong></p>
+                                    <div class="example-sentence">She is a <span class="verb">beautiful</span> <span class="auxiliary">tall</span> <span class="subject">young</span> <span class="yes-no">blonde</span> woman.</div>
+                                    <div class="example-sentence">He is a <span class="verb">handsome</span> <span class="auxiliary">short</span> <span class="subject">middle-aged</span> man.</div>
+                                    <div class="example-sentence">They are <span class="verb">cute</span> <span class="auxiliary">little</span> children.</div>
+                                </div>
+
+                                <div class="example-box">
+                                    <p><strong>Personality:</strong></p>
+                                    <div class="example-sentence">My friend is a <span class="verb">kind</span> and <span class="verb">friendly</span> person.</div>
+                                    <div class="example-sentence">My teacher is a <span class="verb">patient</span> and <span class="verb">helpful</span> woman.</div>
+                                    <div class="example-sentence">My brother is a <span class="verb">smart</span> <span class="subject">young</span> student.</div>
+                                </div>
+
+                                <div class="example-box">
+                                    <p><strong>Mixed Descriptions:</strong></p>
+                                    <div class="example-sentence">She is a <span class="verb">funny</span> <span class="auxiliary">tall</span> <span class="subject">young</span> <span style="background:#f6ad55;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Japanese</span> girl.</div>
+                                    <div class="example-sentence">He is a <span class="verb">serious</span> <span class="subject">old</span> <span style="background:#f6ad55;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">British</span> man.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="examples-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="reading">
+                            <h2>Reading: My Dream Bedroom</h2>
+                            <div class="explanation-box">
+                                <div class="reading-text">
+                                    <p><strong>A Description of My Perfect Room</strong></p>
+
+                                    <p>I have always dreamed of having the perfect bedroom. In my imagination, it is a <span class="highlight-question">beautiful large bright</span> room with big windows.</p>
+
+                                    <p>The walls are painted in a <span class="highlight-question">soft light blue</span> color that makes me feel calm and relaxed. There is a <span class="highlight-question">comfortable big soft</span> bed in the center with <span class="highlight-question">clean white cotton</span> sheets.</p>
+
+                                    <p>On one wall, there is a <span class="highlight-question">beautiful old wooden</span> bookshelf filled with my favorite books. Next to it is a <span class="highlight-question">small round modern</span> reading lamp.</p>
+
+                                    <p>The floor has a <span class="highlight-question">thick warm Persian</span> rug in <span class="highlight-question">beautiful red and gold</span> colors. In the corner, there is a <span class="highlight-question">comfortable old leather</span> reading chair.</p>
+
+                                    <p>On my desk, I have a <span class="highlight-answer">new black metal</span> laptop and some <span class="highlight-answer">expensive German</span> pens. The desk is made of <span class="highlight-answer">strong dark oak</span> wood.</p>
+
+                                    <p>The windows have <span class="highlight-answer">long thin white silk</span> curtains that move gently in the breeze. This is my dream bedroom!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="reading">
+                            <h2>Analysis of Adjectives</h2>
+                            <div class="explanation-box">
+                                <h3>Adjectives in correct order (OSASCOMP):</h3>
+                                <div class="example-box">
+                                    <p>• <strong>beautiful large bright</strong> room (opinion + size + opinion)</p>
+                                    <p>• <strong>soft light blue</strong> color (shape + age + color)</p>
+                                    <p>• <strong>comfortable big soft</strong> bed (opinion + size + opinion)</p>
+                                    <p>• <strong>clean white cotton</strong> sheets (opinion + color + material)</p>
+                                    <p>• <strong>beautiful old wooden</strong> bookshelf (opinion + age + material)</p>
+                                    <p>• <strong>small round modern</strong> lamp (size + shape + age)</p>
+                                </div>
+
+                                <h3>More adjective combinations:</h3>
+                                <div class="example-box">
+                                    <p>• <strong>thick warm Persian</strong> rug (size + opinion + origin)</p>
+                                    <p>• <strong>beautiful red and gold</strong> colors (opinion + color + color)</p>
+                                    <p>• <strong>comfortable old leather</strong> chair (opinion + age + material)</p>
+                                    <p>• <strong>new black metal</strong> laptop (age + color + material)</p>
+                                    <p>• <strong>long thin white silk</strong> curtains (size + shape + color + material)</p>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>Notice:</h4>
+                                    <p>All adjectives come BEFORE the noun. Multiple adjectives follow OSASCOMP order. All adjectives stay the same form (no -s added)!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="reading-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Section -->
+            <div class="section" id="media">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="media">
+                            <h2>Video: Adjective Order</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.1rem; margin-bottom: 20px;">Watch this video about adjective order in English:</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <iframe width="800" height="450"
+                                        src="https://www.youtube.com/embed/aDgJy1RhhSY"
+                                        style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <p style="font-size: 1rem; color: #666; text-align: center; font-style: italic;">
+                                    Learn the correct order of adjectives in English
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="media">
+                            <h2>Video: Using Adjectives</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.1rem; margin-bottom: 20px;">Watch this video about using adjectives correctly:</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <iframe width="800" height="450"
+                                        src="https://www.youtube.com/embed/VrkJCAbbR3w"
+                                        style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <p style="font-size: 1rem; color: #666; text-align: center; font-style: italic;">
+                                    More examples of adjectives and their order
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="media-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Section -->
+            <div class="section" id="practice">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="practice">
+                            <h2>Practice 1: Order the Adjectives</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Put in correct order: "car / German / new / expensive"</p>
+                                    <p>Answer: "a ___ car"</p>
+                                    <input type="text" id="q1" placeholder="expensive new German" onkeypress="if(event.key==='Enter') checkAnswer1()">
+                                    <button class="check-button" onclick="checkAnswer1()">Check Answer</button>
+                                    <div id="feedback1" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 2: Order the Adjectives</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Put in correct order: "dress / silk / blue / beautiful"</p>
+                                    <p>Answer: "a ___ dress"</p>
+                                    <input type="text" id="q2" placeholder="beautiful blue silk" onkeypress="if(event.key==='Enter') checkAnswer2()">
+                                    <button class="check-button" onclick="checkAnswer2()">Check Answer</button>
+                                    <div id="feedback2" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 3: Fix the Plural Error</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Fix this mistake:</p>
+                                    <p>"I have three reds cars." → "___"</p>
+                                    <input type="text" id="q3" placeholder="I have three red cars" onkeypress="if(event.key==='Enter') checkAnswer3()">
+                                    <button class="check-button" onclick="checkAnswer3()">Check Answer</button>
+                                    <div id="feedback3" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 4: Fix the Order</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Fix the adjective order:</p>
+                                    <p>"a red big car" → "___"</p>
+                                    <input type="text" id="q4" placeholder="a big red car" onkeypress="if(event.key==='Enter') checkAnswer4()">
+                                    <button class="check-button" onclick="checkAnswer4()">Check Answer</button>
+                                    <div id="feedback4" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 5: Correct Position</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Fix the adjective position:</p>
+                                    <p>"a house beautiful" → "___"</p>
+                                    <input type="text" id="q5" placeholder="a beautiful house" onkeypress="if(event.key==='Enter') checkAnswer5()">
+                                    <button class="check-button" onclick="checkAnswer5()">Check Answer</button>
+                                    <div id="feedback5" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 6: Order Three Adjectives</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Put in correct order: "table / wooden / round / old"</p>
+                                    <p>Answer: "an ___ table"</p>
+                                    <input type="text" id="q6" placeholder="old round wooden" onkeypress="if(event.key==='Enter') checkAnswer6()">
+                                    <button class="check-button" onclick="checkAnswer6()">Check Answer</button>
+                                    <div id="feedback6" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 7: Fix Multiple Errors</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Fix all mistakes:</p>
+                                    <p>"She has two beautifuls bigs dogs." → "___"</p>
+                                    <input type="text" id="q7" placeholder="She has two beautiful big dogs" onkeypress="if(event.key==='Enter') checkAnswer7()">
+                                    <button class="check-button" onclick="checkAnswer7()">Check Answer</button>
+                                    <div id="feedback7" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 8: Complete Sentence</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Complete with adjectives in correct order:</p>
+                                    <p>"I want a ___ (nice / Italian / leather / black) bag"</p>
+                                    <input type="text" id="q8" placeholder="nice black Italian leather" onkeypress="if(event.key==='Enter') checkAnswer8()">
+                                    <button class="check-button" onclick="checkAnswer8()">Check Answer</button>
+                                    <div id="feedback8" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="practice-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(6)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(7)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(8)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="writing" style="overflow-y: auto;">
+                            <h2>Writing Practice</h2>
+                            <div class="explanation-box">
+                                <h3>Describe your bedroom or favorite place using adjectives</h3>
+                                <p style="margin-bottom: 15px;">Use at least 10 different adjectives. Remember to use correct adjective order (OSASCOMP)!</p>
+                                <div class="question-box">
+                                    <textarea id="writing1" rows="8" style="width: 100%; padding: 12px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; font-size: 1.05rem; font-family: 'Inter', sans-serif; resize: vertical;" spellcheck="true" placeholder="My bedroom has a comfortable big soft bed with clean white sheets. There is a beautiful old wooden desk..."></textarea>
+                                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                        <button class="check-button" onclick="checkGrammar()">Check Grammar</button>
+                                        <button id="send-teacher-btn" class="check-button" onclick="sendToTeacher()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); opacity: 0.5; cursor: not-allowed;" disabled>Send to Teacher</button>
+                                    </div>
+                                    <div id="grammar-feedback" style="margin-top: 15px; padding: 15px; border-radius: 8px; display: none;"></div>
+                                    <p style="font-size: 0.95rem; color: #666; margin-top: 10px;">Tips: Use adjectives to describe size, color, age, material, etc. Remember OSASCOMP order!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="writing-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        let currentSection = 'explanation';
+
+        function showSection(sectionName, element) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            document.getElementById(sectionName).classList.add('active');
+
+            if (element) {
+                element.classList.add('active');
+            }
+
+            currentSection = sectionName;
+            currentSlide = 1;
+
+            setTimeout(() => {
+                const activeSection = document.querySelector('.section.active');
+                const inputField = activeSection.querySelector('input[type="text"]');
+                if (inputField) {
+                    inputField.focus();
+                }
+            }, 100);
+        }
+
+        function changeSlide(direction) {
+            const activeSection = document.querySelector('.section.active');
+            const slides = activeSection.querySelectorAll('.slide');
+            const dots = activeSection.querySelectorAll('.indicator-dot');
+
+            if (slides.length === 1) return;
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > slides.length) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = slides.length;
+            }
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+
+            setTimeout(() => {
+                const activeSlide = slides[currentSlide - 1];
+                const inputField = activeSlide.querySelector('input[type="text"]');
+                if (inputField) {
+                    inputField.focus();
+                    inputField.value = '';
+                }
+            }, 100);
+        }
+
+        function goToSlide(slideNum) {
+            const activeSection = document.querySelector('.section.active');
+            const slides = activeSection.querySelectorAll('.slide');
+            const dots = activeSection.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        function checkAnswer1() {
+            const answer = document.getElementById('q1').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback1');
+
+            if (answer === 'expensive new german' || answer === 'expensive new german car' || answer === 'a expensive new german car' || answer === 'an expensive new german car') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Perfect! "expensive new German" - Opinion, Age, Origin!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Remember OSASCOMP: Opinion (expensive) → Age (new) → Origin (German)';
+            }
+        }
+
+        function checkAnswer2() {
+            const answer = document.getElementById('q2').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback2');
+
+            if (answer === 'beautiful blue silk' || answer === 'beautiful blue silk dress' || answer === 'a beautiful blue silk dress') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Excellent! "beautiful blue silk" - Opinion, Color, Material!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Remember OSASCOMP: Opinion (beautiful) → Color (blue) → Material (silk)';
+            }
+        }
+
+        function checkAnswer3() {
+            const answer = document.getElementById('q3').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback3');
+
+            if (answer === 'i have three red cars' || answer === 'i have three red cars.') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! Adjectives NEVER take -s in English!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Remove the -s from "reds". Adjectives stay the same: I have three red cars.';
+            }
+        }
+
+        function checkAnswer4() {
+            const answer = document.getElementById('q4').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback4');
+
+            if (answer === 'a big red car' || answer === 'big red car') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Perfect! Size (big) comes before Color (red)!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Size comes before color: a big red car (not a red big car)';
+            }
+        }
+
+        function checkAnswer5() {
+            const answer = document.getElementById('q5').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback5');
+
+            if (answer === 'a beautiful house' || answer === 'beautiful house') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! Adjectives come BEFORE the noun in English!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ In English, adjectives come before nouns: a beautiful house';
+            }
+        }
+
+        function checkAnswer6() {
+            const answer = document.getElementById('q6').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback6');
+
+            if (answer === 'old round wooden' || answer === 'old round wooden table' || answer === 'an old round wooden table') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Great! Age (old) → Shape (round) → Material (wooden)!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Remember OSASCOMP: Age (old) → Shape (round) → Material (wooden)';
+            }
+        }
+
+        function checkAnswer7() {
+            const answer = document.getElementById('q7').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback7');
+
+            if (answer === 'she has two beautiful big dogs' || answer === 'she has two beautiful big dogs.') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Perfect! Removed -s from adjectives and fixed order!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Remove -s from adjectives: She has two beautiful big dogs.';
+            }
+        }
+
+        function checkAnswer8() {
+            const answer = document.getElementById('q8').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback8');
+
+            if (answer === 'nice black italian leather' || answer === 'a nice black italian leather bag' || answer.includes('nice') && answer.includes('black') && answer.includes('italian') && answer.includes('leather')) {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Excellent! Opinion → Color → Origin → Material!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ OSASCOMP order: nice (opinion) → black (color) → Italian (origin) → leather (material)';
+            }
+        }
+
+        async function checkGrammar() {
+            const text = document.getElementById('writing1').value;
+            const feedbackDiv = document.getElementById('grammar-feedback');
+            const textarea = document.getElementById('writing1');
+
+            if (!text.trim()) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Please write some sentences first!';
+                return;
+            }
+
+            textarea.style.display = 'none';
+            window.grammarCheckResult = { original: text, corrected: '' };
+
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.style.background = 'rgba(102, 126, 234, 0.1)';
+            feedbackDiv.style.border = '1px solid rgba(102, 126, 234, 0.3)';
+            feedbackDiv.style.color = '#667eea';
+            feedbackDiv.innerHTML = '⏳ Checking your grammar and spelling...';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=AIzaSyBTH0NmDb3cqjrY6p7YROPIJel-iCxSxzs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `You are a strict grammar checker. Fix grammar and spelling errors. Do not change the meaning, style, or add punctuation unless absolutely necessary. Profanities are acceptable, but don't use shortened informal words like "cuz" or "wanna"\n\nText: "${text}"\n\nReturn only the corrected text with minimal changes.`
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                const correctedText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text;
+
+                if (correctedText !== text && correctedText.toLowerCase() !== text.toLowerCase()) {
+                    const originalWords = text.split(/(\s+)/);
+                    const correctedWords = correctedText.split(/(\s+)/);
+                    let highlightedText = '';
+
+                    originalWords.forEach((word, i) => {
+                        if (word.match(/\s+/)) {
+                            highlightedText += word;
+                        } else if (correctedWords[i] && word.toLowerCase() !== correctedWords[i].toLowerCase()) {
+                            highlightedText += `<span style="color: #e53e3e; font-weight: 600; background: rgba(245, 101, 101, 0.15); padding: 2px 4px; border-radius: 3px;">${word}</span>`;
+                        } else {
+                            highlightedText += word;
+                        }
+                    });
+
+                    let html = `
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #c53030;">Your Text (errors highlighted):</strong>
+                            <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid rgba(245, 101, 101, 0.3); line-height: 1.8;">
+                                ${highlightedText}
+                            </div>
+                        </div>
+                        <div>
+                            <strong style="color: #2f855a;">Corrected Text:</strong>
+                            <div style="background: rgba(72, 187, 120, 0.1); padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid rgba(72, 187, 120, 0.3); color: #2d3748; line-height: 1.8;">
+                                ${correctedText}
+                            </div>
+                        </div>
+                    `;
+
+                    feedbackDiv.style.background = 'rgba(245, 101, 101, 0.05)';
+                    feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                    feedbackDiv.style.color = '#2d3748';
+                    feedbackDiv.innerHTML = html;
+
+                    window.grammarCheckResult.corrected = correctedText;
+                    const sendBtn = document.getElementById('send-teacher-btn');
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                } else {
+                    feedbackDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+                    feedbackDiv.style.border = '1px solid rgba(72, 187, 120, 0.3)';
+                    feedbackDiv.style.color = '#2f855a';
+                    feedbackDiv.innerHTML = '✓ Perfect! No grammar or spelling errors detected!';
+
+                    window.grammarCheckResult.corrected = text;
+                    const sendBtn = document.getElementById('send-teacher-btn');
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                }
+            } catch (error) {
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Unable to check grammar. Error: ' + error.message;
+            }
+        }
+
+        function sendToTeacher() {
+            const essayTitle = "A1-16: Adjectives - Order & Agreement";
+            const originalText = window.grammarCheckResult.original;
+            const correctedText = window.grammarCheckResult.corrected;
+
+            const emailBody = `Essay Title: ${essayTitle}\n\nOriginal Essay:\n${originalText}\n\nWe made some changes:\n\nCorrected Text:\n${correctedText}`;
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(essayTitle)}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+        }
+    </script>
+</body>
+</html>

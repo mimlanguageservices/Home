@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1-38: Expressions with there is/there are</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background: white;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 30px 80px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 25px 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -70px;
+        }
+
+        .slide-arrow.next {
+            right: -70px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        .slide h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .explanation-box {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 0;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .explanation-box h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .explanation-box p {
+            color: #2d3748;
+            line-height: 1.5;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .rule-box {
+            background: #e3f2fd;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .rule-box h4 {
+            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .rule-box p {
+            font-size: 1rem;
+            color: #2d3748;
+            margin: 5px 0;
+        }
+
+        .auxiliary {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #48bb78;
+            color: white;
+        }
+
+        .subject {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #9f7aea;
+            color: white;
+        }
+
+        .verb {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #ed64a6;
+            color: white;
+        }
+
+        .example-box {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+
+        .example-box p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #2d3748;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .note-box strong {
+            color: #856404;
+            font-size: 1rem;
+        }
+
+        .note-box p {
+            color: #856404;
+            margin-top: 5px;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .exercise-container {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 10px;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .exercise-container h3 {
+            color: #764ba2;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 0;
+        }
+
+        .question-box p {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 18px;
+            margin: 8px 0;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 15px 5px 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .feedback {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: 500;
+            font-size: 1.05rem;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+            display: block;
+        }
+
+        ul {
+            margin-left: 25px;
+            line-height: 1.6;
+        }
+
+        li {
+            margin: 6px 0;
+            font-size: 1.05rem;
+            color: #2d3748;
+        }
+
+        li strong {
+            color: #667eea;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        .explanation-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .explanation-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .explanation-box::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .explanation-box::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+
+        .formula-box {
+            background: #e6fffa;
+            border: 2px solid #319795;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .grid-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .grid-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .grid-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .reading-text {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.9;
+            margin: 15px 0;
+            border: 2px solid #e2e8f0;
+        }
+
+        .reading-text p {
+            margin: 12px 0;
+        }
+
+        .highlight-will {
+            background: #fed7d7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .example-sentence {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>A1-38: There is/There are</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">mimlanguageservices</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="ESL Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('explanation', this)">Explanation</div>
+            <div class="nav-item" onclick="showSection('examples', this)">Examples</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('media', this)">Media</div>
+            <div class="nav-item" onclick="showSection('practice', this)">Practice</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Explanation Section -->
+            <div class="section active" id="explanation">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="explanation">
+                            <h2>There is / There are</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.2rem; text-align: center; margin: 20px 0;">
+                                    We use <strong>there is</strong> and <strong>there are</strong> to say that something exists.
+                                </p>
+                                <div class="formula-box">
+                                    <strong>There is</strong> a book on the table.<br>
+                                    <strong>There are</strong> two books on the table.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Negatives with "any"</h2>
+                            <div class="explanation-box">
+                                <h3>For negatives, we use "isn't any" and "aren't any".</h3>
+
+                                <div class="rule-box">
+                                    <h4>Rule:</h4>
+                                    <p><strong>There isn't any</strong> + singular/uncountable noun</p>
+                                    <p><strong>There aren't any</strong> + plural noun</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p>There isn't any milk in the fridge.</p>
+                                    <p>There aren't any chairs in the room.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Questions with "any"</h2>
+                            <div class="explanation-box">
+                                <h3>For questions, we use "Is there any...?" and "Are there any...?"</h3>
+
+                                <div class="rule-box">
+                                    <h4>Rule:</h4>
+                                    <p><strong>Is there any</strong> + singular/uncountable noun?</p>
+                                    <p><strong>Are there any</strong> + plural noun?</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p>Is there any sugar?</p>
+                                    <p>Are there any good movies on TV?</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Quantifiers</h2>
+                            <div class="explanation-box">
+                                <h3>We can use quantifiers to say how much or how many.</h3>
+
+                                <div class="example-box">
+                                    <p>There is <strong>a lot of</strong> traffic today.</p>
+                                    <p>There are <strong>many</strong> people at the party.</p>
+                                    <p>There isn't <strong>much</strong> time.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="explanation-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Examples Section -->
+            <div class="section" id="examples">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="examples">
+                            <h2>Examples</h2>
+                            <div class="explanation-box">
+                                <div class="example-box">
+                                    <p><strong>A:</strong> Is there any coffee?</p>
+                                    <p><strong>B:</strong> No, there isn't any coffee, but there is some tea.</p>
+                                    <p><strong>A:</strong> Are there any cookies?</p>
+                                    <p><strong>B:</strong> Yes, there are some cookies on the plate.</p>
+                                    <p><strong>A:</strong> How many students are in your class?</p>
+                                    <p><strong>B:</strong> There are twenty students.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="examples-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <div class="slide active" data-section="reading">
+                            <h2>Reading: In My Living Room</h2>
+                            <div class="explanation-box">
+                                <div class="reading-text">
+                                    <p>In my living room, <strong>there is</strong> a big sofa and two armchairs. <strong>There isn't</strong> a lot of furniture. On the wall, <strong>there are</strong> some pictures of my family. <strong>There aren't any</strong> plants because I always forget to water them. <strong>Is there</strong> a television? Yes, <strong>there is</strong> a big TV on the wall. <strong>Are there any</strong> books? Yes, <strong>there are many</strong> books on the bookshelf.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="reading-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Section -->
+            <div class="section" id="media">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <div class="slide active" data-section="media">
+                            <h2>Video: There is/are with some/any</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.1rem; margin-bottom: 20px;">Watch this video:</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <iframe width="800" height="450"
+                                        src="https://www.youtube.com/embed/j2ggl-uTwME"
+                                        style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="media-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Section -->
+            <div class="section" id="practice">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="practice">
+                            <h2>Practice 1</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>___ a cat on the roof.</p>
+                                    <input type="text" id="q1" placeholder="Type your answer" onkeypress="if(event.key==='Enter') checkAnswer1()">
+                                    <button class="check-button" onclick="checkAnswer1()">Check Answer</button>
+                                    <div id="feedback1" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 2</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>___ any apples in the basket?</p>
+                                    <input type="text" id="q2" placeholder="Type your answer" onkeypress="if(event.key==='Enter') checkAnswer2()">
+                                    <button class="check-button" onclick="checkAnswer2()">Check Answer</button>
+                                    <div id="feedback2" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 3</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>There ___ any milk left.</p>
+                                    <input type="text" id="q3" placeholder="Type your answer" onkeypress="if(event.key==='Enter') checkAnswer3()">
+                                    <button class="check-button" onclick="checkAnswer3()">Check Answer</button>
+                                    <div id="feedback3" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 4</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>There are ___ people here.</p>
+                                    <input type="text" id="q4" placeholder="Type your answer" onkeypress="if(event.key==='Enter') checkAnswer4()">
+                                    <button class="check-button" onclick="checkAnswer4()">Check Answer</button>
+                                    <div id="feedback4" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="practice-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <div class="slide active" data-section="writing" style="overflow-y: auto;">
+                            <h2>Writing Practice</h2>
+                            <div class="explanation-box">
+                                <h3>Describe Your Kitchen</h3>
+                                <p style="margin-bottom: 15px;">Write a few sentences about your kitchen. Use <strong>there is, there are, there isn't any,</strong> and <strong>there aren't any</strong>.</p>
+                                <div class="question-box">
+                                    <textarea id="writing1" rows="8" style="width: 100%; padding: 12px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; font-size: 1.05rem; font-family: 'Inter', sans-serif; resize: vertical;" spellcheck="true" placeholder="In my kitchen, there is a big window. There are four chairs. There isn't any juice..."></textarea>
+                                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                        <button class="check-button" onclick="checkGrammar()">Check Grammar</button>
+                                        <button id="send-teacher-btn" class="check-button" onclick="sendToTeacher()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); opacity: 0.5; cursor: not-allowed;" disabled>Send to Teacher</button>
+                                    </div>
+                                    <div id="grammar-feedback" style="margin-top: 15px; padding: 15px; border-radius: 8px; display: none;"></div>
+                                    <p style="font-size: 0.95rem; color: #666; margin-top: 10px;">Example: In my fridge, there is some milk, but there isn't any orange juice. There are some eggs, but there aren't any tomatoes.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="writing-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        let currentSection = 'explanation';
+
+        function showSection(sectionName, element) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            document.getElementById(sectionName).classList.add('active');
+
+            if (element) {
+                element.classList.add('active');
+            }
+
+            currentSection = sectionName;
+            currentSlide = 1;
+
+            setTimeout(() => {
+                const activeSection = document.querySelector('.section.active');
+                const inputField = activeSection.querySelector('input[type="text"]');
+                if (inputField) {
+                    inputField.focus();
+                }
+            }, 100);
+        }
+
+        function changeSlide(direction) {
+            const activeSection = document.querySelector('.section.active');
+            const slides = activeSection.querySelectorAll('.slide');
+            const dots = activeSection.querySelectorAll('.indicator-dot');
+
+            if (slides.length === 1) return;
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > slides.length) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = slides.length;
+            }
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+
+            setTimeout(() => {
+                const activeSlide = slides[currentSlide - 1];
+                const inputField = activeSlide.querySelector('input[type="text"]');
+                if (inputField) {
+                    inputField.focus();
+                    inputField.value = '';
+                }
+            }, 100);
+        }
+
+        function goToSlide(slideNum) {
+            const activeSection = document.querySelector('.section.active');
+            const slides = activeSection.querySelectorAll('.slide');
+            const dots = activeSection.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        function checkAnswer1() {
+            const answer = document.getElementById('q1').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback1');
+
+            if (answer === 'there is') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Perfect!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Use "there is" for singular nouns.';
+            }
+        }
+
+        function checkAnswer2() {
+            const answer = document.getElementById('q2').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback2');
+
+            if (answer === 'are there') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Excellent!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Use "Are there" for plural questions.';
+            }
+        }
+
+        function checkAnswer3() {
+            const answer = document.getElementById('q3').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback3');
+
+            if (answer === 'isn\'t') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Great!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Use "isn\'t" for singular negatives.';
+            }
+        }
+
+        function checkAnswer4() {
+            const answer = document.getElementById('q4').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback4');
+
+            if (answer === 'a lot of' || answer === 'many') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Perfect!';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Use a quantifier like "a lot of" or "many".';
+            }
+        }
+
+        async function checkGrammar() {
+            const text = document.getElementById('writing1').value;
+            const feedbackDiv = document.getElementById('grammar-feedback');
+            const textarea = document.getElementById('writing1');
+
+            if (!text.trim()) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Please write some sentences first!';
+                return;
+            }
+
+            textarea.style.display = 'none';
+            window.grammarCheckResult = { original: text, corrected: '' };
+
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.style.background = 'rgba(102, 126, 234, 0.1)';
+            feedbackDiv.style.border = '1px solid rgba(102, 126, 234, 0.3)';
+            feedbackDiv.style.color = '#667eea';
+            feedbackDiv.innerHTML = '⏳ Checking your grammar and spelling...';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=AIzaSyBTH0NmDb3cqjrY6p7YROPIJel-iCxSxzs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{"parts": [{"text": `You are a strict grammar checker. Fix grammar and spelling errors. Do not change the meaning, style, or add punctuation unless absolutely necessary. Profanities are acceptable, but don't use shortened informal words like "cuz" or "wanna"
+
+Text: "${text}"
+
+Return only the corrected text with minimal changes.`}]}]
+                    })
+                });
+
+                const data = await response.json();
+                const correctedText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text;
+
+                if (correctedText !== text && correctedText.toLowerCase() !== text.toLowerCase()) {
+                    const originalWords = text.split(/(\s+)/);
+                    const correctedWords = correctedText.split(/(\s+)/);
+                    let highlightedText = '';
+
+                    originalWords.forEach((word, i) => {
+                        if (word.match(/\s+/)) {
+                            highlightedText += word;
+                        } else if (correctedWords[i] && word.toLowerCase() !== correctedWords[i].toLowerCase()) {
+                            highlightedText += `<span style="color: #e53e3e; font-weight: 600; background: rgba(245, 101, 101, 0.15); padding: 2px 4px; border-radius: 3px;">${word}</span>`;
+                        } else {
+                            highlightedText += word;
+                        }
+                    });
+
+                    let html = `
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #c53030;">Your Text (errors highlighted):</strong>
+                            <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid rgba(245, 101, 101, 0.3); line-height: 1.8;">
+                                ${highlightedText}
+                            </div>
+                        </div>
+                        <div>
+                            <strong style="color: #2f855a;">Corrected Text:</strong>
+                            <div style="background: rgba(72, 187, 120, 0.1); padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid rgba(72, 187, 120, 0.3); color: #2d3748; line-height: 1.8;">
+                                ${correctedText}
+                            </div>
+                        </div>
+                    `;
+
+                    feedbackDiv.style.background = 'rgba(245, 101, 101, 0.05)';
+                    feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                    feedbackDiv.style.color = '#2d3748';
+                    feedbackDiv.innerHTML = html;
+
+                    window.grammarCheckResult.corrected = correctedText;
+                    const sendBtn = document.getElementById('send-teacher-btn');
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                } else {
+                    feedbackDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+                    feedbackDiv.style.border = '1px solid rgba(72, 187, 120, 0.3)';
+                    feedbackDiv.style.color = '#2f855a';
+                    feedbackDiv.innerHTML = '✓ Perfect! No grammar or spelling errors detected!';
+
+                    window.grammarCheckResult.corrected = text;
+                    const sendBtn = document.getElementById('send-teacher-btn');
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                }
+            } catch (error) {
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Unable to check grammar. Error: ' + error.message;
+            }
+        }
+
+        function sendToTeacher() {
+            const essayTitle = "A1-38: Expressions with there is/there are";
+            const originalText = window.grammarCheckResult.original;
+            const correctedText = window.grammarCheckResult.corrected;
+
+            const emailBody = `Essay Title: ${essayTitle}\n\nOriginal Essay:\n${originalText}\n\nWe made some changes:\n\nCorrected Text:\n${correctedText}`;
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(essayTitle)}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+        }
+    </script>
+</body>
+</html>
