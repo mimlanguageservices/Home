@@ -1,0 +1,1695 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armchair Psychologists - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        /* Image-only slide (Slide 1) */
+        .slide-image-only {
+            padding: 0;
+        }
+
+        /* Horizontal layout slides (Slides 2-5) */
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            max-width: 50%;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .slide-text-section-left ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .slide-text-section-left li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        .slide-image-section-right {
+            width: 45%;
+            max-width: 50%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Navigation Arrows - Outside the white box */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -60px;
+        }
+
+        .slide-arrow.next {
+            right: -60px;
+        }
+
+        /* Slide Indicators */
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 280px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* NEW QUIZ SYSTEM STYLES */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        /* Video Section */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 15px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: visible;
+        }
+
+        #video {
+            overflow: visible;
+        }
+
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: #48bb78;
+            color: white;
+        }
+
+        .feedback.incorrect {
+            background: #f56565;
+            color: white;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 15px 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .nav-item {
+                flex: 1 1 auto;
+                min-width: 120px;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .section h2 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+
+            .slideshow-container {
+                padding: 20px;
+            }
+
+            .slide-horizontal {
+                flex-direction: column !important;
+            }
+
+            .slide-text-section-left {
+                max-width: 100%;
+                padding-right: 0;
+            }
+
+            .slide-image-section-right {
+                width: 100%;
+                max-width: 100%;
+                height: 250px;
+            }
+
+            .slide-arrow {
+                width: 40px;
+                height: 40px;
+            }
+
+            .slide-arrow.prev {
+                left: 10px;
+            }
+
+            .slide-arrow.next {
+                right: 10px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Armchair Psychologists</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Speaking</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section with Slideshow -->
+            <div class="section active" id="discussion">
+                <div class="slideshow-container">
+
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1 - Image Only -->
+                        <div class="discussion-slide active slide-image-only">
+                            <img src="https://images.unsplash.com/photo-1573497620053-ea5300f94f21?w=1200&h=800&fit=crop" alt="Person sitting in psychology therapy session" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>What is an Armchair Psychologist?</h3>
+                                <p>An armchair psychologist is someone who offers psychological advice or diagnoses without professional training or qualifications. The term suggests someone sitting comfortably in their armchair, theorizing about others' mental states without proper expertise. This phenomenon has grown with social media, where people frequently analyze celebrities, politicians, or even friends using psychology terms they've learned online.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=800&h=600&fit=crop" alt="Person reading psychology book in armchair" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Psychology in the Mainstream</h3>
+                                <p>Terms like "gaslighting," "narcissist," "toxic," and "trauma" have entered everyday conversation. While this increased awareness can be positive, these words are often misused or oversimplified. Professional psychologists spend years learning to properly diagnose conditions, but many people now use these terms casually based on limited information or personal feelings.</p>
+                                <ul>
+                                    <li>Gaslighting: Often used for any disagreement</li>
+                                    <li>Narcissist: Applied to anyone confident or selfish</li>
+                                    <li>Toxic: Used to describe any negative relationship</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                               <img src="https://images.unsplash.com/photo-1611926653458-09294b3142bf?w=800&h=600&fit=crop" alt="Social media on phone screen" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Self-Diagnosis Dangers</h3>
+                                <p>The internet has made psychological information more accessible, but this has led to an increase in self-diagnosis. People read symptoms online and convince themselves they have certain disorders. While self-awareness is valuable, professional diagnosis requires extensive training, testing, and clinical experience. Mental health conditions are complex and often overlap, making accurate diagnosis difficult even for professionals.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=600&fit=crop" alt="Person searching medical information online" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Impact on Society</h3>
+                                <p>When everyone becomes an armchair psychologist, several problems emerge. Real psychological terms lose their meaning, people with actual disorders face stigma, and individuals may avoid seeking proper professional help. However, there's also a positive side: increased mental health awareness and reduced shame around discussing psychological issues. The key is finding balance between awareness and respecting professional expertise.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop" alt="Group therapy or discussion session" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading Practice</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('A2', this)">A2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B1', this)">B1 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
+                    </div>
+
+                    <!-- A2 Level -->
+                    <div class="reading-level" id="A2-level">
+                        <div class="reading-page active">
+                            <h3>Learning About the Mind</h3>
+                            <p>Today, many people learn about psychology from the internet. They read about the mind and mental health. This is good because people understand mental health better now.</p>
+                            <p>But there is a problem. Some people think they are experts after reading a few articles. They tell other people what is wrong with them. This is not good. Real psychologists study for many years.</p>
+                            <p>Words like "depression" and "anxiety" are now very common. People use these words every day. Sometimes they use them correctly. Sometimes they don't.</p>
+                            <p>It's important to learn about mental health. But remember: reading about psychology doesn't make you a psychologist. If you have problems, talk to a real doctor or therapist.</p>
+                        </div>
+                    </div>
+
+                    <!-- B1 Level -->
+                    <div class="reading-level" id="B1-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>When Everyone's a Psychologist</h3>
+                            <p>Have you noticed that people love to analyze each other these days? Social media is full of amateur psychologists diagnosing celebrities, politicians, and even their own family members. Terms like "narcissist," "gaslighting," and "toxic" appear in everyday conversations.</p>
+                            <p>This trend has both positive and negative aspects. On the positive side, more people are aware of mental health issues. They understand that psychological problems are real and deserve attention. People feel more comfortable discussing therapy and emotional struggles.</p>
+                            <p>However, there are dangers. Many people misuse psychological terms. They call someone a "narcissist" just because that person is confident or selfish. They claim they're being "gaslit" during normal disagreements. They diagnose themselves with disorders after reading symptoms online.</p>
+                            <p>Real psychology is complex. Psychologists spend years studying and training. They use standardized tests, careful observation, and evidence-based methods. A few minutes on Google doesn't replace professional expertise.</p>
+                            <p>The lesson? It's wonderful to learn about psychology and mental health. But we should be humble about our knowledge and respect professional boundaries. If you're concerned about yourself or someone else, consult a qualified professional rather than relying on internet research.</p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>The Rise of Armchair Psychology</h3>
+                            <p>In recent years, psychological terminology has permeated mainstream discourse. Words like "gaslighting," "narcissist," "trauma," and "toxic" have become ubiquitous in social media posts, news articles, and casual conversation. While this linguistic shift reflects growing awareness of mental health issues, it also raises concerns about the oversimplification and misapplication of complex psychological concepts.</p>
+                            <p>The term "armchair psychologist" describes individuals who offer psychological analyses or diagnoses without formal training. This phenomenon predates the internet—people have always theorized about human behavior—but social media has amplified it dramatically. Now, anyone can share their psychological interpretations with thousands of followers, often presenting subjective opinions as expert analysis.</p>
+                            <p>Consider the word "gaslighting," which originally described a specific form of psychological manipulation where someone makes another person question their own reality. Today, it's frequently misapplied to any disagreement or difference in memory. Similarly, "narcissist" has evolved from a clinical diagnosis (Narcissistic Personality Disorder) into a casual insult for anyone displaying selfishness or confidence.</p>
+                            <p>Self-diagnosis has also proliferated. People read lists of symptoms online and conclude they have ADHD, autism, bipolar disorder, or other conditions. While self-awareness is valuable, and some individuals correctly identify issues that professionals later confirm, many people misdiagnose themselves, potentially leading to inappropriate self-treatment or avoiding necessary professional care.</p>
+                            <p>The democratization of psychological knowledge isn't entirely negative. Increased mental health literacy can reduce stigma, encourage people to seek help, and foster empathy. The challenge is maintaining nuance and recognizing the limits of lay knowledge. Perhaps the solution isn't less discussion of psychology, but more emphasis on humility, critical thinking, and respect for professional expertise.</p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>Psychological Literacy and Its Discontents</h3>
+                            <p>The mainstreaming of psychological terminology represents a fascinating cultural shift. Clinical terms that once resided exclusively within professional discourse have become vernacular, fundamentally altering how people conceptualize behavior, relationships, and mental health. This transformation embodies both progress and peril, illuminating the complex relationship between expert knowledge and public understanding.</p>
+                            <p>The phenomenon of "armchair psychology" isn't novel—lay theorizing about human nature is arguably universal. However, several contemporary factors have intensified this tendency. Social media provides unprecedented platforms for amateur analysis. Algorithmic content recommendation systems create echo chambers where oversimplified psychological explanations flourish. The therapeutic ethos of modern culture encourages everyone to think psychologically about themselves and others.</p>
+                            <p>The misappropriation of terms like "gaslighting" illustrates how clinical precision erodes during popularization. Gaslighting describes a systematic pattern of psychological manipulation aimed at making victims doubt their perceptions and sanity. Yet the term now frequently appears in contexts ranging from political disagreements to simple miscommunications. This semantic drift dilutes the word's meaning and potentially trivializes the experiences of actual abuse survivors.</p>
+                            <p>Self-diagnosis via internet research presents a particularly thorny issue. While some argue that online information empowers patients and facilitates earlier intervention, psychologists emphasize the dangers. Mental health conditions often have overlapping symptoms, require differential diagnosis, and exist along spectrums of severity. Moreover, confirmation bias leads people to selectively focus on symptoms they relate to while ignoring contradictory information. The Dunning-Kruger effect suggests that those with minimal knowledge are often most confident in their conclusions.</p>
+                            <p>Yet dismissing all lay psychological discourse as harmful oversimplifies the situation. Increased mental health literacy has contributed to reduced stigma, particularly among younger generations. When public figures discuss their struggles with depression or anxiety, it normalizes these experiences and may encourage others to seek help. The proliferation of psychological language provides vocabulary for articulating previously inchoate feelings and experiences.</p>
+                            <p>The path forward likely involves cultivating what might be called "critical psychological literacy"—understanding fundamental concepts while recognizing the limitations of one's knowledge, appreciating the complexity of mental health, and respecting the boundaries of professional expertise. Education systems might address this by teaching not only psychological concepts but also epistemology: how we know what we claim to know, and why expert knowledge differs from lay understanding. In essence, we need more sophistication in our collective psychological discourse, not less engagement with these crucial topics.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Armchair Psychology</h2>
+                <div class="video-container">
+                    <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
+                        <iframe
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <h2>Speaking Practice</h2>
+                <div class="reading-page active">
+                    <h3>Discussion Questions</h3>
+                    <p><strong>Question 1:</strong> Have you ever self-diagnosed a condition after reading about it online? What happened?</p>
+                    <p><strong>Question 2:</strong> Do you think social media has made people more or less understanding of mental health issues? Why?</p>
+                    <p><strong>Question 3:</strong> When is it appropriate to use psychology terms in everyday conversation, and when is it not?</p>
+                    <p><strong>Question 4:</strong> Have you noticed people misusing words like "gaslighting," "narcissist," or "toxic"? Give examples.</p>
+                    <p><strong>Question 5:</strong> What's the difference between being aware of mental health and being an "armchair psychologist"?</p>
+                    <p><strong>Question 6:</strong> Should celebrities and influencers be allowed to discuss mental health topics without professional qualifications?</p>
+                    <p><strong>Question 7:</strong> How can we increase mental health awareness without encouraging self-diagnosis?</p>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Psychology Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">General Vocabulary</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Gaslighting</div></div><div class="flashcard-back"><div class="flashcard-definition">Manipulating someone to make them doubt their own reality or sanity</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Narcissist</div></div><div class="flashcard-back"><div class="flashcard-definition">Someone with excessive self-love or who lacks empathy for others</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Trauma</div></div><div class="flashcard-back"><div class="flashcard-definition">Emotional or psychological injury caused by a distressing event</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Toxic</div></div><div class="flashcard-back"><div class="flashcard-definition">Very harmful or negative, especially in relationships</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Self-diagnosis</div></div><div class="flashcard-back"><div class="flashcard-definition">Identifying one's own medical or psychological condition without professional help</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stigma</div></div><div class="flashcard-back"><div class="flashcard-definition">Negative social attitudes toward something, especially mental illness</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Diagnosis</div></div><div class="flashcard-back"><div class="flashcard-definition">The identification of a disease or condition by a professional</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Therapist</div></div><div class="flashcard-back"><div class="flashcard-definition">A professional who treats mental or psychological disorders</div></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Armchair</div></div><div class="flashcard-back"><div class="flashcard-definition">Done theoretically or without expertise (armchair expert, armchair critic)</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Mainstream</div></div><div class="flashcard-back"><div class="flashcard-definition">Widely accepted or commonly used by most people</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Oversimplify</div></div><div class="flashcard-back"><div class="flashcard-definition">To make something seem simpler than it really is</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Misuse</div></div><div class="flashcard-back"><div class="flashcard-definition">To use something incorrectly or inappropriately</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Expertise</div></div><div class="flashcard-back"><div class="flashcard-definition">Special skill or knowledge in a particular field</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Phenomenon</div></div><div class="flashcard-back"><div class="flashcard-definition">An observable event or trend, especially one that is remarkable</div></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
+            <div class="section" id="quiz">
+                <h2>Vocabulary Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header" id="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div id="quiz-counter">Question 1 of 10</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quizProgressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be generated dynamically -->
+                    </div>
+
+                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalQuizScore">0/10</div>
+                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>Writing Practice</h2>
+                <div class="writing-container">
+                    <div class="writing-content">
+                        <h3 class="writing-question">Reflect on Armchair Psychology</h3>
+
+                        <p class="writing-objective">
+                            Write a short paragraph (100-150 words) about your experience with psychology terms in everyday life. Have you ever used or heard someone use terms like "gaslighting" or "narcissist"? Do you think this trend is positive or negative? Share your thoughts with your teacher.
+                        </p>
+
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group">
+                                <label for="studentName">Student Name</label>
+                                <input type="text" id="studentName" name="studentName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teacherEmail">Teacher's Email</label>
+                                <input type="email" id="teacherEmail" name="teacherEmail" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="writingInput">Your Response</label>
+                                <input type="text" id="writingInput" name="writingInput" required>
+                            </div>
+
+                            <div class="button-container">
+                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send Response</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Vocabulary Popup -->
+            <div class="popup-overlay" id="vocabPopup" style="display: none;">
+                <div class="popup-content">
+                    <div class="popup-word" id="popupWord"></div>
+                    <div class="popup-definition" id="popupDefinition"></div>
+                    <button class="popup-close" onclick="closePopup()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Slideshow variables
+        let currentSlide = 1;
+        let totalSlides = 5;
+
+        // Vocabulary database for the quiz
+        const vocabularyDatabase = [
+            {
+                term: "gaslighting",
+                definition: "Manipulating someone to make them doubt their own reality or sanity.",
+                category: "psychology",
+                sentences: [
+                    "The abuser was ___ his partner by constantly denying things he had said.",
+                    "She realized she was a victim of ___ when her memories were repeatedly questioned.",
+                    "Many people misuse the term ___ to describe simple disagreements."
+                ]
+            },
+            {
+                term: "narcissist",
+                definition: "Someone with excessive self-love or who lacks empathy for others.",
+                category: "psychology",
+                sentences: [
+                    "He's such a ___ that he can't stop talking about himself.",
+                    "Not everyone who posts selfies is a ___.",
+                    "A true ___ lacks empathy for other people's feelings."
+                ]
+            },
+            {
+                term: "stigma",
+                definition: "Negative social attitudes toward something, especially mental illness.",
+                category: "psychology",
+                sentences: [
+                    "There is still significant ___ around seeking mental health treatment.",
+                    "We need to reduce the ___ associated with depression.",
+                    "The ___ of mental illness prevents many from getting help."
+                ]
+            },
+            {
+                term: "diagnosis",
+                definition: "The identification of a disease or condition by a professional.",
+                category: "psychology",
+                sentences: [
+                    "Only a qualified professional can provide an accurate ___.",
+                    "Self-___ based on internet research can be dangerous.",
+                    "She received a ___ of anxiety disorder from her therapist."
+                ]
+            },
+            {
+                term: "trauma",
+                definition: "Emotional or psychological injury caused by a distressing event.",
+                category: "psychology",
+                sentences: [
+                    "He experienced significant ___ from the accident.",
+                    "Not every difficult experience causes lasting ___.",
+                    "The therapist specializes in treating childhood ___."
+                ]
+            },
+            {
+                term: "toxic",
+                definition: "Very harmful or negative, especially in relationships.",
+                category: "psychology",
+                sentences: [
+                    "She finally left her ___ relationship.",
+                    "The word ___ is overused to describe any negative situation.",
+                    "His ___ behavior was affecting the whole team."
+                ]
+            },
+            {
+                term: "mainstream",
+                definition: "Widely accepted or commonly used by most people.",
+                category: "general",
+                sentences: [
+                    "Psychology terms have entered ___ conversation.",
+                    "Mental health discussion has become more ___ in recent years.",
+                    "The idea went from fringe to ___ very quickly."
+                ]
+            },
+            {
+                term: "oversimplify",
+                definition: "To make something seem simpler than it really is.",
+                category: "general",
+                sentences: [
+                    "We shouldn't ___ complex mental health issues.",
+                    "Social media tends to ___ psychological concepts.",
+                    "It's easy to ___ when you don't understand the full picture."
+                ]
+            },
+            {
+                term: "expertise",
+                definition: "Special skill or knowledge in a particular field.",
+                category: "general",
+                sentences: [
+                    "Psychological ___ requires years of training.",
+                    "Reading articles online doesn't give you real ___.",
+                    "We should respect the ___ of mental health professionals."
+                ]
+            },
+            {
+                term: "phenomenon",
+                definition: "An observable event or trend, especially one that is remarkable.",
+                category: "general",
+                sentences: [
+                    "Armchair psychology is a growing social ___.",
+                    "The ___ of self-diagnosis has increased with internet access.",
+                    "This ___ affects how we talk about mental health."
+                ]
+            }
+        ];
+
+        // Section switching
+        function showSection(sectionId, navItem) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+
+            document.getElementById(sectionId).classList.add('active');
+            navItem.classList.add('active');
+        }
+
+        // Slideshow functionality
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > totalSlides) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = totalSlides;
+            }
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        // Reading section management
+        function showReadingLevel(level, button) {
+            document.querySelectorAll('.reading-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.querySelectorAll('.reading-level').forEach(levelDiv => levelDiv.style.display = 'none');
+            document.getElementById(level + '-level').style.display = 'block';
+        }
+
+        // Vocabulary section management
+        function showVocabPage(pageNum, element) {
+            document.querySelectorAll('.vocab-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.vocab-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Vocabulary popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+
+                container.appendChild(questionDiv);
+            });
+        }
+
+
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
+                }
+            }
+        }
+
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+
+            const isCorrect = userAnswer === question.correctAnswer;
+
+            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' :
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+
+            if (isCorrect && !userQuizAnswers[questionNum]) {
+                 quizScore++;
+            }
+            userQuizAnswers[questionNum] = isCorrect;
+
+            checkButton.disabled = true;
+
+            updateQuizProgress();
+
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        function updateQuizProgress() {
+            const counter = document.getElementById('quiz-counter');
+            const progressBar = document.getElementById('quizProgressFill');
+
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+
+            if (progressBar) {
+                const answeredCount = Object.keys(userQuizAnswers).length;
+                const progressPercent = (answeredCount / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'block';
+            document.getElementById('finalQuizScore').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+
+        function restartVocabQuiz() {
+            document.getElementById('quiz-results-page').style.display = 'none';
+            document.getElementById('quiz-questions-container').style.display = 'block';
+            document.getElementById('quiz-header').style.display = 'flex';
+            initializeVocabQuiz();
+        }
+
+        // Writing section management
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+            const writingResponse = document.getElementById('writingInput').value.trim();
+
+            if (!studentName || !teacherEmail || !writingResponse) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const subject = encodeURIComponent('Armchair Psychology Assignment - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
+            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz();
+            showReadingLevel('A2', document.querySelector('.reading-nav .page-btn'));
+        });
+    </script>
+</body>
+</html>

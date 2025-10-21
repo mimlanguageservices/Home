@@ -1,0 +1,1824 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nostalgia Marketing - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        /* Image-only slide (Slide 1) */
+        .slide-image-only {
+            padding: 0;
+        }
+
+        /* Horizontal layout slides (Slides 2-5) */
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            max-width: 50%;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .slide-text-section-left ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .slide-text-section-left li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        .slide-image-section-right {
+            width: 45%;
+            max-width: 50%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Navigation Arrows - Outside the white box */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -60px;
+        }
+
+        .slide-arrow.next {
+            right: -60px;
+        }
+
+        /* Slide Indicators */
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 280px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* Quiz System Styles */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: #48bb78;
+            color: white;
+        }
+
+        .feedback.incorrect {
+            background: #f56565;
+            color: white;
+        }
+
+        /* Video Section */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 15px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 15px 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .nav-item {
+                flex: 1 1 auto;
+                min-width: 120px;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .section h2 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+
+            .slideshow-container {
+                padding: 20px;
+            }
+
+            .slide-horizontal {
+                flex-direction: column !important;
+            }
+
+            .slide-text-section-left {
+                max-width: 100%;
+                padding-right: 0;
+            }
+
+            .slide-image-section-right {
+                width: 100%;
+                max-width: 100%;
+                height: 250px;
+            }
+
+            .slide-arrow {
+                width: 40px;
+                height: 40px;
+            }
+
+            .slide-arrow.prev {
+                left: 10px;
+            }
+
+            .slide-arrow.next {
+                right: 10px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Nostalgia Marketing</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Speaking</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section with Slideshow -->
+            <div class="section active" id="discussion">
+                <div class="slideshow-container">
+
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1 - Image Only -->
+                        <div class="discussion-slide active slide-image-only">
+                            <img src="https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=1200&q=80" alt="Retro gaming and nostalgia" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>What is Nostalgia Marketing?</h3>
+                                <p>Nostalgia marketing is a strategy that uses memories and emotions from the past to connect with consumers. Brands tap into feelings of <span class="vocab-link" onclick="showPopup('nostalgia', 'A sentimental longing for the past')">nostalgia</span> to create emotional bonds with their products. This approach is especially effective with <span class="vocab-link" onclick="showPopup('millennials', 'People born between 1981 and 1996')">millennials</span> who grew up in the 1980s and 1990s and now have purchasing power.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80" alt="Vintage toys and collectibles" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Millennial Target Market</h3>
+                                <p>Brands that once focused on children are now <span class="vocab-link" onclick="showPopup('pivoting', 'Changing direction or strategy')">pivoting</span> to target adults. Why?</p>
+                                <ul>
+                                    <li>Millennials have <span class="vocab-link" onclick="showPopup('disposable income', 'Money available to spend after taxes and necessities')">disposable income</span></li>
+                                    <li>They seek emotional connections with brands</li>
+                                    <li>Nostalgia triggers powerful purchasing decisions</li>
+                                    <li>Adults are willing to pay premium prices for childhood memories</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?w=800&q=80" alt="Adult with vintage items" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Brand Examples</h3>
+                                <p>Major brands have embraced nostalgia marketing:</p>
+                                <ul>
+                                    <li><strong>Pokemon:</strong> Trading cards now valued at thousands of dollars</li>
+                                    <li><strong>LEGO:</strong> Complex sets designed for adult collectors</li>
+                                    <li><strong>Nintendo:</strong> Classic consoles and retro game releases</li>
+                                    <li><strong>Disney:</strong> Live-action remakes of animated classics</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=800&q=80" alt="Pokemon cards" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Psychology Behind It</h3>
+                                <p>Nostalgia marketing works because:</p>
+                                <ul>
+                                    <li>It creates a sense of comfort and security</li>
+                                    <li>Positive memories trigger emotional responses</li>
+                                    <li>Childhood brands build <span class="vocab-link" onclick="showPopup('brand loyalty', 'Customer commitment to repurchase a brand')">brand loyalty</span></li>
+                                    <li>Adults seek to <span class="vocab-link" onclick="showPopup('recapture', 'Experience something from the past again')">recapture</span> simpler times</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=800&q=80" alt="Nostalgic memories" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading Practice</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('B1', this)">B1 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
+                    </div>
+
+                    <!-- B1 Level -->
+                    <div class="reading-level" id="B1-level">
+                        <div class="reading-subnav">
+                            <button class="page-btn active" onclick="showReadingPage('B1', 1, this)">Page 1</button>
+                            <button class="page-btn" onclick="showReadingPage('B1', 2, this)">Page 2</button>
+                            <button class="page-btn" onclick="showReadingPage('B1', 3, this)">Page 3</button>
+                            <button class="page-btn" onclick="showReadingPage('B1', 4, this)">Page 4</button>
+                        </div>
+
+                        <div class="reading-page active" id="B1-page-1">
+                            <h3>Pokemon: From Playground to Investment</h3>
+                            <p>In the 1990s, Pokemon cards were popular with children. Kids collected them, traded them, and played games with them. Today, these same cards are worth thousands of dollars. Adults who played with Pokemon as children are now buying the cards again.</p>
+                            <p>Why are adults buying children's toys? The answer is <span class="vocab-link" onclick="showPopup('nostalgia', 'A sentimental longing for the past')">nostalgia</span>. When people see Pokemon cards, they remember happy times from their childhood. These positive feelings make them want to buy the cards.</p>
+                            <p>Some rare Pokemon cards sell for over $300,000. People see them as <span class="vocab-link" onclick="showPopup('investments', 'Something purchased with the expectation of profit')">investments</span>, not just toys.</p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-2">
+                            <h3>LEGO Builds for Adults</h3>
+                            <p>LEGO was always a toy for children. But now, LEGO makes special sets for adults. These sets have thousands of pieces and take many hours to build. They cost much more than regular LEGO sets.</p>
+                            <p>Why does LEGO make sets for adults? Because adults have money and time. They remember playing with LEGO as children. Now they want to <span class="vocab-link" onclick="showPopup('recapture', 'Experience something from the past again')">recapture</span> those happy memories.</p>
+                            <p>LEGO's adult sets include famous buildings, movie scenes, and art pieces. Some sets cost over $800. Adults enjoy the <span class="vocab-link" onclick="showPopup('therapeutic', 'Having a healing or calming effect')">therapeutic</span> experience of building.</p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-3">
+                            <h3>Nintendo's Retro Strategy</h3>
+                            <p>Nintendo understands nostalgia marketing very well. The company released classic game consoles like the NES Classic and SNES Classic. These are smaller versions of old gaming systems from the 1980s and 1990s.</p>
+                            <p>These <span class="vocab-link" onclick="showPopup('retro', 'Imitating styles from the past')">retro</span> consoles sold out immediately. Adults wanted to play the games they loved as children. Nintendo also brings back old games for modern systems.</p>
+                            <p>The <span class="vocab-link" onclick="showPopup('strategy', 'A plan to achieve a goal')">strategy</span> works because it combines old memories with new technology. Players get the games they remember, but with better graphics and convenience.</p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-4">
+                            <h3>Disney's Live-Action Magic</h3>
+                            <p>Disney has made many live-action versions of classic animated films. Movies like "The Lion King," "Aladdin," and "Beauty and the Beast" were remade with real actors or realistic computer graphics.</p>
+                            <p>Who watches these movies? Parents who saw the original films as children bring their own children to watch the new versions. This creates a <span class="vocab-link" onclick="showPopup('multi-generational', 'Involving multiple age groups')">multi-generational</span> audience.</p>
+                            <p>The remakes earn billions of dollars. They succeed because they give adults a chance to share their childhood memories with their children. This emotional connection is more valuable than any <span class="vocab-link" onclick="showPopup('advertising', 'Promoting a product through media')">advertising</span>.</p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-subnav">
+                            <button class="page-btn active" onclick="showReadingPage('B2', 1, this)">Page 1</button>
+                            <button class="page-btn" onclick="showReadingPage('B2', 2, this)">Page 2</button>
+                            <button class="page-btn" onclick="showReadingPage('B2', 3, this)">Page 3</button>
+                            <button class="page-btn" onclick="showReadingPage('B2', 4, this)">Page 4</button>
+                        </div>
+
+                        <div class="reading-page active" id="B2-page-1">
+                            <h3>The Pokemon Phenomenon: Childhood Cards as Adult Assets</h3>
+                            <p>The Pokemon Trading Card Game launched in 1996, captivating children worldwide with colorful creatures and strategic gameplay. Today, the same cards that children once traded in school playgrounds have transformed into serious <span class="vocab-link" onclick="showPopup('collectibles', 'Items valued by collectors')">collectibles</span> commanding astronomical prices at auction.</p>
+                            <p>This transformation represents a fundamental shift in the Pokemon brand's <span class="vocab-link" onclick="showPopup('target demographic', 'The specific group aimed at by marketing')">target demographic</span>. While children still enjoy Pokemon, the most valuable cards are purchased by adults with <span class="vocab-link" onclick="showPopup('disposable income', 'Money available to spend after taxes and necessities')">disposable income</span> seeking to reconnect with their youth.</p>
+                            <p>The psychology is straightforward: these cards <span class="vocab-link" onclick="showPopup('evoke', 'Bring strong feelings or memories to mind')">evoke</span> powerful childhood memories. A first-edition Charizard card isn't just cardboard—it's a tangible connection to simpler times. This emotional value far exceeds its material worth, making it the perfect <span class="vocab-link" onclick="showPopup('vessel', 'A container or means of carrying something')">vessel</span> for nostalgia marketing.</p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-2">
+                            <h3>LEGO's Strategic Pivot to Adult Consumers</h3>
+                            <p>LEGO has masterfully executed a strategic <span class="vocab-link" onclick="showPopup('pivot', 'A significant change in strategy')">pivot</span> toward adult consumers. The company now dedicates entire product lines to the 18+ market, featuring complex builds like the 9,000-piece Titanic set or detailed <span class="vocab-link" onclick="showPopup('replicas', 'Exact copies or reproductions')">replicas</span> of famous landmarks.</p>
+                            <p>This shift wasn't accidental. LEGO recognized that millennials who played with their bricks in the 1990s now possess both the financial means and the desire to engage with premium building experiences. The company's research revealed that adult builders seek <span class="vocab-link" onclick="showPopup('mindful', 'Being aware and focused on the present')">mindful</span> activities that provide stress relief and creative satisfaction.</p>
+                            <p>The <span class="vocab-link" onclick="showPopup('premium pricing', 'Setting prices higher than competitors')">premium pricing</span> of adult LEGO sets reflects their sophisticated design and the emotional value they deliver. Adults willingly pay hundreds or thousands of dollars for sets that offer both nostalgia and a <span class="vocab-link" onclick="showPopup('meditative', 'Promoting calm and contemplation')">meditative</span> building experience.</p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-3">
+                            <h3>Nintendo: Mining the Past for Future Profits</h3>
+                            <p>Nintendo's approach to nostalgia marketing demonstrates sophisticated understanding of their <span class="vocab-link" onclick="showPopup('legacy', 'Something handed down from the past')">legacy</span>. By releasing miniature versions of classic consoles, the company <span class="vocab-link" onclick="showPopup('capitalized', 'Took advantage of an opportunity')">capitalized</span> on millennials' desire to <span class="vocab-link" onclick="showPopup('relive', 'Experience something again')">relive</span> their gaming childhood.</p>
+                            <p>The NES Classic and SNES Classic weren't just products—they were time machines. These devices allowed adults to experience games exactly as they remembered them, but with modern conveniences like HDMI connections and save states. This balance between <span class="vocab-link" onclick="showPopup('authenticity', 'Genuine or real quality')">authenticity</span> and improvement proved irresistible.</p>
+                            <p>Nintendo's strategy extends beyond hardware. The company regularly releases <span class="vocab-link" onclick="showPopup('remastered', 'Updated or improved versions')">remastered</span> versions of classic games, allowing new generations to experience <span class="vocab-link" onclick="showPopup('iconic', 'Widely recognized and established')">iconic</span> titles while giving original fans a reason to purchase again. This dual-market approach maximizes both nostalgia and novelty.</p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-4">
+                            <h3>Disney's Multi-Generational Marketing Mastery</h3>
+                            <p>Disney's live-action remakes represent perhaps the most successful nostalgia marketing <span class="vocab-link" onclick="showPopup('campaign', 'A coordinated series of marketing activities')">campaign</span> in entertainment history. By <span class="vocab-link" onclick="showPopup('reimagining', 'Creating a new version or interpretation')">reimagining</span> beloved animated classics with modern technology, Disney creates a bridge between generations.</p>
+                            <p>The brilliance lies in the <span class="vocab-link" onclick="showPopup('multi-layered', 'Having multiple levels or aspects')">multi-layered</span> appeal. Adults experience nostalgia for the original films they watched as children, while simultaneously creating new memories by sharing these stories with their own children. This creates an emotional <span class="vocab-link" onclick="showPopup('resonance', 'The power to evoke emotions')">resonance</span> that no amount of traditional advertising could achieve.</p>
+                            <p>The financial results speak volumes. These remakes consistently earn over a billion dollars globally, proving that nostalgia—when properly <span class="vocab-link" onclick="showPopup('leveraged', 'Used to maximum advantage')">leveraged</span>—can be more powerful than any new <span class="vocab-link" onclick="showPopup('intellectual property', 'Creative works protected by law')">intellectual property</span>. Disney has essentially <span class="vocab-link" onclick="showPopup('monetized', 'Earned revenue from')">monetized</span> childhood memories.</p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-subnav">
+                            <button class="page-btn active" onclick="showReadingPage('C1', 1, this)">Page 1</button>
+                            <button class="page-btn" onclick="showReadingPage('C1', 2, this)">Page 2</button>
+                            <button class="page-btn" onclick="showReadingPage('C1', 3, this)">Page 3</button>
+                            <button class="page-btn" onclick="showReadingPage('C1', 4, this)">Page 4</button>
+                        </div>
+
+                        <div class="reading-page active" id="C1-page-1">
+                            <h3>The Commodification of Childhood Memories</h3>
+                            <p>The Pokemon Trading Card Game's evolution from playground pastime to investment vehicle represents a fascinating case study in how nostalgia can transform cultural artifacts into financial assets. This phenomenon reflects broader trends in consumer behavior, where millennials increasingly seek tangible connections to their past in an uncertain present.</p>
+                            <p>The astronomical valuations placed on vintage Pokemon cards—with some specimens fetching six-figure sums—cannot be explained through traditional economic frameworks. These are fundamentally emotional purchases, where the <span class="vocab-link" onclick="showPopup('intrinsic value', 'Worth based on inherent qualities')">intrinsic value</span> is <span class="vocab-link" onclick="showPopup('negligible', 'So small as to be insignificant')">negligible</span> but the sentimental worth is immeasurable.</p>
+                            <p>This market demonstrates how brands can successfully <span class="vocab-link" onclick="showPopup('cultivate', 'Develop or nurture over time')">cultivate</span> long-term value by creating products that become emotionally <span class="vocab-link" onclick="showPopup('imprinted', 'Firmly established in memory')">imprinted</span> on young consumers. The Pokemon Company didn't merely sell cards to children; they inadvertently created future collectors who would pay premium prices to <span class="vocab-link" onclick="showPopup('reclaim', 'Recover or take back')">reclaim</span> fragments of their youth.</p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-2">
+                            <h3>LEGO's Sophisticated Demographic Expansion</h3>
+                            <p>LEGO's transformation into a lifestyle brand for adults represents a masterclass in market segmentation and brand extension. The company recognized that their most <span class="vocab-link" onclick="showPopup('fervent', 'Passionate and intense')">fervent</span> advocates were adults who maintained an emotional attachment to the brand despite aging out of their original target demographic.</p>
+                            <p>By developing complex, aesthetically sophisticated sets targeting the Adult Fan of LEGO (AFOL) community, the company <span class="vocab-link" onclick="showPopup('legitimized', 'Made acceptable or valid')">legitimized</span> adult engagement with what was previously considered a children's toy. This strategic repositioning was crucial—adults needed permission to spend substantial sums on "toys" without feeling juvenile.</p>
+                            <p>The psychological appeal extends beyond nostalgia. LEGO's adult sets tap into the contemporary desire for <span class="vocab-link" onclick="showPopup('analog', 'Non-digital, physical')">analog</span> experiences in an increasingly digital world. The <span class="vocab-link" onclick="showPopup('tactile', 'Relating to the sense of touch')">tactile</tactile> satisfaction of brick-building provides a <span class="vocab-link" onclick="showPopup('reprieve', 'A temporary relief from stress')">reprieve</span> from screen fatigue, while the nostalgic association makes the activity feel comfortingly familiar rather than entirely novel.</p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-3">
+                            <h3>Nintendo's Calculated Exploitation of Cultural Memory</h3>
+                            <p>Nintendo's nostalgia marketing strategy reveals sophisticated understanding of how cultural memory operates. The company doesn't simply <span class="vocab-link" onclick="showPopup('rehash', 'Reuse old ideas without improvement')">rehash</span> old content; it carefully <span class="vocab-link" onclick="showPopup('curates', 'Selects and presents carefully')">curates</span> which elements of gaming history to resurrect and how to present them to contemporary audiences.</p>
+                            <p>The deliberate scarcity of their classic console re-releases exemplifies this approach. By creating artificial shortage, Nintendo transformed nostalgia products into <span class="vocab-link" onclick="showPopup('coveted', 'Greatly desired')">coveted</span> commodities. This scarcity marketing <span class="vocab-link" onclick="showPopup('amplified', 'Increased or intensified')">amplified</span> demand far beyond what unlimited availability would have achieved, demonstrating that nostalgia's value increases when access is restricted.</p>
+                            <p>More <span class="vocab-link" onclick="showPopup('insidiously', 'In a subtle but harmful way')">insidiously</span>, Nintendo has trained consumers to expect and desire constant <span class="vocab-link" onclick="showPopup('iterations', 'Repeated versions or updates')">iterations</span> of classic franchises. Each new Mario or Zelda game must balance innovation with familiar elements, creating a perpetual cycle where nostalgia for previous titles fuels anticipation for future releases. This represents nostalgia marketing's ultimate achievement: making the past <span class="vocab-link" onclick="showPopup('instrumental', 'Serving as a means to an end')">instrumental</span> to selling the future.</p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-4">
+                            <h3>Disney's Industrial-Scale Memory Manufacturing</h3>
+                            <p>Disney's live-action remake strategy represents nostalgia marketing at its most <span class="vocab-link" onclick="showPopup('cynical', 'Distrustful of human sincerity')">cynical</span> yet effective. The company has essentially <span class="vocab-link" onclick="showPopup('industrialized', 'Made systematic and large-scale')">industrialized</span> the production of nostalgic content, creating a <span class="vocab-link" onclick="showPopup('conveyor belt', 'A continuous moving system')">conveyor belt</span> of remakes that systematically exploit millennials' emotional attachment to their childhood entertainment.</p>
+                            <p>The genius—or <span class="vocab-link" onclick="showPopup('audacity', 'Bold willingness to take risks')">audacity</span>—of this approach lies in its self-perpetuating nature. Each remake becomes a new touchstone for a younger generation while simultaneously serving as a nostalgia trigger for adults. In twenty years, today's children will likely consume remakes of these remakes, creating an infinite loop of <span class="vocab-link" onclick="showPopup('self-referential', 'Referring to itself')">self-referential</span> content.</p>
+                            <p>This raises profound questions about cultural production and consumption. When does nostalgia marketing become a <span class="vocab-link" onclick="showPopup('impediment', 'An obstacle or hindrance')">impediment</span> to genuine creativity? By constantly looking backward, are we <span class="vocab-link" onclick="showPopup('stifling', 'Preventing development')">stifling</span> innovation and original storytelling? Disney's financial success suggests consumers don't mind this <span class="vocab-link" onclick="showPopup('regression', 'Return to an earlier state')">regression</span>—they actively seek it. Perhaps in an age of unprecedented change and uncertainty, the familiar past offers more comfort than an unknown future ever could.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Nostalgia Marketing Explained</h2>
+                <div class="video-container">
+                    <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
+                        <iframe
+                            src="https://www.youtube.com/embed/oVQC-xaK1gE"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <h2>Speaking Practice</h2>
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeVideoSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeVideoSlide(1)">&#10095;</button>
+
+                        <!-- Discussion Slide 1 -->
+                        <div class="discussion-slide active slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Discussion Questions: Personal Experience</h3>
+                                <ul>
+                                    <li>What products from your childhood do you still feel nostalgic about?</li>
+                                    <li>Have you ever bought something because it reminded you of your childhood?</li>
+                                    <li>Which brands successfully use nostalgia to market to your generation?</li>
+                                    <li>Do you think nostalgia marketing is manipulative or clever?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?w=800&q=80" alt="People discussing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Discussion Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Critical Thinking Questions</h3>
+                                <ul>
+                                    <li>Is it ethical for companies to exploit childhood memories for profit?</li>
+                                    <li>How does nostalgia marketing differ across cultures?</li>
+                                    <li>Will Gen Z respond to nostalgia marketing the same way millennials do?</li>
+                                    <li>Can nostalgia marketing become too excessive and lose its effectiveness?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80" alt="Business discussion" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Discussion Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Brand Analysis</h3>
+                                <ul>
+                                    <li>Compare how Pokemon, LEGO, Nintendo, and Disney use nostalgia differently.</li>
+                                    <li>Which brand's nostalgia strategy is most effective? Why?</li>
+                                    <li>Can you think of other brands successfully using nostalgia marketing?</li>
+                                    <li>What mistakes do brands make when trying to capitalize on nostalgia?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80" alt="Brand analysis" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Discussion Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Future Trends</h3>
+                                <ul>
+                                    <li>How will nostalgia marketing evolve in the next 10 years?</li>
+                                    <li>What products from today will become nostalgia items in 20 years?</li>
+                                    <li>Will digital products (apps, games) create the same nostalgia as physical items?</li>
+                                    <li>How might virtual reality change nostalgia marketing?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80" alt="Future technology" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToVideoSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(4)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Marketing Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Business Concepts</button>
+                        <button class="page-btn" onclick="showVocabPage(3, this)">Consumer Psychology</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Nostalgia</div></div><div class="flashcard-back"><div class="flashcard-definition">A sentimental longing for the past</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Target demographic</div></div><div class="flashcard-back"><div class="flashcard-definition">The specific group aimed at by marketing</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand loyalty</div></div><div class="flashcard-back"><div class="flashcard-definition">Customer commitment to repurchase a brand</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Pivot</div></div><div class="flashcard-back"><div class="flashcard-definition">A significant change in strategy</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Retro</div></div><div class="flashcard-back"><div class="flashcard-definition">Imitating styles from the past</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Campaign</div></div><div class="flashcard-back"><div class="flashcard-definition">A coordinated series of marketing activities</div></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Disposable income</div></div><div class="flashcard-back"><div class="flashcard-definition">Money available after taxes and necessities</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Collectibles</div></div><div class="flashcard-back"><div class="flashcard-definition">Items valued by collectors</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Premium pricing</div></div><div class="flashcard-back"><div class="flashcard-definition">Setting prices higher than competitors</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Leverage</div></div><div class="flashcard-back"><div class="flashcard-definition">Use something to maximum advantage</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Monetize</div></div><div class="flashcard-back"><div class="flashcard-definition">Earn revenue from something</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Capitalize</div></div><div class="flashcard-back"><div class="flashcard-definition">Take advantage of an opportunity</div></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-3">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Evoke</div></div><div class="flashcard-back"><div class="flashcard-definition">Bring strong feelings to mind</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Recapture</div></div><div class="flashcard-back"><div class="flashcard-definition">Experience something from the past again</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Therapeutic</div></div><div class="flashcard-back"><div class="flashcard-definition">Having a healing or calming effect</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Resonance</div></div><div class="flashcard-back"><div class="flashcard-definition">The power to evoke emotions</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Imprinted</div></div><div class="flashcard-back"><div class="flashcard-definition">Firmly established in memory</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cultivate</div></div><div class="flashcard-back"><div class="flashcard-definition">Develop or nurture over time</div></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Quiz Section -->
+            <div class="section" id="quiz">
+                <h2>Interactive Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header" id="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div id="quiz-counter">Question 1 of 10</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quizProgressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be generated dynamically -->
+                    </div>
+
+                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalQuizScore">0/10</div>
+                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>Writing Task</h2>
+                <div class="writing-container">
+                    <div class="writing-content">
+                        <h3 class="writing-question">Analyze a Nostalgia Marketing Campaign</h3>
+                        <p class="writing-objective">
+                            Choose one brand (Pokemon, LEGO, Nintendo, Disney, or another) and write an analysis of their nostalgia marketing strategy. Consider: Who is their target audience? How do they evoke nostalgia? Is their approach effective? What are the ethical considerations?
+                        </p>
+                        <p class="writing-objective" style="margin-top: 20px;">
+                            When you're ready to submit your work, click the button below to open the submission form.
+                        </p>
+                        <button class="check-button" onclick="openWritingForm()">Open Writing Submission Form</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Popup -->
+            <div class="popup-overlay" id="vocabPopup" style="display: none;">
+                <div class="popup-content">
+                    <div class="popup-word" id="popupWord"></div>
+                    <div class="popup-definition" id="popupDefinition"></div>
+                    <button class="popup-close" onclick="closePopup()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentReadingLevel = 'B1';
+        let currentSlide = 1;
+        let totalSlides = 5;
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+        let currentVideoSlide = 1;
+        let totalVideoSlides = 4;
+
+        // Vocabulary database for quiz
+        const vocabularyDatabase = [
+            {
+                term: "nostalgia",
+                definition: "A sentimental longing for the past",
+                sentences: [
+                    "___ marketing targets emotional memories from childhood.",
+                    "Brands use ___ to create connections with consumers.",
+                    "The feeling of ___ can trigger purchasing decisions."
+                ]
+            },
+            {
+                term: "millennials",
+                definition: "People born between 1981 and 1996",
+                sentences: [
+                    "___ grew up with Pokemon and Nintendo.",
+                    "Marketing campaigns often target ___ with nostalgia.",
+                    "___ have significant purchasing power today."
+                ]
+            },
+            {
+                term: "pivot",
+                definition: "A significant change in strategy",
+                sentences: [
+                    "LEGO made a strategic ___ toward adult consumers.",
+                    "Companies must ___ when market conditions change.",
+                    "The brand's ___ to nostalgia marketing was successful."
+                ]
+            },
+            {
+                term: "disposable income",
+                definition: "Money available to spend after taxes and necessities",
+                sentences: [
+                    "Adults have more ___ than children.",
+                    "Marketing targets consumers with high ___.",
+                    "___ allows people to buy nostalgic collectibles."
+                ]
+            },
+            {
+                term: "collectibles",
+                definition: "Items valued by collectors",
+                sentences: [
+                    "Pokemon cards have become valuable ___.",
+                    "Vintage toys are popular ___ among millennials.",
+                    "The market for nostalgic ___ continues to grow."
+                ]
+            },
+            {
+                term: "retro",
+                definition: "Imitating styles from the past",
+                sentences: [
+                    "Nintendo released ___ versions of classic consoles.",
+                    "The ___ design appeals to nostalgic consumers.",
+                    "___ products combine old aesthetics with new technology."
+                ]
+            },
+            {
+                term: "evoke",
+                definition: "Bring strong feelings or memories to mind",
+                sentences: [
+                    "Brands try to ___ childhood memories.",
+                    "Nostalgia marketing aims to ___ emotional responses.",
+                    "Familiar products ___ feelings of comfort and security."
+                ]
+            },
+            {
+                term: "recapture",
+                definition: "Experience something from the past again",
+                sentences: [
+                    "Adults want to ___ their childhood experiences.",
+                    "LEGO helps people ___ the joy of building.",
+                    "Nostalgia allows us to ___ simpler times."
+                ]
+            },
+            {
+                term: "leverage",
+                definition: "Use something to maximum advantage",
+                sentences: [
+                    "Disney knows how to ___ childhood memories.",
+                    "Brands ___ nostalgia for financial gain.",
+                    "Companies ___ emotional connections with consumers."
+                ]
+            },
+            {
+                term: "campaign",
+                definition: "A coordinated series of marketing activities",
+                sentences: [
+                    "The nostalgia marketing ___ was highly successful.",
+                    "Disney launched a new ___ for their live-action remake.",
+                    "The ___ targeted millennials with childhood memories."
+                ]
+            },
+            {
+                term: "monetize",
+                definition: "Earn revenue from something",
+                sentences: [
+                    "Companies ___ childhood nostalgia.",
+                    "Brands successfully ___ emotional memories.",
+                    "Disney has learned to ___ classic stories repeatedly."
+                ]
+            },
+            {
+                term: "therapeutic",
+                definition: "Having a healing or calming effect",
+                sentences: [
+                    "Building LEGO sets can be ___.",
+                    "Nostalgic activities have a ___ quality.",
+                    "The ___ benefits of nostalgia are well-documented."
+                ]
+            }
+        ];
+
+        // Section switching
+        function showSection(sectionName, element) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionName).classList.add('active');
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Discussion slideshow
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.slide-indicators .indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.slide-indicators .indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        // Reading section
+        function showReadingLevel(level, button) {
+            currentReadingLevel = level;
+            document.querySelectorAll('.reading-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            document.querySelectorAll('.reading-level').forEach(levelDiv => levelDiv.style.display = 'none');
+            document.getElementById(level + '-level').style.display = 'block';
+        }
+
+        function showReadingPage(level, pageNum, button) {
+            const levelContainer = document.getElementById(level + '-level');
+            const pages = levelContainer.querySelectorAll('.reading-page');
+            const buttons = levelContainer.querySelectorAll('.reading-subnav .page-btn');
+
+            pages.forEach(page => page.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(level + '-page-' + pageNum).classList.add('active');
+            button.classList.add('active');
+        }
+
+        // Video discussions slideshow
+        function changeVideoSlide(direction) {
+            const container = document.querySelector('#video-discussions .slideshow-container');
+            const slides = container.querySelectorAll('.discussion-slide');
+            const dots = container.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide += direction;
+            if (currentVideoSlide > totalVideoSlides) currentVideoSlide = 1;
+            if (currentVideoSlide < 1) currentVideoSlide = totalVideoSlides;
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        function goToVideoSlide(slideNum) {
+            const container = document.querySelector('#video-discussions .slideshow-container');
+            const slides = container.querySelectorAll('.discussion-slide');
+            const dots = container.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide = slideNum;
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        // Vocabulary section
+        function showVocabPage(pageNum, element) {
+            document.querySelectorAll('.vocab-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.vocab-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            if (element) element.classList.add('active');
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz system
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
+                }
+            }
+        }
+
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+
+            const isCorrect = userAnswer === question.correctAnswer;
+
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' :
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+
+            if (isCorrect && !userQuizAnswers[questionNum]) {
+                quizScore++;
+            }
+            userQuizAnswers[questionNum] = isCorrect;
+
+            checkButton.disabled = true;
+            updateQuizProgress();
+
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        function updateQuizProgress() {
+            const counter = document.getElementById('quiz-counter');
+            const progressBar = document.getElementById('quizProgressFill');
+
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+
+            if (progressBar) {
+                const answeredCount = Object.keys(userQuizAnswers).length;
+                const progressPercent = (answeredCount / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'block';
+            document.getElementById('finalQuizScore').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+
+        function restartVocabQuiz() {
+            document.getElementById('quiz-results-page').style.display = 'none';
+            document.getElementById('quiz-questions-container').style.display = 'block';
+            document.getElementById('quiz-header').style.display = 'flex';
+            initializeVocabQuiz();
+        }
+
+        // Writing section
+        function openWritingForm() {
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSdExampleFormID/viewform', '_blank');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz();
+        });
+    </script>
+</body>
+</html>
