@@ -733,6 +733,7 @@
             <div class="nav-item active" onclick="showSection('profile', this)">Profile</div>
             <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
             <div class="nav-item" onclick="showSection('activities', this)">Finished Activities</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
             <div class="nav-item" onclick="showSection('contact', this)">
                 <span style="font-size: 1.2rem; margin-right: 8px;">☎</span>Contact
             </div>
@@ -904,6 +905,56 @@
                 </div>
             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>✍️ Writing Assignments</h2>
+                <div style="height: calc(100% - 60px); padding: 10px; display: flex; flex-direction: column;">
+                    <!-- Writing Content Container -->
+                    <div style="width: 100%; height: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); background: rgba(255, 255, 255, 0.95); display: flex; flex-direction: column; overflow-y: auto; padding: 30px;">
+
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h3 style="color: #2d3748; margin: 0 0 10px 0; font-size: 1.8rem; font-weight: 700;">Submit Your Writing</h3>
+                            <p style="color: #4a5568; margin: 0; font-size: 1rem;">Complete the form below to send your writing assignment to your teacher</p>
+                        </div>
+
+                        <form id="writingForm" style="max-width: 700px; margin: 0 auto; width: 100%;">
+
+                            <!-- Assignment Topic -->
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #2d3748; font-weight: 600; margin-bottom: 8px; font-size: 1.1rem;">Assignment Topic</label>
+                                <input type="text" id="assignmentTopic" placeholder="e.g., Money Laundering Essay" style="width: 100%; padding: 12px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.8);" onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 15px rgba(102, 126, 234, 0.2)'" onblur="this.style.borderColor='rgba(102, 126, 234, 0.3)'; this.style.boxShadow='none'" required>
+                            </div>
+
+                            <!-- Your Writing -->
+                            <div style="margin-bottom: 25px;">
+                                <label style="display: block; color: #2d3748; font-weight: 600; margin-bottom: 8px; font-size: 1.1rem;">Your Writing</label>
+                                <textarea id="writingContent" rows="10" placeholder="Type or paste your writing here..." style="width: 100%; padding: 12px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.8); resize: vertical; min-height: 200px;" onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 15px rgba(102, 126, 234, 0.2)'" onblur="this.style.borderColor='rgba(102, 126, 234, 0.3)'; this.style.boxShadow='none'" required></textarea>
+                            </div>
+
+                            <!-- Word Count Display -->
+                            <div style="text-align: right; margin-bottom: 25px;">
+                                <span id="wordCount" style="color: #4a5568; font-size: 0.9rem; font-weight: 500;">Word count: 0</span>
+                            </div>
+
+                            <!-- Additional Notes (Optional) -->
+                            <div style="margin-bottom: 30px;">
+                                <label style="display: block; color: #2d3748; font-weight: 600; margin-bottom: 8px; font-size: 1.1rem;">Additional Notes (Optional)</label>
+                                <textarea id="additionalNotes" rows="3" placeholder="Any questions or comments for your teacher..." style="width: 100%; padding: 12px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.8); resize: vertical;" onfocus="this.style.borderColor='#667eea'; this.style.boxShadow='0 0 15px rgba(102, 126, 234, 0.2)'" onblur="this.style.borderColor='rgba(102, 126, 234, 0.3)'; this.style.boxShadow='none'"></textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div style="text-align: center;">
+                                <button type="button" onclick="submitWriting()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 40px; border-radius: 25px; font-size: 1.2rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.3)'">
+                                    Send to Teacher
+                                </button>
+                            </div>
+
+                        </form>
+
                     </div>
                 </div>
             </div>
