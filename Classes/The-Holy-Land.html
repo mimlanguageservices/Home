@@ -2253,22 +2253,15 @@
                             <strong>Remember, there are no bad opinions, only bad English!</strong>
                         </p>
 
-                        <form id="dogfightForm" class="writing-form">
-                            <div class="form-group">
-                                <label for="studentName">Student Name</label>
-                                <input type="text" id="studentName" name="studentName" required>
+                        <div class="question-box" style="background: #e3f2fd; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                            <textarea id="writing1" rows="12" style="width: 100%; padding: 15px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; font-size: 1.05rem; font-family: 'Inter', sans-serif; resize: vertical; line-height: 1.6;" spellcheck="true" placeholder="Honorable delegates,&#10;&#10;I stand before you today to propose a solution to the conflict in the Holy Land...&#10;&#10;(Use vocabulary like: Jerusalem, Zionism, mandate, partition, Nakba, occupation, settlements, intifada, refugees, diaspora)"></textarea>
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button class="check-button" onclick="checkGrammarHolyLand()">Check Grammar</button>
+                                <button id="send-teacher-btn" class="check-button" onclick="sendToTeacherHolyLand()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); opacity: 0.5; cursor: not-allowed;" disabled>Send to Teacher</button>
                             </div>
+                            <div id="grammar-feedback" style="margin-top: 15px; padding: 15px; border-radius: 8px; display: none;"></div>
 
-                            <div class="form-group">
-                                <label for="teacherEmail">Teacher's Email</label>
-                                <input type="email" id="teacherEmail" name="teacherEmail" required>
-                            </div>
-
-                            <div class="button-container">
-                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Begin!</button>
-                            </div>
-
-                            <div class="tips-box">
+                            <div class="tips-box" style="margin-top: 20px;">
                                 <h4>💡 Key Vocabulary</h4>
                                 <div class="tips-content">
                                     <span class="vocab-items">
@@ -2276,7 +2269,7 @@
                                     </span>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3072,6 +3065,116 @@
         updateReadingSubnav('B1');
 
         // Initialize vocabulary section
+
+        // Grammar checking functions for Writing section
+        async function checkGrammarHolyLand() {
+            const text = document.getElementById('writing1').value;
+            const feedbackDiv = document.getElementById('grammar-feedback');
+            const textarea = document.getElementById('writing1');
+
+            if (!text.trim()) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Please write your UN speech first!';
+                return;
+            }
+
+            textarea.style.display = 'none';
+            window.grammarCheckResult = { original: text, corrected: '' };
+
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.style.background = 'rgba(102, 126, 234, 0.1)';
+            feedbackDiv.style.border = '1px solid rgba(102, 126, 234, 0.3)';
+            feedbackDiv.style.color = '#667eea';
+            feedbackDiv.innerHTML = '⏳ Checking your grammar and spelling...';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=AIzaSyBTH0NmDb3cqjrY6p7YROPIJel-iCxSxzs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `You are a strict grammar checker. Fix grammar and spelling errors. Do not change the meaning, style, or add punctuation unless absolutely necessary. Profanities are acceptable, but don't use shortened informal words like "cuz" or "wanna"\n\nText: "${text}"\n\nReturn only the corrected text with minimal changes.`
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                const correctedText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text;
+
+                if (correctedText !== text && correctedText.toLowerCase() !== text.toLowerCase()) {
+                    const originalWords = text.split(/(\s+)/);
+                    const correctedWords = correctedText.split(/(\s+)/);
+                    let highlightedText = '';
+
+                    originalWords.forEach((word, i) => {
+                        if (word.match(/\s+/)) {
+                            highlightedText += word;
+                        } else if (correctedWords[i] && word.toLowerCase() !== correctedWords[i].toLowerCase()) {
+                            highlightedText += `<span style="color: #e53e3e; font-weight: 600; background: rgba(245, 101, 101, 0.15); padding: 2px 4px; border-radius: 3px;">${word}</span>`;
+                        } else {
+                            highlightedText += word;
+                        }
+                    });
+
+                    let html = `
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #c53030;">Your Text (errors highlighted):</strong>
+                            <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid rgba(245, 101, 101, 0.3); line-height: 1.8;">
+                                ${highlightedText}
+                            </div>
+                        </div>
+                        <div>
+                            <strong style="color: #2f855a;">Corrected Text:</strong>
+                            <div style="background: rgba(72, 187, 120, 0.1); padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid rgba(72, 187, 120, 0.3); color: #2d3748; line-height: 1.8;">
+                                ${correctedText}
+                            </div>
+                        </div>
+                    `;
+
+                    feedbackDiv.style.background = 'rgba(245, 101, 101, 0.05)';
+                    feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                    feedbackDiv.style.color = '#2d3748';
+                    feedbackDiv.innerHTML = html;
+
+                    window.grammarCheckResult.corrected = correctedText;
+                    const sendBtn = document.getElementById('send-teacher-btn');
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                } else {
+                    feedbackDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+                    feedbackDiv.style.border = '1px solid rgba(72, 187, 120, 0.3)';
+                    feedbackDiv.style.color = '#2f855a';
+                    feedbackDiv.innerHTML = '✓ Perfect! No grammar or spelling errors detected!';
+
+                    window.grammarCheckResult.corrected = text;
+                    const sendBtn = document.getElementById('send-teacher-btn');
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                }
+            } catch (error) {
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Unable to check grammar. Error: ' + error.message;
+            }
+        }
+
+        function sendToTeacherHolyLand() {
+            const essayTitle = "The Holy Land - UN Speech Writing";
+            const originalText = window.grammarCheckResult.original;
+            const correctedText = window.grammarCheckResult.corrected;
+
+            const emailBody = `Essay Title: ${essayTitle}\n\nOriginal Essay:\n${originalText}\n\nWe made some changes:\n\nCorrected Text:\n${correctedText}`;
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(essayTitle)}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+        }
     </script>
 </body>
 </html>
