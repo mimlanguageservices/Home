@@ -928,6 +928,14 @@
                     <!-- Writing Content Container -->
                     <div style="width: 100%; height: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); background: rgba(255, 255, 255, 0.95); display: flex; flex-direction: column; overflow-y: auto; padding: 30px;">
 
+                        <!-- Writing Instructions/Content from Column R -->
+                        <div style="margin-bottom: 30px; padding: 20px; background: rgba(102, 126, 234, 0.1); border-radius: 12px; border-left: 4px solid #667eea;">
+                            <h3 style="color: #2d3748; margin: 0 0 15px 0; font-size: 1.5rem; font-weight: 700;">📝 Your Writing Assignment</h3>
+                            <div style="color: #4a5568; font-size: 1rem; line-height: 1.6;">
+                                {{WRITING_ASSIGNMENT}}
+                            </div>
+                        </div>
+
                         <div style="text-align: center; margin-bottom: 30px;">
                             <h3 style="color: #2d3748; margin: 0 0 10px 0; font-size: 1.8rem; font-weight: 700;">Submit Your Writing</h3>
                             <p style="color: #4a5568; margin: 0; font-size: 1rem;">Complete the form below to send your writing assignment to your teacher</p>
@@ -1067,9 +1075,55 @@
         }
 
 
+        // Word count function
+        function updateWordCount() {
+            const writingContent = document.getElementById('writingContent');
+            const wordCountDisplay = document.getElementById('wordCount');
+
+            if (writingContent && wordCountDisplay) {
+                const text = writingContent.value.trim();
+                const words = text === '' ? 0 : text.split(/\s+/).length;
+                wordCountDisplay.textContent = `Word count: ${words}`;
+            }
+        }
+
+        // Submit writing function
+        function submitWriting() {
+            const studentName = 'Georgi Ojeda';
+            const assignmentTopic = document.getElementById('assignmentTopic').value.trim();
+            const writingContent = document.getElementById('writingContent').value.trim();
+            const additionalNotes = document.getElementById('additionalNotes').value.trim();
+
+            if (!assignmentTopic || !writingContent) {
+                alert('Please fill in the Assignment Topic and Your Writing fields!');
+                return;
+            }
+
+            // Create email content
+            const subject = encodeURIComponent(`Writing Assignment: ${assignmentTopic} - ${studentName}`);
+            let body = `Student: ${studentName}\n`;
+            body += `Assignment Topic: ${assignmentTopic}\n`;
+            body += `\n--- Writing ---\n${writingContent}\n`;
+
+            if (additionalNotes) {
+                body += `\n--- Additional Notes ---\n${additionalNotes}\n`;
+            }
+
+            const encodedBody = encodeURIComponent(body);
+
+            // Open email client
+            window.location.href = `mailto:admin@mimlanguageservices.com?subject=${subject}&body=${encodedBody}`;
+        }
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             setClassLinkIcon();
+
+            // Add word count listener
+            const writingContent = document.getElementById('writingContent');
+            if (writingContent) {
+                writingContent.addEventListener('input', updateWordCount);
+            }
         });
 
     </script>
