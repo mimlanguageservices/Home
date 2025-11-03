@@ -34,7 +34,8 @@ class StudentFileManager {
             CLASS_LINK: 12,         // Column M (Class Link on Contact Teacher Page - actual URLs)
             CLASS_IDENTIFIER: 13,   // Column N (Class identifier like C1, C2, etc.)
             LEARNING_OBJECTIVE: 14, // Column O (Learning Objectives)
-            VOCABULARY_URL: 15      // Column P (Vocabulary URL for tab with Google Sheets clipping)
+            VOCABULARY_URL: 15,     // Column P (Vocabulary URL for tab with Google Sheets clipping)
+            WRITING_ASSIGNMENT: 17  // Column R (Writing Assignment Google Doc URL)
         };
 
         this.existingFiles = new Set();
@@ -139,6 +140,7 @@ class StudentFileManager {
                 learningObjective: columns[this.columnMap.LEARNING_OBJECTIVE] || '',
                 vocabularyUrl: rawVocabUrl,
                 finishedActivities: columns[this.columnMap.FINISHED_ACTIVITIES] || '',
+                writingAssignmentUrl: columns[this.columnMap.WRITING_ASSIGNMENT] || '',
                 fileName: this.generateFileName(studentName.trim())
             };
 
@@ -250,7 +252,8 @@ class StudentFileManager {
             '{{FINISHED_ACTIVITIES}}': student.finishedActivities,
             '{{FINISHED_ACTIVITIES_HTML}}': finishedActivitiesHtml,
             '{{NATIONALITY}}': student.nationality || '',
-            '{{LOCATION}}': student.location || ''
+            '{{LOCATION}}': student.location || '',
+            '{{WRITING_ASSIGNMENT_URL}}': student.writingAssignmentUrl || ''
         };
 
         return placeholders;
