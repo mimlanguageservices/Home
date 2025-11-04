@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digestive Disorders - MIM Language Services</title>
+    <title>Organizing Events - MIM Language Services</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -191,12 +191,10 @@
             animation: slideIn 0.5s ease-in-out;
         }
 
-        /* Image-only slide (Slide 1) */
         .slide-image-only {
             padding: 0;
         }
 
-        /* Horizontal layout slides (Slides 2-5) */
         .slide-horizontal {
             flex-direction: row !important;
             gap: 30px;
@@ -279,7 +277,6 @@
             }
         }
 
-        /* Navigation Arrows - Outside the white box */
         .slide-arrow {
             position: absolute;
             top: 50%;
@@ -312,7 +309,6 @@
             right: -60px;
         }
 
-        /* Slide Indicators */
         .slide-indicators {
             position: absolute;
             bottom: 40px;
@@ -352,13 +348,7 @@
             justify-content: center;
             gap: 12px;
             margin-bottom: 20px;
-        }
-
-        .reading-subnav {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
         .reading-level {
@@ -419,6 +409,21 @@
             margin-top: 35px;
             font-size: 1.8rem;
             font-weight: 600;
+        }
+
+        .venue-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .venue-name {
+            color: #667eea;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
         }
 
         .vocab-link {
@@ -592,7 +597,7 @@
             font-size: 1.5rem;
         }
 
-        /* NEW QUIZ SYSTEM STYLES */
+        /* Quiz Section */
         .quiz-container {
             display: flex;
             flex-direction: column;
@@ -857,7 +862,7 @@
             font-size: 1.1rem;
         }
 
-        .form-group input {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 12px 20px;
             border: 2px solid rgba(102, 126, 234, 0.3);
@@ -867,7 +872,12 @@
             transition: all 0.3s ease;
         }
 
-        .form-group input:focus {
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
@@ -876,24 +886,6 @@
         .button-container {
             text-align: center;
             margin-top: 20px;
-        }
-
-        .feedback {
-            margin-top: 15px;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .feedback.correct {
-            background: #48bb78;
-            color: white;
-        }
-
-        .feedback.incorrect {
-            background: #f56565;
-            color: white;
         }
 
         /* Mobile Responsive Styles */
@@ -1003,7 +995,7 @@
 <body>
     <div class="header">
         <div class="header-left">
-            <h1>Digestive Disorders</h1>
+            <h1>Organizing Events</h1>
             <div class="website">
                 <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
             </div>
@@ -1028,61 +1020,60 @@
             <!-- Discussion Section with Slideshow -->
             <div class="section active" id="discussion">
                 <div class="slideshow-container">
-
                     <div class="slide-content-wrapper">
                         <button class="slide-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
                         <button class="slide-arrow next" onclick="changeSlide(1)">&#10095;</button>
 
                         <!-- Slide 1 - Image Only -->
                         <div class="discussion-slide active slide-image-only">
-                            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=800&fit=crop" alt="Medical digestive system" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
-        </div>
+                            <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1200&h=800&fit=crop" alt="Business event meeting" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                        </div>
 
                         <!-- Slide 2 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
                                 <h3>Warm-up Discussion</h3>
                                 <ul>
-                                    <li>Name some conditions related to the digestive system.</li>
-                                    <li>In your country, are there other remedies used besides medication to relieve stomach pain?</li>
-                                    <li>Have you or a family member ever had food poisoning? What happened?</li>
+                                    <li>What facilities would your ideal meeting venue offer?</li>
+                                    <li>What is the best meeting place you have been to? What was so good about it?</li>
+                                    <li>Does your company often arrange meetings or functions outside of the office? Why/why not?</li>
                                 </ul>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1584362917165-526a968579e8?w=800&h=600&fit=crop" alt="Doctor consultation" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600&fit=crop" alt="Conference room" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
                         <!-- Slide 3 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>What is Food Poisoning?</h3>
-                                <p>Food poisoning is an illness caused by consuming contaminated food or water. It occurs when bacteria, viruses, parasites, or chemical toxins enter the body through contaminated sources. Common bacteria include Salmonella, E. coli, and Campylobacter. Symptoms typically include diarrhea, vomiting, abdominal pain, and headache. Dehydration may occur as a result of fluid loss, requiring careful monitoring and fluid replacement.</p>
+                                <h3>Choosing the Right Venue</h3>
+                                <p>Selecting the perfect venue for business meetings requires careful consideration. Important factors include location accessibility, available facilities such as high-speed WiFi and video equipment, accommodation options, and catering services. The venue should also offer the right atmosphere for productivity while providing comfort for attendees. Consider whether you need breakout rooms, conference facilities, or dining options for larger groups.</p>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1505576399279-565b52d4ac71?w=800&h=600&fit=crop" alt="Food safety" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&h=600&fit=crop" alt="Modern office space" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
                         <!-- Slide 4 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>The Gut Microbiome</h3>
-                                <p>The gastrointestinal tract hosts trillions of microbes including bacteria, fungi, and microorganisms. Also referred to as the gut microbiome, these organisms are responsible for digestion and the production of nutrients. They aid the immune system and produce chemicals that may affect brain function. Research indicates that the brain and gut are linked, and when the gut is not balanced, it may contribute to disease. Aging, diet, and environment can disrupt this connection.</p>
+                                <h3>Location Considerations</h3>
+                                <p>The location of your venue can make or break an event. Urban venues offer easy access to transportation hubs and local amenities, perfect for international visitors. Rural locations provide seclusion and a relaxed setting, ideal for focused team retreats. Consider proximity to airports, hotels, and restaurants. Some venues offer all-inclusive packages with accommodation, meals, and meeting facilities in one location, simplifying logistics significantly.</p>
                             </div>
                             <div class="slide-image-section-right">
-                               <img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=800&h=600&fit=crop" alt="Healthy food" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop" alt="Team meeting" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
                         <!-- Slide 5 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>Managing Dehydration</h3>
-                                <p>Dehydration is a serious complication of digestive disorders. Symptoms range from mild (reduced urine output, thirst) to moderate (dizziness, weakness, irritability, muscle cramps, headache) to severe (lethargy, rapid heart rate, confusion, very low urine output, possible coma). The WHO recommends oral rehydration solutions as standard treatment, containing 2% glucose and 50-90 mmol/L sodium. Severe cases must be treated in medical facilities with IV fluids.</p>
+                                <h3>Planning for Success</h3>
+                                <p>Successful event organization requires attention to detail and advance planning. Create a checklist covering venue booking, catering arrangements, technical equipment needs, and accommodation for attendees. Consider cultural differences when hosting international guests. Budget carefully, accounting for potential group discounts. Always have a backup plan for technical issues. Remember that excellent service from venue staff, including concierge support, can significantly enhance the attendee experience.</p>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=800&h=600&fit=crop" alt="Hydration therapy" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop" alt="Business planning" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
                     </div>
@@ -1099,103 +1090,70 @@
 
             <!-- Reading Section -->
             <div class="section" id="reading">
-                <h2>Reading Practice</h2>
+                <h2>Meeting Venues</h2>
                 <div class="reading-container">
                     <div class="reading-nav">
-                        <button class="page-btn active" onclick="showReadingLevel('text1', this)">Text 1: Overview</button>
-                        <button class="page-btn" onclick="showReadingLevel('text2', this)">Text 2: Causes & Treatment</button>
-                        <button class="page-btn" onclick="showReadingLevel('text3', this)">Text 3: Types of Food Poisoning</button>
-                        <button class="page-btn" onclick="showReadingLevel('text4', this)">Text 4: Dehydration Management</button>
+                        <button class="page-btn active" onclick="showReadingLevel('venue1', this)">Davenport Lodge</button>
+                        <button class="page-btn" onclick="showReadingLevel('venue2', this)">Huntwell House</button>
+                        <button class="page-btn" onclick="showReadingLevel('venue3', this)">Stamford Hotel</button>
+                        <button class="page-btn" onclick="showReadingLevel('venue4', this)">Adderley Center</button>
                     </div>
 
-                    <!-- Text 1 -->
-                    <div class="reading-level" id="text1-level">
+                    <!-- Venue 1 -->
+                    <div class="reading-level" id="venue1-level">
                         <div class="reading-page active">
-                            <h3>Food Poisoning: Global Impact</h3>
-                            <p>According to the WHO, approximately 600 million people get some form of <span class="vocab-link" onclick="showPopup('food poisoning', 'illness caused by consuming contaminated food or water')">food poisoning</span> each year. Almost half a million lives are lost to <span class="vocab-link" onclick="showPopup('food-borne illnesses', 'diseases transmitted through contaminated food')">food-borne illnesses</span> and 125,000 of those deaths are in children under the age of five years.</p>
-                            <p>Unsafe food plays <span class="vocab-link" onclick="showPopup('havoc', 'widespread destruction or chaos')">havoc</span> on healthcare systems and affects economies and tourism in low- and middle-income countries. It is estimated that $15 billion is spent annually to treat food-borne illnesses and $192 million is lost in productivity.</p>
-                            <p>Food poisoning can occur when bacteria, viruses, <span class="vocab-link" onclick="showPopup('parasites', 'organisms living in or on another organism to get nutrients')">parasites</span>, or chemical toxins enter the body as a result of consuming <span class="vocab-link" onclick="showPopup('contaminated', 'infected or spoiled by contact')">contaminated</span> food or water. Some common bacteria contamination is from Salmonella, E. coli and Campylobacter.</p>
-                            <p>Sources of contamination include raw milk, shellfish, fruit, vegetables and meat. <span class="vocab-link" onclick="showPopup('Pathogens', 'microorganisms causing disease such as viruses or bacteria')">Pathogens</span> may also enter the food chain via soil and water. Viruses such as Hepatitis A and Shigella, may be spread via contamination from a person handling or preparing food.</p>
-                            <p>Chemical toxins are often the result of environmental pollutants entering the food chain. These substances may damage the immune system, cause developmental issues in children as well as various cancers. Heavy metals such as mercury and lead also affect food supplies through soil and water. These toxic metals can cause damage to the brain, nervous system and kidneys.</p>
+                            <div class="venue-box">
+                                <div class="venue-name">Davenport Lodge</div>
+                                <p>Set in 50 acres of <span class="vocab-link" onclick="showPopup('parkland', 'open land with grass and trees that is designed not wild')">parkland</span> in the <span class="vocab-link" onclick="showPopup('rolling hills', 'gentle slopes in the landscape')">rolling hills</span> of Cheshire, this venue offers a relaxed setting while providing all of the modern-day needs for your business meetings, such as high-speed WiFi, video equipment and a business center.</p>
+
+                                <p>Guests have a choice of six large conference rooms, seven smaller meeting rooms as well as a private dining area for up to 150 people. Drinks and snacks can be provided <span class="vocab-link" onclick="showPopup('around the clock', '24 hours a day')">around the clock</span>, with our chefs providing first-class restaurant dining from 7 am to 10 pm incorporating international cuisine.</p>
+
+                                <p>All rooms come with views of the beautiful grounds and a fully connected <span class="vocab-link" onclick="showPopup('workstation', 'a place for someone to work connected to computer equipment')">workstation</span>. Discounts are available for groups of over 100 persons.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Text 2 -->
-                    <div class="reading-level" id="text2-level" style="display: none;">
+                    <!-- Venue 2 -->
+                    <div class="reading-level" id="venue2-level" style="display: none;">
                         <div class="reading-page active">
-                            <h3>Causes, Symptoms, Treatment</h3>
-                            <p>Food poisoning is an illness caused by food or water that has been contaminated by bacteria, viruses or parasites. Some cases of food poisoning may be due to <span class="vocab-link" onclick="showPopup('ingesting', 'swallowing food or drugs')">ingesting</span> toxic chemicals or pollutants.</p>
-                            <p>Individuals who experience food poisoning have diarrhea, vomiting, abdominal pain and headache. Dehydration may occur as a result of fluid loss. Signs of dehydration include dizziness, fatigue, low urine output, extreme thirst and <span class="vocab-link" onclick="showPopup('sunken eyes', 'eyes appearing hollow and deep as a result of illness')">sunken eyes</span>.</p>
-                            <p>It is vital to replace fluids that have been lost because of diarrhea and vomiting. Some fluid options include water, diluted fruit juice, <span class="vocab-link" onclick="showPopup('electrolyte replacement solutions', 'drinks containing minerals to restore body balance')">electrolyte replacement solutions</span> and broth. People with weak immune systems, the elderly and young children should be given electrolyte replacement fluids as they are more prone to dehydration.</p>
+                            <div class="venue-box">
+                                <div class="venue-name">Huntwell House</div>
+                                <p>Situated just one hour from London's Docklands, the business <span class="vocab-link" onclick="showPopup('hub', 'the most important place for a particular activity')">hub</span> of the United Kingdom, Huntwell House offers <span class="vocab-link" onclick="showPopup('seclusion', 'the state of being separated from other people')">seclusion</span> without <span class="vocab-link" onclick="showPopup('isolation', 'being alone or separated')">isolation</span>.</p>
 
-                            <h3>Safety</h3>
-                            <p>One method to prevent food poisoning is ensuring the proper preparation, cooking and storing of food. Raw meat, fish and eggs should be kept away from other food. Fruit and vegetables should be washed and cleaned prior to cutting, preparing and eating.</p>
-                            <p>Wash hands and clean table surfaces thoroughly before using for food preparation. Food that spoils easily should be refrigerated or frozen. Ensure that meat is cooked at the correct temperature and for the proper length of time.</p>
+                                <p>We offer business facilities and meeting rooms which can accommodate parties of up to thirty people. Our staff is able to assist with bookings in any one of the <span class="vocab-link" onclick="showPopup('top-rated', 'well-respected or highly regarded')">top-rated</span> local restaurants and pubs as well as transport throughout the local area.</p>
+
+                                <p>We can also arrange sandwich delivery for those who would like a working lunch.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Text 3 -->
-                    <div class="reading-level" id="text3-level" style="display: none;">
+                    <!-- Venue 3 -->
+                    <div class="reading-level" id="venue3-level" style="display: none;">
                         <div class="reading-page active">
-                            <h3>Types of Food Poisoning</h3>
+                            <div class="venue-box">
+                                <div class="venue-name">Stamford Hotel</div>
+                                <p>Providing executive services in the <span class="vocab-link" onclick="showPopup('bustling', 'busy and full of activity')">bustling</span> heart of Manchester, the Stamford Hotel is the perfect choice for business meetings and stays in the heart of North-West England.</p>
 
-                            <h3>Botulism</h3>
-                            <p><strong>Sources:</strong> Honey and home-made canned food</p>
-                            <p><strong>Symptoms:</strong> Infants: muscle weakness, constipation, <span class="vocab-link" onclick="showPopup('lethargy', 'abnormal drowsiness')">lethargy</span>; Children/Adults: blurred vision, muscle weakness, dropping eyelids</p>
-                            <p><strong>Duration:</strong> Weeks or months</p>
+                                <p>Relax in our newly <span class="vocab-link" onclick="showPopup('refurbished', 'cleaned and improved to make more attractive')">refurbished</span>, sound-proofed bedrooms, each equipped with working desks, in-room <span class="vocab-link" onclick="showPopup('saunas', 'small rooms reaching high temperatures for health')">saunas</span> and 55" TVs.</p>
 
-                            <h3>Campylobacter</h3>
-                            <p><strong>Sources:</strong> Raw milk, chicken, shellfish, turkey, contaminated water</p>
-                            <p><strong>Symptoms:</strong> Diarrhea, vomiting, fever, abdominal cramps</p>
-                            <p><strong>Duration:</strong> 7 days</p>
+                                <p>Our business center has a choice of ten meeting rooms and there are four conference rooms throughout the hotel which can be used for larger functions, <span class="vocab-link" onclick="showPopup('catering for', 'providing for or serving')">catering for</span> up to a maximum of 200 persons.</p>
 
-                            <h3>E. Coli</h3>
-                            <p><strong>Sources:</strong> Raw milk, undercooked meat, raw fruit and vegetables, drinking/swimming in contaminated water</p>
-                            <p><strong>Symptoms:</strong> Bloody diarrhea, vomiting, severe abdominal pain</p>
-                            <p><strong>Duration:</strong> 5-10 days</p>
-
-                            <h3>Hepatitis A</h3>
-                            <p><strong>Sources:</strong> Raw shellfish, contaminated drinking water, raw produce</p>
-                            <p><strong>Symptoms:</strong> Diarrhea, <span class="vocab-link" onclick="showPopup('jaundice', 'yellowing of skin and eyes')">jaundice</span>, light-colored stools, dark urine, stomach pain, nausea</p>
-                            <p><strong>Duration:</strong> 3 months</p>
-
-                            <h3>Salmonella</h3>
-                            <p><strong>Sources:</strong> Fruit, vegetables, chicken, beef, pork, eggs</p>
-                            <p><strong>Symptoms:</strong> Diarrhea, vomiting, fever, abdominal cramps</p>
-                            <p><strong>Duration:</strong> 4-7 days</p>
+                                <p>Our staff is happy to serve you with any of the <span class="vocab-link" onclick="showPopup('mouth-watering', 'delicious or very appetizing')">mouth-watering</span> choices of food from our kitchen from 6am until 11pm. The fun doesn't stop there as there are many exciting bars, clubs and restaurants within walking distance for you to socialize the night away. A 24-hour <span class="vocab-link" onclick="showPopup('concierge', 'hotel staff providing information and assistance')">concierge</span> is available for all your <span class="vocab-link" onclick="showPopup('out-of-hours', 'during time when business is not conducted')">out-of-hours</span> needs.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Text 4 -->
-                    <div class="reading-level" id="text4-level" style="display: none;">
+                    <!-- Venue 4 -->
+                    <div class="reading-level" id="venue4-level" style="display: none;">
                         <div class="reading-page active">
-                            <h3>Managing Dehydration in Children</h3>
+                            <div class="venue-box">
+                                <div class="venue-name">Adderley Conference Center</div>
+                                <p>We are just a ten-minute journey from Heathrow Airport, allowing you to arrange business trips and meetings with international visitors on a <span class="vocab-link" onclick="showPopup('tight schedule', 'limited time available')">tight schedule</span>. No long and expensive journeys to the city or across the country.</p>
 
-                            <h3>Mild Symptoms:</h3>
-                            <p>- Reduced urine output</p>
-                            <p>- Thirst</p>
+                                <p>We offer hotel rooms for those on a budget, as well as upmarket executive suites for that visitor you want to impress. Our restaurant serves dinner and seats up to 500 people. It can also be booked for private functions.</p>
 
-                            <h3>Moderate Symptoms:</h3>
-                            <p>- Reduced urine output</p>
-                            <p>- Dizziness</p>
-                            <p>- Weakness</p>
-                            <p>- Irritability</p>
-                            <p>- Muscle cramps</p>
-                            <p>- Headache</p>
-
-                            <h3>Treatment:</h3>
-                            <p>The WHO proposes using <span class="vocab-link" onclick="showPopup('oral rehydration solutions', 'liquids containing electrolytes to treat dehydration')">oral rehydration solutions</span> as the standard treatment. These solutions are comprised of: 2% glucose or complex carbohydrate; 50-90 mmol/L sodium.</p>
-                            <p>Sports drinks, carbonated drinks and juices do not fulfill the sodium/glucose balance required. Patients should receive 50 mL/kg over a period of four hours (mild dehydration) and 100 mL/kg (moderate dehydration). Therapy can be discontinued once dehydration symptoms subside.</p>
-
-                            <h3>Severe Symptoms:</h3>
-                            <p>- Lethargy</p>
-                            <p>- Rapid heart rate</p>
-                            <p>- Confusion</p>
-                            <p>- Very low urine output</p>
-                            <p>- Possible coma</p>
-
-                            <h3>Treatment:</h3>
-                            <p>Must be treated in a medical facility with <span class="vocab-link" onclick="showPopup('IV fluids', 'intravenous liquids administered directly into the bloodstream')">IV fluids</span>.</p>
+                                <p>Our cafe serves breakfast, lunch and snacks throughout the working day. We can also arrange in-room dining 24-hours per day for those late arrivals and early flight departures.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1203,11 +1161,11 @@
 
             <!-- Video Section -->
             <div class="section" id="video">
-                <h2>Video: Digestive System</h2>
+                <h2>Video: Planning Business Events</h2>
                 <div class="video-container">
                     <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
                         <iframe
-                            src="https://www.youtube.com/embed/Og5xAdC8EUI"
+                            src="https://www.youtube.com/embed/WXNXSvnCtKA"
                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1220,88 +1178,87 @@
             <!-- Video Discussions Section -->
             <div class="section" id="video-discussions">
                 <div class="slideshow-container">
-
                     <div class="slide-content-wrapper">
                         <button class="slide-arrow prev" onclick="changeVideoSlide(-1)">&#10094;</button>
                         <button class="slide-arrow next" onclick="changeVideoSlide(1)">&#10095;</button>
 
-                        <!-- Slide 1: Gallstones -->
+                        <!-- Slide 1 -->
                         <div class="discussion-slide active slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>Gallstones</h3>
-                                <p>Gallstones may cause various symptoms. They often occur following a meal high in fat. Pain may be severe and concentrated in the upper abdomen. Some individuals have pain in the shoulder or between the shoulder blades.</p>
+                                <h3>Venue Selection Criteria</h3>
+                                <p>What factors should you consider when choosing between urban and rural venues? Think about accessibility, transportation, local amenities, and the type of atmosphere you want to create for your event.</p>
                                 <ul>
-                                    <li>What increases the probability of getting gallstones?</li>
-                                    <li>How are gallstones diagnosed and treated?</li>
-                                    <li>What dietary changes can help prevent gallstones?</li>
+                                    <li>What are the advantages of each location type?</li>
+                                    <li>How does venue location affect attendee experience?</li>
+                                    <li>What role does budget play in venue selection?</li>
                                 </ul>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&h=600&fit=crop" alt="Medical examination" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=600&fit=crop" alt="Venue selection" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
-                        <!-- Slide 2: Gut Microbiome -->
+                        <!-- Slide 2 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>The Gut Microbiome</h3>
-                                <p>The gastrointestinal tract is host to trillions of microbes responsible for digestion and nutrient production. They aid the immune system and produce chemicals that may affect brain function.</p>
+                                <h3>Facilities and Amenities</h3>
+                                <p>Modern business venues need to provide comprehensive facilities. High-speed internet, video conferencing equipment, comfortable seating, and quality catering are essential basics. Additional amenities can enhance the experience.</p>
                                 <ul>
-                                    <li>What factors may alter the brain-gut connection?</li>
-                                    <li>How can we maintain a healthy gut microbiome?</li>
-                                    <li>What role does diet play in gut health?</li>
+                                    <li>What technology is essential for modern meetings?</li>
+                                    <li>How important are accommodation options on-site?</li>
+                                    <li>What catering considerations matter most?</li>
                                 </ul>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop" alt="Healthy food" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1431540015161-0bf868a2d407?w=800&h=600&fit=crop" alt="Facilities" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
-                        <!-- Slide 3: Norovirus -->
+                        <!-- Slide 3 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>Norovirus Outbreak</h3>
-                                <p>Healthcare facilities must report all norovirus cases to health departments. Both confirmed and suspected cases should be reported to track and manage outbreaks effectively.</p>
+                                <h3>International Meetings</h3>
+                                <p>When hosting international visitors, cultural considerations become important. Think about dietary requirements, language support, proximity to airports, and time zones for virtual participants joining remotely.</p>
                                 <ul>
-                                    <li>How does norovirus spread in communities?</li>
-                                    <li>What prevention measures are most effective?</li>
-                                    <li>Why is rapid reporting important?</li>
+                                    <li>How can you accommodate cultural differences?</li>
+                                    <li>What makes a venue internationally accessible?</li>
+                                    <li>How important is multilingual staff support?</li>
                                 </ul>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?w=800&h=600&fit=crop" alt="Hospital" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=600&fit=crop" alt="International business" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
-                        <!-- Slide 4: Food Safety -->
+                        <!-- Slide 4 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>Food Safety Practices</h3>
-                                <p>Proper food preparation, cooking, and storage are essential to preventing food poisoning. Raw meat should be kept separate, surfaces cleaned thoroughly, and food stored at correct temperatures.</p>
+                                <h3>Budget Management</h3>
+                                <p>Effective event planning requires careful budget management. Consider all costs including venue rental, catering, accommodation, transportation, and equipment. Look for venues offering package deals or group discounts.</p>
                                 <ul>
-                                    <li>What are the most common food safety mistakes?</li>
-                                    <li>How can restaurants ensure food safety?</li>
-                                    <li>What temperature should meat be cooked to?</li>
+                                    <li>What hidden costs should you watch for?</li>
+                                    <li>How can you maximize value within budget?</li>
+                                    <li>When should you negotiate prices with venues?</li>
                                 </ul>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800&h=600&fit=crop" alt="Food preparation" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1554224311-beee460c201a?w=800&h=600&fit=crop" alt="Budget planning" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
-                        <!-- Slide 5: Dehydration -->
+                        <!-- Slide 5 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>Managing Dehydration</h3>
-                                <p>Dehydration from digestive disorders requires immediate attention. Oral rehydration solutions containing specific glucose and sodium ratios are the WHO-recommended treatment.</p>
+                                <h3>Follow-up and Evaluation</h3>
+                                <p>After the event, gather feedback from attendees about the venue, facilities, and overall experience. This information is valuable for planning future events and building relationships with quality venues.</p>
                                 <ul>
-                                    <li>What are the warning signs of severe dehydration?</li>
-                                    <li>Why are sports drinks inadequate for treating dehydration?</li>
-                                    <li>When should medical intervention be sought?</li>
+                                    <li>What questions should you ask in feedback surveys?</li>
+                                    <li>How do you measure event success?</li>
+                                    <li>Why is venue relationship building important?</li>
                                 </ul>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop" alt="Hydration" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&h=600&fit=crop" alt="Feedback" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
                     </div>
@@ -1321,37 +1278,39 @@
                 <h2>Vocabulary</h2>
                 <div class="vocab-container">
                     <div class="vocab-nav">
-                        <button class="page-btn active" onclick="showVocabPage(1, this)">Medical Terms</button>
-                        <button class="page-btn" onclick="showVocabPage(2, this)">Symptoms & Treatment</button>
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Venue Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Business Terms</button>
                     </div>
 
                     <div class="vocab-page active" id="vocab-page-1">
                         <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Contaminated</div></div><div class="flashcard-back"><div class="flashcard-definition">Infected or spoiled by contact with harmful substances</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Pathogen</div></div><div class="flashcard-back"><div class="flashcard-definition">A microorganism causing disease such as a virus or bacterium</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Parasite</div></div><div class="flashcard-back"><div class="flashcard-definition">An organism living in or on another organism to get its nutrients</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Food-borne</div></div><div class="flashcard-back"><div class="flashcard-definition">Relating to microorganisms or toxins in contaminated food</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ingest</div></div><div class="flashcard-back"><div class="flashcard-definition">To swallow food or drugs into the body</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Lethargy</div></div><div class="flashcard-back"><div class="flashcard-definition">Abnormal drowsiness or lack of energy</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sunken</div></div><div class="flashcard-back"><div class="flashcard-definition">Hollow and deep as a result of age or disease</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stool Sample</div></div><div class="flashcard-back"><div class="flashcard-definition">Fecal matter collected for medical testing to determine pathogens</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Parkland</div></div><div class="flashcard-back"><div class="flashcard-definition">Open land with grass and trees that is designed, not wild</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Rolling</div></div><div class="flashcard-back"><div class="flashcard-definition">Having gentle slopes in the landscape</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Workstation</div></div><div class="flashcard-back"><div class="flashcard-definition">A place to work connected to computer equipment</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hub</div></div><div class="flashcard-back"><div class="flashcard-definition">The most important place for a particular activity</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Seclusion</div></div><div class="flashcard-back"><div class="flashcard-definition">The state of being separated from other people</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Refurbished</div></div><div class="flashcard-back"><div class="flashcard-definition">Cleaned and improved to make more attractive or useful</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sauna</div></div><div class="flashcard-back"><div class="flashcard-definition">A small room reaching high temperatures for health purposes</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Concierge</div></div><div class="flashcard-back"><div class="flashcard-definition">Hotel staff providing information, assistance, and check-in/out services</div></div></div></div>
                         </div>
                     </div>
 
                     <div class="vocab-page" id="vocab-page-2">
                         <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Dehydration</div></div><div class="flashcard-back"><div class="flashcard-definition">Loss of water and salts essential for normal body function</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Electrolytes</div></div><div class="flashcard-back"><div class="flashcard-definition">Minerals in body fluids that help maintain proper body functions</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">IV Fluids</div></div><div class="flashcard-back"><div class="flashcard-definition">Intravenous liquids administered directly into the bloodstream</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Jaundice</div></div><div class="flashcard-back"><div class="flashcard-definition">Yellowing of the skin and eyes due to liver problems</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Microbiome</div></div><div class="flashcard-back"><div class="flashcard-definition">The community of microorganisms living in the digestive system</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Abdominal</div></div><div class="flashcard-back"><div class="flashcard-definition">Relating to the abdomen or stomach area</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Around the clock</div></div><div class="flashcard-back"><div class="flashcard-definition">24 hours a day, continuously</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Top-rated</div></div><div class="flashcard-back"><div class="flashcard-definition">Well-respected or highly regarded</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Bustling</div></div><div class="flashcard-back"><div class="flashcard-definition">Busy and full of activity</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Catering for</div></div><div class="flashcard-back"><div class="flashcard-definition">Providing for or serving a particular group</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Mouth-watering</div></div><div class="flashcard-back"><div class="flashcard-definition">Delicious or very appetizing</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Out-of-hours</div></div><div class="flashcard-back"><div class="flashcard-definition">During time when business is not normally conducted</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Tight schedule</div></div><div class="flashcard-back"><div class="flashcard-definition">Limited time available for activities</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Isolation</div></div><div class="flashcard-back"><div class="flashcard-definition">Being alone or separated from others</div></div></div></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
+            <!-- Interactive Quiz Section -->
             <div class="section" id="quiz">
                 <h2>Vocabulary Quiz</h2>
                 <div class="quiz-container">
@@ -1389,10 +1348,10 @@
                 <h2>Writing Practice</h2>
                 <div class="writing-container">
                     <div class="writing-content">
-                        <h3 class="writing-question">Food Safety and Public Health</h3>
+                        <h3 class="writing-question">Event Planning Email</h3>
 
                         <p class="writing-objective">
-                            Write a short paragraph (100-150 words) about the importance of food safety in preventing digestive disorders. What role do individuals, restaurants, and governments play? What measures are most effective? Share your thoughts with your teacher.
+                            You need to organize a meeting between representatives from your company and another company. There will be 30 people present and it will take place over 2 days. Write an email to your assistant asking them to research venues, remind them of the number of people, and ensure food and accommodation is available. Write 40-50 words.
                         </p>
 
                         <form id="writingForm" class="writing-form">
@@ -1407,18 +1366,17 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="writingInput">Your Response</label>
-                                <input type="text" id="writingInput" name="writingInput" required>
+                                <label for="writingInput">Your Email (40-50 words)</label>
+                                <textarea id="writingInput" name="writingInput" required></textarea>
                             </div>
 
                             <div class="button-container">
-                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send Response</button>
+                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send to Teacher</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-
 
             <!-- Vocabulary Popup -->
             <div class="popup-overlay" id="vocabPopup">
@@ -1439,103 +1397,103 @@
         // Vocabulary database for the quiz
         const vocabularyDatabase = [
             {
-                term: "contaminated",
-                definition: "Infected or spoiled by contact with harmful substances.",
-                category: "medical",
+                term: "parkland",
+                definition: "Open land with grass and trees that is designed, not wild.",
+                category: "venue",
                 sentences: [
-                    "The water was ___ from agricultural pollutants.",
-                    "People should avoid eating ___ food.",
-                    "___ surfaces can spread disease quickly."
+                    "The venue is set in 50 acres of ___.",
+                    "The hotel features beautiful ___ surroundings.",
+                    "___ venues offer peaceful outdoor settings."
                 ]
             },
             {
-                term: "pathogen",
-                definition: "A microorganism causing disease such as a virus or bacterium.",
-                category: "medical",
+                term: "hub",
+                definition: "The most important place for a particular activity.",
+                category: "business",
                 sentences: [
-                    "Scientists are analyzing samples to determine the ___.",
-                    "Many food-borne ___ can cause serious illness.",
-                    "The ___ entered the food chain via contaminated water."
+                    "London is a major business ___ in Europe.",
+                    "The venue is located near the financial ___.",
+                    "The city serves as a transportation ___."
                 ]
             },
             {
-                term: "parasite",
-                definition: "An organism living in or on another organism to get its nutrients.",
-                category: "medical",
+                term: "seclusion",
+                definition: "The state of being separated from other people.",
+                category: "venue",
                 sentences: [
-                    "It appears that a ___ was the cause of the patient's discomfort.",
-                    "Proper hygiene helps prevent ___ infections.",
-                    "The ___ was identified through laboratory tests."
+                    "The venue offers ___ without isolation.",
+                    "Some teams prefer ___ for focused work.",
+                    "The retreat provided complete ___."
                 ]
             },
             {
-                term: "lethargy",
-                definition: "Abnormal drowsiness or lack of energy.",
-                category: "symptom",
+                term: "refurbished",
+                definition: "Cleaned and improved to make more attractive or useful.",
+                category: "venue",
                 sentences: [
-                    "Infants showing symptoms of ___ should be monitored carefully.",
-                    "Severe ___ can indicate serious dehydration.",
-                    "The patient experienced extreme ___ after the illness."
+                    "The hotel features newly ___ bedrooms.",
+                    "All conference rooms were recently ___.",
+                    "The ___ facilities are modern and comfortable."
                 ]
             },
             {
-                term: "dehydration",
-                definition: "Loss of water and salts essential for normal body function.",
-                category: "condition",
+                term: "bustling",
+                definition: "Busy and full of activity.",
+                category: "description",
                 sentences: [
-                    "Signs of ___ include dizziness and extreme thirst.",
-                    "Young children are more prone to ___.",
-                    "Severe ___ requires immediate medical treatment."
+                    "The hotel is located in the ___ city center.",
+                    "Manchester is a ___ metropolitan area.",
+                    "The ___ venue suited our energetic team."
                 ]
             },
             {
-                term: "ingest",
-                definition: "To swallow food or drugs into the body.",
-                category: "medical",
+                term: "concierge",
+                definition: "Hotel staff providing information and assistance.",
+                category: "venue",
                 sentences: [
-                    "Parents must ensure children do not ___ toxic substances.",
-                    "Be careful what you ___ when traveling abroad.",
-                    "The patient may have ___ contaminated water."
+                    "The ___ can arrange restaurant bookings.",
+                    "A 24-hour ___ is available for guests.",
+                    "Ask the ___ for local recommendations."
                 ]
             },
             {
-                term: "jaundice",
-                definition: "Yellowing of the skin and eyes due to liver problems.",
-                category: "symptom",
+                term: "catering",
+                definition: "Providing food and drink services.",
+                category: "business",
                 sentences: [
-                    "Hepatitis A can cause ___ in infected patients.",
-                    "The doctor noticed signs of ___ during examination.",
-                    "___ indicates potential liver complications."
+                    "The venue is ___ for up to 200 people.",
+                    "We need a venue ___ for large groups.",
+                    "The restaurant is ___ for corporate events."
                 ]
             },
             {
-                term: "electrolytes",
-                definition: "Minerals in body fluids that help maintain proper body functions.",
-                category: "medical",
+                term: "isolation",
+                definition: "Being alone or separated from others.",
+                category: "venue",
                 sentences: [
-                    "Replacement solutions contain essential ___.",
-                    "Loss of ___ can cause serious health problems.",
-                    "Sports drinks provide some ___ but aren't sufficient for treatment."
+                    "The venue offers seclusion without ___.",
+                    "Complete ___ is unnecessary for meetings.",
+                    "We want privacy but not total ___."
                 ]
             },
             {
-                term: "microbiome",
-                definition: "The community of microorganisms living in the digestive system.",
-                category: "medical",
+                term: "workstation",
+                definition: "A place to work connected to computer equipment.",
+                category: "business",
                 sentences: [
-                    "The gut ___ plays a crucial role in digestion.",
-                    "Diet and disease can alter the ___.",
-                    "A healthy ___ supports the immune system."
+                    "Each room includes a fully connected ___.",
+                    "Modern ___ facilities are essential.",
+                    "The ___ has all necessary equipment."
                 ]
             },
             {
-                term: "abdominal",
-                definition: "Relating to the abdomen or stomach area.",
-                category: "medical",
+                term: "tight",
+                definition: "Limited or restricted in time or space.",
+                category: "business",
                 sentences: [
-                    "The patient complained of severe ___ pain.",
-                    "___ cramps are common symptoms of food poisoning.",
-                    "Pain may be concentrated in the upper ___ region."
+                    "International visitors often have a ___ schedule.",
+                    "We're working with a ___ deadline.",
+                    "The ___ budget requires careful planning."
                 ]
             }
         ];
@@ -1547,7 +1505,6 @@
 
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
-
 
             document.getElementById(sectionId).classList.add('active');
             navItem.classList.add('active');
@@ -1717,7 +1674,6 @@
             });
         }
 
-
         function handleQuizKeyPress(event, questionNum) {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -1742,15 +1698,18 @@
 
             const isCorrect = userAnswer === question.correctAnswer;
 
-            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
-
             feedback.style.display = 'block';
             feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
             feedback.textContent = isCorrect ? 'Correct! Well done!' :
                 `Incorrect. The correct answer is: ${question.correctTerm}`;
+            feedback.style.background = isCorrect ? '#48bb78' : '#f56565';
+            feedback.style.color = 'white';
+            feedback.style.padding = '12px 20px';
+            feedback.style.borderRadius = '12px';
+            feedback.style.marginTop = '15px';
 
             if (isCorrect && !userQuizAnswers[questionNum]) {
-                 quizScore++;
+                quizScore++;
             }
             userQuizAnswers[questionNum] = isCorrect;
 
@@ -1834,17 +1793,6 @@
             initializeVocabQuiz();
         }
 
-        // Vocabulary popup system
-        function showPopup(word, definition) {
-            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
-            document.getElementById('popupDefinition').textContent = definition;
-            document.getElementById('vocabPopup').style.display = 'flex';
-        }
-
-        function closePopup() {
-            document.getElementById('vocabPopup').style.display = 'none';
-        }
-
         // Writing section management
         function openMailto() {
             const studentName = document.getElementById('studentName').value.trim();
@@ -1856,7 +1804,7 @@
                 return;
             }
 
-            const subject = encodeURIComponent('Digestive Disorders Assignment - ' + studentName);
+            const subject = encodeURIComponent('Organizing Events Assignment - ' + studentName);
             const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
             window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
         }
@@ -1864,7 +1812,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initializeVocabQuiz();
-            showReadingLevel('text1', document.querySelector('.reading-nav .page-btn'));
+            showReadingLevel('venue1', document.querySelector('.reading-nav .page-btn'));
 
             // Close popup when clicking outside
             const vocabPopup = document.getElementById('vocabPopup');
