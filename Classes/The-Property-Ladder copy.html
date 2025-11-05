@@ -1,0 +1,2648 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Property Ladder - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        /* Image-only slide (Slide 1) */
+        .slide-image-only {
+            padding: 0;
+        }
+
+        /* Horizontal layout slides (Slides 2-5) */
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            max-width: 50%;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .slide-text-section-left ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .slide-text-section-left li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        .slide-image-section-right {
+            width: 45%;
+            max-width: 50%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Navigation Arrows - Outside the white box */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -60px;
+        }
+
+        .slide-arrow.next {
+            right: -60px;
+        }
+
+        /* Slide Indicators */
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 280px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .flashcard-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+            color: #a0aec0;
+            opacity: 0.8;
+        }
+
+        .flashcard:hover .flashcard-inner {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* NEW QUIZ SYSTEM STYLES */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .quiz-input.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .quiz-input.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice input[type="radio"] {
+            display: none;
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.correct {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.incorrect {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .check-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: rgba(160, 174, 192, 0.5);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-weight: 500;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        /* Video Section */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 15px;
+            justify-content: center;
+        }
+
+        /* Video Discussions Section */
+        .video-discussions-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+
+            .header .website a {
+                font-size: 1rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+                margin-top: 15px;
+            }
+
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 20px 15px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                background: rgba(45, 55, 72, 0.95);
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 120px;
+                margin: 5px;
+                font-size: 0.95rem;
+                padding: 12px 16px;
+                border-radius: 20px;
+            }
+
+            .content {
+                height: auto;
+                overflow: visible;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .section {
+                padding: 25px 15px;
+                height: auto;
+                overflow: visible;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .discussion-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                height: auto;
+            }
+
+            .discussion-header {
+                order: -1;
+                padding: 20px;
+            }
+
+            .actual-image {
+                width: 250px;
+                height: 150px;
+                margin: 0 auto 15px;
+                border-radius: 12px;
+            }
+
+            .discussion-question {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .discussion-question h3 {
+                font-size: 1.3rem;
+            }
+
+            /* Mobile styles for slideshow */
+            .slideshow-container {
+                padding: 20px 15px;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .slide-content-wrapper {
+                height: auto;
+                min-height: 80vh;
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .discussion-slide {
+                padding: 20px 15px;
+                height: auto;
+                min-height: 80vh;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .slide-horizontal {
+                flex-direction: column !important;
+                gap: 20px;
+            }
+
+            .slide-text-section-left {
+                max-width: 100%;
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .slide-text-section-left h3 {
+                font-size: 1.4rem;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .slide-text-section-left p {
+                font-size: 1rem;
+                line-height: 1.6;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .slide-text-section-left ul {
+                margin-top: 15px;
+            }
+
+            .slide-text-section-left li {
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+                padding-left: 25px;
+            }
+
+            .slide-image-section-right {
+                width: 100%;
+                max-width: 100%;
+                height: 250px;
+                margin-top: 20px;
+                border-radius: 12px;
+            }
+
+            .slide-image-section-right img {
+                border-radius: 10px;
+            }
+
+            .slide-arrow {
+                width: 40px;
+                height: 40px;
+                z-index: 1000;
+            }
+
+            .slide-arrow.prev {
+                left: 10px;
+            }
+
+            .slide-arrow.next {
+                right: 10px;
+            }
+
+            .slide-indicators {
+                bottom: 20px;
+                gap: 8px;
+            }
+
+            .indicator-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .discussion-question p {
+                font-size: 1rem;
+            }
+
+            .reading-container {
+                height: auto;
+            }
+
+            .reading-nav, .reading-subnav {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .page-btn {
+                font-size: 0.95rem;
+                padding: 10px 16px;
+                flex: 1;
+                min-width: 100px;
+                border-radius: 20px;
+            }
+
+            .reading-page {
+                height: auto;
+                overflow: visible;
+                max-height: none;
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            .reading-page h3 {
+                font-size: 1.5rem;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+                line-height: 1.7;
+            }
+
+            .vocab-container {
+                height: auto;
+            }
+
+            .vocab-nav {
+                gap: 8px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                height: auto;
+            }
+
+            .flashcard {
+                height: 200px;
+            }
+
+            .flashcard-front, .flashcard-back {
+                border-radius: 16px;
+            }
+
+            .flashcard-term {
+                font-size: 1.7rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.3rem;
+            }
+
+            .flashcard-hint {
+                font-size: 1rem;
+            }
+
+            .quiz-container {
+                height: auto;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .quiz-nav {
+                justify-content: center;
+            }
+
+            .nav-btn {
+                font-size: 1rem;
+                padding: 10px 20px;
+                border-radius: 20px;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+                margin: 0 10px;
+                border-radius: 16px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.6rem;
+                margin-bottom: 25px;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                max-width: 100%;
+            }
+
+            .choice {
+                font-size: 1.1rem;
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .quiz-input {
+                font-size: 1.3rem;
+                max-width: 100%;
+                padding: 15px 20px;
+                border-radius: 20px;
+            }
+
+            .check-button {
+                font-size: 1.3rem;
+                padding: 15px 30px;
+                margin: 20px auto;
+                border-radius: 20px;
+            }
+
+            .feedback {
+                font-size: 1rem;
+                margin: 20px 10px;
+                border-radius: 10px;
+            }
+
+            .results-summary {
+                padding: 30px 20px;
+                margin: 0 10px;
+                border-radius: 16px;
+            }
+
+            .results-summary h3 {
+                font-size: 1.8rem;
+            }
+
+            .score {
+                font-size: 3rem;
+            }
+
+            .popup-content {
+                margin: 15px;
+                padding: 30px 25px;
+                max-width: 90%;
+                border-radius: 16px;
+            }
+
+            .popup-word {
+                font-size: 1.6rem;
+            }
+
+            .popup-definition {
+                font-size: 1.1rem;
+            }
+
+            .popup-close {
+                border-radius: 20px;
+            }
+
+            .vocab-link {
+                font-size: 1rem;
+                padding: 3px 8px;
+                display: inline-block;
+                margin: 1px;
+                border-radius: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .nav-item {
+                font-size: 0.85rem;
+                padding: 10px 12px;
+                min-width: 100px;
+            }
+
+            .section {
+                padding: 20px 12px;
+            }
+
+            .section h2 {
+                font-size: 1.6rem;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard {
+                height: 180px;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+
+            .reading-page {
+                padding: 20px 15px;
+            }
+
+            .discussion-question {
+                padding: 18px;
+            }
+
+            .actual-image {
+                width: 200px;
+                height: 120px;
+            }
+
+            .quiz-input {
+                font-size: 1.2rem;
+                padding: 12px 16px;
+            }
+
+            .check-button {
+                font-size: 1.2rem;
+                padding: 12px 25px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .nav-item,
+            .choice,
+            .flashcard,
+            .vocab-link,
+            .check-button,
+            .page-btn {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .vocab-link {
+                min-height: 32px;
+                line-height: 1.2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elements for sound effects -->
+    <audio id="flipSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>The Property Ladder</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="openWritingForm(this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section with Slideshow -->
+            <div class="section active" id="discussion">
+                <div class="slideshow-container">
+                    
+                    <div class="slide-content-wrapper">
+                        <!-- Navigation Arrows - Outside the white box -->
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <!-- Slide 1 - Image Only -->
+                        <div class="discussion-slide active slide-image-only">
+                            <img src="https://static.wixstatic.com/media/593d03_0e471e3b6f2d4a76a29a565c07970e64~mv2.jpg" alt="Property Ladder" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Real Estate Investment</h3>
+                                <p>"Buying real estate is not only the best way, the quickest way, the safest way, but the only way to become wealthy"? - Marshall Field</p>
+                                <ul>
+                                    <li>Do you agree with this quote?</li>
+                                    <li>Think about <span class="vocab-link" onclick="showPopup('market volatility', 'unpredictable changes in property prices and market conditions')">market volatility</span> and risks</li>
+                                    <li>Reflect on alternative investment strategies</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Real Estate Investment" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Housing Market Trends</h3>
+                                <p>Have you noticed similar property trends in your country? Are young people finding it harder to buy their first home? What factors are driving these changes?</p>
+                                <ul>
+                                    <li>Impact of <span class="vocab-link" onclick="showPopup('inflation', 'the general increase in prices and fall in purchasing power of money')">inflation</span> on housing prices</li>
+                                    <li>Government policies and regulations</li>
+                                    <li>Generational wealth gaps and opportunities</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Housing Market Trends" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Renting vs. Buying</h3>
+                                <p>What are the advantages and disadvantages of renting versus buying property? In your opinion, which option provides better financial security in the long term?</p>
+                                <ul>
+                                    <li>Flexibility vs. stability considerations</li>
+                                    <li>Maintenance responsibilities and costs</li>
+                                    <li><span class="vocab-link" onclick="showPopup('Building equity', 'gradually increasing ownership value in a property by paying down the mortgage')">Building equity</span> vs. preserving <span class="vocab-link" onclick="showPopup('liquidity', 'how easily an asset can be converted into cash without affecting its market price')">liquidity</span></li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Renting vs Buying" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Property Professionals</h3>
+                                <p>What's the difference between an <span class="vocab-link" onclick="showPopup('estate agent', 'a professional who helps people buy, sell, or rent properties')">estate agent</span>, a <span class="vocab-link" onclick="showPopup('landlord', 'a person who owns property and rents it out to tenants')">landlord</span>, and a <span class="vocab-link" onclick="showPopup('property manager', 'a professional who manages rental properties on behalf of the owner')">property manager</span>? Have you ever worked with any of these professionals when negotiating a property deal?</p>
+                                <ul>
+                                    <li>Understanding professional roles and responsibilities</li>
+                                    <li>Negotiation strategies and best practices</li>
+                                    <li>Legal considerations in property transactions</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide Indicators -->
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading: Understanding the Property Market</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('B1', this)">B1 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
+                    </div>
+                    
+                    <!-- Sub-navigation for each level -->
+                    <div class="reading-subnav" id="reading-subnav">
+                        <button class="page-btn active" onclick="showReadingPage(1, this)">First-Time Buying</button>
+                        <button class="page-btn" onclick="showReadingPage(2, this)">Market Terms</button>
+                        <button class="page-btn" onclick="showReadingPage(3, this)">Property Investment</button>
+                        <button class="page-btn" onclick="showReadingPage(4, this)">Housing Trends</button>
+                    </div>
+
+                    <!-- B1 Level Reading Pages -->
+                    <div class="reading-level" id="B1-level">
+                        <div class="reading-page active" id="B1-page-1">
+                            <h3>My First Home Purchase</h3>
+                            <p>
+                                My name is Sarah, and I want to tell you about buying my first home. I was a complete <span class="vocab-link" onclick="showPopup('first-time buyer', 'Someone purchasing their first property')">first-time buyer</span> when I started, but now I understand the property market much better!
+                            </p>
+                            <p>
+                                Last year, I decided it was time to get on the <span class="vocab-link" onclick="showPopup('property ladder', 'The sequence of property ownership from starter homes to more expensive ones')">property ladder</span>. I had been saving for a <span class="vocab-link" onclick="showPopup('deposit', 'Initial payment when buying a house')">deposit</span> for three years and finally had enough money to start looking for a small flat.
+                            </p>
+                            <p>
+                                The first thing I did was contact an <span class="vocab-link" onclick="showPopup('estate agent', 'Professional who helps buy and sell properties')">estate agent</span> who showed me several properties. I was shocked by how expensive everything was! The agent explained that the <span class="vocab-link" onclick="showPopup('housing market', 'The buying and selling of residential properties')">housing market</span> had become very competitive.
+                            </p>
+                            <p>
+                                After viewing many flats, I finally found one I liked. I had to make a <span class="vocab-link" onclick="showPopup('bid', 'An offer to buy a property')">bid</span> quickly because other people were also interested. Fortunately, my offer was accepted! The next step was applying for a <span class="vocab-link" onclick="showPopup('mortgage', 'A loan to buy property')">mortgage</span> from the bank.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-2">
+                            <h3>Learning Property Vocabulary</h3>
+                            <p>
+                                Getting a mortgage was more complicated than I expected. The bank wanted to see proof of my income, my credit history, and details about the property. They also required a professional <span class="vocab-link" onclick="showPopup('valuation', 'Assessment of a property&apos;s worth')">valuation</span> to make sure the flat was worth the price I was paying.
+                            </p>
+                            <p>
+                                During this process, I learned many new terms. The <span class="vocab-link" onclick="showPopup('vendor', 'Person selling the property')">vendor</span> (the person selling the flat) had already moved out, so the property was empty. This made it easier to imagine how I would decorate it.
+                            </p>
+                            <p>
+                                I also discovered what <span class="vocab-link" onclick="showPopup('chain', 'Series of connected property transactions')">chain</span> means in property transactions. Fortunately, I wasn't part of a long chain because I was buying my first home and the vendor had already bought their new house.
+                            </p>
+                            <p>
+                                The estate agent earned their <span class="vocab-link" onclick="showPopup('commission', 'Percentage fee paid to agent')">commission</span> by helping coordinate everything. They communicated between me, the vendor, the bank, and the solicitors to make sure the sale went smoothly.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-3">
+                            <h3>Property Investment Basics</h3>
+                            <p>
+                                While waiting for my mortgage approval, I started learning about property investment. Some people buy properties not to live in them, but to <span class="vocab-link" onclick="showPopup('rent out', 'Allow others to live in property for monthly payment')">rent out</span> to tenants. This can provide regular monthly income.
+                            </p>
+                            <p>
+                                I met someone who was a property <span class="vocab-link" onclick="showPopup('flipper', 'Person who buys, renovates and sells properties quickly')">flipper</span>. They bought old houses, renovated them quickly, and then sold them for a profit. It sounded exciting but also risky!
+                            </p>
+                            <p>
+                                My estate agent explained that some investors look for properties that are <span class="vocab-link" onclick="showPopup('below market value', 'Priced lower than similar properties')">below market value</span>. These might need repairs, but they offer good investment potential.
+                            </p>
+                            <p>
+                                After three months, my mortgage was finally approved! I was so happy to receive the keys to my first home. Looking back, the whole process taught me so much about the property market and financial planning.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B1-page-4">
+                            <h3>Property Market Insights</h3>
+                            <p>
+                                Now that I own my flat, I pay more attention to property news and market trends. I've learned that property prices can go up and down based on economic conditions, interest rates, and local developments.
+                            </p>
+                            <p>
+                                My <span class="vocab-link" onclick="showPopup('neighbours', 'People living in nearby properties')">neighbours</span> have been very helpful, giving me advice about local services and maintenance. Living in my own property feels very different from renting – I can make changes and improvements without asking permission.
+                            </p>
+                            <p>
+                                I'm already thinking about the future. Maybe in a few years, I'll be able to <span class="vocab-link" onclick="showPopup('move up the ladder', 'Buy a more expensive property')">move up the ladder</span> and buy a larger place, perhaps even a house with a garden.
+                            </p>
+                            <p>
+                                For now, I'm proud to be a homeowner and grateful for all the people who helped me navigate the property market. It was challenging, but definitely worth the effort!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level Reading Pages -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-page active" id="B2-page-1">
+                            <h3>The Property Market Revolution</h3>
+                            <p>
+                                The residential property market has undergone significant transformation over the past two decades, fundamentally altering the landscape of homeownership and investment opportunities. Traditional patterns of property acquisition have been disrupted by economic pressures, demographic shifts, and evolving lifestyle preferences.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('affordability crisis', 'Situation where housing costs are beyond reach for many people')">Affordability crisis</span> has become a defining feature of modern housing markets, particularly in major urban centers. House prices have increased at a rate far exceeding wage growth, creating barriers for <span class="vocab-link" onclick="showPopup('aspiring homeowners', 'People hoping to buy their first property')">aspiring homeowners</span> who find themselves priced out of traditional entry-level markets.
+                            </p>
+                            <p>
+                                The concept of the <span class="vocab-link" onclick="showPopup('property ladder', 'Progressive homeownership from cheaper to more expensive properties')">property ladder</span> itself is being reconsidered. Many young professionals are discovering that the first rung has become increasingly difficult to reach, leading to extended periods of renting and delayed homeownership.
+                            </p>
+                            <p>
+                                Financial institutions have responded by developing innovative <span class="vocab-link" onclick="showPopup('mortgage products', 'Different types of home loans available to buyers')">mortgage products</span> and relaxing certain lending criteria, though concerns about responsible lending and market stability continue to influence regulatory approaches.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-2">
+                            <h3>Investment Strategies and Market Dynamics</h3>
+                            <p>
+                                Professional property investors have adapted their strategies to capitalize on changing market conditions. <span class="vocab-link" onclick="showPopup('Buy-to-let', 'Purchasing property specifically to rent to tenants')">Buy-to-let</span> investments remain popular, though regulatory changes and tax implications have reduced profit margins for many investors.
+                            </p>
+                            <p>
+                                The rise of <span class="vocab-link" onclick="showPopup('PropTech', 'Technology platforms revolutionizing property transactions')">PropTech</span> has streamlined many traditional processes. Online platforms now facilitate property searches, virtual viewings, and even automated valuations, though the human element remains crucial for complex transactions.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Portfolio diversification', 'Spreading investments across different property types')">Portfolio diversification</span> has become increasingly sophisticated, with investors exploring commercial properties, international markets, and alternative investment structures such as Real Estate Investment Trusts (REITs).
+                            </p>
+                            <p>
+                                Market volatility has highlighted the importance of thorough <span class="vocab-link" onclick="showPopup('due diligence', 'Careful investigation before making investment decisions')">due diligence</span> and professional advice. Successful investors now rely heavily on market analysis, demographic trends, and infrastructure development plans when making purchasing decisions.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-3">
+                            <h3>Regional Variations and Urban Development</h3>
+                            <p>
+                                Property market dynamics vary significantly between regions, with <span class="vocab-link" onclick="showPopup('metropolitan areas', 'Large city regions with surrounding suburbs')">metropolitan areas</span> often experiencing different trends from rural or suburban markets. Government initiatives to promote regional development have created new investment opportunities outside traditional hotspots.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Gentrification', 'Process of improving areas leading to higher property values')">Gentrification</span> processes have transformed previously affordable neighborhoods, creating both opportunities and social challenges. Long-term residents may benefit from increased property values while facing pressure from rising living costs.
+                            </p>
+                            <p>
+                                Infrastructure investments, particularly in transportation networks, continue to be key drivers of property value appreciation. Areas benefiting from improved connectivity often experience rapid price growth and increased development activity.
+                            </p>
+                            <p>
+                                Sustainable development and environmental considerations are increasingly influencing both buyer preferences and regulatory requirements. Energy-efficient properties and those with good environmental credentials command premium prices in many markets.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="B2-page-4">
+                            <h3>Future Prospects and Market Predictions</h3>
+                            <p>
+                                Industry experts remain divided about long-term market prospects, with predictions varying based on economic indicators, demographic projections, and policy changes. <span class="vocab-link" onclick="showPopup('Market cycles', 'Regular patterns of growth and decline in property values')">Market cycles</span> suggest that current high prices may not be sustainable indefinitely.
+                            </p>
+                            <p>
+                                Demographic shifts, including aging populations and changing household formations, are expected to influence housing demand patterns. The rise of remote working has already begun to affect regional price variations and lifestyle preferences.
+                            </p>
+                            <p>
+                                Government intervention through various <span class="vocab-link" onclick="showPopup('housing policies', 'Government programs affecting property markets')">housing policies</span> continues to shape market conditions. First-time buyer assistance programs, social housing initiatives, and taxation changes all have significant market implications.
+                            </p>
+                            <p>
+                                The property market's future will likely be characterized by increased complexity, technological integration, and the need for adaptive strategies from all participants – buyers, sellers, investors, and industry professionals alike.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level Reading Pages -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-page active" id="C1-page-1">
+                            <h3>Macroeconomic Influences on Property Markets</h3>
+                            <p>
+                                The contemporary residential property sector operates within a complex ecosystem of macroeconomic variables, regulatory frameworks, and sociocultural dynamics that collectively determine market trajectories. <span class="vocab-link" onclick="showPopup('Monetary policy', 'Central bank decisions affecting interest rates and money supply')">Monetary policy</span> decisions, particularly regarding interest rates, exert profound influence on mortgage affordability and investment attractiveness.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Quantitative easing', 'Central bank policy of buying government bonds to stimulate economy')">Quantitative easing</span> programs implemented in response to economic crises have inadvertently contributed to asset price inflation, including residential property. This has created a disconnect between property values and underlying economic fundamentals, raising concerns about market sustainability.
+                            </p>
+                            <p>
+                                The phenomenon of <span class="vocab-link" onclick="showPopup('financialization', 'Treating housing as financial investment rather than shelter')">financialization</span> has transformed housing from a basic need into a complex financial instrument. This shift has profound implications for market accessibility, price volatility, and the relationship between property values and local economic conditions.
+                            </p>
+                            <p>
+                                Global capital flows now significantly impact local property markets, with <span class="vocab-link" onclick="showPopup('foreign direct investment', 'International money invested in domestic property markets')">foreign direct investment</span> in real estate creating both opportunities and challenges for domestic buyers and policymakers seeking to maintain market stability.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-2">
+                            <h3>Demographic Transitions and Housing Demand</h3>
+                            <p>
+                                Demographic transitions occurring across developed economies are fundamentally reshaping housing demand patterns and investment strategies. <span class="vocab-link" onclick="showPopup('Population aging', 'Increasing proportion of elderly people in society')">Population aging</span> creates demand for specialized housing solutions while potentially reducing overall household formation rates.
+                            </p>
+                            <p>
+                                The emergence of the <span class="vocab-link" onclick="showPopup('sandwich generation', 'Adults caring for both children and elderly parents')">sandwich generation</span> – adults simultaneously supporting children and aging parents – has created new housing needs and financial pressures that traditional market models struggle to accommodate.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Intergenerational wealth transfer', 'Passing of assets from parents to children')">Intergenerational wealth transfer</span> is becoming increasingly crucial for property acquisition, creating potential for increased inequality and market distortion. Those without family wealth face substantially greater barriers to homeownership.
+                            </p>
+                            <p>
+                                Migration patterns, both internal and international, continue to create regional imbalances in housing demand. <span class="vocab-link" onclick="showPopup('Brain drain', 'Migration of skilled workers from one area to another')">Brain drain</span> from certain regions and concentration in others exacerbates regional property price disparities.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-3">
+                            <h3>Technological Disruption and Market Evolution</h3>
+                            <p>
+                                Technological innovation is precipitating fundamental changes in property market operations, from transaction processes to property management and investment analysis. <span class="vocab-link" onclick="showPopup('Blockchain technology', 'Distributed ledger system potentially revolutionizing property transactions')">Blockchain technology</span> promises to streamline conveyancing processes and improve transparency in property ownership records.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Artificial intelligence', 'Computer systems performing tasks requiring human intelligence')">Artificial intelligence</span> applications in property valuation and market analysis are becoming increasingly sophisticated, potentially disrupting traditional professional roles while improving accuracy and efficiency.
+                            </p>
+                            <p>
+                                The concept of <span class="vocab-link" onclick="showPopup('smart buildings', 'Properties with integrated technology systems')">smart buildings</span> and Internet of Things integration is creating new categories of property features and potentially affecting long-term investment values as technology becomes obsolete.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Platform capitalism', 'Business models based on digital platforms connecting users')">Platform capitalism</span> in property markets, exemplified by various PropTech startups, is challenging traditional intermediary roles while creating new forms of market concentration and potential regulatory concerns.
+                            </p>
+                        </div>
+
+                        <div class="reading-page" id="C1-page-4">
+                            <h3>Policy Interventions and Market Outcomes</h3>
+                            <p>
+                                Government interventions in property markets reflect complex balancing acts between promoting homeownership, ensuring market stability, and addressing social equity concerns. <span class="vocab-link" onclick="showPopup('Macroprudential regulation', 'Policies to maintain financial system stability')">Macroprudential regulation</span> attempts to prevent property bubbles while maintaining credit availability for legitimate buyers.
+                            </p>
+                            <p>
+                                <span class="vocab-link" onclick="showPopup('Inclusionary zoning', 'Requirements for developers to include affordable housing')">Inclusionary zoning</span> policies and other affordable housing mandates create complex interactions between market forces and social objectives, often with unintended consequences for overall housing supply.
+                            </p>
+                            <p>
+                                Tax policy instruments, including capital gains treatment, mortgage interest deductibility, and property taxes, significantly influence investment decisions and market dynamics. <span class="vocab-link" onclick="showPopup('Tax incidence', 'Who ultimately bears the burden of a tax')">Tax incidence</span> analysis reveals that intended policy outcomes may not align with actual market effects.
+                            </p>
+                            <p>
+                                The challenge of achieving <span class="vocab-link" onclick="showPopup('allocative efficiency', 'Optimal distribution of resources in economy')">allocative efficiency</span> in housing markets while addressing distributional concerns remains one of the most complex policy challenges facing contemporary governments, requiring sophisticated understanding of market mechanisms and social priorities.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Buying London</h2>
+                <div class="video-container">
+                    <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                        <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
+                            <iframe 
+                                src="https://www.youtube.com/embed/WlqYhER9Dd8?start=494" 
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <div class="slideshow-container">
+
+                    <div class="slide-content-wrapper">
+                        <!-- Navigation Arrows - Outside the white box -->
+                        <button class="slide-arrow prev" onclick="changeVideoSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeVideoSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <!-- Slide 1 -->
+                        <div class="discussion-slide active slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Legal Protection & Business Structure</h3>
+                                <p>The speaker strongly recommends using an <span class="vocab-link" onclick="showPopup('LLC', 'Limited Liability Company - a business structure that protects personal assets')">LLC</span> for rental properties. Do you think this level of legal protection is necessary? What are the risks of operating without proper business structure?</p>
+                                <ul>
+                                    <li>Personal <span class="vocab-link" onclick="showPopup('liability', 'legal responsibility for damages or debts')">liability</span> vs. business protection</li>
+                                    <li>Asset protection strategies for investors</li>
+                                    <li>Professional vs. DIY approach to legal setup</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Legal Protection" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Tenant Screening & Management</h3>
+                                <p>The video emphasizes that "getting a good tenant is crucial" and recommends <span class="vocab-link" onclick="showPopup('credit checks', 'financial background verification of potential tenants')">credit checks</span> and background screening. How important is thorough tenant screening? What are the consequences of poor tenant selection?</p>
+                                <ul>
+                                    <li>Balancing thorough screening with fair housing laws</li>
+                                    <li>Property management companies vs. self-management</li>
+                                    <li>Red flags to watch for in potential tenants</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Tenant Screening" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Financial Analysis & Deal Selection</h3>
+                                <p>The speaker warns that "if you just pick an average home... the numbers don't work out." How do you evaluate whether a rental property investment makes financial sense? What factors should investors consider?</p>
+                                <ul>
+                                    <li>Running the numbers: expenses vs. rental income</li>
+                                    <li>Comparing <span class="vocab-link" onclick="showPopup('comps', 'comparable properties used to determine market rent or value')">comps</span> and market research</li>
+                                    <li>Impact of <span class="vocab-link" onclick="showPopup('credit score', 'numerical rating of creditworthiness affecting loan terms')">credit score</span> on investment returns</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Financial Analysis" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Tax Strategies & Long-term Planning</h3>
+                                <p>The video mentions <span class="vocab-link" onclick="showPopup('depreciation', 'tax deduction allowing property owners to deduct property value decline')">depreciation</span> deductions and <span class="vocab-link" onclick="showPopup('like-kind exchange', '1031 exchange allowing tax-deferred property swaps')">like-kind exchanges</span> to avoid taxes. Are these tax advantages fair? How do they impact the broader housing market?</p>
+                                <ul>
+                                    <li>Tax benefits vs. social housing policy</li>
+                                    <li>Long-term wealth building through real estate</li>
+                                    <li>Alternative investments: REITs vs. direct ownership</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://static.wixstatic.com/media/593d03_227d8e5543af420080dc2bc4519bcdfd~mv2.jpeg" alt="Tax Planning" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide Indicators -->
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToVideoSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(4)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Property Market Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Basic Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Market Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(3, this)">Investment Terms</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Mortgage</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A loan to buy property, paid back over many years</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Deposit</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Initial payment when buying a house</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Estate Agent</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Professional who helps buy and sell properties</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Landlord</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Owner of property who rents it to tenants</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Tenant</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Person who pays rent to live in someone's property</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Lease</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Legal agreement to rent property for specific period</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Market</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">System of buying and selling properties</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Listing</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Advertisement for property for sale or rent</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Bid</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Offer to buy property at specific price</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Commission</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Percentage fee paid to estate agent</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Broker</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Professional who arranges property deals</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Valuation</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Professional assessment of property's worth</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-3">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Flip</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Buy, renovate and sell property quickly</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Portfolio</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Collection of properties owned by investor</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Yield</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Annual rental income as percentage of property value</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Equity</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Portion of property value that owner actually owns</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Capital Gains</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Profit made from selling property for more than bought</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Buy-to-let</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Purchasing property specifically to rent to tenants</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
+            <div class="section" id="quiz">
+                <h2>Property Vocabulary Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header" id="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div style="text-align: center; margin-bottom: 10px;">
+                                <span id="questionCounter" style="font-size: 1.2rem; font-weight: 600; color: #2d3748;">Question 1 of 10</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quizProgressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Quiz Questions Container -->
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be dynamically generated here -->
+                    </div>
+
+                    <!-- Results Page -->
+                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalQuizScore">0/10</div>
+                            <p>Well done! You've completed the Property Vocabulary quiz.</p>
+                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Popup -->
+    <div class="popup-overlay" id="vocabPopup">
+        <div class="popup-content">
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+            <button class="popup-close" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentReadingLevel = 'B1';
+        let currentSlide = 1;
+        let totalSlides = 5;
+        
+        // New Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        // Vocabulary Database from Flashcards
+        const vocabularyDatabase = [
+            { 
+                term: "Mortgage", 
+                definition: "A loan to buy property, paid back over many years", 
+                sentences: ["The bank approved my _____ application.", "I need to apply for a _____ to buy this house.", "The _____ interest rate is 3.5% per year."] 
+            },
+            { 
+                term: "Deposit", 
+                definition: "Initial payment when buying a house", 
+                sentences: ["I need to save money for a _____ before buying.", "The _____ required is 20% of the property value.", "She put down a large _____ on the apartment."] 
+            },
+            { 
+                term: "Estate Agent", 
+                definition: "Professional who helps buy and sell properties", 
+                sentences: ["The _____ showed us five different houses.", "I contacted an _____ to sell my flat.", "Our _____ found us the perfect home."] 
+            },
+            { 
+                term: "Landlord", 
+                definition: "Owner of property who rents it to tenants", 
+                sentences: ["The _____ increased the rent this month.", "Our _____ is very understanding about repairs.", "She became a _____ when she bought her second property."] 
+            },
+            { 
+                term: "Tenant", 
+                definition: "Person who pays rent to live in someone's property", 
+                sentences: ["The _____ has lived here for three years.", "As a _____, you have certain rights.", "The new _____ moved in last week."] 
+            },
+            { 
+                term: "Lease", 
+                definition: "Legal agreement to rent property for specific period", 
+                sentences: ["We signed a two-year _____ for the office.", "The _____ expires in December.", "Make sure to read the _____ carefully before signing."] 
+            },
+            { 
+                term: "Market", 
+                definition: "System of buying and selling properties", 
+                sentences: ["The property _____ is very competitive right now.", "House prices in this _____ have increased.", "It's a good time to enter the _____."] 
+            },
+            { 
+                term: "Listing", 
+                definition: "Advertisement for property for sale or rent", 
+                sentences: ["I saw an interesting property _____ online.", "The agent created a detailed _____ for our house.", "This _____ shows beautiful photos of the garden."] 
+            },
+            { 
+                term: "Bid", 
+                definition: "Offer to buy property at specific price", 
+                sentences: ["We made a _____ on the Victorian house.", "Their _____ was accepted by the seller.", "The highest _____ wins the property auction."] 
+            },
+            { 
+                term: "Commission", 
+                definition: "Percentage fee paid to estate agent", 
+                sentences: ["The agent earns 2% _____ on each sale.", "Real estate _____ rates vary by location.", "She calculated her _____ from this month's sales."] 
+            },
+            { 
+                term: "Broker", 
+                definition: "Professional who arranges property deals", 
+                sentences: ["The _____ helped negotiate the final price.", "I work as a property _____ in London.", "Our _____ has connections with many lenders."] 
+            },
+            { 
+                term: "Valuation", 
+                definition: "Professional assessment of property's worth", 
+                sentences: ["The property _____ came back higher than expected.", "We need an independent _____ for the mortgage.", "The _____ report shows the house is worth £300,000."] 
+            },
+            { 
+                term: "Flip", 
+                definition: "Buy, renovate and sell property quickly", 
+                sentences: ["They plan to _____ this house within six months.", "Property _____ can be very profitable.", "She decided to _____ the old cottage."] 
+            },
+            { 
+                term: "Portfolio", 
+                definition: "Collection of properties owned by investor", 
+                sentences: ["His property _____ includes ten rental units.", "She's building a diverse investment _____.", "The _____ generates steady monthly income."] 
+            },
+            { 
+                term: "Yield", 
+                definition: "Annual rental income as percentage of property value", 
+                sentences: ["This property offers a 6% rental _____.", "Calculate the _____ before making an investment.", "The _____ on city properties is typically lower."] 
+            },
+            { 
+                term: "Equity", 
+                definition: "Portion of property value that owner actually owns", 
+                sentences: ["I've built up £50,000 in _____ over five years.", "The _____ in their home has doubled.", "You can borrow against your property _____."] 
+            },
+            { 
+                term: "Capital Gains", 
+                definition: "Profit made from selling property for more than bought", 
+                sentences: ["They made significant _____ from the property sale.", "_____ tax applies to investment properties.", "The _____ from this sale will fund their next purchase."] 
+            },
+            { 
+                term: "Buy-to-let", 
+                definition: "Purchasing property specifically to rent to tenants", 
+                sentences: ["_____ investment requires careful planning.", "She specializes in _____ properties.", "The _____ market has grown significantly."] 
+            }
+        ];
+
+
+
+        // Initialize new quiz system
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            // Filter vocabulary to only include single words (no spaces or hyphens)
+            const singleWordVocab = vocabularyDatabase.filter(item =>
+                !item.term.includes(' ') && !item.term.includes('-')
+            );
+
+            // Shuffle the vocabulary array to ensure randomness
+            const shuffledVocab = [...singleWordVocab].sort(() => Math.random() - 0.5);
+
+            // Generate 10 unique questions
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, Math.min(3, vocabItem.term.length)) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+            
+            // Create HTML for all questions
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        // Generate HTML for quiz questions (text input only)
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+                
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+                
+                container.appendChild(questionDiv);
+            });
+        }
+
+
+        // Handle Enter key press in quiz inputs
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
+                }
+            }
+        }
+
+        // Check quiz answer (text input only)
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            
+            let isCorrect = false;
+            
+            // Text input validation
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+            
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+            
+            // Check for multiple acceptable answers (singular, plural, variations)
+            const correctAnswers = [
+                question.correctAnswer,
+                question.correctAnswer + 's',  // plural
+                question.correctAnswer + 'es', // plural for words ending in 's', 'x', 'z', 'ch', 'sh'
+                question.correctAnswer.replace(/y$/, 'ies'), // plural for words ending in 'y'
+                question.correctAnswer.replace(/f$/, 'ves'), // plural for words ending in 'f'
+                question.correctAnswer.replace(/fe$/, 'ves') // plural for words ending in 'fe'
+            ];
+
+            // Remove duplicates and filter out invalid plurals
+            const validAnswers = [...new Set(correctAnswers)].filter(answer =>
+                answer !== question.correctAnswer + 'ys' || question.correctAnswer.endsWith('y')
+            );
+
+            isCorrect = validAnswers.includes(userAnswer);
+            
+            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' : 
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+            
+            // Store answer
+            userQuizAnswers[questionNum] = isCorrect;
+            if (isCorrect) quizScore++;
+            
+            // Disable button
+            checkButton.disabled = true;
+            checkButton.style.opacity = '0.6';
+            
+            // Play sound effect if correct
+            if (isCorrect) {
+                const correctSound = new Audio('https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3');
+                correctSound.play().catch(e => console.log('Audio playbook failed:', e));
+            }
+            
+            updateQuizProgress();
+            
+            // Auto-advance after 2 seconds
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        // Show specific quiz question
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+
+                // Auto-focus on the input field for rapid typing
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        // Next question
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        // Previous question
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        // Update progress
+        function updateQuizProgress() {
+            const counter = document.getElementById('questionCounter');
+            const progressBar = document.getElementById('quizProgressFill');
+            
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+            
+            if (progressBar) {
+                const progressPercent = ((currentQuizQuestion - 1) / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        // Update navigation buttons
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+            
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        // Show quiz results
+        function showQuizResults() {
+            const questionsContainer = document.getElementById('quiz-questions-container');
+            const resultsPage = document.getElementById('quiz-results-page');
+            const finalScore = document.getElementById('finalQuizScore');
+            const quizHeader = document.getElementById('quiz-header');
+            
+            questionsContainer.style.display = 'none';
+            resultsPage.style.display = 'flex';
+            quizHeader.style.display = 'none';
+            
+            if (finalScore) {
+                finalScore.textContent = `${quizScore}/${totalQuizQuestions}`;
+            }
+        }
+
+        // Restart quiz
+        function restartVocabQuiz() {
+            const questionsContainer = document.getElementById('quiz-questions-container');
+            const resultsPage = document.getElementById('quiz-results-page');
+            const quizHeader = document.getElementById('quiz-header');
+            
+            // Reset display
+            questionsContainer.style.display = 'block';
+            resultsPage.style.display = 'none';
+            quizHeader.style.display = 'flex';
+            
+            // Reinitialize quiz
+            initializeVocabQuiz();
+        }
+
+        // Navigation functions
+        function showSection(sectionName, element) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function openWritingForm(element) {
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // Open Google Forms in new tab
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSfW2Wieh456joS23nFUFiUB_czgM1vBPVeZ8n1s-bCwolnQ6Q/viewform?usp=header', '_blank');
+            
+            // Remove active class after a short delay to show it was clicked
+            setTimeout(() => {
+                if (element) {
+                    element.classList.remove('active');
+                }
+                // Reset to discussion tab as default
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            }, 300);
+        }
+
+        function showReadingLevel(level, element) {
+            // Hide all reading levels
+            const levels = document.querySelectorAll('.reading-level');
+            levels.forEach(levelDiv => levelDiv.style.display = 'none');
+            
+            // Remove active class from all level buttons
+            const buttons = document.querySelectorAll('.reading-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected level
+            document.getElementById(level + '-level').style.display = 'block';
+            currentReadingLevel = level;
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // Reset subnav to first page
+            showReadingPage(1, document.querySelectorAll('.reading-subnav .page-btn')[0]);
+        }
+
+        function showReadingPage(pageNum, element) {
+            // Hide all reading pages in current level
+            const pages = document.querySelectorAll(`#${currentReadingLevel}-level .reading-page`);
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all subnav buttons
+            const buttons = document.querySelectorAll('.reading-subnav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(`${currentReadingLevel}-page-` + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function showVocabPage(pageNum, element) {
+            // Hide all vocab pages
+            const pages = document.querySelectorAll('.vocab-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all page buttons
+            const buttons = document.querySelectorAll('.vocab-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // Flashcard function with sound effect
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            
+            // Play sound effect
+            const flipSound = document.getElementById('flipSound');
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => {
+                    console.log('Audio playback failed:', e);
+                });
+            }
+        }
+
+        // Vocabulary popup functions
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Discussion Slideshow Functions
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            
+            currentSlide += direction;
+            
+            if (currentSlide > totalSlides) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = totalSlides;
+            }
+            
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            
+            currentSlide = slideNum;
+            
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        // Video slideshow variables
+        let currentVideoSlide = 1;
+        let totalVideoSlides = 4;
+
+        // Video slideshow navigation functions
+        function changeVideoSlide(direction) {
+            const slides = document.querySelectorAll('#video-discussions .discussion-slide');
+            const dots = document.querySelectorAll('#video-discussions .indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide += direction;
+
+            if (currentVideoSlide > totalVideoSlides) {
+                currentVideoSlide = 1;
+            }
+            if (currentVideoSlide < 1) {
+                currentVideoSlide = totalVideoSlides;
+            }
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        function goToVideoSlide(slideNum) {
+            const slides = document.querySelectorAll('#video-discussions .discussion-slide');
+            const dots = document.querySelectorAll('#video-discussions .indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide = slideNum;
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        // Keyboard navigation for slideshow
+        document.addEventListener('keydown', function(e) {
+            const discussionSection = document.getElementById('discussion');
+            const videoDiscussionSection = document.getElementById('video-discussions');
+
+            if (discussionSection && discussionSection.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') {
+                    changeSlide(-1);
+                } else if (e.key === 'ArrowRight') {
+                    changeSlide(1);
+                }
+            } else if (videoDiscussionSection && videoDiscussionSection.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') {
+                    changeVideoSlide(-1);
+                } else if (e.key === 'ArrowRight') {
+                    changeVideoSlide(1);
+                }
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz(); // Initialize the new vocabulary-based quiz
+            
+            // Close popup when clicking outside
+            document.getElementById('vocabPopup').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePopup();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
