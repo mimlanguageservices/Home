@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png">
+    <link rel="shortcut icon" type="image/png" href="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png">
+    <link rel="apple-touch-icon" href="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png">
+    <title>Anna Russia - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px 40px 40px 40px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border: 4px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .teacher-name {
+            color: #2d3748;
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .teacher-title {
+            color: #4a5568;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-label {
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flag-icon {
+            width: 24px;
+            height: 16px;
+            border-radius: 2px;
+            object-fit: cover;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        .students-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .students-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .students-title {
+            color: #2d3748;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .students-subtitle {
+            color: #4a5568;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .student-card {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .student-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .student-picture {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 10px;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .student-name {
+            color: #2d3748;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .student-status {
+            color: #4a5568;
+            font-size: 0.8rem;
+            font-weight: 400;
+            margin-bottom: 12px;
+        }
+
+        .student-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .student-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 70px;
+            white-space: nowrap;
+        }
+
+        .student-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .student-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Students navigation similar to reading section */
+        .students-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .students-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
+
+        .students-content {
+            display: none;
+            flex: 1;
+        }
+
+        .students-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            /* Prevent horizontal overflow */
+            html, body {
+                overflow-x: hidden;
+                max-width: 100vw;
+            }
+
+            .navigation {
+                width: 100%;
+                height: auto;
+                min-height: 60px;
+                padding: 5px;
+                display: flex;
+                overflow-x: hidden;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                background: rgba(45, 55, 72, 0.95);
+                flex-wrap: nowrap;
+                gap: 3px;
+                align-items: stretch;
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 70px;
+                margin: 2px;
+                font-size: 0.8rem;
+                padding: 8px 6px;
+                text-align: center;
+                white-space: normal;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                line-height: 1.2;
+                height: auto;
+                min-height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Hide Vocabulary tab on mobile */
+            .nav-item[onclick*="vocabulary"] {
+                display: none !important;
+            }
+
+            .container {
+                flex-direction: column;
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
+            }
+
+            .content {
+                height: auto;
+                overflow-y: auto;
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            .section {
+                padding: 15px 8px;
+                width: 100%;
+                max-width: 100vw;
+                box-sizing: border-box;
+            }
+
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                width: 100%;
+                padding: 0;
+            }
+
+            /* Profile grid - single column on mobile */
+            .section h2 {
+                font-size: 1.5rem;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            /* Main content grid - single column */
+            .section .main-content > div:has(.profile-header) + div {
+                grid-template-columns: 1fr !important;
+                gap: 10px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            /* Profile sections styling */
+            .section .main-content > div:has(.profile-header) + div > div {
+                width: 100%;
+                max-width: 100%;
+                box-sizing: border-box;
+                padding: 12px;
+                margin: 0;
+                word-break: break-word;
+                overflow-wrap: break-word;
+            }
+
+            .header {
+                padding: 8px 10px;
+                flex-wrap: wrap;
+                gap: 8px;
+                width: 100%;
+                max-width: 100vw;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+
+            .header-left {
+                flex: 1;
+                min-width: 0;
+                max-width: calc(100% - 90px);
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                line-height: 1.2;
+                margin: 0;
+            }
+
+            .header .website a {
+                font-size: 0.8rem;
+                word-break: break-all;
+            }
+
+            .header-image {
+                width: 70px;
+                height: 45px;
+                flex-shrink: 0;
+            }
+
+            .profile-card {
+                padding: 20px 15px;
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
+                box-sizing: border-box;
+            }
+
+            .teacher-name {
+                font-size: 1.4rem;
+                word-break: break-word;
+            }
+
+            .students-section {
+                padding: 20px 15px;
+                max-width: 100%;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .students-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .student-card {
+                padding: 12px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* Contact section grid fix */
+            .section#contact .main-content > div > div {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px;
+            }
+
+            /* Profile section specific mobile fixes */
+            .section#profile div[style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+
+            .section#profile div[style*="grid-column: 1 / -1"] {
+                grid-column: 1 / -1 !important;
+            }
+
+            /* Contact section mobile fixes */
+            .section#contact {
+                padding: 0 !important;
+                overflow: hidden;
+            }
+
+            .section#contact h2 {
+                display: none !important; /* Hide "Contact Teacher" */
+            }
+
+            .section#contact > div {
+                height: 100% !important;
+                padding: 10px !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+
+            .section#contact > div > div {
+                background: none !important; /* Remove white background */
+                backdrop-filter: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+
+            .section#contact h3 {
+                display: none !important; /* Hide "Contact Your Teacher" */
+            }
+
+            .section#contact > div > div > p {
+                display: none !important; /* Hide bottom text */
+            }
+
+            .section#contact div[style*="grid-template-columns: repeat(3, 1fr)"] {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px !important;
+                padding: 20px 10px !important;
+            }
+
+            .section#contact div[style*="text-align: center; cursor: pointer"] {
+                padding: 15px 10px !important;
+                background: rgba(255, 255, 255, 0.1) !important;
+                border-radius: 12px !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            .section#contact img {
+                width: 40px !important;
+                height: 40px !important;
+                margin-bottom: 8px !important;
+            }
+
+            .section#contact p {
+                font-size: 0.85rem !important;
+                margin: 0 !important;
+                color: #2d3748 !important; /* Black text for mobile */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 6px 8px;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+                line-height: 1.2;
+            }
+
+            .header .website a {
+                font-size: 0.7rem;
+            }
+
+            .header-image {
+                width: 50px;
+                height: 35px;
+            }
+
+            .nav-item {
+                font-size: 0.7rem;
+                padding: 6px 3px;
+                min-width: 60px;
+                min-height: 45px;
+                white-space: normal;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                line-height: 1.1;
+            }
+
+            /* Hide Vocabulary tab on small mobile too */
+            .nav-item[onclick*="vocabulary"] {
+                display: none !important;
+            }
+
+            .section {
+                padding: 10px 5px;
+            }
+
+            /* Ensure single column on very small screens */
+            .section#contact .main-content > div > div {
+                grid-template-columns: 1fr !important;
+                gap: 10px;
+            }
+
+            /* Contact section - single column for very small screens */
+            .section#contact div[style*="grid-template-columns: repeat(3, 1fr)"],
+            .section#contact div[style*="grid-template-columns: repeat(2, 1fr)"] {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                padding: 15px 5px !important;
+            }
+
+            .section#contact img {
+                width: 35px !important;
+                height: 35px !important;
+            }
+
+            .section#contact p {
+                font-size: 0.75rem !important;
+                color: #2d3748 !important; /* Black text for very small mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Anna Russia</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="https://www.mimlanguageservices.com/" target="_blank">
+                <img src="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png" alt="MIM Language Services" class="header-image">
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('profile', this)">Profile</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('activities', this)">Finished Activities</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            <div class="nav-item" onclick="showSection('contact', this)">
+                <span style="font-size: 1.2rem; margin-right: 8px;">☎</span>Contact
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Profile Section -->
+            <div class="section active" id="profile">
+                <h2>👤 Student Profile</h2>
+                <div style="height: calc(100% - 60px); display: flex; flex-direction: column; padding: 20px;">
+
+                    <!-- Top Section: Photo and Name -->
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <img src="https://via.placeholder.com/100x100?text=Student" alt="Student Photo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); border: 3px solid rgba(255, 255, 255, 0.8);">
+                        <h3 style="color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0;">Anna Russia</h3>
+                    </div>
+
+                    <!-- Main Content Grid -->
+                    <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto auto auto; gap: 15px;">
+
+                        <!-- Nationality -->
+                        <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 8px;">🌍</span>
+                            <div>
+                                <h4 style="color: #2d3748; font-size: 0.9rem; font-weight: 600; margin: 0;">Nationality</h4>
+                                <p style="color: #4a5568; font-size: 0.85rem; margin: 0;"></p>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 8px;">📍</span>
+                            <div>
+                                <h4 style="color: #2d3748; font-size: 0.9rem; font-weight: 600; margin: 0;">Location</h4>
+                                <p style="color: #4a5568; font-size: 0.85rem; margin: 0;"></p>
+                            </div>
+                        </div>
+
+                        <!-- Place of Work/Study -->
+                        <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 8px;">🏢</span>
+                            <div>
+                                <h4 style="color: #2d3748; font-size: 0.9rem; font-weight: 600; margin: 0;">Workplace/Study</h4>
+                                <p style="color: #4a5568; font-size: 0.85rem; margin: 0;"></p>
+                            </div>
+                        </div>
+
+                        <!-- Role -->
+                        <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 8px;">💼</span>
+                            <div>
+                                <h4 style="color: #2d3748; font-size: 0.9rem; font-weight: 600; margin: 0;">Role</h4>
+                                <p style="color: #4a5568; font-size: 0.85rem; margin: 0;">Student</p>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 8px;">📧</span>
+                            <div>
+                                <h4 style="color: #2d3748; font-size: 0.9rem; font-weight: 600; margin: 0;">Email</h4>
+                                <p style="color: #4a5568; font-size: 0.85rem; margin: 0;"></p>
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 8px;">📱</span>
+                            <div>
+                                <h4 style="color: #2d3748; font-size: 0.9rem; font-weight: 600; margin: 0;">Phone</h4>
+                                <p style="color: #4a5568; font-size: 0.85rem; margin: 0; cursor: pointer;" onclick="window.open('https://wa.me/', '_blank')"></p>
+                            </div>
+                        </div>
+
+                        <!-- Student Level -->
+                        <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 8px;">🎓</span>
+                            <div>
+                                <h4 style="color: #2d3748; font-size: 0.9rem; font-weight: 600; margin: 0;">Student Level</h4>
+                                <p style="color: #4a5568; font-size: 0.85rem; margin: 0;"></p>
+                            </div>
+                        </div>
+
+                        <!-- Learning Objectives - Spans 2 columns -->
+                        <div style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.4); grid-column: 1 / -1; display: flex; flex-direction: column;">
+                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 1.2rem; margin-right: 8px;">🎯</span>
+                                <h4 style="color: #2d3748; font-size: 1rem; font-weight: 600; margin: 0;">Learning Objectives</h4>
+                            </div>
+                            <div style="color: #4a5568; font-size: 0.85rem; line-height: 1.4;">
+                                
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <div style="height: 100%; padding: 10px; display: flex; flex-direction: column;">
+                    <!-- Google Sheets Embed - Maximized -->
+                    <iframe
+                        src=""
+                        style="width: 100%; height: 100%; border: none; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);"
+                        title="Student Vocabulary Tracker">
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- Finished Activities Section -->
+            <div class="section" id="activities">
+                <div style="height: 100%; padding: 10px; display: flex; flex-direction: column;">
+                    <!-- Finished Activities Content Container -->
+                    <div id="activitiesContent" style="width: 100%; height: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); background: rgba(255, 255, 255, 0.95); display: flex; flex-direction: column;">
+                        <div style="padding: 20px; text-align: center; border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
+                            <h3 style="color: #2d3748; margin: 0; font-size: 1.5rem; font-weight: 700;">Finished Activities</h3>
+                            <p style="color: #4a5568; margin: 5px 0 0 0; font-size: 0.9rem;">Activities completed for Anna Russia</p>
+                        </div>
+                        <div id="activitiesList" style="flex: 1; padding: 20px; overflow-y: auto;">
+                            <div style="text-align: center; color: #666; padding: 40px;"><p>No finished activities yet.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <div style="height: 100%; padding: 10px; display: flex; flex-direction: column;">
+                    <!-- Google Doc Embed - Maximized -->
+                    <iframe
+                        src=""
+                        style="width: 100%; height: 100%; border: none; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);"
+                        title="Writing Assignment Document">
+                    </iframe>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="section" id="contact">
+                <h2><span style="font-size: 2rem; margin-right: 10px;">☎</span>Contact Teacher</h2>
+                <div style="height: calc(100% - 60px); padding: 30px; display: flex; justify-content: center; align-items: center;">
+                    <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); border: 1px solid rgba(255, 255, 255, 0.3); max-width: 600px; width: 100%;">
+
+                        <h3 style="color: #2d3748; text-align: center; margin-bottom: 30px; font-size: 1.8rem; font-weight: 600;">Contact Your Teacher</h3>
+
+                        <!-- App Icons Grid -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px;">
+
+                            <!-- WhatsApp -->
+                            <div style="text-align: center; cursor: pointer; padding: 20px; border-radius: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.4);" onmouseover="this.style.transform='translateY(-5px)'; this.style.background='rgba(255, 255, 255, 0.7)'" onmouseout="this.style.transform='translateY(0px)'; this.style.background='rgba(255, 255, 255, 0.4)'" onclick="window.open('https://wa.me/573016730018', '_blank')">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style="width: 60px; height: 60px; margin-bottom: 10px;">
+                                <p style="color: #2d3748; font-weight: 600; font-size: 1rem;">WhatsApp</p>
+                            </div>
+
+                            <!-- Class Link -->
+                            <div style="text-align: center; cursor: pointer; padding: 20px; border-radius: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.4);" onmouseover="this.style.transform='translateY(-5px)'; this.style.background='rgba(255, 255, 255, 0.7)'" onmouseout="this.style.transform='translateY(0px)'; this.style.background='rgba(255, 255, 255, 0.4)'" onclick="window.open('', '_blank')">
+                                <img id="classLinkIcon" src="" alt="Class Link" style="width: 60px; height: 60px; margin-bottom: 10px; object-fit: contain;">
+                                <p style="color: #2d3748; font-weight: 600; font-size: 1rem;">Class Link</p>
+                            </div>
+
+                            <!-- Email -->
+                            <div style="text-align: center; cursor: pointer; padding: 20px; border-radius: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.4);" onmouseover="this.style.transform='translateY(-5px)'; this.style.background='rgba(255, 255, 255, 0.7)'" onmouseout="this.style.transform='translateY(0px)'; this.style.background='rgba(255, 255, 255, 0.4)'" onclick="window.open('mailto:admin@mimlanguageservices.com', '_blank')">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Email" style="width: 60px; height: 60px; margin-bottom: 10px;">
+                                <p style="color: #2d3748; font-weight: 600; font-size: 1rem;">Email</p>
+                            </div>
+
+                            <!-- Facebook -->
+                            <div style="text-align: center; cursor: pointer; padding: 20px; border-radius: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.4);" onmouseover="this.style.transform='translateY(-5px)'; this.style.background='rgba(255, 255, 255, 0.7)'" onmouseout="this.style.transform='translateY(0px)'; this.style.background='rgba(255, 255, 255, 0.4)'" onclick="window.open('https://www.facebook.com/Mimlanguageservices', '_blank')">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" style="width: 60px; height: 60px; margin-bottom: 10px;">
+                                <p style="color: #2d3748; font-weight: 600; font-size: 1rem;">Facebook</p>
+                            </div>
+
+                            <!-- Instagram -->
+                            <div style="text-align: center; cursor: pointer; padding: 20px; border-radius: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.4);" onmouseover="this.style.transform='translateY(-5px)'; this.style.background='rgba(255, 255, 255, 0.7)'" onmouseout="this.style.transform='translateY(0px)'; this.style.background='rgba(255, 255, 255, 0.4)'" onclick="window.open('https://www.instagram.com/mimlanguageservices/', '_blank')">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" style="width: 60px; height: 60px; margin-bottom: 10px;">
+                                <p style="color: #2d3748; font-weight: 600; font-size: 1rem;">Instagram</p>
+                            </div>
+
+                            <!-- TikTok -->
+                            <div style="text-align: center; cursor: pointer; padding: 20px; border-radius: 15px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.4);" onmouseover="this.style.transform='translateY(-5px)'; this.style.background='rgba(255, 255, 255, 0.7)'" onmouseout="this.style.transform='translateY(0px)'; this.style.background='rgba(255, 255, 255, 0.4)'" onclick="window.open('https://www.tiktok.com/@mimlanguageservices?lang=en', '_blank')">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok" style="width: 60px; height: 60px; margin-bottom: 10px;">
+                                <p style="color: #2d3748; font-weight: 600; font-size: 1rem;">TikTok</p>
+                            </div>
+
+                        </div>
+
+                        <p style="text-align: center; margin-top: 25px; color: #4a5568; font-size: 0.95rem;">Choose your preferred way to contact Jerome</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Navigation functionality
+        function showSection(sectionId, element) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            // Show selected section and mark nav item as active
+            document.getElementById(sectionId).classList.add('active');
+            element.classList.add('active');
+
+            // No special handling needed for activities section anymore
+        }
+
+        // Dynamic icon selection based on class link type
+        function setClassLinkIcon() {
+            const classLink = '';
+            const iconElement = document.getElementById('classLinkIcon');
+
+            if (!iconElement || !classLink) return;
+
+            let iconUrl;
+
+            if (classLink.includes('teams.microsoft.com') || classLink.includes('teams.live.com')) {
+                iconUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg/1200px-Microsoft_Office_Teams_%282018%E2%80%93present%29.svg.png';
+            } else if (classLink.includes('meet.google.com')) {
+                iconUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Meet_icon_%282020%29.svg/512px-Google_Meet_icon_%282020%29.svg.png?20221213135236';
+            } else {
+                iconUrl = 'https://static.wixstatic.com/media/593d03_b3673f0bdf4248fc9cbbb9a009330935~mv2.jpg';
+            }
+
+            iconElement.src = iconUrl;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setClassLinkIcon();
+        });
+
+    </script>
+</body>
+</html>
