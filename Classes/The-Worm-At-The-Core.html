@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salsa Dancing - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .slide-image-only {
+            padding: 0;
+        }
+
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            max-width: 50%;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .slide-text-section-left ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .slide-text-section-left li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        .slide-image-section-right {
+            width: 45%;
+            max-width: 50%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -60px;
+        }
+
+        .slide-arrow.next {
+            right: -60px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: block;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 320px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        /* Video Section */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 15px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: visible;
+        }
+
+        #video {
+            overflow: visible;
+        }
+
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 15px 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .nav-item {
+                flex: 1 1 auto;
+                min-width: 120px;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .section h2 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+
+            .slideshow-container {
+                padding: 20px;
+            }
+
+            .slide-horizontal {
+                flex-direction: column !important;
+            }
+
+            .slide-text-section-left {
+                max-width: 100%;
+                padding-right: 0;
+            }
+
+            .slide-image-section-right {
+                width: 100%;
+                max-width: 100%;
+                height: 250px;
+            }
+
+            .slide-arrow {
+                width: 40px;
+                height: 40px;
+            }
+
+            .slide-arrow.prev {
+                left: 10px;
+            }
+
+            .slide-arrow.next {
+                right: 10px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Salsa Dancing</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Quiz</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section with Slideshow -->
+            <div class="section active" id="discussion">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1 - Image Only -->
+                        <div class="discussion-slide active slide-image-only">
+                            <img src="https://static.wixstatic.com/media/593d03_2c3957ea2b8e45bb8a7ce49132872a53~mv2.jpg" alt="Salsa dancing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Getting Started with Salsa</h3>
+                                <p>Beginning salsa dancing can feel overwhelming, but everyone starts as a beginner. The key is finding the right learning environment and being patient with yourself as you develop rhythm, coordination, and confidence.</p>
+                                <ul>
+                                    <li>What would motivate you to try salsa dancing?</li>
+                                    <li>Do you prefer learning in group classes or private lessons?</li>
+                                    <li>How important is having a dedicated practice partner?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=800&h=600&fit=crop" alt="Salsa beginners class" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Music and Rhythm</h3>
+                                <p>Understanding salsa music is essential for dancing. The clave rhythm forms the foundation, while percussion instruments like congas, timbales, and bongos create layers of complexity. Learning to hear and feel these rhythms transforms dancing from mechanical steps to musical expression.</p>
+                                <ul>
+                                    <li>How does music influence your mood and movement?</li>
+                                    <li>Can you recognize different instruments in salsa music?</li>
+                                    <li>Is dancing "on beat" natural or does it require practice?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&h=600&fit=crop" alt="Live salsa band" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Social Dancing Culture</h3>
+                                <p>Salsa thrives in social dance venues worldwide. These spaces bring together people from diverse backgrounds united by their love of dance. Social dancing emphasizes connection, fun, and mutual respect over perfection or competition.</p>
+                                <ul>
+                                    <li>What makes a good social dance atmosphere?</li>
+                                    <li>How do dancers communicate respect on the dance floor?</li>
+                                    <li>Why might someone prefer social dancing over performances?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&h=600&fit=crop" alt="Social salsa dancing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Physical and Mental Benefits</h3>
+                                <p>Salsa provides excellent cardiovascular exercise while improving coordination, balance, and flexibility. Beyond physical benefits, dancing reduces stress, boosts confidence, and creates opportunities for meaningful social connections. Many dancers describe it as meditation in motion.</p>
+                                <ul>
+                                    <li>How can dancing improve overall well-being?</li>
+                                    <li>What mental challenges does learning dance present?</li>
+                                    <li>Can dance replace traditional exercise routines?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1545224144-b38cd309ef69?w=800&h=600&fit=crop" alt="Fitness and dance" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Cultural Exchange and Evolution</h3>
+                                <p>As salsa spreads globally, it absorbs influences from local cultures while maintaining Caribbean roots. This evolution raises questions about authenticity, cultural appropriation, and respect for traditions. Yet salsa's adaptability demonstrates how culture thrives through sharing and transformation.</p>
+                                <ul>
+                                    <li>How do dances change when adopted by new cultures?</li>
+                                    <li>Is it important to learn about salsa's cultural origins?</li>
+                                    <li>Can cultural exchange happen respectfully through dance?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&h=600&fit=crop" alt="Cultural dance performance" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(6)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>The World of Salsa Dancing</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('A2', this)">A2 Level</button>
+                        <button class="page-btn" onclick="showReadingLevel('B1', this)">B1 Level</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Level</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Level</button>
+                    </div>
+
+                    <!-- A2 Level -->
+                    <div class="reading-level" id="A2-level">
+                        <div class="reading-page">
+                            <h3>Learning Salsa Dancing</h3>
+                            <p>Salsa is a fun and exciting dance from Latin America. People dance salsa all over the world. It is a partner dance, which means two people dance together. The music is fast and has a strong <span class="vocab-link" onclick="showPopup('rhythm', 'a regular pattern of sounds or beats in music')">rhythm</span>.</p>
+
+                            <p><strong>Getting Started:</strong> To learn salsa, you need to learn the basic <span class="vocab-link" onclick="showPopup('steps', 'movements of the feet in dancing')">steps</span>. The basic step is easy. You step forward, then to the side, then back. You move your hips naturally as you step. At first, it feels strange, but with practice, it becomes easier.</p>
+
+                            <p><strong>Dancing with a Partner:</strong> In salsa, one person is the <span class="vocab-link" onclick="showPopup('lead', 'the person who guides the dance')">lead</span> and one person is the <span class="vocab-link" onclick="showPopup('follow', 'the person who responds to the leads signals')">follow</span>. The lead decides which moves to do. The follow responds to the lead's signals. Both roles are important. You hold hands and keep your arm in a good position. This is called the dance <span class="vocab-link" onclick="showPopup('frame', 'the position of arms and hands in partner dancing')">frame</span>.</p>
+
+                            <p><strong>The Music:</strong> Salsa music is happy and energetic. It has many instruments like drums, piano, and trumpets. The music has eight beats. You dance on some beats and pause on others. Listening to the music helps you dance better. Many people love salsa music even when they are not dancing.</p>
+
+                            <p><strong>Why People Love Salsa:</strong> Salsa dancing is great exercise. It makes you fit and healthy. It is also very social. You meet new people and make friends. Many cities have salsa clubs where people go to dance. At these clubs, you can practice your <span class="vocab-link" onclick="showPopup('moves', 'dance steps and patterns')">moves</span> and dance with different partners. Salsa makes people happy and helps them forget their worries.</p>
+                        </div>
+                    </div>
+
+                    <!-- B1 Level -->
+                    <div class="reading-level" id="B1-level" style="display: none;">
+                        <div class="reading-page">
+                            <h3>The Art of Salsa Dancing</h3>
+                            <p>Salsa dancing has become a global phenomenon, captivating people across continents with its infectious <span class="vocab-link" onclick="showPopup('rhythm', 'a strong, regular repeated pattern of sound')">rhythm</span> and passionate movements. While the dance originated in the Caribbean, it has evolved into various styles, each with distinct characteristics and cultural influences.</p>
+
+                            <p><strong>Historical Background:</strong> Salsa emerged in New York City during the 1960s and 1970s, created by Latin American immigrants who combined their traditional dances and music. The name "salsa" (Spanish for "sauce") represents the spicy blend of different dance forms including son cubano, mambo, and cha-cha-cha. This fusion created a unique dance style that continues to evolve today.</p>
+
+                            <p><strong>Learning the Fundamentals:</strong> Beginners start with the basic <span class="vocab-link" onclick="showPopup('step', 'a movement made by lifting the foot and putting it down')">step</span>, which follows an eight-count pattern. The most common styles are "on1" (breaking forward on count 1) and "on2" (breaking forward on count 2). Mastering timing is crucial, as dancers must synchronize their movements with the music's <span class="vocab-link" onclick="showPopup('beat', 'the basic rhythm or pulse of music')">beat</span>. Hip movement, a signature element of salsa, emerges naturally from proper footwork rather than forced motion.</p>
+
+                            <p><strong>Partnership Dynamics:</strong> Salsa requires effective communication between partners. The <span class="vocab-link" onclick="showPopup('lead', 'the partner who initiates and guides movements')">lead</span> communicates intentions through hand pressure, body positioning, and arm movements. The <span class="vocab-link" onclick="showPopup('follow', 'the partner who interprets and responds to signals')">follow</span> maintains receptiveness to these signals while adding personal <span class="vocab-link" onclick="showPopup('styling', 'individual flair and expression in dance')">styling</span>. Both partners maintain a proper <span class="vocab-link" onclick="showPopup('frame', 'the structural position of arms and posture')">frame</span>—the positioning of arms, hands, and upper body that facilitates smooth <span class="vocab-link" onclick="showPopup('turns', 'rotating movements in dance')">turns</span> and transitions.</p>
+
+                            <p><strong>Musical Understanding:</strong> Developing musicality enhances dancing significantly. Salsa music typically features a <span class="vocab-link" onclick="showPopup('clave', 'a fundamental rhythm pattern in Latin music')">clave</span> rhythm that serves as the song's backbone. Experienced dancers learn to identify musical breaks, instrument solos, and rhythmic patterns, adjusting their dancing to match the music's energy and mood. This musical awareness transforms mechanical steps into expressive, dynamic movement.</p>
+
+                            <p><strong>Social and Cultural Aspects:</strong> Salsa transcends mere exercise; it creates community. Social dancing venues, from casual clubs to formal <span class="vocab-link" onclick="showPopup('congresses', 'large salsa dance events with workshops and performances')">congresses</span>, provide spaces for cultural exchange and connection. The dance floor becomes a place where age, background, and language barriers dissolve. Many dancers describe the salsa community as welcoming and inclusive, united by shared passion for music and movement. Regular practice not only improves technical skill but also builds confidence, reduces stress, and fosters lasting friendships.</p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-page">
+                            <h3>Salsa Dancing: Culture, Technique, and Community</h3>
+                            <p>Salsa dancing represents a fascinating intersection of cultural heritage, athletic skill, and social interaction. What began as a grassroots movement among Latin American communities in New York has evolved into a sophisticated dance form practiced worldwide, characterized by complex <span class="vocab-link" onclick="showPopup('footwork', 'intricate movements and patterns executed with the feet')">footwork</span>, dynamic partner work, and expressive musicality.</p>
+
+                            <p><strong>Cultural Evolution and Regional Styles:</strong> The term "salsa" emerged in the 1960s, though the dance draws from earlier Caribbean traditions. Cuban salsa (Casino) emphasizes circular patterns and Afro-Cuban body movement. New York style (dancing "on2") prioritizes elegance and linear patterns synchronized with the music's tumbao. Los Angeles style (dancing "on1") features dramatic dips, drops, and theatrical <span class="vocab-link" onclick="showPopup('styling', 'personal expression and flair added to basic movements')">styling</span>. Colombian salsa incorporates rapid <span class="vocab-link" onclick="showPopup('footwork', 'quick, intricate foot movements')">footwork</span> and close partner connection. These regional variations reflect different cultural influences and aesthetic preferences, yet all share fundamental salsa principles.</p>
+
+                            <p><strong>Technical Foundations:</strong> Effective salsa dancing requires mastering several technical elements. Timing and musicality form the foundation—dancers must internalize the eight-count structure while remaining responsive to the music's nuances. The <span class="vocab-link" onclick="showPopup('clave', 'the foundational rhythmic pattern underlying salsa music')">clave</span> rhythm, either 2-3 or 3-2, provides the musical backbone that informs phrasing and expression. Body movement involves controlled weight transfers, natural hip action resulting from proper footwork, and maintained <span class="vocab-link" onclick="showPopup('posture', 'the position and bearing of the body')">posture</span> that facilitates both aesthetic appeal and functional partnership.</p>
+
+                            <p><strong>Partnership Mechanics:</strong> The <span class="vocab-link" onclick="showPopup('lead-follow', 'the communication system between dance partners')">lead-follow</span> relationship in salsa transcends simple signal-response; it constitutes a sophisticated communication system. Effective leads provide clear, timely signals through connection points—primarily hands but also through body positioning and momentum. Skilled followers maintain receptiveness without anticipation, responding to actual signals rather than predicted patterns. This dynamic requires both partners to maintain appropriate <span class="vocab-link" onclick="showPopup('tension', 'controlled resistance in partner connection')">tension</span>—neither pulling nor pushing, but maintaining active connection that facilitates complex <span class="vocab-link" onclick="showPopup('combinations', 'sequences of multiple dance moves')">combinations</span> including <span class="vocab-link" onclick="showPopup('turns', 'rotational movements')">turns</span>, <span class="vocab-link" onclick="showPopup('dips', 'dramatic lowering movements')">dips</span>, and <span class="vocab-link" onclick="showPopup('shine', 'solo footwork performed without partner contact')">shines</span> (solo footwork sections).</p>
+
+                            <p><strong>Musical Interpretation:</strong> Advanced dancers develop sophisticated musicality, moving beyond basic timing to interpret musical nuances. This involves recognizing instrument solos (piano, timbales, congas) and adjusting movement to highlight these moments. Dancers learn to "play" with the music—accelerating during high-energy sections, incorporating pauses during breaks, and matching styling to melodic phrasing. Some dancers develop such refined musical sensitivity that their movement becomes a visual representation of the music's structure and emotion.</p>
+
+                            <p><strong>Social Dimensions and Community:</strong> Salsa's social nature distinguishes it from purely performative dance forms. Social dancing emphasizes connection, enjoyment, and inclusivity over technical perfection. The global salsa community maintains shared etiquette: inviting others to dance regardless of skill level, rotating partners throughout the evening, and thanking partners after each dance. <span class="vocab-link" onclick="showPopup('Congresses', 'multi-day salsa events featuring workshops, performances, and social dancing')">Congresses</span> and festivals create temporary communities where dancers from different cities and countries converge, exchange techniques, and celebrate their shared passion. These events often feature workshops with renowned instructors, competitions showcasing elite dancers, and marathon social dancing sessions extending into early morning hours. The community aspect often proves as addictive as the dancing itself, with many participants describing their salsa network as an extended family spanning continents.</p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-page">
+                            <h3>Salsa Dancing: Embodied Culture and Transnational Community</h3>
+                            <p>Salsa dancing constitutes a complex cultural phenomenon that transcends its classification as mere recreational activity. As both artistic practice and social institution, salsa embodies the transnational flow of Latin American cultural forms, representing a dynamic synthesis of African diasporic traditions, Caribbean musical evolution, and contemporary global dance culture. The dance form's technical sophistication, cultural significance, and capacity for fostering transcultural connection merit serious scholarly and practical attention.</p>
+
+                            <p><strong>Historical Trajectory and Cultural Hybridization:</strong> Salsa's emergence in 1960s-70s New York City represents a paradigmatic example of cultural <span class="vocab-link" onclick="showPopup('hybridity', 'the mixing of different cultural elements to create something new')">hybridity</span>. Cuban son, Puerto Rican plena and bomba, Dominican merengue, and Colombian cumbia converged in urban Latino communities, creating a distinctly cosmopolitan form that maintained Caribbean roots while developing new characteristics. The term "salsa"—adopted by Fania Records for marketing purposes—successfully branded this musical-choreographic complex, facilitating its globalization. Contemporary salsa encompasses multiple codified styles: Cuban Casino with its circular rueda formations and Afro-Cuban body <span class="vocab-link" onclick="showPopup('isolations', 'movements of individual body parts independent of others')">isolations</span>; New York "on2" style emphasizing musicality and the tumbao rhythm; Los Angeles "on1" style incorporating theatrical elements and extended <span class="vocab-link" onclick="showPopup('partnerwork', 'collaborative movements between dance partners')">partnerwork</span>; and Colombian style featuring rapid, intricate <span class="vocab-link" onclick="showPopup('footwork', 'complex patterns executed with the feet')">footwork</span>. These regional variations reflect distinct cultural priorities and aesthetic sensibilities while maintaining recognizable salsa fundamentals.</p>
+
+                            <p><strong>Embodied Technique and Kinesthetic Awareness:</strong> Salsa's technical demands require sophisticated <span class="vocab-link" onclick="showPopup('proprioception', 'awareness of body position and movement in space')">proprioception</span>—the internalized sense of body position and movement in space. Dancers develop precise control over weight transfers, maintaining balance through continuous shifting while executing complex patterns. The characteristic Cuban motion, often simplified as "hip movement," actually results from proper weight transfer mechanics and requires years to master authentically. Advanced practitioners cultivate <span class="vocab-link" onclick="showPopup('dissociation', 'the ability to move different body parts independently')">dissociation</span>—the capacity to move upper and lower body independently—enabling simultaneous arm <span class="vocab-link" onclick="showPopup('styling', 'expressive embellishments and personal interpretation')">styling</span> while maintaining lower body precision.</p>
+
+                            <p><strong>Musical Sophistication and Interpretive Freedom:</strong> Elite dancers demonstrate remarkable musicality, moving beyond mechanical step execution to embody musical structure. This requires understanding the <span class="vocab-link" onclick="showPopup('clave', 'the fundamental rhythmic cell organizing salsa music')">clave</span> as organizational principle, recognizing instrumental <span class="vocab-link" onclick="showPopup('montunos', 'repetitive piano patterns in salsa music')">montunos</span> and percussion patterns, and interpreting melodic phrasing through movement dynamics. Advanced musicality involves strategic use of <span class="vocab-link" onclick="showPopup('syncopation', 'rhythmic emphasis on unexpected beats')">syncopation</span>, intentional pausing during musical breaks, and <span class="vocab-link" onclick="showPopup('phrasing', 'organizing movement to match musical structure')">phrasing</span> that mirrors the song's architecture. Some dancers develop such refined sensitivity that observers describe their movement as musical visualization.</p>
+
+                            <p><strong>Social Choreography and Embodied Communication:</strong> The <span class="vocab-link" onclick="showPopup('lead-follow', 'the nonverbal communication system between partners')">lead-follow</span> dynamic represents a sophisticated nonverbal communication system requiring mutual attentiveness and responsiveness. Effective leading involves clarity, timing, and respect for the follower's comfort and capability. Skilled following requires active interpretation rather than passive compliance, with followers making instantaneous decisions about movement quality and personal <span class="vocab-link" onclick="showPopup('styling', 'individual expression within structured movements')">styling</span>. This partnership negotiation occurs continuously, with dancers adjusting connection, timing, and complexity based on mutual feedback. The system's sophistication becomes apparent when considering the diversity of <span class="vocab-link" onclick="showPopup('combinations', 'sequences linking multiple moves')">combinations</span>—from simple <span class="vocab-link" onclick="showPopup('cross-body leads', 'fundamental salsa pattern involving position exchange')">cross-body leads</span> to complex multiple <span class="vocab-link" onclick="showPopup('turns', 'rotational movements')">turns</span>, <span class="vocab-link" onclick="showPopup('dips', 'controlled lowering movements')">dips</span>, and <span class="vocab-link" onclick="showPopup('tricks', 'theatrical or acrobatic elements')">tricks</span>—all communicated through subtle physical cues.</p>
+
+                            <p><strong>Transnational Community and Cultural Capital:</strong> The global salsa scene constitutes a transnational community united by shared practice despite geographic dispersion. International <span class="vocab-link" onclick="showPopup('congresses', 'major multi-day dance events')">congresses</span> and festivals create nodes of intensive interaction where participants from dozens of countries converge. These events facilitate cultural exchange, technique transmission, and community reinforcement. Within this community, dancers accumulate various forms of capital: technical proficiency, musical knowledge, social connections, and recognition from peers. The scene's democratic ethos—emphasizing social dancing over performance, encouraging cross-level interaction, and valuing personality alongside technique—distinguishes it from more hierarchical dance communities. Yet tensions exist regarding authenticity, commercialization, and the relationship between salsa's Latin American roots and its global manifestations. These dynamics raise questions about cultural appropriation, authenticity politics, and the evolution of traditional forms in transnational contexts. Nonetheless, salsa's capacity to create meaningful connection across cultural boundaries—transforming strangers into dance partners and fostering communities transcending national identity—demonstrates dance's potential as a vehicle for intercultural understanding and embodied cosmopolitanism.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Salsa Dancing Guide</h2>
+                <div class="video-container">
+                    <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
+                        <iframe
+                            src="https://www.youtube.com/embed/Z8kGAkvuwnA"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeVideoSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeVideoSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1 -->
+                        <div class="discussion-slide active slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Salsa On1 vs On2: What's the Difference?</h3>
+                                <p>Salsa can be danced "on1" (LA style) or "on2" (New York style), referring to which beat the dancer breaks forward. On1 dancers step forward on the first beat of the music, creating a bold, energetic style popular in Los Angeles. On2 dancers break on the second beat, syncing with the tumbao rhythm, resulting in a smoother, more musical style associated with New York.</p>
+                                <ul>
+                                    <li>Which timing style appeals to you more - the energy of On1 or the musicality of On2?</li>
+                                    <li>Do you think the timing difference significantly changes the character of the dance?</li>
+                                    <li>Should beginners learn both styles or master one first?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=800&h=600&fit=crop" alt="Salsa dancers" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Origins of Salsa Dance Styles</h3>
+                                <p>According to the video, Salsa On2 (New York style) was actually the first official way to dance salsa, originating in the 1970s from Mambo and Cuban son. In contrast, Salsa On1 (LA style) was born later in the 1990s in Los Angeles nightclubs, inspired by showcase dances like West Coast Swing and hip-hop.</p>
+                                <ul>
+                                    <li>Why do you think LA style became more popular worldwide despite being created later?</li>
+                                    <li>How might the different origins of these styles affect their character and appeal?</li>
+                                    <li>Does knowing the history of a dance style enhance your appreciation of it?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&h=600&fit=crop" alt="Live salsa band" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Cuban Casino and Rueda de Casino</h3>
+                                <p>The video explains that Cuban Casino style involves dancing in circles with interlocking arms and complicated knots, rarely letting go of hands. Rueda de Casino is a variant where many couples perform choreographed moves dictated by a leader calling out commands. It has hundreds of different moves developed in Havana and Miami.</p>
+                                <ul>
+                                    <li>Why might dancing in synchronized groups (Rueda) be appealing to some dancers?</li>
+                                    <li>How does the circular movement pattern differ from the linear patterns of On1 and On2?</li>
+                                    <li>Would you prefer learning individual couple dancing or synchronized group dancing?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=800&h=600&fit=crop" alt="Social salsa dancing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Colombian Caleño Style and Competition</h3>
+                                <p>The video describes Colombian salsa from Cali as focusing on foot speed, stepping on all eight beats of the measure, and moving side-to-side rather than forward-backward. It's known for acrobatics and difficulty, developing through important competitions. The style combines mambo with cumbia influences and often uses fast songs.</p>
+                                <ul>
+                                    <li>What are the advantages and disadvantages of competition-based dance development?</li>
+                                    <li>Why might extreme foot speed and acrobatics appeal to Colombian dancers?</li>
+                                    <li>Should competitive salsa be considered separate from social salsa?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1545224144-b38cd309ef69?w=800&h=600&fit=crop" alt="Fitness and dance" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Popular Salsa: The Universal Language</h3>
+                                <p>The video explains that popular or social salsa is "the salsa of the streets" danced since the 1970s across Latin America and worldwide. It's not taught in formal classes but comes from allowing your body to follow the music with simple steps and circular turns. The narrator describes it as "a universal language that transcends borders of cultures, languages, and ages."</p>
+                                <ul>
+                                    <li>Why might informal street salsa be more accessible than structured studio styles?</li>
+                                    <li>Can dance truly be a "universal language" that connects people across cultures?</li>
+                                    <li>Is there value in preserving informal dance traditions alongside formal techniques?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&h=600&fit=crop" alt="Cultural dance performance" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToVideoSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(5)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Salsa Dancing Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Basic Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Dance Elements</button>
+                        <button class="page-btn" onclick="showVocabPage(3, this)">Advanced Concepts</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Rhythm</div></div><div class="flashcard-back"><div class="flashcard-definition">A strong, regular repeated pattern of sounds or beats in music</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Step</div></div><div class="flashcard-back"><div class="flashcard-definition">A movement made by lifting the foot and putting it down in a different position</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Lead</div></div><div class="flashcard-back"><div class="flashcard-definition">The dance partner who initiates and guides the movements during partner dancing</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Follow</div></div><div class="flashcard-back"><div class="flashcard-definition">The dance partner who interprets and responds to the lead's signals</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Beat</div></div><div class="flashcard-back"><div class="flashcard-definition">The basic unit of rhythm or pulse in music that dancers count and move to</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Frame</div></div><div class="flashcard-back"><div class="flashcard-definition">The structural position of arms, hands, and upper body in partner dancing</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Partner</div></div><div class="flashcard-back"><div class="flashcard-definition">The person you dance with in salsa or other partner dances</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Moves</div></div><div class="flashcard-back"><div class="flashcard-definition">Dance steps, patterns, or sequences performed individually or with a partner</div></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Turn</div></div><div class="flashcard-back"><div class="flashcard-definition">A rotational movement where a dancer spins around their axis</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Footwork</div></div><div class="flashcard-back"><div class="flashcard-definition">Intricate movements and patterns executed with the feet</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Styling</div></div><div class="flashcard-back"><div class="flashcard-definition">Personal flair, expression, and embellishments added to basic dance movements</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Dip</div></div><div class="flashcard-back"><div class="flashcard-definition">A dramatic move where one partner is lowered toward the floor</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Shine</div></div><div class="flashcard-back"><div class="flashcard-definition">Solo footwork performed without maintaining contact with your partner</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Combination</div></div><div class="flashcard-back"><div class="flashcard-definition">A sequence of multiple dance moves linked together</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Posture</div></div><div class="flashcard-back"><div class="flashcard-definition">The position and bearing of the body while dancing</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Connection</div></div><div class="flashcard-back"><div class="flashcard-definition">The physical and communicative link between dance partners</div></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-3">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Clave</div></div><div class="flashcard-back"><div class="flashcard-definition">The fundamental rhythmic pattern that forms the backbone of salsa music</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Musicality</div></div><div class="flashcard-back"><div class="flashcard-definition">The ability to interpret and express music through dance movements</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Congress</div></div><div class="flashcard-back"><div class="flashcard-definition">A large multi-day salsa event featuring workshops, performances, and social dancing</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Social Dancing</div></div><div class="flashcard-back"><div class="flashcard-definition">Dancing for enjoyment and connection rather than performance or competition</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cross-Body Lead</div></div><div class="flashcard-back"><div class="flashcard-definition">A fundamental salsa pattern where partners exchange positions</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">On1 / On2</div></div><div class="flashcard-back"><div class="flashcard-definition">Different timing styles in salsa referring to which beat the break step occurs</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Partnerwork</div></div><div class="flashcard-back"><div class="flashcard-definition">Collaborative dance movements executed together with a partner</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Floor Craft</div></div><div class="flashcard-back"><div class="flashcard-definition">The ability to navigate a crowded dance floor safely and courteously</div></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="section" id="quiz">
+                <h2>Vocabulary Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header" id="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div id="quiz-counter">Question 1 of 10</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quizProgressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be generated dynamically -->
+                    </div>
+
+                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalQuizScore">0/10</div>
+                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>Writing Practice</h2>
+                <div class="writing-container">
+                    <div class="writing-content">
+                        <h3 class="writing-question">Your Experience with Dance</h3>
+
+                        <p class="writing-objective">
+                            Write an essay (200-250 words) about a type of dance that is unique to where you live. Explain to the reader how the dance is performed and the types of dress used as well as the history and origins of this style of dance.
+                        </p>
+
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group">
+                                <label for="studentName">Student Name</label>
+                                <input type="text" id="studentName" name="studentName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teacherEmail">Teacher's Email</label>
+                                <input type="email" id="teacherEmail" name="teacherEmail" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="writingInput">Your Essay (200-250 words)</label>
+                                <textarea id="writingInput" name="writingInput" required></textarea>
+                            </div>
+
+                            <div class="button-container">
+                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send to Teacher</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Popup -->
+            <div class="popup-overlay" id="vocabPopup">
+                <div class="popup-content">
+                    <div class="popup-word" id="popupWord"></div>
+                    <div class="popup-definition" id="popupDefinition"></div>
+                    <button class="popup-close" onclick="closePopup()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Slideshow variables
+        let currentSlide = 1;
+        let totalSlides = 6;
+
+        // Vocabulary database for the quiz
+        const vocabularyDatabase = [
+            {
+                term: "rhythm",
+                definition: "A strong, regular repeated pattern of sounds.",
+                sentences: [
+                    "Salsa music has an infectious ___.",
+                    "Learning to feel the ___ is essential for dancing.",
+                    "The drummer kept a steady ___."
+                ]
+            },
+            {
+                term: "lead",
+                definition: "The partner who initiates movements.",
+                sentences: [
+                    "The ___ guides the follower through different moves.",
+                    "Being a good ___ requires clear communication.",
+                    "She learned to ___ as well as follow."
+                ]
+            },
+            {
+                term: "follow",
+                definition: "The partner who responds to signals.",
+                sentences: [
+                    "The ___ interprets the lead's movements.",
+                    "Learning to ___ takes practice and trust.",
+                    "He enjoys dancing as a ___."
+                ]
+            },
+            {
+                term: "turn",
+                definition: "A rotational spinning movement.",
+                sentences: [
+                    "She executed a perfect ___.",
+                    "Multiple ___ require good balance.",
+                    "The ___ was smooth and controlled."
+                ]
+            },
+            {
+                term: "footwork",
+                definition: "Intricate movements with the feet.",
+                sentences: [
+                    "Cuban salsa features fast ___.",
+                    "His ___ was impressive and precise.",
+                    "Practicing ___ improves your dancing."
+                ]
+            },
+            {
+                term: "styling",
+                definition: "Personal flair added to movements.",
+                sentences: [
+                    "Her ___ makes her dancing unique.",
+                    "Good ___ expresses your personality.",
+                    "He added beautiful arm ___."
+                ]
+            },
+            {
+                term: "beat",
+                definition: "The basic pulse of music.",
+                sentences: [
+                    "Dancers count the ___ of the music.",
+                    "Stay on the ___ while dancing.",
+                    "The song has a strong ___."
+                ]
+            },
+            {
+                term: "frame",
+                definition: "Arm and body position in partner dancing.",
+                sentences: [
+                    "Maintain a strong ___ while dancing.",
+                    "Good ___ helps partners move together.",
+                    "She improved her dance ___."
+                ]
+            },
+            {
+                term: "combination",
+                definition: "A sequence of multiple moves.",
+                sentences: [
+                    "The instructor taught a new ___.",
+                    "That ___ was complex but beautiful.",
+                    "He created his own ___."
+                ]
+            },
+            {
+                term: "musicality",
+                definition: "Expressing music through movement.",
+                sentences: [
+                    "Her ___ impressed everyone.",
+                    "Developing ___ takes time.",
+                    "Good ___ makes dancing expressive."
+                ]
+            }
+        ];
+
+        // Section switching
+        function showSection(sectionId, navItem) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            document.getElementById(sectionId).classList.add('active');
+            navItem.classList.add('active');
+        }
+
+        // Slideshow functionality
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > totalSlides) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = totalSlides;
+            }
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        // Video Discussions Slideshow
+        let currentVideoSlide = 1;
+        let totalVideoSlides = 5;
+
+        function changeVideoSlide(direction) {
+            const videoSection = document.getElementById('video-discussions');
+            const slides = videoSection.querySelectorAll('.discussion-slide');
+            const dots = videoSection.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide += direction;
+
+            if (currentVideoSlide > totalVideoSlides) {
+                currentVideoSlide = 1;
+            }
+            if (currentVideoSlide < 1) {
+                currentVideoSlide = totalVideoSlides;
+            }
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        function goToVideoSlide(slideNum) {
+            const videoSection = document.getElementById('video-discussions');
+            const slides = videoSection.querySelectorAll('.discussion-slide');
+            const dots = videoSection.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide = slideNum;
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        // Reading section management
+        function showReadingLevel(level, button) {
+            document.querySelectorAll('.reading-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.querySelectorAll('.reading-level').forEach(levelDiv => levelDiv.style.display = 'none');
+            document.getElementById(level + '-level').style.display = 'block';
+        }
+
+        // Vocabulary section management
+        function showVocabPage(pageNum, element) {
+            document.querySelectorAll('.vocab-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.vocab-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Vocabulary popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
+                }
+            }
+        }
+
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+
+            const isCorrect = userAnswer === question.correctAnswer;
+
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' :
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+            feedback.style.background = isCorrect ? '#48bb78' : '#f56565';
+            feedback.style.color = 'white';
+            feedback.style.padding = '12px 20px';
+            feedback.style.borderRadius = '12px';
+            feedback.style.marginTop = '15px';
+
+            if (isCorrect && !userQuizAnswers[questionNum]) {
+                quizScore++;
+            }
+            userQuizAnswers[questionNum] = isCorrect;
+
+            checkButton.disabled = true;
+
+            updateQuizProgress();
+
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        function updateQuizProgress() {
+            const counter = document.getElementById('quiz-counter');
+            const progressBar = document.getElementById('quizProgressFill');
+
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+
+            if (progressBar) {
+                const answeredCount = Object.keys(userQuizAnswers).length;
+                const progressPercent = (answeredCount / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'block';
+            document.getElementById('finalQuizScore').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+
+        function restartVocabQuiz() {
+            document.getElementById('quiz-results-page').style.display = 'none';
+            document.getElementById('quiz-questions-container').style.display = 'block';
+            document.getElementById('quiz-header').style.display = 'flex';
+            initializeVocabQuiz();
+        }
+
+        // Writing section management
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+            const writingResponse = document.getElementById('writingInput').value.trim();
+
+            if (!studentName || !teacherEmail || !writingResponse) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const subject = encodeURIComponent('Salsa Dancing Essay - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nEssay:\n' + writingResponse);
+            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz();
+
+            // Close popup when clicking outside
+            const vocabPopup = document.getElementById('vocabPopup');
+            if (vocabPopup) {
+                vocabPopup.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closePopup();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
