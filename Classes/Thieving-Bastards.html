@@ -533,7 +533,32 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
-        /* Flashcard Styles */
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
         .vocab-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1280,6 +1305,14 @@
                 font-size: 3rem;
             }
 
+            .vocab-container {
+                height: auto;
+            }
+
+            .vocab-nav {
+                gap: 8px;
+            }
+
             .vocab-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
@@ -1668,217 +1701,241 @@
 
             <!-- Vocabulary Section -->
             <div class="section" id="vocabulary">
-                <h2>Thief Vocabulary Flashcards</h2>
-                <div class="vocab-grid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+                <h2>Thief Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Types of Thieves</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Tools & Methods</button>
+                        <button class="page-btn" onclick="showVocabPage(3, this)">Rob vs Steal</button>
+                    </div>
 
-                    <!-- Flashcard 1: Pickpocket -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Pickpocket</div>
-                                <div class="flashcard-hint">Click to see definition</div>
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Pickpocket</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A thief who steals from people's pockets or bags in crowded places</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A thief who steals from people's pockets or bags in crowded places</div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Mugger</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A thief who attacks and robs people using force or threats</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Burglar</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A thief who breaks into buildings to steal things</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Shoplifter</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A person who steals items from stores</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Con Artist</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A person who tricks others into giving them money or valuables</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Cat Burglar</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A skilled thief who enters buildings by climbing</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Flashcard 2: Mugger -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Mugger</div>
-                                <div class="flashcard-hint">Click to see definition</div>
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Lockpicks</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Tools used to open locks without a key</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A thief who attacks and robs people using force or threats</div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Crowbar</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A metal bar used to force open doors and windows</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Getaway Car</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A vehicle used to escape after committing a crime</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Accomplice</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A person who helps another commit a crime</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Heist</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A carefully planned robbery, especially of money or valuables</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Loot</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Stolen money or goods</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Flashcard 3: Burglar -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Burglar</div>
-                                <div class="flashcard-hint">Click to see definition</div>
+                    <div class="vocab-page" id="vocab-page-3">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">ROB</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">To steal from a PERSON or PLACE (rob someone, rob a bank)</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A thief who breaks into buildings to steal things</div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">STEAL</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">To take an OBJECT without permission (steal money, steal a car)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Fence</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A person who buys and sells stolen goods</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Safecracker</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A thief who specializes in opening safes</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Bandit</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">An armed robber who attacks travelers or isolated places</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Thief</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A person who steals - general term for all types</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Flashcard 4: Shoplifter -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Shoplifter</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A person who steals items from stores</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 5: Con Artist -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Con Artist</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A person who tricks others into giving them money or valuables</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 6: Cat Burglar -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Cat Burglar</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A skilled thief who enters buildings by climbing</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 7: Fence -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Fence</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A person who buys and sells stolen goods</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 8: Safecracker -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Safecracker</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A thief who specializes in opening safes</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 9: Lockpicks -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Lockpicks</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">Tools used to open locks without a key</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 10: Crowbar -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Crowbar</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A metal bar used to force open doors and windows</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 11: Heist -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Heist</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A carefully planned robbery, especially of money or valuables</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 12: Loot -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Loot</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">Stolen money or goods</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 13: Accomplice -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Accomplice</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A person who helps another commit a crime</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 14: Getaway Car -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front">
-                                <div class="flashcard-term">Getaway Car</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-definition">A vehicle used to escape after committing a crime</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 15: ROB -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front" style="background: rgba(255, 187, 120, 0.3);">
-                                <div class="flashcard-term" style="color: #d97706;">ROB</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                                <div class="flashcard-definition">To steal from a PERSON or PLACE (rob someone, rob a bank)</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Flashcard 16: STEAL -->
-                    <div class="flashcard" onclick="flipCard(this)">
-                        <div class="flashcard-inner">
-                            <div class="flashcard-front" style="background: rgba(120, 255, 187, 0.3);">
-                                <div class="flashcard-term" style="color: #059669;">STEAL</div>
-                                <div class="flashcard-hint">Click to see definition</div>
-                            </div>
-                            <div class="flashcard-back" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                                <div class="flashcard-definition">To take an OBJECT without permission (steal money, steal a car)</div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
