@@ -2237,13 +2237,30 @@
         // Reading Pages
         function showPage(pageNumber) {
             const pages = document.querySelectorAll('.reading-page');
-            const buttons = document.querySelectorAll('.page-btn');
+            const buttons = document.querySelectorAll('.reading-nav .page-btn');
 
             pages.forEach(page => page.classList.remove('active'));
             buttons.forEach(btn => btn.classList.remove('active'));
 
             document.getElementById('page' + pageNumber).classList.add('active');
             buttons[pageNumber - 1].classList.add('active');
+        }
+
+        // Vocabulary Pages
+        function showVocabPage(pageNum, element) {
+            // Hide all vocab pages
+            const pages = document.querySelectorAll('.vocab-page');
+            pages.forEach(page => page.classList.remove('active'));
+
+            // Remove active class from all page buttons
+            const buttons = document.querySelectorAll('.vocab-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected page
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+
+            // Add active class to clicked button
+            element.classList.add('active');
         }
 
         // Vocabulary Popup
