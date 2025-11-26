@@ -1569,7 +1569,6 @@
 
     <script>
         // Global variables
-        let currentReadingLevel = 'B1';
         let currentSlide = 1;
         let totalSlides = 5;
         
@@ -1949,46 +1948,6 @@
             }, 300);
         }
 
-        function showReadingLevel(level, element) {
-            // Hide all reading levels
-            const levels = document.querySelectorAll('.reading-level');
-            levels.forEach(levelDiv => levelDiv.style.display = 'none');
-            
-            // Remove active class from all level buttons
-            const buttons = document.querySelectorAll('.reading-nav .page-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // Show selected level
-            document.getElementById(level + '-level').style.display = 'block';
-            currentReadingLevel = level;
-            
-            // Add active class to clicked button
-            if (element) {
-                element.classList.add('active');
-            }
-            
-            // Reset subnav to first page
-            showReadingPage(1, document.querySelectorAll('.reading-subnav .page-btn')[0]);
-        }
-
-        function showReadingPage(pageNum, element) {
-            // Hide all reading pages in current level
-            const pages = document.querySelectorAll(`#${currentReadingLevel}-level .reading-page`);
-            pages.forEach(page => page.classList.remove('active'));
-            
-            // Remove active class from all subnav buttons
-            const buttons = document.querySelectorAll('.reading-subnav .page-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // Show selected page
-            document.getElementById(`${currentReadingLevel}-page-` + pageNum).classList.add('active');
-            
-            // Add active class to clicked button
-            if (element) {
-                element.classList.add('active');
-            }
-        }
-
         function showVocabPage(pageNum, element) {
             // Hide all vocab pages
             const pages = document.querySelectorAll('.vocab-page');
@@ -2064,44 +2023,6 @@
             
             slides[currentSlide - 1].classList.add('active');
             dots[currentSlide - 1].classList.add('active');
-        }
-
-        // Video slideshow variables
-        let currentVideoSlide = 1;
-        let totalVideoSlides = 4;
-
-        // Video slideshow navigation functions
-        function changeVideoSlide(direction) {
-            const slides = document.querySelectorAll('#video-discussions .discussion-slide');
-            const dots = document.querySelectorAll('#video-discussions .indicator-dot');
-
-            slides[currentVideoSlide - 1].classList.remove('active');
-            dots[currentVideoSlide - 1].classList.remove('active');
-
-            currentVideoSlide += direction;
-
-            if (currentVideoSlide > totalVideoSlides) {
-                currentVideoSlide = 1;
-            }
-            if (currentVideoSlide < 1) {
-                currentVideoSlide = totalVideoSlides;
-            }
-
-            slides[currentVideoSlide - 1].classList.add('active');
-            dots[currentVideoSlide - 1].classList.add('active');
-        }
-
-        function goToVideoSlide(slideNum) {
-            const slides = document.querySelectorAll('#video-discussions .discussion-slide');
-            const dots = document.querySelectorAll('#video-discussions .indicator-dot');
-
-            slides[currentVideoSlide - 1].classList.remove('active');
-            dots[currentVideoSlide - 1].classList.remove('active');
-
-            currentVideoSlide = slideNum;
-
-            slides[currentVideoSlide - 1].classList.add('active');
-            dots[currentVideoSlide - 1].classList.add('active');
         }
 
         // Keyboard navigation for slideshow
