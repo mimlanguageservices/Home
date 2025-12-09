@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Hallucinations - MIM Language Services</title>
+    <title>Money Laundering - MIM Language Services</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -167,8 +167,8 @@
         .slide-content-wrapper {
             position: relative;
             width: 100%;
-            max-width: 1800px;
-            height: 95%;
+            max-width: 1400px;
+            height: 85%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -180,7 +180,7 @@
             height: 100%;
             background: white;
             border-radius: 20px;
-            padding: 60px;
+            padding: 40px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
@@ -340,6 +340,163 @@
             background: #9CA3AF;
         }
 
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 280px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
         /* Vocabulary Section */
         .vocab-container {
             display: flex;
@@ -435,20 +592,6 @@
             font-size: 1.5rem;
         }
 
-        .flashcard-hint {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.1rem;
-            color: #a0aec0;
-            opacity: 0.8;
-        }
-
-        .flashcard:hover .flashcard-inner {
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-
         /* NEW QUIZ SYSTEM STYLES */
         .quiz-container {
             display: flex;
@@ -541,16 +684,6 @@
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
         }
 
-        .quiz-input.correct {
-            border-color: #48bb78;
-            background: rgba(72, 187, 120, 0.1);
-        }
-
-        .quiz-input.incorrect {
-            border-color: #f56565;
-            background: rgba(245, 101, 101, 0.1);
-        }
-
         .multiple-choice {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -580,24 +713,8 @@
             transform: translateY(-2px);
         }
 
-        .choice input[type="radio"] {
-            display: none;
-        }
-
         .choice.selected {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border-color: transparent;
-        }
-
-        .choice.correct {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: #ffffff;
-            border-color: transparent;
-        }
-
-        .choice.incorrect {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
             color: #ffffff;
             border-color: transparent;
         }
@@ -622,12 +739,6 @@
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
-        .check-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .nav-btn {
             padding: 12px 25px;
             background: rgba(45, 55, 72, 0.9);
@@ -643,33 +754,6 @@
         .nav-btn:hover {
             background: rgba(102, 126, 234, 0.9);
             transform: translateY(-2px);
-        }
-
-        .nav-btn:disabled {
-            background: rgba(160, 174, 192, 0.5);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .feedback {
-            padding: 20px;
-            border-radius: 12px;
-            margin: 25px 0;
-            font-weight: 500;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        .feedback.correct {
-            background: rgba(72, 187, 120, 0.1);
-            color: #2f855a;
-            border: 1px solid rgba(72, 187, 120, 0.3);
-        }
-
-        .feedback.incorrect {
-            background: rgba(245, 101, 101, 0.1);
-            color: #c53030;
-            border: 1px solid rgba(245, 101, 101, 0.3);
         }
 
         .results-summary {
@@ -701,234 +785,174 @@
             margin: 25px 0;
         }
 
-
-        /* Vocabulary Popup Styles */
-        .popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
+        /* Video Section */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 15px;
             justify-content: center;
-        }
-
-        .popup-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 500px;
+            align-items: center;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: visible;
         }
 
-        .popup-word {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 20px;
+        #video {
+            overflow: visible;
         }
 
-        .popup-definition {
-            font-size: 1.3rem;
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
             color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
             line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
             margin-bottom: 30px;
         }
 
-        .popup-close {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 25px;
-            font-size: 1.2rem;
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d3748;
             font-weight: 600;
-            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
             transition: all 0.3s ease;
         }
 
-        .popup-close:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: #48bb78;
+            color: white;
+        }
+
+        .feedback.incorrect {
+            background: #f56565;
+            color: white;
         }
 
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
-            body {
-                overflow-y: auto;
-                height: auto;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            }
-
-            .header {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px 15px;
-                background: rgba(255, 255, 255, 0.95);
-            }
-
             .header h1 {
-                font-size: 2rem;
-                margin-bottom: 15px;
-            }
-
-            .header .website a {
-                font-size: 1rem;
+                font-size: 1.8rem;
             }
 
             .header-image {
                 width: 80px;
                 height: 60px;
-                margin-top: 15px;
             }
 
             .container {
                 flex-direction: column;
-                height: auto;
             }
 
             .navigation {
                 width: 100%;
-                padding: 20px 15px;
+                padding: 15px 10px;
                 display: flex;
                 flex-wrap: wrap;
-                gap: 10px;
-                justify-content: center;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-                background: rgba(45, 55, 72, 0.95);
+                gap: 8px;
             }
 
             .nav-item {
-                flex: 1;
+                flex: 1 1 auto;
                 min-width: 120px;
-                margin: 5px;
-                font-size: 0.95rem;
                 padding: 12px 16px;
-                border-radius: 20px;
-            }
-
-            .content {
-                height: auto;
-                overflow: visible;
-                background: rgba(255, 255, 255, 0.95);
-            }
-
-            .section {
-                padding: 25px 15px;
-                height: auto;
-                overflow: visible;
+                font-size: 0.95rem;
             }
 
             .section h2 {
-                font-size: 2rem;
-                text-align: center;
-                margin-bottom: 30px;
+                font-size: 1.8rem;
+                margin-bottom: 20px;
             }
 
-            .discussion-grid {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                height: auto;
-            }
-
-            .discussion-header {
-                order: -1;
-                padding: 20px;
-            }
-
-            .actual-image {
-                width: 250px;
-                height: 150px;
-                margin: 0 auto 15px;
-                border-radius: 12px;
-            }
-
-            .discussion-question {
-                padding: 20px;
-                border-radius: 12px;
-            }
-
-            .discussion-question h3 {
-                font-size: 1.3rem;
-            }
-
-            /* Mobile styles for slideshow */
             .slideshow-container {
-                padding: 20px 15px;
-                height: auto;
-                min-height: 100vh;
-            }
-
-            .slide-content-wrapper {
-                height: auto;
-                min-height: 80vh;
-                max-width: 100%;
-                padding: 0;
-            }
-
-            .discussion-slide {
-                padding: 20px 15px;
-                height: auto;
-                min-height: 80vh;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                padding: 20px;
             }
 
             .slide-horizontal {
                 flex-direction: column !important;
-                gap: 20px;
             }
 
             .slide-text-section-left {
                 max-width: 100%;
                 padding-right: 0;
-                margin-bottom: 20px;
-            }
-
-            .slide-text-section-left h3 {
-                font-size: 1.4rem;
-                margin-bottom: 15px;
-                text-align: center;
-            }
-
-            .slide-text-section-left p {
-                font-size: 1rem;
-                line-height: 1.6;
-                margin-bottom: 15px;
-                text-align: center;
-            }
-
-            .slide-text-section-left ul {
-                margin-top: 15px;
-            }
-
-            .slide-text-section-left li {
-                font-size: 0.95rem;
-                margin-bottom: 10px;
-                padding-left: 25px;
             }
 
             .slide-image-section-right {
                 width: 100%;
                 max-width: 100%;
                 height: 250px;
-                margin-top: 20px;
-                border-radius: 12px;
-            }
-
-            .slide-image-section-right img {
-                border-radius: 10px;
             }
 
             .slide-arrow {
                 width: 40px;
                 height: 40px;
-                z-index: 1000;
             }
 
             .slide-arrow.prev {
@@ -939,217 +963,30 @@
                 right: 10px;
             }
 
-            .slide-indicators {
-                bottom: 20px;
-                gap: 8px;
-            }
-
-            .indicator-dot {
-                width: 10px;
-                height: 10px;
-            }
-
-            .discussion-question p {
-                font-size: 1rem;
-            }
-
-            .reading-container {
-                height: auto;
-            }
-
-            .reading-nav, .reading-subnav {
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-
-            .page-btn {
-                font-size: 0.95rem;
-                padding: 10px 16px;
-                flex: 1;
-                min-width: 100px;
-                border-radius: 20px;
-            }
-
-            .reading-page {
-                height: auto;
-                overflow: visible;
-                max-height: none;
-                padding: 25px 20px;
-                border-radius: 16px;
-            }
-
-            .reading-page h3 {
-                font-size: 1.5rem;
-            }
-
-            .reading-page p {
-                font-size: 1rem;
-                line-height: 1.7;
-            }
-
-            .vocab-container {
-                height: auto;
-            }
-
-            .vocab-nav {
-                gap: 8px;
-            }
-
             .vocab-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
-                height: auto;
-            }
-
-            .flashcard {
-                height: 200px;
-            }
-
-            .flashcard-front, .flashcard-back {
-                border-radius: 16px;
-            }
-
-            .flashcard-term {
-                font-size: 1.7rem;
-            }
-
-            .flashcard-definition {
-                font-size: 1.3rem;
-            }
-
-            .flashcard-hint {
-                font-size: 1rem;
-            }
-
-            .quiz-container {
-                height: auto;
-            }
-
-            .quiz-header {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .quiz-nav {
-                justify-content: center;
-            }
-
-            .nav-btn {
-                font-size: 1rem;
-                padding: 10px 20px;
-                border-radius: 20px;
-            }
-
-            .quiz-question {
-                padding: 30px 20px;
-                margin: 0 10px;
-                border-radius: 16px;
-            }
-
-            .quiz-question h3 {
-                font-size: 1.6rem;
-                margin-bottom: 25px;
             }
 
             .multiple-choice {
                 grid-template-columns: 1fr;
-                gap: 15px;
-                max-width: 100%;
             }
 
-            .choice {
-                font-size: 1.1rem;
-                padding: 20px;
-                border-radius: 12px;
-            }
-
-            .quiz-input {
-                font-size: 1.3rem;
-                max-width: 100%;
-                padding: 15px 20px;
-                border-radius: 20px;
-            }
-
-            .check-button {
-                font-size: 1.3rem;
-                padding: 15px 30px;
-                margin: 20px auto;
-                border-radius: 20px;
-            }
-
-            .feedback {
+            .reading-page p {
                 font-size: 1rem;
-                margin: 20px 10px;
-                border-radius: 10px;
             }
 
-            .results-summary {
+            .quiz-question {
                 padding: 30px 20px;
-                margin: 0 10px;
-                border-radius: 16px;
             }
 
-            .results-summary h3 {
-                font-size: 1.8rem;
-            }
-
-            .score {
-                font-size: 3rem;
-            }
-
-            .popup-content {
-                margin: 15px;
-                padding: 30px 25px;
-                max-width: 90%;
-                border-radius: 16px;
-            }
-
-            .popup-word {
-                font-size: 1.6rem;
-            }
-
-            .popup-definition {
-                font-size: 1.1rem;
-            }
-
-            .popup-close {
-                border-radius: 20px;
-            }
-
-            .vocab-link {
-                font-size: 1rem;
-                padding: 3px 8px;
-                display: inline-block;
-                margin: 1px;
-                border-radius: 5px;
+            .quiz-question h3 {
+                font-size: 1.5rem;
             }
         }
 
         @media (max-width: 480px) {
             .header h1 {
-                font-size: 1.6rem;
-            }
-
-            .nav-item {
-                font-size: 0.85rem;
-                padding: 10px 12px;
-                min-width: 100px;
-            }
-
-            .section {
-                padding: 20px 12px;
-            }
-
-            .section h2 {
-                font-size: 1.6rem;
-            }
-
-            .quiz-question h3 {
                 font-size: 1.4rem;
-            }
-
-            .flashcard {
-                height: 180px;
             }
 
             .flashcard-term {
@@ -1159,75 +996,14 @@
             .flashcard-definition {
                 font-size: 1.2rem;
             }
-
-            .reading-page {
-                padding: 20px 15px;
-            }
-
-            .discussion-question {
-                padding: 18px;
-            }
-
-            .actual-image {
-                width: 200px;
-                height: 120px;
-            }
-
-            .quiz-input {
-                font-size: 1.2rem;
-                padding: 12px 16px;
-            }
-
-            .check-button {
-                font-size: 1.2rem;
-                padding: 12px 25px;
-            }
         }
 
-        @media (hover: none) and (pointer: coarse) {
-            .nav-item,
-            .choice,
-            .flashcard,
-            .vocab-link,
-            .check-button,
-            .page-btn {
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .vocab-link {
-                min-height: 32px;
-                line-height: 1.2;
-            }
-        }
-
-        .vocab-link {
-            color: #667eea;
-            text-decoration: underline;
-            cursor: pointer;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-
-        .vocab-link:hover {
-            color: #553c9a;
-        }
     </style>
 </head>
 <body>
-    <!-- Audio elements for sound effects -->
-    <audio id="flipSound" preload="auto">
-        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="correctSound" preload="auto">
-        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
-    </audio>
-
     <div class="header">
         <div class="header-left">
-            <h1>AI Hallucinations</h1>
+            <h1>Money Laundering</h1>
             <div class="website">
                 <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
             </div>
@@ -1240,9 +1016,12 @@
     <div class="container">
         <div class="navigation">
             <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
             <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
             <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
-            <div class="nav-item" onclick="openWritingForm(this)">Writing</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
         </div>
 
         <div class="content">
@@ -1251,78 +1030,64 @@
                 <div class="slideshow-container">
 
                     <div class="slide-content-wrapper">
-                        <!-- Navigation Arrows - Outside the white box -->
-                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                <polyline points="15 18 9 12 15 6"></polyline>
-                            </svg>
-                        </button>
-                        <button class="slide-arrow next" onclick="changeSlide(1)">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </button>
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">&#10095;</button>
 
                         <!-- Slide 1 - Image Only -->
                         <div class="discussion-slide active slide-image-only">
-                            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80" alt="AI Hallucinations" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                            <img src="https://images.unsplash.com/photo-1580519542036-c47de6196ba5?w=1200&h=800&fit=crop" alt="Money and financial crime concept" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
                         </div>
 
                         <!-- Slide 2 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>What Are AI Hallucinations?</h3>
-                                <p>AI hallucinations occur when artificial intelligence systems generate false, misleading, or entirely fabricated information while presenting it as factual. These errors happen because <span class="vocab-link" onclick="showPopup('language models', 'AI systems trained on large amounts of text data to generate human-like responses')">language models</span> predict likely patterns rather than truly understanding content.</p>
-                                <ul>
-                                    <li>Have you ever received incorrect information from an AI chatbot?</li>
-                                    <li>Why might AI systems "hallucinate" information?</li>
-                                    <li>What are the potential dangers of AI hallucinations?</li>
-                                </ul>
+                                <h3>What is Money Laundering?</h3>
+                                <p>Money laundering is the illegal process of making large amounts of money generated by criminal activity appear to have come from legitimate sources. Criminals use this process to hide the origins of illegally obtained money, making it difficult for law enforcement to trace. The term comes from the historical practice of using laundromats as fronts to mix illegal cash with legitimate business income. Today, money laundering is a sophisticated global crime involving billions of dollars annually.</p>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1655720828018-edd2daec9349?w=1000&q=80" alt="AI Technology" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&h=600&fit=crop" alt="Money and banking concept" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
                         <!-- Slide 3 -->
-                        <div class="discussion-slide slide-image-only">
-                            <iframe src="https://www.youtube.com/embed/rOlB0CkOdLs" style="width: 100%; height: 100%; border: none; border-radius: 16px;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Three Stages of Money Laundering</h3>
+                                <p>Money laundering typically involves three distinct stages that criminals use to "clean" their illegal funds. Understanding these stages helps businesses and regulators detect and prevent financial crimes.</p>
+                                <ul>
+                                    <li>Placement: Introducing illegal money into the financial system</li>
+                                    <li>Layering: Concealing the source through complex transactions</li>
+                                    <li>Integration: Making the money appear legitimate and usable</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                               <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=600&fit=crop" alt="Business and finance" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
                         </div>
 
                         <!-- Slide 4 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>Real-World Consequences</h3>
-                                <p>AI hallucinations have led to serious problems: lawyers citing fake legal cases, students submitting essays with fabricated sources, and businesses making decisions based on false data. These incidents highlight the importance of <span class="vocab-link" onclick="showPopup('fact-checking', 'the process of verifying information to ensure accuracy and truthfulness')">fact-checking</span> AI-generated content.</p>
-                                <ul>
-                                    <li>Should AI companies be held liable for hallucinations?</li>
-                                    <li>How can we verify AI-generated information?</li>
-                                    <li>What industries are most at risk from AI errors?</li>
-                                </ul>
+                                <h3>Common Money Laundering Methods</h3>
+                                <p>Criminals employ various techniques to launder money, constantly evolving to avoid detection. Shell companies allow them to move money through fake businesses. Real estate purchases hide cash in property investments. Casinos enable the conversion of cash into chips and back into "winnings." Trade-based laundering involves over or under-invoicing goods to move value across borders. Digital currencies and online platforms have created new opportunities for sophisticated laundering schemes.</p>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1589254065878-42c9da997008?w=1000&q=80" alt="Fact Checking" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=800&h=600&fit=crop" alt="Casino and gambling" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
 
                         <!-- Slide 5 -->
                         <div class="discussion-slide slide-horizontal">
                             <div class="slide-text-section-left">
-                                <h3>Reducing AI Hallucinations</h3>
-                                <p>Researchers are developing methods to reduce hallucinations through better <span class="vocab-link" onclick="showPopup('training data', 'the information used to teach AI systems how to respond and generate content')">training data</span>, improved <span class="vocab-link" onclick="showPopup('algorithms', 'step-by-step instructions that tell computers how to solve problems')">algorithms</span>, and verification systems. Users can also help by cross-referencing information and understanding AI limitations.</p>
-                                <ul>
-                                    <li>What role should humans play in AI oversight?</li>
-                                    <li>Can AI hallucinations ever be completely eliminated?</li>
-                                    <li>How might education systems adapt to AI challenges?</li>
-                                </ul>
+                                <h3>The Global Impact and Prevention</h3>
+                                <p>Money laundering has devastating effects on the global economy, funding organized crime, terrorism, and corruption. It undermines legitimate businesses, distorts markets, and weakens financial institutions. Governments and international organizations have implemented anti-money laundering (AML) regulations requiring businesses to verify customer identities, report suspicious transactions, and maintain detailed records. Financial institutions now employ compliance officers, sophisticated software, and risk assessment procedures. However, criminals continue to find new ways to evade detection, making ongoing vigilance essential.</p>
                             </div>
                             <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=1000&q=80" alt="AI Research" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop" alt="Global business and compliance" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Slide Indicators -->
                     <div class="slide-indicators">
                         <span class="indicator-dot active" onclick="goToSlide(1)"></span>
                         <span class="indicator-dot" onclick="goToSlide(2)"></span>
@@ -1333,241 +1098,265 @@
                 </div>
             </div>
 
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading Practice</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('A2', this)">A2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B1', this)">B1 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
+                    </div>
+
+                    <!-- A2 Level -->
+                    <div class="reading-level" id="A2-level">
+                        <div class="reading-page active">
+                            <h3>What is Money Laundering?</h3>
+                            <p>Money laundering is when <span class="vocab-link" onclick="showPopup('criminals', 'people who commit crimes')">criminals</span> hide where their money comes from. They get money from <span class="vocab-link" onclick="showPopup('illegal', 'against the law')">illegal</span> activities. Then they try to make this money look <span class="vocab-link" onclick="showPopup('legitimate', 'legal and acceptable')">legitimate</span>.</p>
+                            <p>The name comes from old times. Criminals used <span class="vocab-link" onclick="showPopup('laundromats', 'places where people wash clothes')">laundromats</span> to hide their bad money. They mixed illegal money with money from washing clothes. This made it hard for police to find.</p>
+                            <p>Today, money laundering is a big problem. Criminals use banks, <span class="vocab-link" onclick="showPopup('casinos', 'places where people gamble')">casinos</span>, and businesses. They move money many times. This makes it very <span class="vocab-link" onclick="showPopup('difficult', 'hard to do')">difficult</span> to follow.</p>
+                            <p>Banks and governments try to stop money laundering. They have special <span class="vocab-link" onclick="showPopup('rules', 'official instructions about what people must do')">rules</span>. But criminals always try to find new ways. This is why we need to be <span class="vocab-link" onclick="showPopup('careful', 'paying attention to avoid danger')">careful</span> with money.</p>
+                        </div>
+                    </div>
+
+                    <!-- B1 Level -->
+                    <div class="reading-level" id="B1-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>Understanding Money Laundering</h3>
+                            <p>Money laundering is a serious financial crime that affects economies worldwide. It's the process of making <span class="vocab-link" onclick="showPopup('illegally-obtained', 'gotten through breaking the law')">illegally-obtained</span> money appear <span class="vocab-link" onclick="showPopup('legitimate', 'legal and acceptable')">legitimate</span>. Criminals who earn money through drug trafficking, <span class="vocab-link" onclick="showPopup('fraud', 'dishonest schemes to get money')">fraud</span>, corruption, or other illegal activities need to hide the source of these funds before they can use them without attracting attention.</p>
+                            <p>The money laundering process typically involves three stages. First is <span class="vocab-link" onclick="showPopup('placement', 'putting something in a particular position')">placement</span>, where criminals introduce illegal cash into the financial system. This might involve depositing small amounts into bank accounts to avoid <span class="vocab-link" onclick="showPopup('suspicion', 'feeling that something wrong is happening')">suspicion</span>. Second is <span class="vocab-link" onclick="showPopup('layering', 'creating multiple levels')">layering</span>, which involves moving money through complex transactions to hide its origin. Finally, <span class="vocab-link" onclick="showPopup('integration', 'combining things into a whole')">integration</span> occurs when the "cleaned" money re-enters the economy and appears legitimate.</p>
+                            <p>Common laundering methods include using shell companies (fake businesses), buying and selling real estate, gambling at <span class="vocab-link" onclick="showPopup('casinos', 'places where people bet money on games')">casinos</span>, and <span class="vocab-link" onclick="showPopup('trade-based', 'related to buying and selling goods')">trade-based</span> schemes. Modern technology has created new opportunities, with criminals now using <span class="vocab-link" onclick="showPopup('cryptocurrency', 'digital money like Bitcoin')">cryptocurrency</span> and online platforms.</p>
+                            <p>Governments fight money laundering through <span class="vocab-link" onclick="showPopup('regulations', 'official rules controlling something')">regulations</span> called Anti-Money Laundering (AML) laws. Banks must verify customer identities, report suspicious transactions, and keep detailed records. <span class="vocab-link" onclick="showPopup('compliance', 'following rules and regulations')">Compliance</span> officers work to detect unusual patterns. However, as detection methods improve, criminals find new ways to <span class="vocab-link" onclick="showPopup('evade', 'avoid or escape from something')">evade</span> them.</p>
+                            <p>Understanding money laundering is important for business professionals. Companies must implement proper controls to avoid being used for laundering. The consequences include legal penalties, reputation damage, and contributing to organized crime. Everyone in the business world shares responsibility for maintaining the integrity of the financial system.</p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>Money Laundering: A Global Challenge</h3>
+                            <p>Money laundering represents one of the most <span class="vocab-link" onclick="showPopup('pervasive', 'spreading widely throughout')">pervasive</span> and damaging financial crimes in the modern economy. The International Monetary Fund estimates that between 2-5% of global GDP—approximately $800 billion to $2 trillion annually—is <span class="vocab-link" onclick="showPopup('laundered', 'made to appear legitimate through illegal processes')">laundered</span> through the international financial system. This staggering figure highlights how deeply <span class="vocab-link" onclick="showPopup('entrenched', 'firmly established and difficult to remove')">entrenched</span> the problem has become, affecting developed and developing nations alike.</p>
+                            <p>The three-stage process of money laundering—placement, layering, and integration—has become increasingly <span class="vocab-link" onclick="showPopup('sophisticated', 'complex and advanced')">sophisticated</span>. During placement, criminals introduce illegal funds into the financial system, often through methods designed to avoid detection thresholds. "Smurfing" or "<span class="vocab-link" onclick="showPopup('structuring', 'arranging transactions to avoid reporting requirements')">structuring</span>" involves breaking large sums into smaller deposits. Currency exchanges, casinos, and cash-intensive businesses serve as common <span class="vocab-link" onclick="showPopup('entry points', 'places where something begins or enters')">entry points</span>.</p>
+                            <p>The layering stage proves most complex, involving numerous transactions across multiple jurisdictions to <span class="vocab-link" onclick="showPopup('obscure', 'hide or make unclear')">obscure</span> the money's origin. Criminals transfer funds between shell companies, convert currencies, purchase and sell assets, and utilize <span class="vocab-link" onclick="showPopup('offshore', 'in countries with favorable tax or secrecy laws')">offshore</span> accounts. Trade-based money laundering—where criminals manipulate invoices to move value across borders—has become particularly prevalent. Over-invoicing exports or under-invoicing imports allows criminals to transfer wealth while appearing to conduct legitimate business.</p>
+                            <p>Finally, integration returns the laundered money to the criminal as apparently <span class="vocab-link" onclick="showPopup('legitimate', 'legal and conforming to rules')">legitimate</span> wealth. Real estate investments, business acquisitions, and luxury goods purchases serve this purpose. The money can now be used openly without raising suspicion about its illegal origins.</p>
+                            <p>The consequences extend far beyond the criminals themselves. Money laundering <span class="vocab-link" onclick="showPopup('undermines', 'weakens or damages gradually')">undermines</span> financial institutions' integrity, distorts asset prices, facilitates tax evasion, and funds organized crime and terrorism. Legitimate businesses struggle to compete with enterprises subsidized by criminal proceeds. Developing countries suffer particularly acute impacts, as corruption and capital flight <span class="vocab-link" onclick="showPopup('impede', 'delay or prevent progress')">impede</span> economic development.</p>
+                            <p>International cooperation has intensified through organizations like the Financial Action Task Force (FATF), which sets global standards for <span class="vocab-link" onclick="showPopup('combating', 'fighting against')">combating</span> money laundering. Banks now implement extensive Know Your Customer (KYC) and Customer Due Diligence (CDD) procedures. Suspicious Activity Reports (SARs) alert authorities to unusual transactions. However, enforcement remains <span class="vocab-link" onclick="showPopup('uneven', 'inconsistent or varying')">uneven</span>, and jurisdictions with weak regulations continue to attract illicit funds. The ongoing challenge requires balancing effective <span class="vocab-link" onclick="showPopup('deterrence', 'prevention through fear of consequences')">deterrence</span> with maintaining an efficient financial system that serves legitimate needs.</p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>The Evolving Landscape of Money Laundering and Financial Crime</h3>
+                            <p>Money laundering constitutes a <span class="vocab-link" onclick="showPopup('pernicious', 'having a harmful effect in a gradual or subtle way')">pernicious</span> threat to global financial stability, economic development, and the rule of law. While the practice itself is ancient—criminals have always sought to conceal ill-gotten gains—the scale, sophistication, and international nature of contemporary money laundering operations represent an unprecedented challenge. The <span class="vocab-link" onclick="showPopup('confluence', 'coming together of multiple factors')">confluence</span> of globalization, technological advancement, and regulatory <span class="vocab-link" onclick="showPopup('arbitrage', 'exploiting differences between jurisdictions')">arbitrage</span> has created an environment where illicit financial flows have become deeply <span class="vocab-link" onclick="showPopup('embedded', 'firmly and deeply fixed')">embedded</span> within legitimate economic activity.</p>
+                            <p>The traditional three-stage paradigm—placement, layering, and integration—while pedagogically useful, arguably oversimplifies the multifaceted reality of modern laundering schemes. Contemporary criminals employ increasingly complex <span class="vocab-link" onclick="showPopup('stratagems', 'clever plans or schemes')">stratagems</span> that blur these categorical distinctions. Trade-based money laundering (TBML), for instance, <span class="vocab-link" onclick="showPopup('circumvents', 'finds ways around obstacles')">circumvents</span> traditional financial monitoring by exploiting international commerce. Through invoice manipulation—over-invoicing exports, under-invoicing imports, or creating entirely fictitious transactions—criminals transfer value across borders while maintaining the <span class="vocab-link" onclick="showPopup('veneer', 'attractive appearance that covers the true nature')">veneer</span> of legitimate business operations. The sheer volume of global trade makes detection exceptionally challenging; distinguishing genuine commercial errors from deliberate manipulation requires sophisticated analytical capabilities.</p>
+                            <p>The emergence of <span class="vocab-link" onclick="showPopup('cryptocurrency', 'digital currency using cryptography for security')">cryptocurrency</span> has introduced novel <span class="vocab-link" onclick="showPopup('vectors', 'means of transmitting or carrying something')">vectors</span> for laundering. While blockchain technology's transparency might seem counterintuitive for criminal purposes, the <span class="vocab-link" onclick="showPopup('pseudonymous', 'using a false name')">pseudonymous</span> nature of transactions, cross-border <span class="vocab-link" onclick="showPopup('fungibility', 'ability to be exchanged for something equivalent')">fungibility</span>, and emergence of privacy coins offer significant advantages for launderers. "Crypto mixers" or "tumblers" <span class="vocab-link" onclick="showPopup('obfuscate', 'make unclear or incomprehensible')">obfuscate</span> transaction trails by pooling and redistributing funds. Decentralized finance (DeFi) platforms, operating without traditional gatekeepers, present additional regulatory challenges. However, the immutability of blockchain records also creates permanent evidence, and authorities are developing increasingly sophisticated <span class="vocab-link" onclick="showPopup('analytics', 'systematic analysis of data')">analytics</span> to trace crypto-based laundering.</p>
+                            <p>The professional enablers—lawyers, accountants, real estate agents, and corporate service providers who <span class="vocab-link" onclick="showPopup('facilitate', 'make easier or help bring about')">facilitate</span> laundering, whether knowingly or through willful blindness—represent a critical vulnerability in anti-money laundering (AML) frameworks. These "gatekeepers" possess specialized knowledge and access that prove invaluable for structuring complex schemes. Establishing shell companies in secrecy jurisdictions, creating layered ownership structures through nominees and trusts, and exploiting legal professional privilege to shield communications from scrutiny—these tactics rely heavily on professional assistance. Regulatory attention has increasingly focused on extending AML obligations beyond financial institutions to encompass these <span class="vocab-link" onclick="showPopup('auxiliary', 'providing supplementary support')">auxiliary</span> professions, though implementation remains <span class="vocab-link" onclick="showPopup('patchy', 'existing in some places but not others')">patchy</span>.</p>
+                            <p>The consequences of money laundering extend far beyond the immediate criminal <span class="vocab-link" onclick="showPopup('predicate offenses', 'underlying crimes generating illegal proceeds')">predicate offenses</span>. By enabling criminals to enjoy their proceeds without detection, laundering <span class="vocab-link" onclick="showPopup('perpetuates', 'causes to continue indefinitely')">perpetuates</span> criminal enterprises, funding continued illegal activity. The economic distortions prove substantial: asset prices become inflated in markets attractive to launderers (particularly real estate), legitimate businesses face unfair competition from enterprises subsidized by criminal capital, and financial institutions' integrity erodes. Perhaps most <span class="vocab-link" onclick="showPopup('insidiously', 'proceeding in a subtle, harmful manner')">insidiously</span>, the <span class="vocab-link" onclick="showPopup('normalization', 'making something become accepted as normal')">normalization</span> of corruption and criminality in societies with endemic laundering undermines social cohesion and governance.</p>
+                            <p>International cooperation through the Financial Action Task Force (FATF) and similar bodies has established comprehensive standards, yet implementation remains highly variable. Jurisdictions face competing pressures: robust AML enforcement protects financial integrity but imposes compliance costs and may drive business to less scrupulous competitors. This creates a <span class="vocab-link" onclick="showPopup('collective action problem', 'situation requiring coordinated effort from multiple parties')">collective action problem</span> where individual jurisdictions hesitate to implement stringent measures unless assured of reciprocal action elsewhere. The effectiveness of "name and shame" approaches—publicly identifying non-compliant jurisdictions—demonstrates mixed results. Moreover, the tension between privacy rights and financial transparency raises <span class="vocab-link" onclick="showPopup('normative', 'establishing or relating to a standard')">normative</span> questions about appropriate state surveillance of economic activity.</p>
+                            <p>Looking forward, artificial intelligence and machine learning offer promising tools for enhancing detection capabilities, identifying patterns imperceptible to human analysts. However, criminals will undoubtedly employ the same technologies to develop more sophisticated evasion techniques. The ongoing contest between laundering innovation and regulatory response seems likely to continue <span class="vocab-link" onclick="showPopup('in perpetuity', 'forever, without end')">in perpetuity</span>, requiring sustained vigilance, international cooperation, and adaptive regulatory frameworks that balance security with legitimate economic freedom.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Money Laundering Explained</h2>
+                <div class="video-container">
+                    <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
+                        <iframe
+                            src="https://www.youtube.com/embed/3MZ3VlTepiQ"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <div class="slideshow-container">
+
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeVideoSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeVideoSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1: Smurfing -->
+                        <div class="discussion-slide active slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Smurfing</h3>
+                                <p>The video explains "<span class="vocab-link" onclick="showPopup('smurfing', 'breaking large amounts into smaller deposits to avoid detection')">smurfing</span>" as breaking large amounts of illegal cash into smaller deposits (e.g., $9,000 each) to avoid triggering banking alerts. Why do you think this method is called "smurfing"?</p>
+                                <ul>
+                                    <li>How effective are banking systems at detecting this today?</li>
+                                    <li>Should deposit limits be lowered to catch smurfs?</li>
+                                    <li>What role do "smurfs" (the people making deposits) play?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&h=600&fit=crop" alt="Cash deposits" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: Layering -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Layering</h3>
+                                <p>According to the video, <span class="vocab-link" onclick="showPopup('layering', 'moving money through complex transactions to hide its origin')">layering</span> involves making the money's path "so complicated no one can trace it" through wire transfers, foreign currency conversions, and fake invoices.</p>
+                                <ul>
+                                    <li>Does this complexity make it impossible to catch criminals?</li>
+                                    <li>What tools might investigators use to follow the trail?</li>
+                                    <li>How many transactions should trigger suspicion?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&h=600&fit=crop" alt="Complex transactions" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Integration & Cash-Intensive Businesses -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Integration & Cash Businesses</h3>
+                                <p>The video shows how criminals use real estate, stocks, and gambling winnings to <span class="vocab-link" onclick="showPopup('integrate', 'reintroduce cleaned money into the economy as legitimate')">integrate</span> money. It also describes cafes and bars as fronts to "soak up dirty cash."</p>
+                                <ul>
+                                    <li>Which integration method is hardest to detect?</li>
+                                    <li>Have you noticed suspicious businesses that stay open despite being empty?</li>
+                                    <li>Should all cash businesses face extra scrutiny?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=800&h=600&fit=crop" alt="Cash business" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: Trade-Based Laundering -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Trade-Based Laundering</h3>
+                                <p>The video explains how criminals fake export <span class="vocab-link" onclick="showPopup('invoices', 'bills for goods or services')">invoices</span> for goods that don't exist, or ship empty containers while claiming full value—justifying massive money transfers across borders.</p>
+                                <ul>
+                                    <li>Why do customs agents struggle to catch this?</li>
+                                    <li>Should there be stricter international trade inspections?</li>
+                                    <li>How can legitimate businesses protect themselves from being used?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&h=600&fit=crop" alt="International trade" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5: Black Market Peso Exchange -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Black Market Peso Exchange</h3>
+                                <p>This method involves Colombian cartels using black market brokers to swap US dollars for <span class="vocab-link" onclick="showPopup('pesos', 'Colombian currency')">pesos</span> without crossing borders—creating parallel money flows that look normal on the surface.</p>
+                                <ul>
+                                    <li>Why is this system so hard to detect?</li>
+                                    <li>Could this method work in other countries?</li>
+                                    <li>What role do legitimate importers play (knowingly or unknowingly)?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1582560475093-ba66accbc424?w=800&h=600&fit=crop" alt="Currency exchange" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 6: Real Estate Laundering -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Real Estate Laundering</h3>
+                                <p>The video mentions luxury properties sitting empty because "they're not homes—they're hiding places." Criminals buy property through <span class="vocab-link" onclick="showPopup('shell companies', 'fake businesses with no real operations')">shell companies</span>, then sell to themselves to clean money.</p>
+                                <ul>
+                                    <li>Should governments require transparency about property ownership?</li>
+                                    <li>What are the pros and cons of anonymity in real estate?</li>
+                                    <li>How does this affect housing affordability in major cities?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop" alt="Luxury real estate" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 7: Shell Companies -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Shell Companies</h3>
+                                <p>Shell companies look legitimate but have "no employees, no office, no product"—existing only on paper in places like Panama and the <span class="vocab-link" onclick="showPopup('British Virgin Islands', 'Caribbean territory known for financial secrecy')">British Virgin Islands</span>.</p>
+                                <ul>
+                                    <li>Why do these jurisdictions allow shell companies to exist?</li>
+                                    <li>Should they be made illegal globally?</li>
+                                    <li>What legitimate reasons might people have for using shell companies?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop" alt="Corporate buildings" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 8: Bank Complicity & Offshore Accounts -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Bank Complicity & Offshore Accounts</h3>
+                                <p>The video reveals that bankers sometimes "wave through" suspicious transactions—either through bribes or "not wanting to know." <span class="vocab-link" onclick="showPopup('Offshore accounts', 'bank accounts in countries with favorable secrecy laws')">Offshore accounts</span> in the Cayman Islands and Switzerland hide both money and ownership.</p>
+                                <ul>
+                                    <li>Should individual bankers face criminal charges for complicity?</li>
+                                    <li>Should offshore banking be legal?</li>
+                                    <li>How can regulations balance privacy with transparency?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop" alt="Banking" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToVideoSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(6)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(7)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(8)"></span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Vocabulary Section -->
             <div class="section" id="vocabulary">
-                <h2>AI & Technology Vocabulary</h2>
+                <h2>Vocabulary</h2>
                 <div class="vocab-container">
                     <div class="vocab-nav">
-                        <button class="page-btn active" onclick="showVocabPage(1, this)">AI Basics</button>
-                        <button class="page-btn" onclick="showVocabPage(2, this)">Technical Terms</button>
-                        <button class="page-btn" onclick="showVocabPage(3, this)">Advanced Concepts</button>
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Financial Crime Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Business Vocabulary</button>
                     </div>
 
                     <div class="vocab-page active" id="vocab-page-1">
                         <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Hallucination</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">When AI generates false or fabricated information</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Algorithm</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Step-by-step instructions for computer problem-solving</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Chatbot</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">AI program designed to simulate conversation with users</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Dataset</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Collection of data used to train AI systems</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Accuracy</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">How correct and precise AI outputs are</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Bias</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Unfair preferences in AI based on training data</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Money Laundering</div></div><div class="flashcard-back"><div class="flashcard-definition">Making illegally-obtained money appear legitimate through complex transactions</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Placement</div></div><div class="flashcard-back"><div class="flashcard-definition">The first stage of laundering where illegal cash enters the financial system</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Layering</div></div><div class="flashcard-back"><div class="flashcard-definition">Moving money through complex transactions to hide its origin</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Integration</div></div><div class="flashcard-back"><div class="flashcard-definition">The final stage where cleaned money re-enters the economy as legitimate</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Shell Company</div></div><div class="flashcard-back"><div class="flashcard-definition">A fake business used to hide illegal financial activities</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Structuring</div></div><div class="flashcard-back"><div class="flashcard-definition">Breaking large transactions into smaller ones to avoid detection</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">AML</div></div><div class="flashcard-back"><div class="flashcard-definition">Anti-Money Laundering - laws and regulations to prevent financial crime</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Compliance</div></div><div class="flashcard-back"><div class="flashcard-definition">Following rules and regulations to prevent illegal activities</div></div></div></div>
                         </div>
                     </div>
 
                     <div class="vocab-page" id="vocab-page-2">
                         <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Prompt</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Text input given to AI to generate response</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Model</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">The AI system trained to perform specific tasks</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Training</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Process of teaching AI using data and examples</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Output</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Information or content generated by AI system</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Verification</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Checking if AI information is accurate and true</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Reliability</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">How consistently trustworthy AI results are</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="vocab-page" id="vocab-page-3">
-                        <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Generative</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">AI that creates new content like text or images</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Synthetic</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Artificially created by computer systems, not real</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Fabrication</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Making up false information that seems real</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Misinformation</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">False information spread unintentionally</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Credibility</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Quality of being trusted and believed in</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Oversight</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Supervision and monitoring to ensure proper use</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Legitimate</div></div><div class="flashcard-back"><div class="flashcard-definition">Legal, valid, and conforming to rules or standards</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Fraud</div></div><div class="flashcard-back"><div class="flashcard-definition">Dishonest schemes designed to gain money or advantage illegally</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cryptocurrency</div></div><div class="flashcard-back"><div class="flashcard-definition">Digital currency secured by cryptography like Bitcoin or Ethereum</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Offshore</div></div><div class="flashcard-back"><div class="flashcard-definition">Located in foreign countries with favorable tax or secrecy laws</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Due Diligence</div></div><div class="flashcard-back"><div class="flashcard-definition">Careful investigation or research before making a business decision</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sanctions</div></div><div class="flashcard-back"><div class="flashcard-definition">Penalties or restrictions imposed for violating laws or regulations</div></div></div></div>
                         </div>
                     </div>
                 </div>
@@ -1575,16 +1364,14 @@
 
             <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
             <div class="section" id="quiz">
-                <h2>AI Vocabulary Quiz</h2>
+                <h2>Vocabulary Quiz</h2>
                 <div class="quiz-container">
                     <div class="quiz-header" id="quiz-header">
                         <div class="quiz-nav">
                             <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
                         </div>
                         <div class="progress-container">
-                            <div style="text-align: center; margin-bottom: 10px;">
-                                <span id="questionCounter" style="font-size: 1.2rem; font-weight: 600; color: #2d3748;">Question 1 of 10</span>
-                            </div>
+                            <div id="quiz-counter">Question 1 of 10</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" id="quizProgressFill"></div>
                             </div>
@@ -1594,459 +1381,190 @@
                         </div>
                     </div>
 
-                    <!-- Dynamic Quiz Questions Container -->
                     <div id="quiz-questions-container">
-                        <!-- Questions will be dynamically generated here -->
+                        <!-- Questions will be generated dynamically -->
                     </div>
 
-                    <!-- Results Page -->
                     <div class="quiz-page" id="quiz-results-page" style="display: none;">
                         <div class="results-summary">
                             <h3>Quiz Complete!</h3>
                             <div class="score" id="finalQuizScore">0/10</div>
-                            <p>Well done! You've completed the AI Vocabulary quiz.</p>
                             <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Vocabulary Popup -->
-    <div class="popup-overlay" id="vocabPopup">
-        <div class="popup-content">
-            <div class="popup-word" id="popupWord"></div>
-            <div class="popup-definition" id="popupDefinition"></div>
-            <button class="popup-close" onclick="closePopup()">Close</button>
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>Writing Practice</h2>
+                <div class="writing-container">
+                    <div class="writing-content">
+                        <h3 class="writing-question">Money Laundering and Business Ethics</h3>
+
+                        <p class="writing-objective">
+                            Write a short paragraph (100-150 words) about the role of businesses in preventing money laundering. What responsibilities do companies have? What measures should they implement? How can businesses balance compliance with customer privacy? Share your thoughts with your teacher.
+                        </p>
+
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group">
+                                <label for="studentName">Student Name</label>
+                                <input type="text" id="studentName" name="studentName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teacherEmail">Teacher's Email</label>
+                                <input type="email" id="teacherEmail" name="teacherEmail" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="writingInput">Your Response</label>
+                                <input type="text" id="writingInput" name="writingInput" required>
+                            </div>
+
+                            <div class="button-container">
+                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send Response</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Vocabulary Popup -->
+            <div class="popup-overlay" id="vocabPopup">
+                <div class="popup-content">
+                    <div class="popup-word" id="popupWord"></div>
+                    <div class="popup-definition" id="popupDefinition"></div>
+                    <button class="popup-close" onclick="closePopup()">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Global variables
+        // Slideshow variables
         let currentSlide = 1;
         let totalSlides = 5;
 
-        // New Quiz System Variables
-        let currentQuizQuestion = 1;
-        let totalQuizQuestions = 10;
-        let quizQuestions = [];
-        let userQuizAnswers = {};
-        let quizScore = 0;
-
-        // Vocabulary Database from Flashcards
+        // Vocabulary database for the quiz
         const vocabularyDatabase = [
             {
-                term: "Hallucination",
-                definition: "When AI generates false or fabricated information",
-                sentences: ["The AI _____ included completely fake statistics.", "We need to prevent _____ in language models.", "That _____ made the chatbot cite nonexistent sources."]
+                term: "laundering",
+                definition: "Making illegally-obtained money appear legitimate.",
+                category: "finance",
+                sentences: [
+                    "Money ___ is a serious financial crime that affects the global economy.",
+                    "The bank was fined for failing to detect ___ activities.",
+                    "Criminals use various methods for ___ their illegal proceeds."
+                ]
             },
             {
-                term: "Algorithm",
-                definition: "Step-by-step instructions for computer problem-solving",
-                sentences: ["The _____ determines how the AI processes data.", "Engineers improved the _____ to reduce errors.", "This _____ helps the system learn patterns."]
+                term: "placement",
+                definition: "The first stage of money laundering where illegal cash enters the financial system.",
+                category: "finance",
+                sentences: [
+                    "The ___ stage involves depositing illegal cash into banks.",
+                    "During ___, criminals try to avoid triggering reporting requirements.",
+                    "Successful ___ is the first step in the laundering process."
+                ]
             },
             {
-                term: "Chatbot",
-                definition: "AI program designed to simulate conversation with users",
-                sentences: ["The _____ answered my questions about the product.", "Many companies use _____ for customer service.", "This _____ can speak multiple languages."]
+                term: "layering",
+                definition: "Moving money through complex transactions to hide its origin.",
+                category: "finance",
+                sentences: [
+                    "The ___ stage makes it difficult to trace the money's source.",
+                    "Through ___, criminals move funds across multiple accounts.",
+                    "Complex ___ schemes can involve dozens of transactions."
+                ]
             },
             {
-                term: "Dataset",
-                definition: "Collection of data used to train AI systems",
-                sentences: ["The _____ contains millions of text examples.", "Researchers built a new _____ for training.", "A biased _____ leads to biased AI outputs."]
+                term: "integration",
+                definition: "The final stage where cleaned money re-enters the economy.",
+                category: "finance",
+                sentences: [
+                    "During ___, the laundered money appears legitimate.",
+                    "The ___ phase allows criminals to use their money openly.",
+                    "Real estate purchases are common during the ___ stage."
+                ]
             },
             {
-                term: "Accuracy",
-                definition: "How correct and precise AI outputs are",
-                sentences: ["The model's _____ improved after more training.", "We measure _____ by comparing AI outputs to facts.", "High _____ is essential for medical AI systems."]
+                term: "compliance",
+                definition: "Following rules and regulations to prevent illegal activities.",
+                category: "business",
+                sentences: [
+                    "Banks must maintain strict ___ with AML regulations.",
+                    "The ___ officer monitors suspicious transactions.",
+                    "Failure to ensure ___ can result in heavy fines."
+                ]
             },
             {
-                term: "Bias",
-                definition: "Unfair preferences in AI based on training data",
-                sentences: ["The AI showed _____ against certain groups.", "Developers work to eliminate _____ from algorithms.", "Gender _____ was found in the hiring AI."]
+                term: "legitimate",
+                definition: "Legal, valid, and conforming to rules or standards.",
+                category: "business",
+                sentences: [
+                    "The money appeared ___ after being laundered.",
+                    "Only ___ businesses should be used for transactions.",
+                    "It's difficult to distinguish ___ transactions from illegal ones."
+                ]
             },
             {
-                term: "Prompt",
-                definition: "Text input given to AI to generate response",
-                sentences: ["I wrote a detailed _____ to get better results.", "The _____ asked the AI to explain quantum physics.", "A clear _____ produces more accurate answers."]
+                term: "fraud",
+                definition: "Dishonest schemes designed to gain money illegally.",
+                category: "finance",
+                sentences: [
+                    "The company was involved in financial ___.",
+                    "Identity ___ is increasingly common in the digital age.",
+                    "Preventing ___ requires constant vigilance."
+                ]
             },
             {
-                term: "Model",
-                definition: "The AI system trained to perform specific tasks",
-                sentences: ["This language _____ was trained on internet text.", "The company released a new AI _____.", "Our _____ can generate images from descriptions."]
+                term: "offshore",
+                definition: "Located in foreign countries with favorable tax or secrecy laws.",
+                category: "finance",
+                sentences: [
+                    "Many criminals hide assets in ___ accounts.",
+                    "The ___ banking industry has faced increased scrutiny.",
+                    "Money was transferred to an ___ shell company."
+                ]
             },
             {
-                term: "Training",
-                definition: "Process of teaching AI using data and examples",
-                sentences: ["The _____ process took several weeks.", "Better _____ data leads to better AI performance.", "We're _____ the model on medical literature."]
+                term: "regulations",
+                definition: "Official rules controlling something.",
+                category: "business",
+                sentences: [
+                    "Financial ___ aim to prevent money laundering.",
+                    "Banks must comply with strict AML ___.",
+                    "New ___ make it harder for criminals to launder money."
+                ]
             },
             {
-                term: "Output",
-                definition: "Information or content generated by AI system",
-                sentences: ["The AI's _____ contained several errors.", "We reviewed the _____ for accuracy.", "The _____ was surprisingly creative and detailed."]
-            },
-            {
-                term: "Verification",
-                definition: "Checking if AI information is accurate and true",
-                sentences: ["_____ is essential before trusting AI results.", "The team performed _____ on all AI claims.", "Without _____, hallucinations go undetected."]
-            },
-            {
-                term: "Reliability",
-                definition: "How consistently trustworthy AI results are",
-                sentences: ["The system's _____ has improved significantly.", "We can't depend on AI without high _____.", "Testing showed low _____ for complex questions."]
-            },
-            {
-                term: "Generative",
-                definition: "AI that creates new content like text or images",
-                sentences: ["_____ AI can write essays and stories.", "The _____ model produced realistic artwork.", "_____ systems raise concerns about misinformation."]
-            },
-            {
-                term: "Synthetic",
-                definition: "Artificially created by computer systems, not real",
-                sentences: ["The image was _____, not a real photograph.", "_____ data can supplement real training examples.", "It's hard to distinguish _____ voices from real ones."]
-            },
-            {
-                term: "Fabrication",
-                definition: "Making up false information that seems real",
-                sentences: ["The AI's _____ of legal cases caused problems.", "_____ is a serious issue in AI journalism.", "We detected _____ in the generated citations."]
-            },
-            {
-                term: "Misinformation",
-                definition: "False information spread unintentionally",
-                sentences: ["AI hallucinations can create _____.", "Social media platforms struggle with _____.", "_____ spreads faster than corrections."]
-            },
-            {
-                term: "Credibility",
-                definition: "Quality of being trusted and believed in",
-                sentences: ["The AI's _____ suffered after the errors.", "Fact-checking maintains _____.", "Users question the _____ of AI sources."]
-            },
-            {
-                term: "Oversight",
-                definition: "Supervision and monitoring to ensure proper use",
-                sentences: ["Human _____ prevents AI mistakes.", "The committee provides _____ for AI development.", "Proper _____ is necessary for AI safety."]
+                term: "sophisticated",
+                definition: "Complex and advanced.",
+                category: "general",
+                sentences: [
+                    "Money laundering schemes have become increasingly ___.",
+                    "Criminals use ___ technology to evade detection.",
+                    "A ___ approach is needed to combat financial crime."
+                ]
             }
         ];
 
-
-
-        // Initialize new quiz system
-        function initializeVocabQuiz() {
-            currentQuizQuestion = 1;
-            userQuizAnswers = {};
-            quizScore = 0;
-            quizQuestions = [];
-
-            // Filter vocabulary to only include single words (no spaces or hyphens)
-            const singleWordVocab = vocabularyDatabase.filter(item =>
-                !item.term.includes(' ') && !item.term.includes('-')
-            );
-
-            // Shuffle the vocabulary array to ensure randomness
-            const shuffledVocab = [...singleWordVocab].sort(() => Math.random() - 0.5);
-
-            // Generate 10 unique questions
-            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
-                const vocabItem = shuffledVocab[i];
-                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
-                const hint = vocabItem.term.toLowerCase().substring(0, Math.min(3, vocabItem.term.length)) + '...';
-
-                quizQuestions.push({
-                    type: 'fill-blank',
-                    question: `Complete the sentence: "${sentence}"`,
-                    correctAnswer: vocabItem.term.toLowerCase(),
-                    hint: hint,
-                    correctTerm: vocabItem.term
-                });
-            }
-
-            // Create HTML for all questions
-            generateQuizHTML();
-            showQuizQuestion(1);
-            updateQuizProgress();
-        }
-
-        // Generate HTML for quiz questions (text input only)
-        function generateQuizHTML() {
-            const container = document.getElementById('quiz-questions-container');
-            container.innerHTML = '';
-
-            quizQuestions.forEach((q, index) => {
-                const questionNum = index + 1;
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'quiz-page';
-                questionDiv.id = `quiz-question-${questionNum}`;
-                if (questionNum === 1) questionDiv.classList.add('active');
-
-                questionDiv.innerHTML = `
-                    <div class="quiz-question">
-                        <h3>${q.question}</h3>
-                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
-                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
-                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
-                    </div>
-                `;
-
-                container.appendChild(questionDiv);
-            });
-        }
-
-
-        // Handle Enter key press in quiz inputs
-        function handleQuizKeyPress(event, questionNum) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
-                if (!checkButton.disabled) {
-                    checkQuizAnswer(questionNum);
-                }
-            }
-        }
-
-        // Check quiz answer (text input only)
-        function checkQuizAnswer(questionNum) {
-            const question = quizQuestions[questionNum - 1];
-            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
-            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
-
-            let isCorrect = false;
-
-            // Text input validation
-            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
-            const userAnswer = userInput.value.trim().toLowerCase();
-
-            if (!userAnswer) {
-                alert('Please enter an answer first!');
-                return;
-            }
-
-            // Check for multiple acceptable answers (singular, plural, variations)
-            const correctAnswers = [
-                question.correctAnswer,
-                question.correctAnswer + 's',  // plural
-                question.correctAnswer + 'es', // plural for words ending in 's', 'x', 'z', 'ch', 'sh'
-                question.correctAnswer.replace(/y$/, 'ies'), // plural for words ending in 'y'
-                question.correctAnswer.replace(/f$/, 'ves'), // plural for words ending in 'f'
-                question.correctAnswer.replace(/fe$/, 'ves') // plural for words ending in 'fe'
-            ];
-
-            // Remove duplicates and filter out invalid plurals
-            const validAnswers = [...new Set(correctAnswers)].filter(answer =>
-                answer !== question.correctAnswer + 'ys' || question.correctAnswer.endsWith('y')
-            );
-
-            isCorrect = validAnswers.includes(userAnswer);
-
-            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
-
-            // Show feedback
-            feedback.style.display = 'block';
-            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-            feedback.textContent = isCorrect ? 'Correct! Well done!' :
-                `Incorrect. The correct answer is: ${question.correctTerm}`;
-
-            // Store answer
-            userQuizAnswers[questionNum] = isCorrect;
-            if (isCorrect) quizScore++;
-
-            // Disable button
-            checkButton.disabled = true;
-            checkButton.style.opacity = '0.6';
-
-            // Play sound effect if correct
-            if (isCorrect) {
-                const correctSound = new Audio('https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3');
-                correctSound.play().catch(e => console.log('Audio playbook failed:', e));
-            }
-
-            updateQuizProgress();
-
-            // Auto-advance after 2 seconds
-            setTimeout(() => {
-                if (currentQuizQuestion < totalQuizQuestions) {
-                    nextQuizQuestion();
-                } else {
-                    showQuizResults();
-                }
-            }, 2000);
-        }
-
-        // Show specific quiz question
-        function showQuizQuestion(questionNum) {
-            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
-            questions.forEach(q => q.classList.remove('active'));
-
-            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
-            if (currentQ) {
-                currentQ.classList.add('active');
-
-                // Auto-focus on the input field for rapid typing
-                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
-                if (inputField && !inputField.disabled) {
-                    setTimeout(() => inputField.focus(), 100);
-                }
-            }
-
-            currentQuizQuestion = questionNum;
-            updateQuizProgress();
-            updateQuizNavButtons();
-        }
-
-        // Next question
-        function nextQuizQuestion() {
-            if (currentQuizQuestion < totalQuizQuestions) {
-                showQuizQuestion(currentQuizQuestion + 1);
-            }
-        }
-
-        // Previous question
-        function previousQuizQuestion() {
-            if (currentQuizQuestion > 1) {
-                showQuizQuestion(currentQuizQuestion - 1);
-            }
-        }
-
-        // Update progress
-        function updateQuizProgress() {
-            const counter = document.getElementById('questionCounter');
-            const progressBar = document.getElementById('quizProgressFill');
-
-            if (counter) {
-                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
-            }
-
-            if (progressBar) {
-                const progressPercent = ((currentQuizQuestion - 1) / totalQuizQuestions) * 100;
-                progressBar.style.width = progressPercent + '%';
-            }
-        }
-
-        // Update navigation buttons
-        function updateQuizNavButtons() {
-            const prevBtn = document.getElementById('prevQuizBtn');
-            const nextBtn = document.getElementById('nextQuizBtn');
-
-            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
-            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
-        }
-
-        // Show quiz results
-        function showQuizResults() {
-            const questionsContainer = document.getElementById('quiz-questions-container');
-            const resultsPage = document.getElementById('quiz-results-page');
-            const finalScore = document.getElementById('finalQuizScore');
-            const quizHeader = document.getElementById('quiz-header');
-
-            questionsContainer.style.display = 'none';
-            resultsPage.style.display = 'flex';
-            quizHeader.style.display = 'none';
-
-            if (finalScore) {
-                finalScore.textContent = `${quizScore}/${totalQuizQuestions}`;
-            }
-        }
-
-        // Restart quiz
-        function restartVocabQuiz() {
-            const questionsContainer = document.getElementById('quiz-questions-container');
-            const resultsPage = document.getElementById('quiz-results-page');
-            const quizHeader = document.getElementById('quiz-header');
-
-            // Reset display
-            questionsContainer.style.display = 'block';
-            resultsPage.style.display = 'none';
-            quizHeader.style.display = 'flex';
-
-            // Reinitialize quiz
-            initializeVocabQuiz();
-        }
-
-        // Navigation functions
-        function showSection(sectionName, element) {
-            // Hide all sections
+        // Section switching
+        function showSection(sectionId, navItem) {
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => section.classList.remove('active'));
 
-            // Remove active class from all nav items
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
 
-            // Show selected section
-            document.getElementById(sectionName).classList.add('active');
 
-            // Add active class to clicked nav item
-            if (element) {
-                element.classList.add('active');
-            }
+            document.getElementById(sectionId).classList.add('active');
+            navItem.classList.add('active');
         }
 
-        function openWritingForm(element) {
-            // Remove active class from all nav items
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-
-            // Add active class to clicked nav item
-            if (element) {
-                element.classList.add('active');
-            }
-
-            // Open Google Forms in new tab
-            window.open('https://docs.google.com/forms/d/e/1FAIpQLSfW2Wieh456joS23nFUFiUB_czgM1vBPVeZ8n1s-bCwolnQ6Q/viewform?usp=header', '_blank');
-
-            // Remove active class after a short delay to show it was clicked
-            setTimeout(() => {
-                if (element) {
-                    element.classList.remove('active');
-                }
-                // Reset to discussion tab as default
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-            }, 300);
-        }
-
-        function showVocabPage(pageNum, element) {
-            // Hide all vocab pages
-            const pages = document.querySelectorAll('.vocab-page');
-            pages.forEach(page => page.classList.remove('active'));
-
-            // Remove active class from all page buttons
-            const buttons = document.querySelectorAll('.vocab-nav .page-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-
-            // Show selected page
-            document.getElementById('vocab-page-' + pageNum).classList.add('active');
-
-            // Add active class to clicked button
-            if (element) {
-                element.classList.add('active');
-            }
-        }
-
-        // Flashcard function with sound effect
-        function flipCard(card) {
-            card.classList.toggle('flipped');
-
-            // Play sound effect
-            const flipSound = document.getElementById('flipSound');
-            if (flipSound) {
-                flipSound.currentTime = 0;
-                flipSound.play().catch(e => {
-                    console.log('Audio playback failed:', e);
-                });
-            }
-        }
-
-        // Vocabulary popup functions
-        function showPopup(word, definition) {
-            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
-            document.getElementById('popupDefinition').textContent = definition;
-            document.getElementById('vocabPopup').style.display = 'flex';
-        }
-
-        function closePopup() {
-            document.getElementById('vocabPopup').style.display = 'none';
-        }
-
-        // Discussion Slideshow Functions
+        // Slideshow functionality
         function changeSlide(direction) {
             const slides = document.querySelectorAll('.discussion-slide');
             const dots = document.querySelectorAll('.indicator-dot');
@@ -2080,29 +1598,294 @@
             dots[currentSlide - 1].classList.add('active');
         }
 
-        // Keyboard navigation for slideshow
-        document.addEventListener('keydown', function(e) {
-            const discussionSection = document.getElementById('discussion');
+        // Video Discussions Slideshow
+        let currentVideoSlide = 1;
+        let totalVideoSlides = 8;
 
-            if (discussionSection && discussionSection.classList.contains('active')) {
-                if (e.key === 'ArrowLeft') {
-                    changeSlide(-1);
-                } else if (e.key === 'ArrowRight') {
-                    changeSlide(1);
+        function changeVideoSlide(direction) {
+            const videoSection = document.getElementById('video-discussions');
+            const slides = videoSection.querySelectorAll('.discussion-slide');
+            const dots = videoSection.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide += direction;
+
+            if (currentVideoSlide > totalVideoSlides) {
+                currentVideoSlide = 1;
+            }
+            if (currentVideoSlide < 1) {
+                currentVideoSlide = totalVideoSlides;
+            }
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        function goToVideoSlide(slideNum) {
+            const videoSection = document.getElementById('video-discussions');
+            const slides = videoSection.querySelectorAll('.discussion-slide');
+            const dots = videoSection.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide = slideNum;
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        // Reading section management
+        function showReadingLevel(level, button) {
+            document.querySelectorAll('.reading-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.querySelectorAll('.reading-level').forEach(levelDiv => levelDiv.style.display = 'none');
+            document.getElementById(level + '-level').style.display = 'block';
+        }
+
+        // Vocabulary section management
+        function showVocabPage(pageNum, element) {
+            document.querySelectorAll('.vocab-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.vocab-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Vocabulary popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+
+                container.appendChild(questionDiv);
+            });
+        }
+
+
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
                 }
             }
-        });
+        }
+
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+
+            const isCorrect = userAnswer === question.correctAnswer;
+
+            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' :
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+
+            if (isCorrect && !userQuizAnswers[questionNum]) {
+                 quizScore++;
+            }
+            userQuizAnswers[questionNum] = isCorrect;
+
+            checkButton.disabled = true;
+
+            updateQuizProgress();
+
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        function updateQuizProgress() {
+            const counter = document.getElementById('quiz-counter');
+            const progressBar = document.getElementById('quizProgressFill');
+
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+
+            if (progressBar) {
+                const answeredCount = Object.keys(userQuizAnswers).length;
+                const progressPercent = (answeredCount / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'block';
+            document.getElementById('finalQuizScore').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+
+        function restartVocabQuiz() {
+            document.getElementById('quiz-results-page').style.display = 'none';
+            document.getElementById('quiz-questions-container').style.display = 'block';
+            document.getElementById('quiz-header').style.display = 'flex';
+            initializeVocabQuiz();
+        }
+
+        // Vocabulary popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Writing section management
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+            const writingResponse = document.getElementById('writingInput').value.trim();
+
+            if (!studentName || !teacherEmail || !writingResponse) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const subject = encodeURIComponent('Money Laundering Assignment - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
+            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            initializeVocabQuiz(); // Initialize the new vocabulary-based quiz
+            initializeVocabQuiz();
+            showReadingLevel('A2', document.querySelector('.reading-nav .page-btn'));
 
             // Close popup when clicking outside
-            document.getElementById('vocabPopup').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closePopup();
-                }
-            });
+            const vocabPopup = document.getElementById('vocabPopup');
+            if (vocabPopup) {
+                vocabPopup.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closePopup();
+                    }
+                });
+            }
         });
     </script>
 </body>
