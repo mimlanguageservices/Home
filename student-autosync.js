@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 const path = require('path');
 
-const CHECK_INTERVAL = 60000; // Check every 60 seconds
+const CHECK_INTERVAL = 300000; // Check every 5 minutes (300 seconds)
 
 console.log('Student Roster Auto-Sync Service Started');
 console.log(`Check interval: ${CHECK_INTERVAL / 1000} seconds\n`);
