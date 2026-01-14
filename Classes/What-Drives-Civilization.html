@@ -1,0 +1,2368 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Property Ladder - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1800px;
+            height: 95%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 60px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        /* Image-only slide (Slide 1) */
+        .slide-image-only {
+            padding: 0;
+        }
+
+        /* Horizontal layout slides (Slides 2-5) */
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            max-width: 50%;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .slide-text-section-left ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .slide-text-section-left li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        /* Slide choice link styles */
+        .slide-choice-link {
+            color: #4a5568;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+        }
+
+        .slide-choice-link:hover {
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .slide-choice-link:hover::before {
+            color: #764ba2;
+            transform: scale(1.3);
+        }
+
+        .slide-image-section-right {
+            width: 45%;
+            max-width: 50%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Navigation Arrows - Outside the white box */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -60px;
+        }
+
+        .slide-arrow.next {
+            right: -60px;
+        }
+
+        /* Slide Indicators */
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .flashcard-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+            color: #a0aec0;
+            opacity: 0.8;
+        }
+
+        .flashcard:hover .flashcard-inner {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* NEW QUIZ SYSTEM STYLES */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .quiz-input.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .quiz-input.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice input[type="radio"] {
+            display: none;
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.correct {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.incorrect {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .check-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: rgba(160, 174, 192, 0.5);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-weight: 500;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+
+        /* Vocabulary Popup Styles */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-word {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .popup-definition {
+            font-size: 1.3rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+
+            .header .website a {
+                font-size: 1rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+                margin-top: 15px;
+            }
+
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 20px 15px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                background: rgba(45, 55, 72, 0.95);
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 120px;
+                margin: 5px;
+                font-size: 0.95rem;
+                padding: 12px 16px;
+                border-radius: 20px;
+            }
+
+            .content {
+                height: auto;
+                overflow: visible;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .section {
+                padding: 25px 15px;
+                height: auto;
+                overflow: visible;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .discussion-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                height: auto;
+            }
+
+            .discussion-header {
+                order: -1;
+                padding: 20px;
+            }
+
+            .actual-image {
+                width: 250px;
+                height: 150px;
+                margin: 0 auto 15px;
+                border-radius: 12px;
+            }
+
+            .discussion-question {
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .discussion-question h3 {
+                font-size: 1.3rem;
+            }
+
+            /* Mobile styles for slideshow */
+            .slideshow-container {
+                padding: 20px 15px;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .slide-content-wrapper {
+                height: auto;
+                min-height: 80vh;
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .discussion-slide {
+                padding: 20px 15px;
+                height: auto;
+                min-height: 80vh;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .slide-horizontal {
+                flex-direction: column !important;
+                gap: 20px;
+            }
+
+            .slide-text-section-left {
+                max-width: 100%;
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .slide-text-section-left h3 {
+                font-size: 1.4rem;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .slide-text-section-left p {
+                font-size: 1rem;
+                line-height: 1.6;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .slide-text-section-left ul {
+                margin-top: 15px;
+            }
+
+            .slide-text-section-left li {
+                font-size: 0.95rem;
+                margin-bottom: 10px;
+                padding-left: 25px;
+            }
+
+            .slide-image-section-right {
+                width: 100%;
+                max-width: 100%;
+                height: 250px;
+                margin-top: 20px;
+                border-radius: 12px;
+            }
+
+            .slide-image-section-right img {
+                border-radius: 10px;
+            }
+
+            .slide-arrow {
+                width: 40px;
+                height: 40px;
+                z-index: 1000;
+            }
+
+            .slide-arrow.prev {
+                left: 10px;
+            }
+
+            .slide-arrow.next {
+                right: 10px;
+            }
+
+            .slide-indicators {
+                bottom: 20px;
+                gap: 8px;
+            }
+
+            .indicator-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .discussion-question p {
+                font-size: 1rem;
+            }
+
+            .reading-container {
+                height: auto;
+            }
+
+            .reading-nav, .reading-subnav {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .page-btn {
+                font-size: 0.95rem;
+                padding: 10px 16px;
+                flex: 1;
+                min-width: 100px;
+                border-radius: 20px;
+            }
+
+            .reading-page {
+                height: auto;
+                overflow: visible;
+                max-height: none;
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            .reading-page h3 {
+                font-size: 1.5rem;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+                line-height: 1.7;
+            }
+
+            .vocab-container {
+                height: auto;
+            }
+
+            .vocab-nav {
+                gap: 8px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                height: auto;
+            }
+
+            .flashcard {
+                height: 200px;
+            }
+
+            .flashcard-front, .flashcard-back {
+                border-radius: 16px;
+            }
+
+            .flashcard-term {
+                font-size: 1.7rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.3rem;
+            }
+
+            .flashcard-hint {
+                font-size: 1rem;
+            }
+
+            .quiz-container {
+                height: auto;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .quiz-nav {
+                justify-content: center;
+            }
+
+            .nav-btn {
+                font-size: 1rem;
+                padding: 10px 20px;
+                border-radius: 20px;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+                margin: 0 10px;
+                border-radius: 16px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.6rem;
+                margin-bottom: 25px;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                max-width: 100%;
+            }
+
+            .choice {
+                font-size: 1.1rem;
+                padding: 20px;
+                border-radius: 12px;
+            }
+
+            .quiz-input {
+                font-size: 1.3rem;
+                max-width: 100%;
+                padding: 15px 20px;
+                border-radius: 20px;
+            }
+
+            .check-button {
+                font-size: 1.3rem;
+                padding: 15px 30px;
+                margin: 20px auto;
+                border-radius: 20px;
+            }
+
+            .feedback {
+                font-size: 1rem;
+                margin: 20px 10px;
+                border-radius: 10px;
+            }
+
+            .results-summary {
+                padding: 30px 20px;
+                margin: 0 10px;
+                border-radius: 16px;
+            }
+
+            .results-summary h3 {
+                font-size: 1.8rem;
+            }
+
+            .score {
+                font-size: 3rem;
+            }
+
+            .popup-content {
+                margin: 15px;
+                padding: 30px 25px;
+                max-width: 90%;
+                border-radius: 16px;
+            }
+
+            .popup-word {
+                font-size: 1.6rem;
+            }
+
+            .popup-definition {
+                font-size: 1.1rem;
+            }
+
+            .popup-close {
+                border-radius: 20px;
+            }
+
+            .vocab-link {
+                font-size: 1rem;
+                padding: 3px 8px;
+                display: inline-block;
+                margin: 1px;
+                border-radius: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .nav-item {
+                font-size: 0.85rem;
+                padding: 10px 12px;
+                min-width: 100px;
+            }
+
+            .section {
+                padding: 20px 12px;
+            }
+
+            .section h2 {
+                font-size: 1.6rem;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard {
+                height: 180px;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+
+            .reading-page {
+                padding: 20px 15px;
+            }
+
+            .discussion-question {
+                padding: 18px;
+            }
+
+            .actual-image {
+                width: 200px;
+                height: 120px;
+            }
+
+            .quiz-input {
+                font-size: 1.2rem;
+                padding: 12px 16px;
+            }
+
+            .check-button {
+                font-size: 1.2rem;
+                padding: 12px 25px;
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .nav-item,
+            .choice,
+            .flashcard,
+            .vocab-link,
+            .check-button,
+            .page-btn {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .vocab-link {
+                min-height: 32px;
+                line-height: 1.2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elements for sound effects -->
+    <audio id="flipSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>The Worm at the Core</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="openWritingForm(this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section with Slideshow -->
+            <div class="section active" id="discussion">
+                <div class="slideshow-container">
+                    
+                    <div class="slide-content-wrapper">
+                        <!-- Navigation Arrows - Outside the white box -->
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <!-- Slide 1 - Image Only -->
+                        <div class="discussion-slide active slide-image-only">
+                            <img src="https://www.earthintransition.org/wp-content/uploads/2016/01/apple-worm-608x4001.jpg" alt="The Worm at the Core" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-image-only">
+                            <iframe src="https://www.youtube.com/embed/Ul2iW3mWl90" style="width: 100%; height: 100%; border: none; border-radius: 16px;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Worm at the Core</h3>
+                                <p>The Worm at the Core is a book that says fear of death is a basic reason why people act the way they do. The book uses many years of psychology research to show how knowing we will die affects our culture, confidence, decisions, relationships, and fights. Often, we don't even realize this fear pushes us to find meaning, identity, and safety in our lives.</p>
+                                <ul>
+                                    <li>Do you agree with this quote?</li>
+                                    <li>Think about <span class="vocab-link" onclick="showPopup('market volatility', 'unpredictable changes in property prices and market conditions')">market volatility</span> and risks</li>
+                                    <li>Reflect on alternative investment strategies</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.squarespace-cdn.com/content/v1/5f3b0512bd6e79400b0b2f1a/1719048245498-S1FZD6BKED006MQK57YV/Worm+at+core+-+B+front.jpg?format=300w" alt="The Worm at the Core Book" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>You see an unattended bicycle while walking on the road.  You're not sure who owns it but nobody seems to be around.</h3>
+                                <p>What do you do?</p>
+                                <ul>
+                                    <li><a href="#" onclick="goToSlide(5); return false;" class="slide-choice-link">Leave it alone. The last thing I need is problems with the law right now. It could be a trap or a setup</a></li>
+                                    <li><a href="#" onclick="goToSlide(6); return false;" class="slide-choice-link">Leave it alone. I'd hate to have a reputation around town as a thief.</a></li>
+                                    <li><a href="#" onclick="goToSlide(7); return false;" class="slide-choice-link">Leave it alone. I wouldn't get caught... But stealing is just morally the wrong thing to do</a></li>
+                                    <li><a href="#" onclick="goToSlide(8); return false;" class="slide-choice-link">Oh nice, a free bicycle! I need one badly and this owner obviously doesn't need it right now. It's my turn for some good luck!</a></li>
+                                    <li><a href="#" onclick="goToSlide(9); return false;" class="slide-choice-link">If the owner is stupid enough to leave it here and I can guarantee it will be stolen soon by someone. Then it may as well be me!</a></li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://t3.ftcdn.net/jpg/02/89/06/24/360_F_289062491_YqtJL165ZkOPyp5vEomsaScMwGiRu76J.jpg" alt="Renting vs Buying" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Fear</h3>
+                                <p>Fear is the most basic emotion in the human brain. People in all cultures understand fear. A society built on fear works in one simple way: the threat of terrible punishment is the only sure way to keep order. In history, this system has created both great stability and great human suffering. When we look at leaders like Draco and Genghis Khan, we see the clear choice between using terror efficiently and destroying human dignity. </p>
+                                <ul>
+
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://bloodredreviews.com/wp-content/uploads/2018/05/draculauntold10.jpg" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 6 (Duplicate of Slide 5) -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Efficiency of Fear</h3>
+                                <p>The main benefit of a fear-based system is that it can create quick and equal stability. In 7th-century BCE Athens, Draco replaced a chaotic system of private family fights with written laws. His laws were very harsh—even small crimes like theft could get the death penalty—but they worked to centralize power and stop the cycle of family revenge.
+
+Similarly, Genghis Khan used fear of total destruction to build the Mongol Empire. This created the Pax Mongolica, a time when people said a traveler could carry gold from one side of Asia to the other without being robbed. In these cases, fear worked to reduce crime and make trade safer. </p>
+                                <ul>
+
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://bloodredreviews.com/wp-content/uploads/2018/05/draculauntold10.jpg" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 7 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Costs of Fear</h3>
+                                <p>However, the problems of fear-based systems are very destructive. Fear-based government stops new ideas and creates a weak social system.</p>
+                                <ul>
+                                    <li>Injustice: Draco's laws did not separate accidents from crimes done on purpose. The law could not see the difference, so Solon eventually cancelled these laws.</li>
+                                    <li>Instability: Ruling by terror needs to keep getting worse. When people get used to punishment, the state must use even more cruelty to stay in control. This often causes the system to collapse or people to revolt.</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://bloodredreviews.com/wp-content/uploads/2018/05/draculauntold10.jpg" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 7 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Shame</h3>
+                                <p>A shame-based society (also called an "honor-shame" culture) uses social pressure from others and the fear of being excluded to keep order. Unlike guilt-based societies, where people control themselves with their own conscience, shame-based systems care most about how the group sees you. This creates a strong but often strict social system.</p>
+                                <ul>                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.fastcompany.com/image/upload/f_webp,c_fit,w_1920,q_auto/wp-cms/uploads/2023/09/p-1-90948737-what-to-do-if-you-are-being-shamed-at-work.jpg" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 8 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Case for Social Cohesion</h3>
+                                <p>The main benefit of a shame-based system is its strong ability to create group responsibility and self-control. The Bushido code of the Japanese Samurai is a good historical example. Bushido focused on gi (doing what is right) and meiyo (honor). A warrior's value depended on his public honesty and integrity. Because one act of cowardice or dishonesty would bring "social death" to the person and their whole family, this code created very disciplined and loyal leaders. Today, this way of thinking can lead to high cooperation in society and low crime, because people are very motivated to protect their community's reputation.</p>
+                            
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.fastcompany.com/image/upload/f_webp,c_fit,w_1920,q_auto/wp-cms/uploads/2023/09/p-1-90948737-what-to-do-if-you-are-being-shamed-at-work.jpg" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 9 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Cost of External Judgment</h3>
+                                <p>The problems are found in limiting individual rights and keeping social inequality. Because "honor" is often connected to traditional power structures, it often hurts the most vulnerable people. In the end, while shame can create an orderly and loyal society, it often does this by sacrificing the individual to what the group thinks. When the fear of disgrace is stronger than the search for justice, the society becomes a prison of public opinion.</p>
+                                <ul>
+                                    <li>Gender Oppression: In parts of India and various Muslim-majority countries, the idea of izzat (honor) or sharaf is often unfairly placed on women's behavior.</li>
+                                    <li>The "Honour" Trap: When a woman's actions—from her education choices to whom she marries—are seen as the only measure of a family's status, shame becomes a tool for extreme control. This can appear as limits on movement, denial of healthcare, or in extreme cases, "honor killings" to "clean" a perceived social stain.</li>
+
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.fastcompany.com/image/upload/f_webp,c_fit,w_1920,q_auto/wp-cms/uploads/2023/09/p-1-90948737-what-to-do-if-you-are-being-shamed-at-work.jpg" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 10 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Pride</h3>
+                                <p>A pride-based society (often called "heroic" or "contest" cultures by anthropologists) is driven by the search for personal respect, fighting ability, and a lasting legacy. Unlike fear-based systems that demand obedience or shame-based systems that demand conformity, pride-based cultures encourage people to be better than their peers through extraordinary achievements.</p>
+                                <ul>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://sevenswords.uk/wp-content/uploads/2025/04/stamford-bridge-scaled.jpg" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 11 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>For Blood and Glory!</h3>
+                                <p>The main benefit of a pride-based society is its amazing ability to drive individual achievement and community strength. In Viking and Celtic cultures, a person's social position was not just inherited but earned through drengskapr (courage and integrity) or bravery in battle.</p>
+                                <ul>
+                                    <li>The Immortality of Reputation: This belief created the "heroic age" mentality, where the fear of death was less important than the fear of being forgotten. This pushed the Vikings to explore the North Atlantic and the Celts to make detailed, skillful metalwork that showed their status.</li>
+                                    <li>Self-Governance: In many herder societies, like the Nuer or Maasai, where wealth (livestock) can be easily stolen, a "culture of honor" based on pride works as protection. A person's strong pride in their ability to defend their property creates security without needing an army.</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://sevenswords.uk/wp-content/uploads/2025/04/stamford-bridge-scaled.jpg" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 12 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>An eternal pissing contest</h3>
+                                <p>The problem with this system is the natural instability of a society where everyone is competing for the top position. In the end, while pride creates a high-energy society of "heroes" and innovators, it often lacks the stability of official laws, leading to a world where life is as glorious as it is unstable.</p>
+                                <ul>
+                                    <li>The Cycle of Revenge: When pride is the most important thing, any insult must be answered to avoid losing status. This leads to endless "blood feuds," common in Viking stories, where many generations are stuck in private wars.</li>
+                                    <li>Weak Cooperation: Pride-based societies often struggle to form large, united countries. The Celts, despite their individual brilliance and shared culture, were famously unable to unite against the Roman Empire because tribal pride and the desire for personal glory often mattered more than the need for strategic, group defense.</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://sevenswords.uk/wp-content/uploads/2025/04/stamford-bridge-scaled.jpg" alt="Property Professionals" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 13 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Guilt</h3>
+                                <p>A guilt-based society depends on an internal moral code—a "conscience"—to control behavior. Unlike fear (enforced by the state) or shame (enforced by the community), guilt is self-controlled. It is the main force in individualistic societies, where the person is an independent moral being responsible for their own good behavior.</p>
+                                <ul>
+
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://cdn.indcatholicnews.com/articles/1677110071epwcbWEhV97KBmjHsvu0nZ8DXiFGoM.png?width=330" alt="Slide 13" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 14 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Case for Internalized Integrity</h3>
+                                <p>The main benefit of a guilt-based system is its ability to keep order even when no one is watching. Because the "judge" is yourself, people are motivated to act ethically whether they are being watched or not.</p>
+                                <ul>
+                                    <li>The Philosophical Foundation: Socrates supported this by arguing that doing wrong harms the soul more than any external punishment could. For him, "knowledge is virtue," and once a person truly understands what is right, the internal pain of breaking that truth (guilt) becomes a powerful deterrent.</li>
+                                    <li>Stoic and Christian Development: The Stoics developed this by focusing on personal character (prohairesis) as the only true good, making people care less about social status but care deeply about personal integrity. Christianity further developed this through the idea of "sin" as a personal wrong against God. This moved morality from a public performance (honor) to an internal relationship, creating a society where people feel a "duty" to a universal law. This internalized sense of duty allows complex, individualistic societies to work without needing guards everywhere.</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://cdn.indcatholicnews.com/articles/1677110071epwcbWEhV97KBmjHsvu0nZ8DXiFGoM.png?width=330" alt="Slide 14" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 15 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Cost of the Internal Judge</h3>
+                                <p>The problem with this system is the possibility of mental breakdown and social isolation.</p>
+                                <ul>
+                                    <li>Mental Burden: In a guilt-based culture, failure is completely your own responsibility. Without the public "release" of shame rituals, guilt can become a constant, damaging weight, leading to anxiety and depression.</li>
+                                    <li>Breaking Down Community: By making individual conscience more important than social harmony, these societies can become separated and isolated. If everyone is their own moral judge, group traditions and social bonds can weaken, as seen in modern individualistic societies where "doing what feels right to me" can lead to a lack of shared purpose or community support.</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://cdn.indcatholicnews.com/articles/1677110071epwcbWEhV97KBmjHsvu0nZ8DXiFGoM.png?width=330" alt="Slide 15" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 16 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Envy</h3>
+                                <p>An envy-based society is often the unintended result of "basic communism" or extreme equality movements. While the stated goal is social justice and getting rid of social classes, the working method often changes from "raising the bottom" to "pulling down the top." In this system, a neighbor's success is not seen as an example to copy, but as a crime against the group.</p>
+                                <ul>
+                                
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://i.guim.co.uk/img/media/89233eada04f583801f3d73b7c2bb397bfa745b7/0_0_2560_1847/master/2560.jpg?width=375&dpr=1&s=none&crop=none" alt="Slide 16" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 17 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Case for Radical Equality</h3>
+                                <p>The main benefit of an envy-based structure is its effectiveness at destroying old aristocracies and making sure everyone has basic survival needs met.</p>
+                                <ul>
+                                    <li>The Promise of the Soviet Union: In its early stages, the USSR successfully destroyed the Tsarist class system, providing education and jobs for everyone. By using the working class's anger against the "Bourgeoisie," the state created a united group that could organize millions of people for industrialization.</li>
+                                    <li>Social Safety Net: In these societies, the "envy" of the group acts as a control that prevents huge wealth gaps from forming. This can lead to a sense of "shared fate"—the idea that since no one is allowed to be much better off than others, the community stays close and protected from the worries of market competition.</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://i.guim.co.uk/img/media/89233eada04f583801f3d73b7c2bb397bfa745b7/0_0_2560_1847/master/2560.jpg?width=375&dpr=1&s=none&crop=none" alt="Slide 17" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 18 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Cost of Stagnation and Surveillance</h3>
+                                <p>The problems of envy-based government eventually led to the collapse of the Soviet Union and the stagnation of similar Eastern Bloc countries.</p>
+                                <ul>
+                                    <li>The "Crab Mentality": When excellence is punished or looked at with suspicion, people lose the reason to innovate. In the Soviet economy, workers often said, "They pretend to pay us, and we pretend to work." If a farmer produced more than his neighbor, he was called a "Kulak" and punished; as a result, agricultural productivity fell dramatically.</li>
+                                    <li>Organized Spying: Envy becomes a tool for state control. In East Germany or the USSR, citizens were encouraged to report neighbors who had "illegal" luxuries or Western goods. This "neighborhood envy" destroyed trust, replacing social trust with widespread fear of your own neighbors.</li>
+                                    <li>The "Nomenklatura" Paradox: Ironically, these societies often created a new elite—the Party bureaucrats—who enjoyed secret luxuries. This "hidden inequality" created deep, damaging bitterness among the public, which eventually made the system lose legitimacy and speed up its 1991 collapse.</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://i.guim.co.uk/img/media/89233eada04f583801f3d73b7c2bb397bfa745b7/0_0_2560_1847/master/2560.jpg?width=375&dpr=1&s=none&crop=none" alt="Slide 18" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 19 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>New Slide 19</h3>
+                                <p>Content for slide 19 goes here.</p>
+                                <ul>
+                                    <li>Point 1</li>
+                                    <li>Point 2</li>
+                                    <li>Point 3</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Slide 19" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 20 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>New Slide 20</h3>
+                                <p>Content for slide 20 goes here.</p>
+                                <ul>
+                                    <li>Point 1</li>
+                                    <li>Point 2</li>
+                                    <li>Point 3</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Slide 20" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide Indicators -->
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(6)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(7)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(8)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(9)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(10)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(11)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(12)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(13)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(14)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(15)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(16)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(17)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(18)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(19)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(20)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Property Market Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Basic Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Market Terms</button>
+                        <button class="page-btn" onclick="showVocabPage(3, this)">Investment Terms</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Mortgage</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">A loan to buy property, paid back over many years</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Deposit</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Initial payment when buying a house</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Estate Agent</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Professional who helps buy and sell properties</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Landlord</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Owner of property who rents it to tenants</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Tenant</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Person who pays rent to live in someone's property</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Lease</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Legal agreement to rent property for specific period</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Market</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">System of buying and selling properties</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Listing</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Advertisement for property for sale or rent</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Bid</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Offer to buy property at specific price</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Commission</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Percentage fee paid to estate agent</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Broker</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Professional who arranges property deals</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Valuation</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Professional assessment of property's worth</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-3">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Flip</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Buy, renovate and sell property quickly</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Portfolio</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Collection of properties owned by investor</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Yield</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Annual rental income as percentage of property value</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Equity</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Portion of property value that owner actually owns</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Capital Gains</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Profit made from selling property for more than bought</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard" onclick="flipCard(this)">
+                                <div class="flashcard-inner">
+                                    <div class="flashcard-front">
+                                        <div class="flashcard-term">Buy-to-let</div>
+                                        <div class="flashcard-hint">Click to see definition</div>
+                                    </div>
+                                    <div class="flashcard-back">
+                                        <div class="flashcard-definition">Purchasing property specifically to rent to tenants</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
+            <div class="section" id="quiz">
+                <h2>Property Vocabulary Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header" id="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div style="text-align: center; margin-bottom: 10px;">
+                                <span id="questionCounter" style="font-size: 1.2rem; font-weight: 600; color: #2d3748;">Question 1 of 10</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quizProgressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Quiz Questions Container -->
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be dynamically generated here -->
+                    </div>
+
+                    <!-- Results Page -->
+                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalQuizScore">0/10</div>
+                            <p>Well done! You've completed the Property Vocabulary quiz.</p>
+                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Popup -->
+    <div class="popup-overlay" id="vocabPopup">
+        <div class="popup-content">
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+            <button class="popup-close" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSlide = 1;
+        let totalSlides = 20;
+        
+        // New Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        // Vocabulary Database from Flashcards
+        const vocabularyDatabase = [
+            { 
+                term: "Mortgage", 
+                definition: "A loan to buy property, paid back over many years", 
+                sentences: ["The bank approved my _____ application.", "I need to apply for a _____ to buy this house.", "The _____ interest rate is 3.5% per year."] 
+            },
+            { 
+                term: "Deposit", 
+                definition: "Initial payment when buying a house", 
+                sentences: ["I need to save money for a _____ before buying.", "The _____ required is 20% of the property value.", "She put down a large _____ on the apartment."] 
+            },
+            { 
+                term: "Estate Agent", 
+                definition: "Professional who helps buy and sell properties", 
+                sentences: ["The _____ showed us five different houses.", "I contacted an _____ to sell my flat.", "Our _____ found us the perfect home."] 
+            },
+            { 
+                term: "Landlord", 
+                definition: "Owner of property who rents it to tenants", 
+                sentences: ["The _____ increased the rent this month.", "Our _____ is very understanding about repairs.", "She became a _____ when she bought her second property."] 
+            },
+            { 
+                term: "Tenant", 
+                definition: "Person who pays rent to live in someone's property", 
+                sentences: ["The _____ has lived here for three years.", "As a _____, you have certain rights.", "The new _____ moved in last week."] 
+            },
+            { 
+                term: "Lease", 
+                definition: "Legal agreement to rent property for specific period", 
+                sentences: ["We signed a two-year _____ for the office.", "The _____ expires in December.", "Make sure to read the _____ carefully before signing."] 
+            },
+            { 
+                term: "Market", 
+                definition: "System of buying and selling properties", 
+                sentences: ["The property _____ is very competitive right now.", "House prices in this _____ have increased.", "It's a good time to enter the _____."] 
+            },
+            { 
+                term: "Listing", 
+                definition: "Advertisement for property for sale or rent", 
+                sentences: ["I saw an interesting property _____ online.", "The agent created a detailed _____ for our house.", "This _____ shows beautiful photos of the garden."] 
+            },
+            { 
+                term: "Bid", 
+                definition: "Offer to buy property at specific price", 
+                sentences: ["We made a _____ on the Victorian house.", "Their _____ was accepted by the seller.", "The highest _____ wins the property auction."] 
+            },
+            { 
+                term: "Commission", 
+                definition: "Percentage fee paid to estate agent", 
+                sentences: ["The agent earns 2% _____ on each sale.", "Real estate _____ rates vary by location.", "She calculated her _____ from this month's sales."] 
+            },
+            { 
+                term: "Broker", 
+                definition: "Professional who arranges property deals", 
+                sentences: ["The _____ helped negotiate the final price.", "I work as a property _____ in London.", "Our _____ has connections with many lenders."] 
+            },
+            { 
+                term: "Valuation", 
+                definition: "Professional assessment of property's worth", 
+                sentences: ["The property _____ came back higher than expected.", "We need an independent _____ for the mortgage.", "The _____ report shows the house is worth £300,000."] 
+            },
+            { 
+                term: "Flip", 
+                definition: "Buy, renovate and sell property quickly", 
+                sentences: ["They plan to _____ this house within six months.", "Property _____ can be very profitable.", "She decided to _____ the old cottage."] 
+            },
+            { 
+                term: "Portfolio", 
+                definition: "Collection of properties owned by investor", 
+                sentences: ["His property _____ includes ten rental units.", "She's building a diverse investment _____.", "The _____ generates steady monthly income."] 
+            },
+            { 
+                term: "Yield", 
+                definition: "Annual rental income as percentage of property value", 
+                sentences: ["This property offers a 6% rental _____.", "Calculate the _____ before making an investment.", "The _____ on city properties is typically lower."] 
+            },
+            { 
+                term: "Equity", 
+                definition: "Portion of property value that owner actually owns", 
+                sentences: ["I've built up £50,000 in _____ over five years.", "The _____ in their home has doubled.", "You can borrow against your property _____."] 
+            },
+            { 
+                term: "Capital Gains", 
+                definition: "Profit made from selling property for more than bought", 
+                sentences: ["They made significant _____ from the property sale.", "_____ tax applies to investment properties.", "The _____ from this sale will fund their next purchase."] 
+            },
+            { 
+                term: "Buy-to-let", 
+                definition: "Purchasing property specifically to rent to tenants", 
+                sentences: ["_____ investment requires careful planning.", "She specializes in _____ properties.", "The _____ market has grown significantly."] 
+            }
+        ];
+
+
+
+        // Initialize new quiz system
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            // Filter vocabulary to only include single words (no spaces or hyphens)
+            const singleWordVocab = vocabularyDatabase.filter(item =>
+                !item.term.includes(' ') && !item.term.includes('-')
+            );
+
+            // Shuffle the vocabulary array to ensure randomness
+            const shuffledVocab = [...singleWordVocab].sort(() => Math.random() - 0.5);
+
+            // Generate 10 unique questions
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, Math.min(3, vocabItem.term.length)) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+            
+            // Create HTML for all questions
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        // Generate HTML for quiz questions (text input only)
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+                
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+                
+                container.appendChild(questionDiv);
+            });
+        }
+
+
+        // Handle Enter key press in quiz inputs
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
+                }
+            }
+        }
+
+        // Check quiz answer (text input only)
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            
+            let isCorrect = false;
+            
+            // Text input validation
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+            
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+            
+            // Check for multiple acceptable answers (singular, plural, variations)
+            const correctAnswers = [
+                question.correctAnswer,
+                question.correctAnswer + 's',  // plural
+                question.correctAnswer + 'es', // plural for words ending in 's', 'x', 'z', 'ch', 'sh'
+                question.correctAnswer.replace(/y$/, 'ies'), // plural for words ending in 'y'
+                question.correctAnswer.replace(/f$/, 'ves'), // plural for words ending in 'f'
+                question.correctAnswer.replace(/fe$/, 'ves') // plural for words ending in 'fe'
+            ];
+
+            // Remove duplicates and filter out invalid plurals
+            const validAnswers = [...new Set(correctAnswers)].filter(answer =>
+                answer !== question.correctAnswer + 'ys' || question.correctAnswer.endsWith('y')
+            );
+
+            isCorrect = validAnswers.includes(userAnswer);
+            
+            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            // Show feedback
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' : 
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+            
+            // Store answer
+            userQuizAnswers[questionNum] = isCorrect;
+            if (isCorrect) quizScore++;
+            
+            // Disable button
+            checkButton.disabled = true;
+            checkButton.style.opacity = '0.6';
+            
+            // Play sound effect if correct
+            if (isCorrect) {
+                const correctSound = new Audio('https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3');
+                correctSound.play().catch(e => console.log('Audio playbook failed:', e));
+            }
+            
+            updateQuizProgress();
+            
+            // Auto-advance after 2 seconds
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        // Show specific quiz question
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+
+                // Auto-focus on the input field for rapid typing
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        // Next question
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        // Previous question
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        // Update progress
+        function updateQuizProgress() {
+            const counter = document.getElementById('questionCounter');
+            const progressBar = document.getElementById('quizProgressFill');
+            
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+            
+            if (progressBar) {
+                const progressPercent = ((currentQuizQuestion - 1) / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        // Update navigation buttons
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+            
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        // Show quiz results
+        function showQuizResults() {
+            const questionsContainer = document.getElementById('quiz-questions-container');
+            const resultsPage = document.getElementById('quiz-results-page');
+            const finalScore = document.getElementById('finalQuizScore');
+            const quizHeader = document.getElementById('quiz-header');
+            
+            questionsContainer.style.display = 'none';
+            resultsPage.style.display = 'flex';
+            quizHeader.style.display = 'none';
+            
+            if (finalScore) {
+                finalScore.textContent = `${quizScore}/${totalQuizQuestions}`;
+            }
+        }
+
+        // Restart quiz
+        function restartVocabQuiz() {
+            const questionsContainer = document.getElementById('quiz-questions-container');
+            const resultsPage = document.getElementById('quiz-results-page');
+            const quizHeader = document.getElementById('quiz-header');
+            
+            // Reset display
+            questionsContainer.style.display = 'block';
+            resultsPage.style.display = 'none';
+            quizHeader.style.display = 'flex';
+            
+            // Reinitialize quiz
+            initializeVocabQuiz();
+        }
+
+        // Navigation functions
+        function showSection(sectionName, element) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function openWritingForm(element) {
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Add active class to clicked nav item
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // Open Google Forms in new tab
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSfW2Wieh456joS23nFUFiUB_czgM1vBPVeZ8n1s-bCwolnQ6Q/viewform?usp=header', '_blank');
+            
+            // Remove active class after a short delay to show it was clicked
+            setTimeout(() => {
+                if (element) {
+                    element.classList.remove('active');
+                }
+                // Reset to discussion tab as default
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            }, 300);
+        }
+
+        function showVocabPage(pageNum, element) {
+            // Hide all vocab pages
+            const pages = document.querySelectorAll('.vocab-page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Remove active class from all page buttons
+            const buttons = document.querySelectorAll('.vocab-nav .page-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            
+            // Add active class to clicked button
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        // Flashcard function with sound effect
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            
+            // Play sound effect
+            const flipSound = document.getElementById('flipSound');
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => {
+                    console.log('Audio playback failed:', e);
+                });
+            }
+        }
+
+        // Vocabulary popup functions
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Discussion Slideshow Functions
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            
+            currentSlide += direction;
+            
+            if (currentSlide > totalSlides) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = totalSlides;
+            }
+            
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            
+            currentSlide = slideNum;
+            
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        // Keyboard navigation for slideshow
+        document.addEventListener('keydown', function(e) {
+            const discussionSection = document.getElementById('discussion');
+
+            if (discussionSection && discussionSection.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') {
+                    changeSlide(-1);
+                } else if (e.key === 'ArrowRight') {
+                    changeSlide(1);
+                }
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz(); // Initialize the new vocabulary-based quiz
+            
+            // Close popup when clicking outside
+            document.getElementById('vocabPopup').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePopup();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
