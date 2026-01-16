@@ -914,6 +914,125 @@
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .writing-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .writing-form .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .writing-form .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .writing-form .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .writing-form .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .writing-form .check-button {
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .tips-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .tips-box h4 {
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .vocab-category {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .vocab-category strong {
+            color: #2d3748;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .vocab-items {
+            color: #4a5568;
+            font-style: italic;
+        }
+
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             body {
@@ -2472,6 +2591,45 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>Writing Assignment</h2>
+                <div class="writing-container">
+                    <div class="writing-content">
+                        <h3 class="writing-question">What Drives Civilization?</h3>
+
+                        <p class="writing-objective">
+                            Consider the emotions discussed in today's lesson: fear, shame, pride, guilt, and envy. Which emotion do you think has been the most powerful force in shaping human civilization? Explain your reasoning with examples from history or modern society.
+                        </p>
+
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group">
+                                <label for="studentName">Student Name</label>
+                                <input type="text" id="studentName" name="studentName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teacherEmail">Teacher's Email</label>
+                                <input type="email" id="teacherEmail" name="teacherEmail" required>
+                            </div>
+
+                            <div class="button-container">
+                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Begin!</button>
+                            </div>
+
+                            <div class="tips-box">
+                                <h4>Key Vocabulary to Use</h4>
+                                <div class="tips-content">
+                                    <span class="vocab-items">
+                                        fear, shame, pride, guilt, envy, civilization, stability, terror, dignity, conformity, legacy, coercion, egalitarian, transgression
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2842,27 +3000,56 @@
             }
         }
 
+        // Writing section management
         function openWritingForm(element) {
-            // Remove active class from all nav items
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            
-            // Add active class to clicked nav item
-            if (element) {
-                element.classList.add('active');
+            showSection('writing', element);
+        }
+
+        // Mailto function for writing section
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+
+            if (!studentName) {
+                alert('Please enter your name first!');
+                document.getElementById('studentName').focus();
+                return;
             }
-            
-            // Open Google Forms in new tab
-            window.open('https://docs.google.com/forms/d/e/1FAIpQLSfW2Wieh456joS23nFUFiUB_czgM1vBPVeZ8n1s-bCwolnQ6Q/viewform?usp=header', '_blank');
-            
-            // Remove active class after a short delay to show it was clicked
-            setTimeout(() => {
-                if (element) {
-                    element.classList.remove('active');
+
+            if (!teacherEmail) {
+                alert('Please enter the teacher\'s email first!');
+                document.getElementById('teacherEmail').focus();
+                return;
+            }
+
+            // Get the writing objective text
+            const objectiveElement = document.querySelector('.writing-objective');
+            const objective = objectiveElement ? objectiveElement.textContent.trim() : 'What Drives Civilization writing assignment.';
+
+            // Create mailto link
+            const subject = encodeURIComponent('What Drives Civilization - Writing Assignment - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nAssignment: ' + objective + '\n\n--- Write your response below this line ---\n\n');
+            const mailtoLink = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+
+            // Open mailto
+            window.location.href = mailtoLink;
+        }
+
+        // Form validation for writing section
+        function validateWritingForm() {
+            const studentName = document.getElementById('studentName');
+            const teacherEmail = document.getElementById('teacherEmail');
+            const beginBtn = document.getElementById('beginBtn');
+
+            if (studentName && teacherEmail && beginBtn) {
+                if (studentName.value.trim() && teacherEmail.value.trim()) {
+                    beginBtn.disabled = false;
+                    beginBtn.style.opacity = '1';
+                } else {
+                    beginBtn.disabled = true;
+                    beginBtn.style.opacity = '0.6';
                 }
-                // Reset to discussion tab as default
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-            }, 300);
+            }
         }
 
         function showVocabPage(pageNum, element) {
@@ -2984,13 +3171,39 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initializeVocabQuiz(); // Initialize the new vocabulary-based quiz
-            
+
             // Close popup when clicking outside
             document.getElementById('vocabPopup').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closePopup();
                 }
             });
+
+            // Writing form event listeners
+            const writingForm = document.getElementById('writingForm');
+            if (writingForm) {
+                // Form submission prevention
+                writingForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const studentName = document.getElementById('studentName').value.trim();
+                    const teacherEmail = document.getElementById('teacherEmail').value.trim();
+
+                    if (!studentName || !teacherEmail) {
+                        alert('Please fill in all fields!');
+                        return;
+                    }
+
+                    openMailto();
+                });
+
+                // Real-time validation for Begin button
+                document.getElementById('studentName').addEventListener('input', validateWritingForm);
+                document.getElementById('teacherEmail').addEventListener('input', validateWritingForm);
+
+                // Initialize validation on load
+                validateWritingForm();
+            }
         });
         // Vocabulary popup functions
         function showPopup(word, definition) {
