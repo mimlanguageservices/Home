@@ -1676,12 +1676,19 @@
             <div class="section" id="quiz">
                 <h2>Vocabulary Quiz</h2>
                 <div class="quiz-container">
+                    <div class="vocab-nav" id="quiz-level-nav">
+                        <button class="page-btn active" onclick="selectQuizLevel('A2', this)">A2 - Elementary</button>
+                        <button class="page-btn" onclick="selectQuizLevel('B1', this)">B1 - Intermediate</button>
+                        <button class="page-btn" onclick="selectQuizLevel('B2', this)">B2 - Upper-Intermediate</button>
+                        <button class="page-btn" onclick="selectQuizLevel('C1', this)">C1 - Advanced</button>
+                    </div>
+
                     <div class="quiz-header" id="quiz-header">
                         <div class="quiz-nav">
                             <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
                         </div>
                         <div class="progress-container">
-                            <div id="quiz-counter">Question 1 of 10</div>
+                            <div id="quiz-counter">Question 1 of 4</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" id="quizProgressFill"></div>
                             </div>
@@ -1698,7 +1705,7 @@
                     <div class="quiz-page" id="quiz-results-page" style="display: none;">
                         <div class="results-summary">
                             <h3>Quiz Complete!</h3>
-                            <div class="score" id="finalQuizScore">0/10</div>
+                            <div class="score" id="finalQuizScore">0/4</div>
                             <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
                         </div>
                     </div>
@@ -2076,20 +2083,36 @@
 
         // Quiz System Variables
         let currentQuizQuestion = 1;
-        let totalQuizQuestions = 10;
+        let totalQuizQuestions = 4;
         let quizQuestions = [];
         let userQuizAnswers = {};
         let quizScore = 0;
+        let currentQuizLevel = 'A2';
 
-        function initializeVocabQuiz() {
+        function selectQuizLevel(level, button) {
+            // Update button states
+            document.querySelectorAll('#quiz-level-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // Set current level and initialize quiz
+            currentQuizLevel = level;
+            initializeVocabQuiz(level);
+        }
+
+        function initializeVocabQuiz(level = currentQuizLevel) {
             currentQuizQuestion = 1;
             userQuizAnswers = {};
             quizScore = 0;
             quizQuestions = [];
 
-            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
+            // Filter vocabulary by level
+            const levelVocab = vocabularyDatabase.filter(item => item.category === level);
+            const shuffledVocab = [...levelVocab].sort(() => Math.random() - 0.5);
 
-            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+            // Set total questions based on available vocabulary for this level
+            totalQuizQuestions = shuffledVocab.length;
+
+            for (let i = 0; i < shuffledVocab.length; i++) {
                 const vocabItem = shuffledVocab[i];
                 const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
                 const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
@@ -2102,6 +2125,11 @@
                     correctTerm: vocabItem.term
                 });
             }
+
+            // Reset display
+            document.getElementById('quiz-results-page').style.display = 'none';
+            document.getElementById('quiz-questions-container').style.display = 'block';
+            document.getElementById('quiz-header').style.display = 'flex';
 
             generateQuizHTML();
             showQuizQuestion(1);
