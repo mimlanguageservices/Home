@@ -1751,13 +1751,8 @@
                                 <input type="email" id="teacherEmail" name="teacherEmail" required>
                             </div>
 
-                            <div class="form-group">
-                                <label for="writingInput">Your Response</label>
-                                <input type="text" id="writingInput" name="writingInput" required>
-                            </div>
-
                             <div class="button-container">
-                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send Response</button>
+                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Start Writing</button>
                             </div>
                         </form>
                     </div>
@@ -2306,15 +2301,14 @@
         function openMailto() {
             const studentName = document.getElementById('studentName').value.trim();
             const teacherEmail = document.getElementById('teacherEmail').value.trim();
-            const writingResponse = document.getElementById('writingInput').value.trim();
 
-            if (!studentName || !teacherEmail || !writingResponse) {
-                alert('Please fill in all fields!');
+            if (!studentName || !teacherEmail) {
+                alert('Please fill in your name and teacher email!');
                 return;
             }
 
             const subject = encodeURIComponent('Yeison Jiménez Assignment - ' + studentName);
-            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n');
             window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
         }
 
