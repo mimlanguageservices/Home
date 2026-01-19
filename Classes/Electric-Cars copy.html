@@ -1,0 +1,1893 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Cars & The Environment - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        /* Image-only slide (Slide 1) */
+        .slide-image-only {
+            padding: 0;
+        }
+
+        /* Horizontal layout slides (Slides 2-5) */
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            max-width: 50%;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .slide-text-section-left ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .slide-text-section-left li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        .slide-image-section-right {
+            width: 45%;
+            max-width: 50%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Navigation Arrows - Outside the white box */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -60px;
+        }
+
+        .slide-arrow.next {
+            right: -60px;
+        }
+
+        /* Slide Indicators */
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 280px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* NEW QUIZ SYSTEM STYLES */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        /* Video Section */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 15px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: visible;
+        }
+
+        #video {
+            overflow: visible;
+        }
+
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: #48bb78;
+            color: white;
+        }
+
+        .feedback.incorrect {
+            background: #f56565;
+            color: white;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 15px 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .nav-item {
+                flex: 1 1 auto;
+                min-width: 120px;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .section h2 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+
+            .slideshow-container {
+                padding: 20px;
+            }
+
+            .slide-horizontal {
+                flex-direction: column !important;
+            }
+
+            .slide-text-section-left {
+                max-width: 100%;
+                padding-right: 0;
+            }
+
+            .slide-image-section-right {
+                width: 100%;
+                max-width: 100%;
+                height: 250px;
+            }
+
+            .slide-arrow {
+                width: 40px;
+                height: 40px;
+            }
+
+            .slide-arrow.prev {
+                left: 10px;
+            }
+
+            .slide-arrow.next {
+                right: 10px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Electric Cars & The Environment</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section with Slideshow -->
+            <div class="section active" id="discussion">
+                <div class="slideshow-container">
+
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1 - Image Only -->
+                        <div class="discussion-slide active slide-image-only">
+                            <img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&h=800&fit=crop" alt="Electric car charging" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Electric Vehicle Promise</h3>
+                                <p>Electric vehicles (EVs) are often presented as the solution to climate change and air pollution. They produce zero tailpipe emissions, meaning cleaner air in cities. Governments worldwide are offering incentives to encourage adoption, and many countries plan to ban petrol and diesel cars within the next two decades. However, the question remains: are electric cars truly as environmentally friendly as they appear? The answer is more complex than a simple yes or no, involving factors from battery production to electricity sources and end-of-life disposal.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop" alt="Electric vehicle charging station" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Dark Side of Lithium Mining</h3>
+                                <p>Lithium-ion batteries power most electric vehicles, but extracting lithium comes with significant environmental costs. Mining operations in countries like Chile, Argentina, and Australia consume vast amounts of water and can contaminate local water supplies. In the Atacama Desert, lithium extraction uses approximately 2 million litres of water per tonne of lithium produced.</p>
+                                <ul>
+                                    <li>Water depletion in already arid regions</li>
+                                    <li>Habitat destruction and biodiversity loss</li>
+                                    <li>Chemical leakage into soil and groundwater</li>
+                                    <li>Displacement of indigenous communities</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                               <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&h=600&fit=crop" alt="Mining operations" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Cobalt and Human Rights Concerns</h3>
+                                <p>Beyond lithium, EV batteries require cobalt, nickel, and manganese. The Democratic Republic of Congo supplies over 70% of the world's cobalt, where mining conditions have raised serious human rights concerns. Reports document child labour, unsafe working conditions, and environmental degradation. While manufacturers are working to reduce cobalt content and improve supply chain transparency, the ethical implications of battery production cannot be ignored. Some companies are developing cobalt-free batteries, but these alternatives are not yet widely available.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1581093458791-9f3c3250a8b0?w=800&h=600&fit=crop" alt="Mining industry" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Bigger Picture: Lifecycle Analysis</h3>
+                                <p>Despite the environmental costs of production, studies consistently show that EVs produce fewer lifetime emissions than petrol cars when charged with average grid electricity. The "carbon payback period" - the time needed to offset higher manufacturing emissions - is typically 1-3 years. As electricity grids become greener and battery recycling improves, the environmental advantage of EVs will increase. However, the most sustainable transport options remain walking, cycling, and public transport. The greenest car is ultimately one that isn't built at all.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1532601224476-15c79f2f7a51?w=800&h=600&fit=crop" alt="Sustainable transport" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading Practice</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('A2', this)">A2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B1', this)">B1 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
+                    </div>
+
+                    <!-- A2 Level -->
+                    <div class="reading-level" id="A2-level">
+                        <div class="reading-page active">
+                            <h3>Are Electric Cars Good for the Environment?</h3>
+                            <p>Electric cars do not use <span class="vocab-link" onclick="showPopup('petrol', 'fuel made from oil for cars')">petrol</span> or diesel. They use batteries to run. Many people think they are better for the <span class="vocab-link" onclick="showPopup('environment', 'the natural world around us')">environment</span> because they do not make <span class="vocab-link" onclick="showPopup('pollution', 'dirty air, water, or land')">pollution</span> when you drive them.</p>
+                            <p>But making the batteries is not easy. The batteries need special metals like <span class="vocab-link" onclick="showPopup('lithium', 'a light metal used in batteries')">lithium</span>. To get lithium, people must dig it from the ground. This uses a lot of water and can <span class="vocab-link" onclick="showPopup('damage', 'harm or break something')">damage</span> the land.</p>
+                            <p>Some batteries also need cobalt. Most cobalt comes from Africa. Sometimes the <span class="vocab-link" onclick="showPopup('mining', 'digging for metals in the ground')">mining</span> conditions are not safe. This is a big problem.</p>
+                            <p>Electric cars are still better than petrol cars over time. But we must also think about how we make the batteries. We should try to <span class="vocab-link" onclick="showPopup('recycle', 'use something again')">recycle</span> old batteries. Walking and cycling are even better for the planet.</p>
+                        </div>
+                    </div>
+
+                    <!-- B1 Level -->
+                    <div class="reading-level" id="B1-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>The Environmental Truth About Electric Cars</h3>
+                            <p>Electric vehicles (EVs) are becoming increasingly popular as people look for ways to reduce their <span class="vocab-link" onclick="showPopup('carbon footprint', 'the amount of CO2 produced by a person or activity')">carbon footprint</span>. Unlike traditional cars, EVs produce zero <span class="vocab-link" onclick="showPopup('emissions', 'gases released into the air')">emissions</span> while driving, which means cleaner air in our cities. However, the environmental story of electric cars is more <span class="vocab-link" onclick="showPopup('complicated', 'not simple; having many parts')">complicated</span> than it first appears.</p>
+                            <p>The main concern is battery production. EV batteries require <span class="vocab-link" onclick="showPopup('lithium', 'a lightweight metal essential for rechargeable batteries')">lithium</span>, cobalt, nickel, and other <span class="vocab-link" onclick="showPopup('minerals', 'natural substances found in the earth')">minerals</span>. Mining these materials uses enormous amounts of energy and water. In Chile's Atacama Desert, lithium extraction has caused water shortages for local farmers. In the Democratic Republic of Congo, cobalt mining has been linked to child labour and dangerous working conditions.</p>
+                            <p>Another issue is <span class="vocab-link" onclick="showPopup('battery longevity', 'how long a battery lasts before it needs replacing')">battery longevity</span>. Most EV batteries last between 10-20 years, but their capacity decreases over time. After about 8 years, a battery might only hold 70-80% of its original charge. This affects the car's range and <span class="vocab-link" onclick="showPopup('resale value', 'how much something is worth when sold second-hand')">resale value</span>.</p>
+                            <p>Despite these challenges, research shows that EVs still produce fewer <span class="vocab-link" onclick="showPopup('greenhouse gases', 'gases that trap heat in the atmosphere')">greenhouse gases</span> over their lifetime compared to petrol cars. The key is ensuring that the electricity used to charge them comes from <span class="vocab-link" onclick="showPopup('renewable sources', 'energy from sun, wind, or water that won\'t run out')">renewable sources</span>. As battery technology improves and recycling becomes more common, the environmental benefits of EVs will only increase.</p>
+                            <p>The most environmentally friendly choice remains reducing car use altogether. Public transport, cycling, and walking have a much smaller <span class="vocab-link" onclick="showPopup('environmental impact', 'the effect something has on nature')">environmental impact</span> than any type of car.</p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>Electric Vehicles: A Balanced Environmental Assessment</h3>
+                            <p>The global transition to electric vehicles represents one of the most significant shifts in transportation history. Governments worldwide are implementing <span class="vocab-link" onclick="showPopup('ambitious', 'having strong goals that are difficult to achieve')">ambitious</span> policies to phase out internal combustion engines, with several nations setting deadlines for banning new petrol and diesel car sales by 2030 or 2035. While the environmental benefits of EVs in terms of reduced <span class="vocab-link" onclick="showPopup('tailpipe emissions', 'pollution that comes directly from a vehicle\'s exhaust')">tailpipe emissions</span> are undeniable, a comprehensive analysis reveals a more <span class="vocab-link" onclick="showPopup('nuanced', 'having subtle differences or details')">nuanced</span> picture.</p>
+                            <p>The environmental footprint of EV production centres primarily on battery manufacturing. Lithium-ion batteries require significant quantities of lithium, cobalt, nickel, and manganese - minerals whose extraction carries <span class="vocab-link" onclick="showPopup('substantial', 'large in amount or importance')">substantial</span> environmental costs. Lithium mining in South America's "Lithium Triangle" (Argentina, Bolivia, and Chile) involves pumping brine from underground deposits into evaporation ponds, a process that consumes approximately 2.2 million litres of water per tonne of lithium produced. In regions already experiencing <span class="vocab-link" onclick="showPopup('water scarcity', 'not having enough water')">water scarcity</span>, this extraction has proven devastating for local ecosystems and agricultural communities.</p>
+                            <p>The cobalt supply chain presents equally <span class="vocab-link" onclick="showPopup('troubling', 'causing worry or concern')">troubling</span> concerns. With over 70% of global cobalt production originating from the Democratic Republic of Congo, investigations have documented <span class="vocab-link" onclick="showPopup('artisanal mining', 'small-scale mining done by hand')">artisanal mining</span> operations employing child labour under hazardous conditions. Major manufacturers have responded by committing to supply chain transparency and developing cobalt-free battery chemistries, though progress remains <span class="vocab-link" onclick="showPopup('incremental', 'happening gradually in small steps')">incremental</span>.</p>
+                            <p>Battery <span class="vocab-link" onclick="showPopup('degradation', 'the process of becoming worse or less effective')">degradation</span> represents another consideration. Current lithium-ion batteries typically retain 80% capacity after 8 years of normal use, though extreme temperatures and charging patterns can accelerate decline. This degradation affects vehicle range and, consequently, <span class="vocab-link" onclick="showPopup('depreciation', 'decrease in value over time')">depreciation</span> rates. However, "second-life" applications for degraded EV batteries in stationary energy storage are emerging, potentially extending their useful lifespan significantly.</p>
+                            <p>Life cycle assessments consistently demonstrate that, despite higher manufacturing emissions, EVs produce fewer total greenhouse gas emissions than comparable petrol vehicles when operated over their lifetime - typically achieving "<span class="vocab-link" onclick="showPopup('carbon parity', 'the point where carbon emissions become equal')">carbon parity</span>" within 1-3 years of average use. This advantage magnifies substantially when vehicles are charged using electricity from renewable sources. As global electricity grids <span class="vocab-link" onclick="showPopup('decarbonise', 'reduce or eliminate carbon emissions')">decarbonise</span>, the relative environmental benefits of EVs will increase proportionally.</p>
+                            <p>Nevertheless, sustainable transport policy should recognise that private vehicle ownership - regardless of propulsion type - carries inherent environmental costs. Urban planning that <span class="vocab-link" onclick="showPopup('prioritises', 'treats as more important')">prioritises</span> public transport, cycling infrastructure, and walkable communities offers more comprehensive environmental benefits than simply replacing petrol cars with electric ones.</p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>Electric Vehicles and Environmental Sustainability: A Critical Examination</h3>
+                            <p>The <span class="vocab-link" onclick="showPopup('proliferation', 'rapid increase or spread')">proliferation</span> of electric vehicles represents a <span class="vocab-link" onclick="showPopup('paradigm shift', 'fundamental change in approach or assumptions')">paradigm shift</span> in personal transportation, yet the environmental credentials of this transition warrant rigorous scrutiny beyond the marketing narratives of automotive manufacturers and government incentive programmes. While the elimination of tailpipe emissions offers <span class="vocab-link" onclick="showPopup('tangible', 'clear and definite; real')">tangible</span> benefits for urban air quality, a comprehensive lifecycle analysis reveals that the environmental calculus of electric mobility is considerably more <span class="vocab-link" onclick="showPopup('intricate', 'very complicated and detailed')">intricate</span> than popular discourse suggests.</p>
+                            <p>The <span class="vocab-link" onclick="showPopup('crux', 'the most important point')">crux</span> of environmental concern lies in the extraction and processing of battery materials. Lithium extraction, whether through hard-rock mining in Australia or brine evaporation in South America, exerts <span class="vocab-link" onclick="showPopup('considerable', 'notably large in amount')">considerable</span> pressure on local ecosystems. The Atacama region, which hosts the world's largest lithium reserves, has witnessed alarming declines in groundwater levels, threatening the delicate high-altitude wetlands that support endemic flamingo populations and indigenous Atacameno communities whose <span class="vocab-link" onclick="showPopup('livelihoods', 'means of earning money to live')">livelihoods</span> depend on traditional agriculture. The water intensity of lithium production - approximately 2.2 million litres per tonne of lithium carbonate - represents an <span class="vocab-link" onclick="showPopup('existential', 'relating to existence itself')">existential</span> threat in regions where water scarcity is already acute.</p>
+                            <p>The cobalt supply chain introduces <span class="vocab-link" onclick="showPopup('equally fraught', 'similarly problematic')">equally fraught</span> ethical dimensions. The Democratic Republic of Congo's dominance in global cobalt production has been accompanied by extensively documented human rights abuses, including the <span class="vocab-link" onclick="showPopup('exploitation', 'treating someone unfairly for profit')">exploitation</span> of child labour in artisanal mining operations characterised by minimal safety provisions and exposure to toxic materials. While major manufacturers have made public commitments to responsible sourcing and supply chain auditing, the <span class="vocab-link" onclick="showPopup('opacity', 'lack of transparency')">opacity</span> of mineral supply chains and the economic pressures driving informal mining operations render comprehensive oversight extremely challenging.</p>
+                            <p>Battery <span class="vocab-link" onclick="showPopup('longevity', 'length of life or duration')">longevity</span> and degradation patterns introduce additional complexity to environmental assessments. Contemporary lithium-ion batteries typically experience capacity fade of 1-2% annually under normal operating conditions, though this rate accelerates significantly under thermal stress or aggressive charging protocols. The <span class="vocab-link" onclick="showPopup('implications', 'possible effects or results')">implications</span> for vehicle utility and residual value are substantial: a battery retaining only 70% of original capacity may prove inadequate for owners requiring consistent long-distance capability. However, the emerging "second-life" battery market - repurposing degraded EV batteries for stationary energy storage applications - offers a promising pathway for extending functional lifespan and <span class="vocab-link" onclick="showPopup('amortising', 'spreading cost or impact over time')">amortising</span> manufacturing impacts over a longer utilisation period.</p>
+                            <p>Notwithstanding these concerns, <span class="vocab-link" onclick="showPopup('peer-reviewed', 'evaluated by experts in the field')">peer-reviewed</span> lifecycle assessments <span class="vocab-link" onclick="showPopup('consistently', 'always in the same way')">consistently</span> conclude that EVs produce fewer aggregate greenhouse gas emissions than internal combustion vehicles when operated over their typical service life. The "carbon payback period" - the operational duration required to offset elevated manufacturing emissions - ranges from approximately 16,000 to 60,000 kilometres depending on the carbon intensity of local electricity generation. In jurisdictions with predominantly renewable or nuclear electricity supplies, this threshold is reached within the first year of average use; in coal-dependent grids, the advantage, while still present, is considerably <span class="vocab-link" onclick="showPopup('attenuated', 'reduced or weakened')">attenuated</span>.</p>
+                            <p>The trajectory of technological development suggests that current limitations will diminish progressively. Solid-state battery technologies promise higher energy densities, reduced material requirements, and enhanced <span class="vocab-link" onclick="showPopup('recyclability', 'ability to be processed and used again')">recyclability</span>. Concurrently, advances in direct lithium extraction techniques may substantially reduce water consumption and environmental disruption compared to conventional evaporation methods. The expansion of battery recycling infrastructure will increasingly close material loops, reducing <span class="vocab-link" onclick="showPopup('dependence', 'the state of relying on something')">dependence</span> on primary extraction.</p>
+                            <p>Nevertheless, a truly sustainable transport paradigm must recognise that replacing private vehicle fleets - regardless of propulsion technology - with electric alternatives represents an incomplete solution. The <span class="vocab-link" onclick="showPopup('embodied', 'contained within something')">embodied</span> carbon and material intensity of vehicle manufacturing, road infrastructure, and suburban development patterns designed around car dependency present systemic challenges that electrification alone cannot address. Comprehensive sustainability requires <span class="vocab-link" onclick="showPopup('complementary', 'combining well together')">complementary</span> investments in public transit, active transportation infrastructure, and urban densification that reduce overall vehicle miles travelled - the most environmentally benign journey remains the one not undertaken.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: Electric Cars Explained</h2>
+                <div class="video-container">
+                    <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
+                        <iframe
+                            src="https://www.youtube.com/embed/G67i_Z8ukD4"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <div class="slideshow-container">
+
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeVideoSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeVideoSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1: Zero Emissions Claim -->
+                        <div class="discussion-slide active slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The "Zero Emissions" Claim</h3>
+                                <p>Electric cars are often marketed as "<span class="vocab-link" onclick="showPopup('zero emissions', 'producing no pollution')">zero emissions</span>" vehicles. While this is true at the point of use, is it misleading when we consider the full picture?</p>
+                                <ul>
+                                    <li>What about emissions from electricity generation?</li>
+                                    <li>Should manufacturers be required to show "lifecycle emissions"?</li>
+                                    <li>How does your country generate most of its electricity?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&h=600&fit=crop" alt="Electric car charging" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: Lithium Mining -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Lithium Mining Impact</h3>
+                                <p>Extracting <span class="vocab-link" onclick="showPopup('lithium', 'a light metal essential for EV batteries')">lithium</span> for batteries requires massive amounts of water in some of the world's driest regions, affecting local communities and ecosystems.</p>
+                                <ul>
+                                    <li>Should wealthy nations pay compensation to mining regions?</li>
+                                    <li>Is it ethical to deplete water resources for "green" technology?</li>
+                                    <li>What alternatives to lithium batteries exist?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&h=600&fit=crop" alt="Mining operations" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Cobalt & Ethics -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Cobalt and Human Rights</h3>
+                                <p>Most of the world's <span class="vocab-link" onclick="showPopup('cobalt', 'a metal needed for battery production')">cobalt</span> comes from the Democratic Republic of Congo, where child labour and dangerous working conditions have been widely documented.</p>
+                                <ul>
+                                    <li>Should consumers boycott products with unethical supply chains?</li>
+                                    <li>How can we ensure "clean" minerals in our technology?</li>
+                                    <li>Is it the manufacturer's or government's responsibility to regulate this?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1581093458791-9f3c3250a8b0?w=800&h=600&fit=crop" alt="Mining industry" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: Battery Longevity -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Battery Longevity Concerns</h3>
+                                <p>EV batteries typically lose 20-30% of their capacity after 8-10 years. This affects vehicle range and <span class="vocab-link" onclick="showPopup('resale value', 'how much something is worth when sold second-hand')">resale value</span>, raising questions about long-term ownership costs.</p>
+                                <ul>
+                                    <li>Would you buy a second-hand electric car?</li>
+                                    <li>Should manufacturers guarantee battery performance for longer?</li>
+                                    <li>What should happen to old batteries?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1620714223084-8fcacc6dfd8d?w=800&h=600&fit=crop" alt="EV battery" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5: Recycling Challenge -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>The Recycling Challenge</h3>
+                                <p>Currently, only about 5% of lithium-ion batteries are <span class="vocab-link" onclick="showPopup('recycled', 'processed to be used again')">recycled</span> globally. Improving this rate is crucial for EVs to be truly sustainable long-term.</p>
+                                <ul>
+                                    <li>Who should be responsible for recycling - manufacturers or consumers?</li>
+                                    <li>Should there be a "battery deposit" scheme like for bottles?</li>
+                                    <li>What are the barriers to better recycling rates?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=800&h=600&fit=crop" alt="Recycling" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 6: Grid Capacity -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Grid Capacity and Infrastructure</h3>
+                                <p>Mass EV adoption will require massive investment in <span class="vocab-link" onclick="showPopup('infrastructure', 'basic systems and structures needed for a society to function')">infrastructure</span> - charging stations, upgraded power grids, and increased electricity generation.</p>
+                                <ul>
+                                    <li>Who should pay for this infrastructure - taxpayers or car owners?</li>
+                                    <li>Is your country ready for widespread EV adoption?</li>
+                                    <li>Could the grid handle everyone charging at night?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop" alt="Charging infrastructure" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 7: Alternatives to Cars -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Is There a Better Alternative?</h3>
+                                <p>Some argue that focusing on EVs distracts from more sustainable solutions like public transport, cycling, and walkable cities. The greenest car might be no car at all.</p>
+                                <ul>
+                                    <li>Should cities invest more in public transport than charging stations?</li>
+                                    <li>Could you live without a car?</li>
+                                    <li>What changes would make car-free living possible in your area?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1532601224476-15c79f2f7a51?w=800&h=600&fit=crop" alt="Public transport" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 8: The Future -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Looking to the Future</h3>
+                                <p>Technology is evolving rapidly. <span class="vocab-link" onclick="showPopup('solid-state batteries', 'next-generation batteries that are safer and more efficient')">Solid-state batteries</span>, improved recycling, and renewable energy growth may address many current concerns.</p>
+                                <ul>
+                                    <li>Should we wait for better technology before switching to EVs?</li>
+                                    <li>What do you think transport will look like in 2050?</li>
+                                    <li>Would you buy an electric car today?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&h=600&fit=crop" alt="Future transport" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToVideoSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(6)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(7)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(8)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Environment & Mining</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Technology & Energy</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Lithium</div></div><div class="flashcard-back"><div class="flashcard-definition">A lightweight metal essential for rechargeable batteries in electric vehicles</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Carbon Footprint</div></div><div class="flashcard-back"><div class="flashcard-definition">The total amount of greenhouse gases produced by human activities</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Mining</div></div><div class="flashcard-back"><div class="flashcard-definition">Extracting minerals and metals from the earth</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ecosystem</div></div><div class="flashcard-back"><div class="flashcard-definition">A community of living organisms interacting with their environment</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Emissions</div></div><div class="flashcard-back"><div class="flashcard-definition">Gases or particles released into the atmosphere</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sustainability</div></div><div class="flashcard-back"><div class="flashcard-definition">Meeting present needs without compromising future generations' ability to meet theirs</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Extraction</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of removing or obtaining something, especially minerals</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cobalt</div></div><div class="flashcard-back"><div class="flashcard-definition">A metallic element used in lithium-ion batteries, mostly mined in Congo</div></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Battery Degradation</div></div><div class="flashcard-back"><div class="flashcard-definition">The gradual loss of a battery's ability to hold charge over time</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Renewable Energy</div></div><div class="flashcard-back"><div class="flashcard-definition">Energy from sources that naturally replenish, like solar or wind</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Infrastructure</div></div><div class="flashcard-back"><div class="flashcard-definition">Basic physical structures needed for society to function</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Lifecycle Analysis</div></div><div class="flashcard-back"><div class="flashcard-definition">Assessing environmental impact from production to disposal</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Recycling</div></div><div class="flashcard-back"><div class="flashcard-definition">Processing used materials to create new products</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Power Grid</div></div><div class="flashcard-back"><div class="flashcard-definition">The network that delivers electricity from producers to consumers</div></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
+            <div class="section" id="quiz">
+                <h2>Vocabulary Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header" id="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div id="quiz-counter">Question 1 of 10</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quizProgressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be generated dynamically -->
+                    </div>
+
+                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalQuizScore">0/10</div>
+                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>Writing Practice</h2>
+                <div class="writing-container">
+                    <div class="writing-content">
+                        <h3 class="writing-question">Electric Cars: Progress or Problem?</h3>
+
+                        <p class="writing-objective">
+                            Write a balanced paragraph (100-150 words) discussing whether electric cars are truly good for the environment. Consider both the benefits (zero tailpipe emissions, reduced air pollution) and the drawbacks (mining impacts, battery production, electricity sources). What factors should consumers consider before buying an electric car? Share your thoughts with your teacher.
+                        </p>
+
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group">
+                                <label for="studentName">Student Name</label>
+                                <input type="text" id="studentName" name="studentName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teacherEmail">Teacher's Email</label>
+                                <input type="email" id="teacherEmail" name="teacherEmail" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="writingInput">Your Response</label>
+                                <input type="text" id="writingInput" name="writingInput" required>
+                            </div>
+
+                            <div class="button-container">
+                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send Response</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Vocabulary Popup -->
+            <div class="popup-overlay" id="vocabPopup">
+                <div class="popup-content">
+                    <div class="popup-word" id="popupWord"></div>
+                    <div class="popup-definition" id="popupDefinition"></div>
+                    <button class="popup-close" onclick="closePopup()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Slideshow variables
+        let currentSlide = 1;
+        let totalSlides = 5;
+
+        // Vocabulary database for the quiz
+        const vocabularyDatabase = [
+            {
+                term: "lithium",
+                definition: "A lightweight metal essential for rechargeable batteries.",
+                category: "mining",
+                sentences: [
+                    "Electric car batteries contain ___, which is mined in South America.",
+                    "The demand for ___ has increased dramatically with EV production.",
+                    "___ extraction uses vast amounts of water in desert regions."
+                ]
+            },
+            {
+                term: "emissions",
+                definition: "Gases or particles released into the atmosphere.",
+                category: "environment",
+                sentences: [
+                    "Electric cars produce zero tailpipe ___ while driving.",
+                    "Reducing carbon ___ is essential for fighting climate change.",
+                    "Manufacturing ___ from battery production must be considered."
+                ]
+            },
+            {
+                term: "sustainability",
+                definition: "Meeting present needs without compromising future generations.",
+                category: "environment",
+                sentences: [
+                    "True ___ requires considering the entire product lifecycle.",
+                    "The ___ of electric vehicles depends on how batteries are made.",
+                    "Environmental ___ is about more than just reducing emissions."
+                ]
+            },
+            {
+                term: "degradation",
+                definition: "The gradual loss of quality or function over time.",
+                category: "technology",
+                sentences: [
+                    "Battery ___ reduces an electric car's range over the years.",
+                    "After 8 years, ___ means the battery holds less charge.",
+                    "Temperature extremes accelerate battery ___."
+                ]
+            },
+            {
+                term: "extraction",
+                definition: "The process of removing or obtaining something.",
+                category: "mining",
+                sentences: [
+                    "Lithium ___ requires millions of litres of water.",
+                    "The ___ of cobalt raises human rights concerns.",
+                    "New ___ methods may reduce environmental damage."
+                ]
+            },
+            {
+                term: "renewable",
+                definition: "Energy from sources that naturally replenish.",
+                category: "energy",
+                sentences: [
+                    "Charging EVs with ___ energy maximises their environmental benefit.",
+                    "___ sources like solar and wind are becoming cheaper.",
+                    "The grid must shift to ___ energy for EVs to be truly green."
+                ]
+            },
+            {
+                term: "infrastructure",
+                definition: "Basic physical structures needed for society to function.",
+                category: "technology",
+                sentences: [
+                    "Charging ___ must expand for widespread EV adoption.",
+                    "The electrical ___ needs upgrading to handle more EVs.",
+                    "Building new ___ requires significant investment."
+                ]
+            },
+            {
+                term: "recycling",
+                definition: "Processing used materials to create new products.",
+                category: "environment",
+                sentences: [
+                    "Battery ___ rates are currently very low.",
+                    "Improving ___ is essential for sustainable EV production.",
+                    "Proper ___ can recover valuable metals from old batteries."
+                ]
+            },
+            {
+                term: "cobalt",
+                definition: "A metallic element used in lithium-ion batteries.",
+                category: "mining",
+                sentences: [
+                    "Most ___ comes from the Democratic Republic of Congo.",
+                    "___ mining has been linked to child labour concerns.",
+                    "Manufacturers are trying to reduce ___ content in batteries."
+                ]
+            },
+            {
+                term: "ecosystem",
+                definition: "A community of living organisms and their environment.",
+                category: "environment",
+                sentences: [
+                    "Mining can damage local ___ and water supplies.",
+                    "The desert ___ is threatened by lithium extraction.",
+                    "Protecting the ___ must be balanced with green technology needs."
+                ]
+            }
+        ];
+
+        // Section switching
+        function showSection(sectionId, navItem) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+
+            document.getElementById(sectionId).classList.add('active');
+            navItem.classList.add('active');
+        }
+
+        // Slideshow functionality
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > totalSlides) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = totalSlides;
+            }
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        // Video Discussions Slideshow
+        let currentVideoSlide = 1;
+        let totalVideoSlides = 8;
+
+        function changeVideoSlide(direction) {
+            const videoSection = document.getElementById('video-discussions');
+            const slides = videoSection.querySelectorAll('.discussion-slide');
+            const dots = videoSection.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide += direction;
+
+            if (currentVideoSlide > totalVideoSlides) {
+                currentVideoSlide = 1;
+            }
+            if (currentVideoSlide < 1) {
+                currentVideoSlide = totalVideoSlides;
+            }
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        function goToVideoSlide(slideNum) {
+            const videoSection = document.getElementById('video-discussions');
+            const slides = videoSection.querySelectorAll('.discussion-slide');
+            const dots = videoSection.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide = slideNum;
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        // Reading section management
+        function showReadingLevel(level, button) {
+            document.querySelectorAll('.reading-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.querySelectorAll('.reading-level').forEach(levelDiv => levelDiv.style.display = 'none');
+            document.getElementById(level + '-level').style.display = 'block';
+        }
+
+        // Vocabulary section management
+        function showVocabPage(pageNum, element) {
+            document.querySelectorAll('.vocab-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.vocab-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Vocabulary popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+
+                container.appendChild(questionDiv);
+            });
+        }
+
+
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
+                }
+            }
+        }
+
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+
+            const isCorrect = userAnswer === question.correctAnswer;
+
+            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' :
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+
+            if (isCorrect && !userQuizAnswers[questionNum]) {
+                 quizScore++;
+            }
+            userQuizAnswers[questionNum] = isCorrect;
+
+            checkButton.disabled = true;
+
+            updateQuizProgress();
+
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        function updateQuizProgress() {
+            const counter = document.getElementById('quiz-counter');
+            const progressBar = document.getElementById('quizProgressFill');
+
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+
+            if (progressBar) {
+                const answeredCount = Object.keys(userQuizAnswers).length;
+                const progressPercent = (answeredCount / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'block';
+            document.getElementById('finalQuizScore').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+
+        function restartVocabQuiz() {
+            document.getElementById('quiz-results-page').style.display = 'none';
+            document.getElementById('quiz-questions-container').style.display = 'block';
+            document.getElementById('quiz-header').style.display = 'flex';
+            initializeVocabQuiz();
+        }
+
+        // Vocabulary popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Writing section management
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+            const writingResponse = document.getElementById('writingInput').value.trim();
+
+            if (!studentName || !teacherEmail || !writingResponse) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const subject = encodeURIComponent('Electric Cars & Environment Assignment - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
+            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz();
+            showReadingLevel('A2', document.querySelector('.reading-nav .page-btn'));
+
+            // Close popup when clicking outside
+            const vocabPopup = document.getElementById('vocabPopup');
+            if (vocabPopup) {
+                vocabPopup.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closePopup();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
