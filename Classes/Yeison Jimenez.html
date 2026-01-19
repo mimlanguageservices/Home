@@ -1170,11 +1170,11 @@
 
             <!-- Video Section -->
             <div class="section" id="video">
-                <h2>Video: Yeison Jiménez - Aventurero</h2>
+                <h2>Video: Yeison Jiménez - His Story</h2>
                 <div class="video-container">
                     <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
                         <iframe
-                            src="https://www.youtube.com/embed/K0P6RnBi1dA"
+                            src="https://www.youtube.com/embed/jgi3SpPGxDM?start=108"
                             style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1908,106 +1908,200 @@
         let currentSlide = 1;
         let totalSlides = 5;
 
-        // Vocabulary database for the quiz
+        // Vocabulary database for the quiz - organized by level
         const vocabularyDatabase = [
+            // A2 Level
             {
-                term: "humble",
-                definition: "Having or showing a modest estimate of one's importance; from a low social background.",
-                category: "life",
+                term: "famous",
+                definition: "Known by many people.",
+                category: "A2",
                 sentences: [
-                    "Despite his fame, Yeison never forgot his ___ beginnings.",
-                    "His ___ origins made his success even more impressive.",
-                    "The singer remained ___ throughout his career."
+                    "Yeison became ___ after his song went viral.",
+                    "He was a ___ singer in Colombia.",
+                    "Many ___ people came to his concerts."
+                ]
+            },
+            {
+                term: "difficult",
+                definition: "Hard; not easy.",
+                category: "A2",
+                sentences: [
+                    "His childhood was very ___.",
+                    "Working 15 hours a day is ___.",
+                    "Life was ___ before he became successful."
+                ]
+            },
+            {
+                term: "popular",
+                definition: "Liked by many people.",
+                category: "A2",
+                sentences: [
+                    "His music was very ___ in Colombia.",
+                    "He became the most ___ singer in the country.",
+                    "The song was ___ on YouTube."
+                ]
+            },
+            {
+                term: "crashed",
+                definition: "Hit something hard and was destroyed.",
+                category: "A2",
+                sentences: [
+                    "The plane ___ near Paipa.",
+                    "Sadly, the aircraft ___ shortly after takeoff.",
+                    "The helicopter ___ in the mountains."
+                ]
+            },
+            // B1 Level
+            {
+                term: "determination",
+                definition: "The quality of being strongly motivated to succeed.",
+                category: "B1",
+                sentences: [
+                    "His ___ helped him achieve his dreams.",
+                    "Yeison showed great ___ throughout his life.",
+                    "With ___, he overcame every obstacle."
+                ]
+            },
+            {
+                term: "hardship",
+                definition: "Difficult conditions of life.",
+                category: "B1",
+                sentences: [
+                    "He faced ___ during his childhood.",
+                    "Despite the ___, he never gave up.",
+                    "Years of ___ made him stronger."
                 ]
             },
             {
                 term: "gruelling",
-                definition: "Extremely tiring and demanding; exhausting.",
-                category: "life",
+                definition: "Extremely tiring and difficult.",
+                category: "B1",
                 sentences: [
-                    "Yeison worked ___ 15-hour shifts at the market.",
-                    "The ___ work schedule would have broken most people.",
-                    "Despite the ___ conditions, he never gave up on his dream."
+                    "He worked ___ 15-hour shifts at the market.",
+                    "The ___ work schedule was exhausting.",
+                    "Despite the ___ conditions, he persisted."
                 ]
             },
             {
                 term: "breakthrough",
-                definition: "A sudden, important development that leads to success.",
-                category: "career",
+                definition: "An important discovery or success.",
+                category: "B1",
                 sentences: [
-                    "His 2018 hit 'Aventurero' was his major ___.",
-                    "The song represented a ___ moment in his career.",
+                    "His 2018 hit was his major ___.",
+                    "The song represented a ___ in his career.",
                     "After years of struggle, the ___ finally came."
                 ]
             },
             {
-                term: "legacy",
-                definition: "Something left behind after someone dies; lasting impact.",
-                category: "impact",
+                term: "tragically",
+                definition: "In a very sad way.",
+                category: "B1",
                 sentences: [
-                    "Yeison's musical ___ continues to inspire millions.",
-                    "His ___ includes eight albums and over 70 songs.",
-                    "The artist's ___ lives on through his music."
+                    "He ___ died in a plane crash.",
+                    "His life ended ___ at just 34.",
+                    "The concert was ___ cancelled after his death."
+                ]
+            },
+            // B2 Level
+            {
+                term: "adversity",
+                definition: "Difficult or unfavourable circumstances.",
+                category: "B2",
+                sentences: [
+                    "His story is one of triumph over ___.",
+                    "He faced ___ throughout his childhood.",
+                    "Despite ___, he achieved greatness."
+                ]
+            },
+            {
+                term: "catapulted",
+                definition: "Suddenly moved to a much higher position.",
+                category: "B2",
+                sentences: [
+                    "The song ___ him to stardom.",
+                    "His viral video ___ him to fame.",
+                    "Success ___ him into the spotlight."
+                ]
+            },
+            {
+                term: "phenomenon",
+                definition: "Something remarkable or extraordinary.",
+                category: "B2",
+                sentences: [
+                    "His rise to fame was a cultural ___.",
+                    "The song became a national ___.",
+                    "He was considered a musical ___."
                 ]
             },
             {
                 term: "premonition",
-                definition: "A strong feeling that something will happen, especially something bad.",
-                category: "impact",
+                definition: "A strong feeling that something will happen.",
+                category: "B2",
                 sentences: [
-                    "Yeison had a ___ about the plane crash.",
-                    "His recurring dreams seemed like a terrible ___.",
+                    "Yeison had a ___ about the crash.",
+                    "His dreams seemed like a terrible ___.",
                     "The singer's ___ proved tragically accurate."
                 ]
             },
             {
-                term: "authenticity",
-                definition: "The quality of being genuine, real, or true to one's character.",
-                category: "life",
+                term: "culmination",
+                definition: "The highest point of achievement.",
+                category: "B2",
                 sentences: [
-                    "Fans loved his ___ and connection to ordinary people.",
-                    "His ___ set him apart from other celebrities.",
-                    "The ___ of his music resonated with working-class Colombians."
+                    "Selling out El Campín was the ___ of his career.",
+                    "The concert was the ___ of years of hard work.",
+                    "His success represented the ___ of his dreams."
+                ]
+            },
+            // C1 Level
+            {
+                term: "meteoric",
+                definition: "Very rapid and impressive.",
+                category: "C1",
+                sentences: [
+                    "His ___ rise surprised everyone.",
+                    "The singer had a ___ career trajectory.",
+                    "His ___ success came after years of struggle."
                 ]
             },
             {
-                term: "adversity",
-                definition: "Difficulties or misfortune; challenging circumstances.",
-                category: "life",
+                term: "encapsulates",
+                definition: "Expresses the essential features of something.",
+                category: "C1",
                 sentences: [
-                    "Yeison's story is one of triumph over ___.",
-                    "He faced ___ throughout his childhood.",
-                    "Despite ___, he never abandoned his dreams."
+                    "His story ___ the Colombian dream.",
+                    "The song ___ the spirit of the working class.",
+                    "His life ___ the power of perseverance."
                 ]
             },
             {
-                term: "resonate",
-                definition: "To evoke feelings or memories; to have special meaning for someone.",
-                category: "impact",
+                term: "precarious",
+                definition: "Uncertain and possibly dangerous.",
+                category: "C1",
                 sentences: [
-                    "His songs ___ with millions of Colombians.",
-                    "The lyrics ___ with working-class audiences.",
-                    "His story continues to ___ with people everywhere."
+                    "His family lived in ___ circumstances.",
+                    "The ___ conditions of his childhood shaped him.",
+                    "Despite his ___ start, he achieved success."
                 ]
             },
             {
-                term: "tragic",
-                definition: "Causing extreme sadness; relating to disaster or death.",
-                category: "impact",
+                term: "transcendence",
+                definition: "Rising above ordinary limits.",
+                category: "C1",
                 sentences: [
-                    "His death at 34 was a ___ loss for Colombian music.",
-                    "The ___ accident took six lives.",
-                    "Colombia mourned the ___ news of his passing."
+                    "His music represented a kind of ___.",
+                    "Fans saw his success as proof of ___.",
+                    "His story embodies the possibility of ___."
                 ]
             },
             {
-                term: "perseverance",
-                definition: "Continuing to try despite difficulties; determination to succeed.",
-                category: "life",
+                term: "mythologising",
+                definition: "Transforming into a myth or legend.",
+                category: "C1",
                 sentences: [
-                    "His ___ through years of hard work paid off.",
-                    "Yeison's ___ is an inspiration to many.",
-                    "Without ___, he would never have achieved his dreams."
+                    "His death led to the ___ of his life story.",
+                    "Fans began ___ his humble beginnings.",
+                    "The media contributed to ___ his legacy."
                 ]
             }
         ];
