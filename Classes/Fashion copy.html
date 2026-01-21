@@ -1,0 +1,1891 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talking About Fashion - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        /* Image-only slide (Slide 1) */
+        .slide-image-only {
+            padding: 0;
+        }
+
+        /* Horizontal layout slides (Slides 2-5) */
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 20px;
+            max-width: 50%;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.6rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.05rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .slide-text-section-left ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 8px;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .slide-text-section-left li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+
+        .slide-image-section-right {
+            width: 45%;
+            max-width: 50%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Navigation Arrows - Outside the white box */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -60px;
+        }
+
+        .slide-arrow.next {
+            right: -60px;
+        }
+
+        /* Slide Indicators */
+        .slide-indicators {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        /* Reading Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .reading-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .reading-subnav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .reading-level {
+            flex: 1;
+        }
+
+        .page-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #4c51bf;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reading-page {
+            display: none;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+            max-height: calc(100vh - 280px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .reading-page.active {
+            display: block;
+        }
+
+        .reading-page p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        .reading-page h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            margin-top: 35px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1.15rem;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.25rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .vocab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: auto;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* NEW QUIZ SYSTEM STYLES */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        /* Video Section */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            padding: 15px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: visible;
+        }
+
+        #video {
+            overflow: visible;
+        }
+
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background: #48bb78;
+            color: white;
+        }
+
+        .feedback.incorrect {
+            background: #f56565;
+            color: white;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 15px 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .nav-item {
+                flex: 1 1 auto;
+                min-width: 120px;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+            }
+
+            .section h2 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+
+            .slideshow-container {
+                padding: 20px;
+            }
+
+            .slide-horizontal {
+                flex-direction: column !important;
+            }
+
+            .slide-text-section-left {
+                max-width: 100%;
+                padding-right: 0;
+            }
+
+            .slide-image-section-right {
+                width: 100%;
+                max-width: 100%;
+                height: 250px;
+            }
+
+            .slide-arrow {
+                width: 40px;
+                height: 40px;
+            }
+
+            .slide-arrow.prev {
+                left: 10px;
+            }
+
+            .slide-arrow.next {
+                right: 10px;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+            }
+
+            .reading-page p {
+                font-size: 1rem;
+            }
+
+            .quiz-question {
+                padding: 30px 20px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.2rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>Talking About Fashion</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('video', this)">Video</div>
+            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Discussion Section with Slideshow -->
+            <div class="section active" id="discussion">
+                <div class="slideshow-container">
+
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1 - Image Only -->
+                        <div class="discussion-slide active slide-image-only">
+                            <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&h=800&fit=crop" alt="Fashion shopping" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>What is Fashion?</h3>
+                                <p>Fashion is more than just clothing - it's a form of self-expression that reflects our personality, culture, and social identity. The clothes we choose to wear send messages about who we are and how we want to be perceived. Fashion trends change constantly, influenced by designers, celebrities, social media, and cultural movements. Understanding fashion helps us communicate without words and connect with others who share similar tastes and values.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&h=600&fit=crop" alt="Fashion designer at work" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Personal Style vs. Trends</h3>
+                                <p>While fashion trends come and go, personal style remains constant. Some people prefer to follow the latest trends, while others develop their own unique look that doesn't change with the seasons. Finding your personal style involves experimenting with different clothes, colours, and accessories until you discover what makes you feel confident and comfortable.</p>
+                                <ul>
+                                    <li>Classic style: timeless pieces that never go out of fashion</li>
+                                    <li>Casual style: comfortable, everyday clothing</li>
+                                    <li>Bohemian style: free-spirited, artistic clothing</li>
+                                    <li>Minimalist style: simple, clean lines with neutral colours</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                               <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=600&fit=crop" alt="Personal style" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Fashion and Identity</h3>
+                                <p>The clothes we wear can significantly impact how we feel and how others perceive us. Research shows that wearing certain types of clothing can affect our confidence, mood, and even cognitive performance - a phenomenon known as "enclothed cognition." Fashion also plays a crucial role in expressing cultural identity, with traditional clothing connecting people to their heritage and history. In professional settings, dress codes help establish credibility and respect.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&h=600&fit=crop" alt="Professional fashion" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Sustainable Fashion</h3>
+                                <p>The fashion industry is one of the world's largest polluters, leading many people to reconsider their shopping habits. Sustainable fashion focuses on reducing environmental impact through ethical production, recycled materials, and longer-lasting garments. "Fast fashion" - cheap, trendy clothing that quickly goes out of style - contributes to massive waste. Many consumers are now choosing quality over quantity, buying secondhand, or supporting brands with ethical practices.</p>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?w=800&h=600&fit=crop" alt="Sustainable fashion" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <h2>Reading Practice</h2>
+                <div class="reading-container">
+                    <div class="reading-nav">
+                        <button class="page-btn active" onclick="showReadingLevel('A2', this)">A2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B1', this)">B1 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
+                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
+                    </div>
+
+                    <!-- A2 Level -->
+                    <div class="reading-level" id="A2-level">
+                        <div class="reading-page active">
+                            <h3>What Do You Like to Wear?</h3>
+                            <p>Everyone has their own <span class="vocab-link" onclick="showPopup('style', 'the way you dress or look')">style</span>. Some people like to wear jeans and T-shirts every day. Other people prefer <span class="vocab-link" onclick="showPopup('smart', 'neat and formal looking')">smart</span> clothes like shirts and trousers. What you wear can show your <span class="vocab-link" onclick="showPopup('personality', 'the type of person you are')">personality</span>.</p>
+                            <p>Clothes come in many colours and <span class="vocab-link" onclick="showPopup('patterns', 'designs like stripes, dots, or flowers')">patterns</span>. Some people always wear black. Others like bright colours like red, yellow, or pink. What colours do you like to wear?</p>
+                            <p><span class="vocab-link" onclick="showPopup('Accessories', 'extra items you wear, like bags, hats, or watches')">Accessories</span> are also important. A nice watch, a <span class="vocab-link" onclick="showPopup('bracelet', 'jewelry worn around the wrist')">bracelet</span>, or a pretty <span class="vocab-link" onclick="showPopup('scarf', 'fabric worn around the neck')">scarf</span> can make your <span class="vocab-link" onclick="showPopup('outfit', 'the clothes you are wearing together')">outfit</span> look better.</p>
+                            <p>When you buy clothes, do you think about <span class="vocab-link" onclick="showPopup('comfort', 'feeling relaxed and at ease')">comfort</span> or style? Many people want both. They want to look good AND feel good in their clothes.</p>
+                        </div>
+                    </div>
+
+                    <!-- B1 Level -->
+                    <div class="reading-level" id="B1-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>Fashion and Self-Expression</h3>
+                            <p>Fashion is one of the most visible ways we express ourselves. The clothes we choose to wear every day tell others something about our <span class="vocab-link" onclick="showPopup('personality', 'your character and who you are as a person')">personality</span>, our mood, and even our values. Some people use fashion to stand out from the crowd, while others prefer to <span class="vocab-link" onclick="showPopup('blend in', 'look similar to others; not stand out')">blend in</span>.</p>
+                            <p><span class="vocab-link" onclick="showPopup('Trends', 'popular styles at a particular time')">Trends</span> in fashion change quickly. What is <span class="vocab-link" onclick="showPopup('fashionable', 'currently popular or stylish')">fashionable</span> today might look strange in a few years. Think about fashion from the 1980s or 1990s - many of those styles seem unusual now, though some are coming back. This cycle of fashion repeating itself is very common.</p>
+                            <p>The way we dress can also affect how we feel. When we wear something that makes us look good, we often feel more <span class="vocab-link" onclick="showPopup('confident', 'believing in yourself and your abilities')">confident</span>. This is why many people choose their clothes carefully for important events like job interviews or first dates.</p>
+                            <p>However, fashion isn't just about following trends. Many people develop their own personal style that stays the same regardless of what's popular. They might prefer <span class="vocab-link" onclick="showPopup('classic', 'traditional and always in style')">classic</span> pieces like a good pair of jeans and a white shirt, rather than the latest designer items. This approach is often more <span class="vocab-link" onclick="showPopup('sustainable', 'able to continue for a long time without damaging the environment')">sustainable</span> and economical too.</p>
+                            <p>What matters most is that you feel comfortable and authentic in what you wear. Fashion should be fun, not stressful!</p>
+                        </div>
+                    </div>
+
+                    <!-- B2 Level -->
+                    <div class="reading-level" id="B2-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>The Psychology of Fashion</h3>
+                            <p>The relationship between fashion and psychology is more <span class="vocab-link" onclick="showPopup('profound', 'very deep or intense')">profound</span> than many people realise. Researchers have discovered a phenomenon called "<span class="vocab-link" onclick="showPopup('enclothed cognition', 'how clothing affects our psychological processes')">enclothed cognition</span>" - the systematic influence that clothes have on the wearer's psychological processes. In simple terms, what we wear doesn't just change how others see us; it changes how we think and feel about ourselves.</p>
+                            <p>Studies have shown that wearing formal clothing can enhance abstract thinking and give people a broader perspective. Meanwhile, wearing clothes associated with a particular role - such as a doctor's coat or athletic wear - can actually improve performance in tasks related to that role. This suggests that the <span class="vocab-link" onclick="showPopup('symbolic meaning', 'what something represents beyond its physical form')">symbolic meaning</span> of clothing has real psychological power.</p>
+                            <p>Fashion also plays a crucial role in <span class="vocab-link" onclick="showPopup('social signalling', 'communicating information about yourself through appearance')">social signalling</span>. Throughout history, clothing has indicated social status, profession, and group membership. While modern society is generally less rigid about dress codes, we still use fashion to communicate our identity and <span class="vocab-link" onclick="showPopup('affiliations', 'connections or memberships to groups')">affiliations</span>. A person wearing band T-shirts signals different interests than someone in designer suits.</p>
+                            <p>The rise of "fast fashion" has <span class="vocab-link" onclick="showPopup('democratised', 'made available to everyone regardless of social class')">democratised</span> trendy clothing, making current styles accessible to almost everyone. However, this has come at a significant environmental cost. The fashion industry is responsible for approximately 10% of global carbon emissions and is the second-largest consumer of water worldwide.</p>
+                            <p>Increasingly, consumers are becoming aware of these issues and seeking more <span class="vocab-link" onclick="showPopup('ethical', 'morally correct or acceptable')">ethical</span> alternatives. The secondhand clothing market is booming, and many brands are <span class="vocab-link" onclick="showPopup('implementing', 'putting into action')">implementing</span> sustainable practices. This shift suggests that the future of fashion may prioritise <span class="vocab-link" onclick="showPopup('longevity', 'lasting for a long time')">longevity</span> and responsibility alongside style.</p>
+                        </div>
+                    </div>
+
+                    <!-- C1 Level -->
+                    <div class="reading-level" id="C1-level" style="display: none;">
+                        <div class="reading-page active">
+                            <h3>Fashion as Cultural Commentary</h3>
+                            <p>Fashion has always served as a <span class="vocab-link" onclick="showPopup('barometer', 'something that indicates changes')">barometer</span> of social and cultural change, reflecting and sometimes driving transformations in society. Far from being merely <span class="vocab-link" onclick="showPopup('superficial', 'concerned only with surface appearance')">superficial</span> or frivolous, clothing choices have historically been <span class="vocab-link" onclick="showPopup('intertwined', 'closely connected or linked')">intertwined</span> with political movements, economic conditions, and shifting social norms.</p>
+                            <p>Consider the <span class="vocab-link" onclick="showPopup('seminal', 'strongly influencing later developments')">seminal</span> moments in fashion history: the flapper dresses of the 1920s symbolised women's increasing independence and rejection of Victorian constraints; the youth-driven styles of the 1960s reflected a generation's desire to break from their parents' conservative values; punk fashion in the 1970s and 80s was an explicit <span class="vocab-link" onclick="showPopup('rejection', 'refusing to accept')">rejection</span> of mainstream consumer culture. In each case, fashion served as a visible <span class="vocab-link" onclick="showPopup('manifestation', 'a clear showing or display')">manifestation</span> of broader societal tensions and aspirations.</p>
+                            <p>Contemporary fashion continues this tradition of cultural commentary, though perhaps in more <span class="vocab-link" onclick="showPopup('nuanced', 'having subtle differences or details')">nuanced</span> ways. The growing prominence of gender-neutral clothing challenges traditional binary notions of masculinity and femininity. The "athleisure" trend - wearing athletic clothing in non-sporting contexts - reflects changing attitudes toward work-life balance and the <span class="vocab-link" onclick="showPopup('prioritisation', 'treating something as more important')">prioritisation</span> of wellness. Meanwhile, the rise of modest fashion caters to diverse religious and cultural preferences whilst maintaining contemporary aesthetics.</p>
+                            <p>The fashion industry itself is undergoing <span class="vocab-link" onclick="showPopup('unprecedented', 'never done or known before')">unprecedented</span> <span class="vocab-link" onclick="showPopup('scrutiny', 'careful and critical examination')">scrutiny</span> regarding its environmental and ethical practices. The <span class="vocab-link" onclick="showPopup('paradox', 'a seemingly contradictory situation')">paradox</span> of an industry built on constant change being asked to embrace sustainability presents significant challenges. Some argue that the very concept of fashion - predicated on the obsolescence of previous styles - is <span class="vocab-link" onclick="showPopup('fundamentally', 'in a basic or essential way')">fundamentally</span> incompatible with environmental responsibility.</p>
+                            <p>Others <span class="vocab-link" onclick="showPopup('contend', 'argue or claim')">contend</span> that fashion can evolve to become more sustainable without losing its creative and expressive essence. Innovations in materials science, including fabrics made from recycled plastics, agricultural waste, and even laboratory-grown leather, offer promising alternatives to traditional resource-intensive production. The growing market for vintage and secondhand clothing suggests that consumers are increasingly comfortable <span class="vocab-link" onclick="showPopup('decoupling', 'separating or disconnecting')">decoupling</span> fashion from newness.</p>
+                            <p>Perhaps most significantly, there is a growing movement to slow down fashion's <span class="vocab-link" onclick="showPopup('relentless', 'continuing without stopping')">relentless</span> pace of change. The concept of a "capsule wardrobe" - a small collection of versatile, high-quality pieces - challenges the assumption that style requires constant acquisition. This approach echoes historical practices when clothing was expensive and carefully maintained, suggesting that the future of fashion may paradoxically involve looking to the past.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Section -->
+            <div class="section" id="video">
+                <h2>Video: The History of Fashion</h2>
+                <div class="video-container">
+                    <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
+                        <iframe
+                            src="https://www.youtube.com/embed/LpxLdHWzgvk"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Discussions Section -->
+            <div class="section" id="video-discussions">
+                <div class="slideshow-container">
+
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeVideoSlide(-1)">&#10094;</button>
+                        <button class="slide-arrow next" onclick="changeVideoSlide(1)">&#10095;</button>
+
+                        <!-- Slide 1: Personal Style -->
+                        <div class="discussion-slide active slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Personal Style</h3>
+                                <p>Everyone has their own unique <span class="vocab-link" onclick="showPopup('personal style', 'your individual way of dressing')">personal style</span> that reflects who they are. Some people follow trends, while others create their own look.</p>
+                                <ul>
+                                    <li>How would you describe your everyday style in three words?</li>
+                                    <li>Is there a colour you feel most confident wearing? Why?</li>
+                                    <li>Do you prefer simple outfits or bold ones? Why?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=600&fit=crop" alt="Personal style shopping" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: Trends and Influence -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Trends and Influence</h3>
+                                <p>Fashion <span class="vocab-link" onclick="showPopup('trends', 'styles that are popular at a certain time')">trends</span> are constantly changing, influenced by celebrities, social media, and fashion designers.</p>
+                                <ul>
+                                    <li>Who or what influences the way you dress the most?</li>
+                                    <li>Have you ever tried a fashion trend that didn't suit you? What happened?</li>
+                                    <li>How quickly do trends change where you live?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&h=600&fit=crop" alt="Fashion trends" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Comfort vs Style -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Comfort and Style</h3>
+                                <p>Finding the balance between looking good and feeling <span class="vocab-link" onclick="showPopup('comfortable', 'relaxed and at ease')">comfortable</span> is a challenge many people face when choosing what to wear.</p>
+                                <ul>
+                                    <li>Which is more important to you: comfort or style? Give an example.</li>
+                                    <li>Are there any clothes you own that look good but feel uncomfortable?</li>
+                                    <li>What do you usually wear when you want to feel relaxed?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=600&fit=crop" alt="Comfortable style" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: Fashion and Society -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Fashion and Society</h3>
+                                <p>Clothing can affect how people <span class="vocab-link" onclick="showPopup('perceive', 'see or understand')">perceive</span> us in social and professional situations. First impressions often include judgments about appearance.</p>
+                                <ul>
+                                    <li>Do you think people judge others by their clothes? Why?</li>
+                                    <li>Should schools or workplaces have dress codes? Why / why not?</li>
+                                    <li>Can clothing affect how seriously someone is taken?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=600&fit=crop" alt="Professional dress" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 5: Fashion and Identity -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Fashion and Identity</h3>
+                                <p>Clothing is a powerful way to express <span class="vocab-link" onclick="showPopup('identity', 'who you are as a person')">identity</span>, including cultural background, interests, and personal values.</p>
+                                <ul>
+                                    <li>Can clothing help people express who they are? How?</li>
+                                    <li>Have you ever changed your style to fit in with a group? Why / why not?</li>
+                                    <li>Do you think people can misunderstand someone's personality based on their clothes?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&h=600&fit=crop" alt="Fashion identity" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 6: Fashion Across Ages -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Fashion Across Ages</h3>
+                                <p>Different <span class="vocab-link" onclick="showPopup('generations', 'groups of people born around the same time')">generations</span> often have different views about what is appropriate to wear at various stages of life.</p>
+                                <ul>
+                                    <li>Do you think age should influence how people dress? Why / why not?</li>
+                                    <li>Are there styles you think only suit certain age groups? Give an example.</li>
+                                    <li>How do life stages influence clothing choices?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=800&h=600&fit=crop" alt="Fashion ages" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 7: Shopping Habits -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Shopping Habits</h3>
+                                <p>How and where we buy clothes has changed dramatically with online shopping and the rise of <span class="vocab-link" onclick="showPopup('fast fashion', 'cheap, trendy clothes that quickly go out of style')">fast fashion</span>.</p>
+                                <ul>
+                                    <li>Where do you usually buy clothes? Online or in shops?</li>
+                                    <li>What's the most expensive piece of clothing you've ever bought?</li>
+                                    <li>Do people buy secondhand clothes in your country? Why/why not?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&h=600&fit=crop" alt="Shopping" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+
+                        <!-- Slide 8: Traditional Fashion -->
+                        <div class="discussion-slide slide-horizontal">
+                            <div class="slide-text-section-left">
+                                <h3>Traditional and Cultural Fashion</h3>
+                                <p>Every culture has its own <span class="vocab-link" onclick="showPopup('traditional', 'following customs passed down through generations')">traditional</span> clothing that reflects its history and values.</p>
+                                <ul>
+                                    <li>What traditional clothes do people from your country wear?</li>
+                                    <li>What would you wear to meet royalty or the president?</li>
+                                    <li>What differences have you noticed in fashion when you travel?</li>
+                                </ul>
+                            </div>
+                            <div class="slide-image-section-right">
+                                <img src="https://images.unsplash.com/photo-1604537466158-719b1972feb8?w=800&h=600&fit=crop" alt="Traditional fashion" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide-indicators">
+                        <span class="indicator-dot active" onclick="goToVideoSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(6)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(7)"></span>
+                        <span class="indicator-dot" onclick="goToVideoSlide(8)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-nav">
+                        <button class="page-btn active" onclick="showVocabPage(1, this)">Clothes & Accessories</button>
+                        <button class="page-btn" onclick="showVocabPage(2, this)">Style & Trends</button>
+                    </div>
+
+                    <div class="vocab-page active" id="vocab-page-1">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Outfit</div></div><div class="flashcard-back"><div class="flashcard-definition">A set of clothes worn together</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accessories</div></div><div class="flashcard-back"><div class="flashcard-definition">Extra items worn with clothes, like bags, belts, or jewelry</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Footwear</div></div><div class="flashcard-back"><div class="flashcard-definition">Items worn on the feet, like shoes, boots, or sandals</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Outerwear</div></div><div class="flashcard-back"><div class="flashcard-definition">Clothes worn over other clothes, like coats and jackets</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Wardrobe</div></div><div class="flashcard-back"><div class="flashcard-definition">All the clothes a person owns; also a piece of furniture for storing clothes</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Jewelry</div></div><div class="flashcard-back"><div class="flashcard-definition">Decorative items worn on the body, like rings, necklaces, or earrings</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Pattern</div></div><div class="flashcard-back"><div class="flashcard-definition">A repeated design on fabric, like stripes, dots, or flowers</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Fabric</div></div><div class="flashcard-back"><div class="flashcard-definition">The material used to make clothes, like cotton, silk, or polyester</div></div></div></div>
+                        </div>
+                    </div>
+
+                    <div class="vocab-page" id="vocab-page-2">
+                        <div class="vocab-grid">
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Trendy</div></div><div class="flashcard-back"><div class="flashcard-definition">Very fashionable or up to date with current styles</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Vintage</div></div><div class="flashcard-back"><div class="flashcard-definition">Clothing from a previous era, usually at least 20 years old</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Casual</div></div><div class="flashcard-back"><div class="flashcard-definition">Relaxed and informal style of dressing</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Formal</div></div><div class="flashcard-back"><div class="flashcard-definition">Smart, elegant clothing for special occasions or professional settings</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Dress Up</div></div><div class="flashcard-back"><div class="flashcard-definition">To wear nicer or more formal clothes than usual</div></div></div></div>
+                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Fashionable</div></div><div class="flashcard-back"><div class="flashcard-definition">Following or representing current popular styles</div></div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
+            <div class="section" id="quiz">
+                <h2>Vocabulary Quiz</h2>
+                <div class="quiz-container">
+                    <div class="quiz-header" id="quiz-header">
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                        </div>
+                        <div class="progress-container">
+                            <div id="quiz-counter">Question 1 of 10</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quizProgressFill"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-questions-container">
+                        <!-- Questions will be generated dynamically -->
+                    </div>
+
+                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                        <div class="results-summary">
+                            <h3>Quiz Complete!</h3>
+                            <div class="score" id="finalQuizScore">0/10</div>
+                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <h2>Writing Practice</h2>
+                <div class="writing-container">
+                    <div class="writing-content">
+                        <h3 class="writing-question">Fashion and Self-Expression</h3>
+
+                        <p class="writing-objective">
+                            Write a paragraph (100-150 words) about how fashion helps you express yourself. Consider questions like: What is your personal style? How do you choose what to wear? Do you follow trends or prefer classic pieces? How do you think the clothes you wear reflect your personality? Share your thoughts with your teacher.
+                        </p>
+
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group">
+                                <label for="studentName">Student Name</label>
+                                <input type="text" id="studentName" name="studentName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="teacherEmail">Teacher's Email</label>
+                                <input type="email" id="teacherEmail" name="teacherEmail" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="writingInput">Your Response</label>
+                                <input type="text" id="writingInput" name="writingInput" required>
+                            </div>
+
+                            <div class="button-container">
+                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send Response</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Vocabulary Popup -->
+            <div class="popup-overlay" id="vocabPopup">
+                <div class="popup-content">
+                    <div class="popup-word" id="popupWord"></div>
+                    <div class="popup-definition" id="popupDefinition"></div>
+                    <button class="popup-close" onclick="closePopup()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Slideshow variables
+        let currentSlide = 1;
+        let totalSlides = 5;
+
+        // Vocabulary database for the quiz
+        const vocabularyDatabase = [
+            {
+                term: "outfit",
+                definition: "A set of clothes worn together.",
+                category: "clothes",
+                sentences: [
+                    "She put together a lovely ___ for the party.",
+                    "What ___ are you planning to wear tomorrow?",
+                    "His ___ was perfect for the job interview."
+                ]
+            },
+            {
+                term: "accessories",
+                definition: "Extra items worn with clothes, like bags or jewelry.",
+                category: "clothes",
+                sentences: [
+                    "The right ___ can transform a simple dress.",
+                    "She loves buying ___ like scarves and belts.",
+                    "Don't forget to add some ___ to complete your look."
+                ]
+            },
+            {
+                term: "trendy",
+                definition: "Very fashionable or up to date with current styles.",
+                category: "style",
+                sentences: [
+                    "That shop sells very ___ clothes.",
+                    "She always wears the most ___ outfits.",
+                    "Those sneakers are really ___ right now."
+                ]
+            },
+            {
+                term: "vintage",
+                definition: "Clothing from a previous era, usually at least 20 years old.",
+                category: "style",
+                sentences: [
+                    "She found a beautiful ___ dress at the market.",
+                    "I love shopping for ___ clothes.",
+                    "That ___ jacket is from the 1980s."
+                ]
+            },
+            {
+                term: "casual",
+                definition: "Relaxed and informal style of dressing.",
+                category: "style",
+                sentences: [
+                    "The dress code is smart ___.",
+                    "I prefer ___ clothes for weekends.",
+                    "Jeans and a T-shirt is a ___ look."
+                ]
+            },
+            {
+                term: "formal",
+                definition: "Smart, elegant clothing for special occasions.",
+                category: "style",
+                sentences: [
+                    "You need to wear ___ attire to the wedding.",
+                    "The event has a ___ dress code.",
+                    "He looked very smart in ___ clothes."
+                ]
+            },
+            {
+                term: "wardrobe",
+                definition: "All the clothes a person owns.",
+                category: "clothes",
+                sentences: [
+                    "I need to update my ___.",
+                    "Her ___ is full of designer clothes.",
+                    "A capsule ___ contains only essential items."
+                ]
+            },
+            {
+                term: "fashionable",
+                definition: "Following or representing current popular styles.",
+                category: "style",
+                sentences: [
+                    "That coat is very ___ this season.",
+                    "She always looks so ___.",
+                    "The designer creates ___ clothing for young people."
+                ]
+            },
+            {
+                term: "pattern",
+                definition: "A repeated design on fabric, like stripes or dots.",
+                category: "clothes",
+                sentences: [
+                    "I love the floral ___ on that skirt.",
+                    "Stripes are a classic ___ that never goes out of style.",
+                    "The ___ on his tie is quite bold."
+                ]
+            },
+            {
+                term: "fabric",
+                definition: "The material used to make clothes.",
+                category: "clothes",
+                sentences: [
+                    "Cotton is a natural ___ that's comfortable to wear.",
+                    "This dress is made from a beautiful silk ___.",
+                    "What ___ is your shirt made of?"
+                ]
+            }
+        ];
+
+        // Section switching
+        function showSection(sectionId, navItem) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+
+            document.getElementById(sectionId).classList.add('active');
+            navItem.classList.add('active');
+        }
+
+        // Slideshow functionality
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > totalSlides) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = totalSlides;
+            }
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        // Video Discussions Slideshow
+        let currentVideoSlide = 1;
+        let totalVideoSlides = 8;
+
+        function changeVideoSlide(direction) {
+            const videoSection = document.getElementById('video-discussions');
+            const slides = videoSection.querySelectorAll('.discussion-slide');
+            const dots = videoSection.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide += direction;
+
+            if (currentVideoSlide > totalVideoSlides) {
+                currentVideoSlide = 1;
+            }
+            if (currentVideoSlide < 1) {
+                currentVideoSlide = totalVideoSlides;
+            }
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        function goToVideoSlide(slideNum) {
+            const videoSection = document.getElementById('video-discussions');
+            const slides = videoSection.querySelectorAll('.discussion-slide');
+            const dots = videoSection.querySelectorAll('.indicator-dot');
+
+            slides[currentVideoSlide - 1].classList.remove('active');
+            dots[currentVideoSlide - 1].classList.remove('active');
+
+            currentVideoSlide = slideNum;
+
+            slides[currentVideoSlide - 1].classList.add('active');
+            dots[currentVideoSlide - 1].classList.add('active');
+        }
+
+        // Reading section management
+        function showReadingLevel(level, button) {
+            document.querySelectorAll('.reading-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.querySelectorAll('.reading-level').forEach(levelDiv => levelDiv.style.display = 'none');
+            document.getElementById(level + '-level').style.display = 'block';
+        }
+
+        // Vocabulary section management
+        function showVocabPage(pageNum, element) {
+            document.querySelectorAll('.vocab-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.vocab-nav .page-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('vocab-page-' + pageNum).classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            }
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Vocabulary popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+
+                container.appendChild(questionDiv);
+            });
+        }
+
+
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
+                }
+            }
+        }
+
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+
+            const isCorrect = userAnswer === question.correctAnswer;
+
+            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' :
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+
+            if (isCorrect && !userQuizAnswers[questionNum]) {
+                 quizScore++;
+            }
+            userQuizAnswers[questionNum] = isCorrect;
+
+            checkButton.disabled = true;
+
+            updateQuizProgress();
+
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        function updateQuizProgress() {
+            const counter = document.getElementById('quiz-counter');
+            const progressBar = document.getElementById('quizProgressFill');
+
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+
+            if (progressBar) {
+                const answeredCount = Object.keys(userQuizAnswers).length;
+                const progressPercent = (answeredCount / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'block';
+            document.getElementById('finalQuizScore').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+
+        function restartVocabQuiz() {
+            document.getElementById('quiz-results-page').style.display = 'none';
+            document.getElementById('quiz-questions-container').style.display = 'block';
+            document.getElementById('quiz-header').style.display = 'flex';
+            initializeVocabQuiz();
+        }
+
+        // Vocabulary popup system
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        // Writing section management
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+            const writingResponse = document.getElementById('writingInput').value.trim();
+
+            if (!studentName || !teacherEmail || !writingResponse) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const subject = encodeURIComponent('Fashion & Self-Expression Assignment - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
+            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz();
+            showReadingLevel('A2', document.querySelector('.reading-nav .page-btn'));
+
+            // Close popup when clicking outside
+            const vocabPopup = document.getElementById('vocabPopup');
+            if (vocabPopup) {
+                vocabPopup.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closePopup();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
