@@ -149,6 +149,19 @@
         .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
         .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
 
+        /* Writing Card Hover Effect */
+        .writing-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: #f472b6;
+            box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4);
+        }
+        .writing-card:hover .writing-card-bg {
+            filter: grayscale(0%);
+        }
+        .writing-card:hover > div:nth-child(2) {
+            background: rgba(0,0,0,0.2);
+        }
+
         .level-icon {
             font-size: 3rem;
             margin-bottom: 15px;
@@ -1772,10 +1785,10 @@
                                         </div>
 
                                         <!-- Writing Card -->
-                                        <div onclick="openWritingForm(document.querySelectorAll('.nav-item')[3])" class="menu-card" style="width: 200px; height: 220px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s ease; backdrop-filter: blur(10px);">
-                                            <div style="color: #f472b6; font-size: 2rem; margin-bottom: 10px;">&#9733;&#9733;&#9733;</div>
-                                            <div style="color: white; font-size: 1.8rem; font-weight: 700; margin-bottom: 8px;">Writing</div>
-                                            <div style="color: rgba(255,255,255,0.7); font-size: 1rem;">Express your thoughts</div>
+                                        <div onclick="openWritingForm(document.querySelectorAll('.nav-item')[3])" class="menu-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="writing-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_46c5a20f05544c93889c6f64a3af2b41~mv2.jpg'); background-size: cover; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; color: white; font-size: 1.8rem; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Writing</div>
                                         </div>
                                     </div>
                                 </div>
