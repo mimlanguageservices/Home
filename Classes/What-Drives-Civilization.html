@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>What Drives Civilization - MIM Language Services</title>
     <style>
@@ -1115,39 +1115,78 @@
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
+            body {
+                overflow: hidden;
+                touch-action: pan-y;
+            }
+
             .loading-screen {
                 padding: 20px;
             }
 
             .game-title {
-                font-size: 2.5rem;
+                font-size: 2rem;
+                padding: 0 10px;
             }
 
             .game-subtitle {
-                font-size: 1rem;
+                font-size: 0.9rem;
+                margin-bottom: 40px;
             }
 
             .level-cards {
                 flex-direction: column;
-                gap: 20px;
+                gap: 15px;
             }
 
             .level-card {
-                width: 250px;
-                height: 180px;
+                width: 220px;
+                height: 150px;
+            }
+
+            .level-icon {
+                font-size: 2rem;
+                margin-bottom: 8px;
+            }
+
+            .level-name {
+                font-size: 1.8rem;
+            }
+
+            .level-desc {
+                font-size: 0.85rem;
+            }
+
+            .select-prompt {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
             }
 
             .header {
-                padding: 10px 20px;
+                padding: 10px 15px;
             }
 
             .header h1 {
-                font-size: 1.3rem;
+                font-size: 1.1rem;
             }
 
             .header-image {
-                width: 70px;
-                height: 45px;
+                width: 60px;
+                height: 40px;
+            }
+
+            .header .website {
+                display: none;
+            }
+
+            .menu-toggle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .current-level-badge {
+                font-size: 0.75rem;
+                padding: 3px 8px;
             }
 
             .navigation {
@@ -1155,26 +1194,274 @@
                 left: -100%;
             }
 
+            .main-container {
+                height: calc(100vh - 70px);
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+
+            /* Slideshow mobile */
             .slideshow-container {
+                padding: 15px 10px;
+                touch-action: pan-y pinch-zoom;
+            }
+
+            .slide-content-wrapper {
+                height: 100%;
+            }
+
+            .discussion-slide {
                 padding: 20px 15px;
+                border-radius: 12px;
             }
 
             .slide-horizontal {
                 flex-direction: column !important;
+                gap: 15px;
             }
 
             .slide-text-section-left {
                 max-width: 100%;
+                padding-right: 0;
+                max-height: none;
+                overflow-y: visible;
+            }
+
+            .slide-text-section-left h3 {
+                font-size: 1.3rem;
+                margin-bottom: 10px;
+            }
+
+            .slide-text-section-left p {
+                font-size: 0.95rem;
+                line-height: 1.6;
+                margin-bottom: 12px;
+            }
+
+            .slide-text-section-left li {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
             }
 
             .slide-image-section-right {
                 max-width: 100%;
-                height: 250px;
+                height: 180px;
+                flex-shrink: 0;
             }
 
+            /* Hide desktop arrows on mobile */
+            .slide-arrow {
+                display: none;
+            }
+
+            /* Mobile slide indicators */
+            .slide-indicators {
+                bottom: 10px;
+                gap: 6px;
+            }
+
+            .indicator-dot {
+                width: 8px;
+                height: 8px;
+            }
+
+            /* Vocabulary mobile */
             .vocab-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
+
+            .flashcard {
+                height: 160px;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.1rem;
+            }
+
+            .flashcard-hint {
+                font-size: 0.9rem;
+            }
+
+            .reading-nav {
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .page-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            /* Quiz mobile */
+            .quiz-container {
+                height: auto;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .quiz-nav {
+                order: 2;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .progress-container {
+                margin: 0;
+                width: 100%;
+                order: 1;
+            }
+
+            #quiz-counter {
+                font-size: 0.9rem;
+            }
+
+            .quiz-question {
+                padding: 20px 15px;
+                border-radius: 12px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+            }
+
+            .quiz-input {
+                font-size: 1.2rem;
+                padding: 14px 18px;
+                max-width: 100%;
+            }
+
+            .check-button {
+                font-size: 1.1rem;
+                padding: 14px 28px;
+            }
+
+            .nav-btn {
+                padding: 10px 18px;
+                font-size: 0.95rem;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .choice {
+                padding: 15px;
+                font-size: 1rem;
+            }
+
+            .results-summary {
+                padding: 30px 20px;
+            }
+
+            .results-summary h3 {
+                font-size: 1.6rem;
+            }
+
+            .score {
+                font-size: 3rem;
+            }
+
+            /* Popup mobile */
+            .popup-content {
+                margin: 20px;
+                padding: 25px;
+                max-width: calc(100% - 40px);
+            }
+
+            .popup-word {
+                font-size: 1.8rem;
+            }
+
+            .popup-definition {
+                font-size: 1.1rem;
+            }
+
+            /* Vocab link */
+            .vocab-link {
+                padding: 2px 6px;
+                font-size: 0.9rem;
+            }
+
+            /* Menu card mobile */
+            .menu-card.image-card {
+                width: 150px !important;
+                height: 170px !important;
+            }
+
+            .menu-card.image-card span {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 380px) {
+            .game-title {
+                font-size: 1.6rem;
+            }
+
+            .level-card {
+                width: 180px;
+                height: 130px;
+            }
+
+            .level-name {
+                font-size: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 0.95rem;
+            }
+
+            .slide-text-section-left h3 {
+                font-size: 1.1rem;
+            }
+
+            .slide-text-section-left p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Swipe hint animation */
+        .swipe-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(45, 55, 72, 0.6);
+            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: swipeHintFade 2s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .swipe-hint {
+                display: flex;
+            }
+        }
+
+        @keyframes swipeHintFade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
