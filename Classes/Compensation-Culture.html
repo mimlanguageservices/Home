@@ -809,6 +809,162 @@
             opacity: 0.8;
         }
 
+        /* Slide Vocabulary Flashcards */
+        .slide-vocab-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: stretch;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+        }
+
+        .slide-flashcard {
+            flex: 1;
+            max-width: 280px;
+            height: 380px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .slide-flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .slide-flashcard.flipped .slide-flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .slide-flashcard-front, .slide-flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            background: #fff;
+            border: 2px dashed #cbd5e0;
+        }
+
+        .slide-flashcard-front {
+            background: #fff;
+        }
+
+        .slide-flashcard-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .slide-flashcard-clue {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            margin: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .slide-flashcard-clue p {
+            font-size: 1rem;
+            color: #2d3748;
+            line-height: 1.5;
+            text-align: center;
+            margin: 0;
+        }
+
+        .slide-flashcard-clue .example-sentence {
+            font-style: italic;
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .slide-flashcard-clue .example-sentence strong {
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .slide-flashcard-type {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-top: 10px;
+        }
+
+        .slide-flashcard-image {
+            height: 140px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide-flashcard-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slide-flashcard-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .slide-flashcard-flip-icon {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .slide-flashcard-word {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .slide-flashcard-word-type {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         /* Quiz Section */
         .quiz-container {
             display: flex;
