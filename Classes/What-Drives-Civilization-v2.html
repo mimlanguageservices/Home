@@ -900,6 +900,23 @@
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
         }
 
+        .quiz-input.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .quiz-input.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        #quiz-counter {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
         .multiple-choice {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -2317,23 +2334,33 @@
 
                 <!-- Quiz Section -->
                 <div class="section" id="quiz">
-                    <h2>Interactive Quiz</h2>
+                    <h2>Vocabulary Quiz</h2>
                     <div class="quiz-container">
-                        <div class="quiz-header">
+                        <div class="quiz-header" id="quiz-header">
                             <div class="quiz-nav">
-                                <button class="nav-btn" onclick="prevQuizQuestion()" id="prevQuizBtn" disabled>Previous</button>
+                                <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
                             </div>
                             <div class="progress-container">
+                                <div id="quiz-counter">Question 1 of 10</div>
                                 <div class="progress-bar">
-                                    <div class="progress-fill" id="quizProgress"></div>
+                                    <div class="progress-fill" id="quizProgressFill"></div>
                                 </div>
                             </div>
                             <div class="quiz-nav">
                                 <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
                             </div>
                         </div>
-                        <div id="quizContent">
-                            <!-- Quiz questions will be generated here -->
+
+                        <div id="quiz-questions-container">
+                            <!-- Questions will be generated dynamically -->
+                        </div>
+
+                        <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="finalQuizScore">0/10</div>
+                                <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                            </div>
                         </div>
                     </div>
                 </div>
