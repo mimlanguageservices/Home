@@ -1046,6 +1046,85 @@
             margin: 25px 0;
         }
 
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .writing-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .writing-form .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .writing-form .form-group input,
+        .writing-form .form-group textarea {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .writing-form .form-group input:focus,
+        .writing-form .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .writing-form .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
         /* Popup Overlay */
         .popup-overlay {
             display: none;
@@ -2761,6 +2840,43 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing" style="display: none;">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-content">
+                            <h3 class="writing-question">What Drives Civilization?</h3>
+
+                            <p class="writing-objective">
+                                In your opinion, which force is the most effective at maintaining order in society: Fear, Shame, Pride, Guilt, or Envy?<br><br>
+                                Write 150-250 words explaining your choice. Use examples from the lesson (Draco's laws, Genghis Khan, shame cultures, Viking pride, or guilt-based societies) to support your argument.<br><br>
+                                Consider: What are the advantages of your chosen force? What are the potential problems? Can you think of a real-world example from your own culture or experience?
+                            </p>
+
+                            <form id="writingForm" class="writing-form">
+                                <div class="form-group">
+                                    <label for="studentName">Student Name</label>
+                                    <input type="text" id="studentName" name="studentName" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="teacherEmail">Teacher's Email</label>
+                                    <input type="email" id="teacherEmail" name="teacherEmail" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="writingInput">Your Response</label>
+                                    <textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea>
+                                </div>
+
+                                <div class="button-container">
+                                    <button type="button" class="check-button" onclick="openMailto()">Send Response</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2882,29 +2998,27 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             element.classList.add('active');
 
-            // Open email client
-            const subject = encodeURIComponent('Writing Assignment - What Drives Civilization');
-            const writingObjective = `WRITING OBJECTIVE:
-
-In your opinion, which force is the most effective at maintaining order in society: Fear, Shame, or Guilt?
-
-Write 150-250 words explaining your choice. Use examples from the lesson (Draco's laws, Genghis Khan, shame cultures, or guilt-based societies) to support your argument.
-
-Consider:
-- What are the advantages of your chosen force?
-- What are the potential problems?
-- Can you think of a real-world example from your own culture or experience?
-
----
-
-YOUR RESPONSE:
-
-`;
-            const body = encodeURIComponent(writingObjective);
-            window.open(`mailto:?subject=${subject}&body=${body}`);
+            // Show writing section
+            showSection('writing', element);
 
             // Close nav
             toggleNav();
+        }
+
+        // Writing section - send email
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+            const writingResponse = document.getElementById('writingInput').value.trim();
+
+            if (!studentName || !teacherEmail || !writingResponse) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const subject = encodeURIComponent('Writing Assignment - What Drives Civilization - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
+            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
         }
 
         // ========== SLIDESHOW ==========
