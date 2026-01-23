@@ -2130,6 +2130,11 @@
                             <div class="indicator-dot" onclick="goToSlide(18)"></div>
                             <div class="indicator-dot" onclick="goToSlide(19)"></div>
                         </div>
+
+                        <!-- Swipe hint for mobile -->
+                        <div class="swipe-hint">
+                            <span>←</span> Swipe to navigate <span>→</span>
+                        </div>
                     </div>
                 </div>
 
@@ -3096,6 +3101,49 @@ YOUR RESPONSE:
             initializeVocabQuiz();
         }
 
+        // ========== TOUCH SWIPE FOR MOBILE ==========
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        const minSwipeDistance = 50;
+        const maxVerticalDistance = 100;
+
+        function initTouchSwipe() {
+            const slideshowContainer = document.querySelector('.slideshow-container');
+            if (!slideshowContainer) return;
+
+            slideshowContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+            slideshowContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+        }
+
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipeGesture();
+        }
+
+        function handleSwipeGesture() {
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = Math.abs(touchEndY - touchStartY);
+
+            // Only register horizontal swipes (not vertical scrolling)
+            if (Math.abs(deltaX) > minSwipeDistance && deltaY < maxVerticalDistance) {
+                if (deltaX > 0) {
+                    // Swipe right - go to previous slide
+                    changeSlide(-1);
+                } else {
+                    // Swipe left - go to next slide
+                    changeSlide(1);
+                }
+            }
+        }
+
         // ========== INITIALIZATION ==========
         document.addEventListener('DOMContentLoaded', function() {
             initializeVocabQuiz();
@@ -3105,6 +3153,9 @@ YOUR RESPONSE:
 
             // Set default vocab page
             setVocabPage('B2');
+
+            // Initialize touch swipe for mobile
+            initTouchSwipe();
         });
     </script>
 </body>
