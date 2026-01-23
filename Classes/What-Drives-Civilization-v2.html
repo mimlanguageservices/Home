@@ -2413,6 +2413,9 @@
 
             // Set vocabulary page to match level
             setVocabPage(level);
+
+            // Initialize quiz with level-specific vocabulary
+            initializeVocabQuiz();
         }
 
         function showLoadingScreen() {
@@ -2463,6 +2466,15 @@
             // Update nav items
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             element.classList.add('active');
+
+            // Reinitialize quiz when navigating to quiz section
+            if (sectionId === 'quiz') {
+                // Reset quiz display state
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
 
             // Close nav
             toggleNav();
