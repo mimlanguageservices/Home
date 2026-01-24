@@ -3905,6 +3905,34 @@
             }
         }
 
+        function showCompensationExplanation(type) {
+            // Show the explanation panel
+            const panel = document.getElementById('compensationExplanation');
+            panel.style.display = 'block';
+
+            // Hide all explanations first
+            document.querySelectorAll('.compensation-explain').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Show the correct explanation for current level
+            const explainId = 'explain-' + type + '-' + currentDifficulty;
+            const explanation = document.getElementById(explainId);
+            if (explanation) {
+                explanation.style.display = 'block';
+            }
+
+            // Highlight selected option
+            document.querySelectorAll('.fox-options .fox-option-btn').forEach(btn => {
+                btn.style.background = '#f8fafc';
+                btn.style.color = '#2d3748';
+                btn.style.borderColor = '#e2e8f0';
+            });
+            event.target.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            event.target.style.color = 'white';
+            event.target.style.borderColor = '#667eea';
+        }
+
         function setVocabPage(level) {
             document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
             const vocabPage = document.getElementById('vocab-page-' + level);
