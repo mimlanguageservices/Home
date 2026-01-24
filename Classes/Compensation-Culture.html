@@ -964,6 +964,106 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        /* Fox Mascot Question Slide */
+        .fox-question-slide {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .fox-slide-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.7);
+        }
+
+        .fox-slide-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+        }
+
+        .fox-character {
+            position: absolute;
+            bottom: 0;
+            left: 40px;
+            width: 280px;
+            height: auto;
+            animation: foxBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+
+        @keyframes foxBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .fox-speech-bubble {
+            position: absolute;
+            top: 50%;
+            right: 60px;
+            transform: translateY(-50%);
+            max-width: 500px;
+            background: white;
+            border-radius: 24px;
+            padding: 30px 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .fox-speech-bubble::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 15px solid transparent;
+            border-right-color: white;
+        }
+
+        .fox-question {
+            font-size: 1.4rem;
+            color: #2d3748;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .fox-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .fox-option-btn {
+            padding: 18px 30px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+            font-size: 1.1rem;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .fox-option-btn:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
         /* Quiz Section */
         .quiz-container {
             display: flex;
@@ -1636,6 +1736,44 @@
                 font-size: 0.9rem;
             }
 
+            /* Fox question slide mobile */
+            .fox-character {
+                width: 140px;
+                left: 10px;
+                bottom: 10px;
+            }
+
+            .fox-speech-bubble {
+                position: relative;
+                top: 20px;
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                max-width: 90%;
+                padding: 20px;
+                margin-top: 10px;
+            }
+
+            .fox-speech-bubble::before {
+                display: none;
+            }
+
+            .fox-question {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+
+            .fox-option-btn {
+                padding: 14px 20px;
+                font-size: 1rem;
+            }
+
+            .fox-slide-content {
+                flex-direction: column;
+                padding: 20px;
+                justify-content: flex-start;
+            }
+
             /* Slide vocabulary flashcards mobile */
             .slide-vocab-container {
                 flex-direction: column;
@@ -1962,10 +2100,20 @@
                                 <img src="https://static.wixstatic.com/media/593d03_e09c0e9f9c374910a0e642b0489908e4~mv2.jpg" alt="What Drives Civilization" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
                             </div>
 
-                            <!-- Slide 2 - Video -->
+                            <!-- Slide 2 - Fox Question -->
                             <div class="discussion-slide slide-image-only">
-                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
-                                    <iframe src="https://www.youtube.com/embed/Ul2iW3mWl90?enablejsapi=1&origin=file://&start=150" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                <div class="fox-question-slide">
+                                    <img src="https://i.imgur.com/JyVqZmT.jpg" alt="Car crash into house" class="fox-slide-background">
+                                    <div class="fox-slide-content">
+                                        <img src="https://i.imgur.com/Yx6cQVw.png" alt="Fox mascot" class="fox-character">
+                                        <div class="fox-speech-bubble">
+                                            <div class="fox-question">Who do you think is responsible for repairing the broken window?</div>
+                                            <div class="fox-options">
+                                                <button class="fox-option-btn" onclick="this.style.background='linear-gradient(135deg, #48bb78 0%, #38a169 100%)'; this.style.borderColor='#48bb78'; this.style.color='white';">The driver of the car</button>
+                                                <button class="fox-option-btn" onclick="this.style.background='linear-gradient(135deg, #48bb78 0%, #38a169 100%)'; this.style.borderColor='#48bb78'; this.style.color='white';">The owner of the house</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
