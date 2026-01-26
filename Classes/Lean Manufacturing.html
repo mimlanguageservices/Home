@@ -1,0 +1,3388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>What Drives Civilization - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ========== LOADING SCREEN STYLES ========== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%),
+                        url('https://static.wixstatic.com/media/593d03_e09c0e9f9c374910a0e642b0489908e4~mv2.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+
+        .game-title {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5);
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        .game-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 60px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); }
+            50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); }
+        }
+
+        .level-select-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .select-prompt {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease 0.5s both;
+        }
+
+        .level-cards {
+            display: flex;
+            gap: 30px;
+            perspective: 1000px;
+        }
+
+        .level-card {
+            width: 200px;
+            height: 280px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: cardFloat 3s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+        }
+
+        .level-card:nth-child(1) { animation-delay: 0s; }
+        .level-card:nth-child(2) { animation-delay: 0.5s; }
+        .level-card:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+
+        .level-card:hover::before {
+            animation: shine 0.8s ease;
+        }
+
+        @keyframes shine {
+            0% { left: -50%; opacity: 1; }
+            100% { left: 150%; opacity: 0; }
+        }
+
+        .level-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+
+        /* Image Card Hover Effects */
+        .image-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: #f472b6;
+            box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4);
+        }
+        .image-card:hover .image-card-bg {
+            filter: grayscale(0%) !important;
+        }
+        .image-card:hover .image-card-overlay {
+            background: rgba(0,0,0,0.1) !important;
+        }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+
+        .level-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .b1-card .level-icon { color: #4ade80; }
+        .b2-card .level-icon { color: #60a5fa; }
+        .c1-card .level-icon { color: #f472b6; }
+
+        .level-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .level-desc {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            padding: 0 15px;
+        }
+
+        .level-difficulty {
+            margin-top: 15px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .difficulty-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .b1-card .difficulty-dot:nth-child(-n+1) { background: #4ade80; }
+        .b2-card .difficulty-dot:nth-child(-n+2) { background: #60a5fa; }
+        .c1-card .difficulty-dot:nth-child(-n+3) { background: #f472b6; }
+
+        .powered-by {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .powered-by a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .powered-by a:hover {
+            color: #fff;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== MAIN APP STYLES ========== */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.3s;
+        }
+
+        .app-container.visible {
+            opacity: 1;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .menu-toggle span {
+            width: 22px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .current-level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+
+        .current-level-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .header-image {
+            width: 100px;
+            height: 65px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 95px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Collapsible Navigation */
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            position: absolute;
+            left: -280px;
+            top: 0;
+            height: 100%;
+            z-index: 50;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .navigation.open {
+            left: 0;
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 40;
+        }
+
+        .nav-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        /* Discussion Slideshow Styles */
+        #discussion {
+            padding: 0;
+            background: white;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1800px;
+            height: 95%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discussion-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 60px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .discussion-slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Difficulty content - hide by default */
+        .difficulty-content {
+            display: none;
+        }
+
+        /* Horizontal layout slides */
+        .slide-horizontal {
+            flex-direction: row !important;
+            gap: 30px;
+        }
+
+        .slide-text-section-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-right: 20px;
+            max-width: 50%;
+            max-height: 100%;
+            overflow-y: auto;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .slide-text-section-left::-webkit-scrollbar {
+            width: 8px;
+        }
+        .slide-text-section-left::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .slide-text-section-left::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .slide-text-section-left h3 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .slide-text-section-left p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .slide-text-section-left ul {
+            margin-top: 15px;
+            padding-left: 25px;
+        }
+
+        .slide-text-section-left li {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+
+        .slide-image-section-right {
+            flex: 1;
+            max-width: 45%;
+            height: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .slide-image-section-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Navigation Arrows */
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(45, 55, 72, 0.9);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev { left: -70px; }
+        .slide-arrow.next { right: -70px; }
+
+        /* Slide Indicators */
+        .slide-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(45, 55, 72, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scale(1.2);
+        }
+
+        .indicator-dot:hover {
+            background: rgba(102, 126, 234, 0.6);
+        }
+
+        /* Vocabulary Highlight Links */
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Slide Choice Links */
+        .slide-choice-link {
+            color: #4c51bf;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .slide-choice-link:hover {
+            color: #667eea;
+            text-decoration: underline;
+        }
+
+        /* Vocabulary Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .reading-nav {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 12px 28px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            color: #2d3748;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .vocab-page {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .vocab-page.active {
+            display: block;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 220px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .flashcard-definition {
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .flashcard-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+            color: #a0aec0;
+            opacity: 0.8;
+        }
+
+        /* Quiz Section */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+            border-radius: 20px;
+        }
+
+        .quiz-page {
+            display: none;
+            flex: 1;
+        }
+
+        .quiz-page.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-question {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question h3 {
+            color: #2d3748;
+            margin-bottom: 35px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .quiz-input {
+            width: 100%;
+            max-width: 450px;
+            padding: 18px 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            font-size: 1.6rem;
+            text-align: center;
+            margin: 25px auto;
+            display: block;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .quiz-input.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .quiz-input.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        #quiz-counter {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .multiple-choice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 35px auto;
+            max-width: 700px;
+        }
+
+        .choice {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 1.25rem;
+        }
+
+        .choice:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .choice.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .choice.correct {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+        }
+
+        .choice.incorrect {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #ffffff;
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 25px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: rgba(45, 55, 72, 0.9);
+            color: #ffffff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: rgba(160, 174, 192, 0.5);
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .results-summary {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-summary h3 {
+            color: #2d3748;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+        }
+
+        .score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 25px 0;
+        }
+
+        /* Writing Section */
+        .writing-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
+            padding: 10px;
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .writing-content {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 95%;
+            width: 95%;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 140px);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .writing-objective {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .writing-question {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .writing-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .writing-form .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .writing-form .form-group input,
+        .writing-form .form-group textarea {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .writing-form .form-group input:focus,
+        .writing-form .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .writing-form .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* Popup Overlay */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-word {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .popup-definition {
+            font-size: 1.3rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Vocab Popup */
+        #vocabPopup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            /* Hide scrollbar but keep functionality */
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+                touch-action: pan-y;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            body::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* Fixed header */
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+
+            .app-container {
+                padding-top: 60px;
+            }
+
+            .loading-screen {
+                padding: 20px;
+            }
+
+            .game-title {
+                font-size: 2rem;
+                padding: 0 10px;
+            }
+
+            .game-subtitle {
+                display: none;
+            }
+
+            .level-cards {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .level-card {
+                width: 220px;
+                height: 150px;
+            }
+
+            .level-icon {
+                font-size: 2rem;
+                margin-bottom: 8px;
+            }
+
+            .level-name {
+                font-size: 1.8rem;
+            }
+
+            .level-desc {
+                font-size: 0.85rem;
+            }
+
+            .select-prompt {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+
+            .header {
+                padding: 10px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+            }
+
+            .header-image {
+                width: 60px;
+                height: 40px;
+            }
+
+            .header .website {
+                display: none;
+            }
+
+            .powered-by {
+                display: none;
+            }
+
+            .menu-toggle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .current-level-badge {
+                font-size: 0.75rem;
+                padding: 3px 8px;
+            }
+
+            .current-level-badge span[style*="click to change"],
+            .current-level-badge span:last-child {
+                display: none;
+            }
+
+            .navigation {
+                width: 100%;
+                left: -100%;
+            }
+
+            .main-container {
+                height: auto;
+                min-height: calc(100vh - 70px);
+                overflow-y: auto;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .main-container::-webkit-scrollbar {
+                display: none;
+            }
+
+            .section {
+                padding: 15px;
+                overflow-y: auto;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .section::-webkit-scrollbar {
+                display: none;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+
+            /* Slideshow mobile */
+            .slideshow-container {
+                padding: 10px 8px;
+                touch-action: pan-y pinch-zoom;
+                height: calc(100vh - 130px);
+                overflow: hidden;
+            }
+
+            .slide-content-wrapper {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .discussion-slide {
+                padding: 15px 12px;
+                border-radius: 12px;
+                overflow: hidden;
+                height: auto;
+                max-height: none;
+            }
+
+            .slide-horizontal {
+                flex-direction: column !important;
+                gap: 10px;
+            }
+
+            .slide-text-section-left {
+                max-width: 100%;
+                padding-right: 0;
+                max-height: none;
+                overflow-y: visible;
+            }
+
+            .slide-text-section-left h3 {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+            }
+
+            .slide-text-section-left p {
+                font-size: 0.85rem;
+                line-height: 1.5;
+                margin-bottom: 8px;
+            }
+
+            .slide-text-section-left li {
+                font-size: 0.8rem;
+                margin-bottom: 6px;
+            }
+
+            .slide-image-section-right {
+                max-width: 100%;
+                height: 120px;
+                flex-shrink: 0;
+            }
+
+            /* Video iframe responsive */
+            .slide-image-section-right iframe {
+                height: 120px !important;
+            }
+
+            /* Full-screen image/video slides on mobile */
+            .slide-image-only {
+                height: calc(100vh - 180px) !important;
+                padding: 10px !important;
+            }
+
+            .slide-image-only > div {
+                height: 100% !important;
+                min-height: 200px;
+            }
+
+            .slide-image-only iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            .slide-image-only img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            /* Lesson Complete slide - allow scrolling */
+            .lesson-complete-slide {
+                overflow-y: auto !important;
+                height: auto !important;
+                max-height: none !important;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .lesson-complete-slide::-webkit-scrollbar {
+                display: none;
+            }
+
+            .lesson-complete-slide > div {
+                height: auto !important;
+                min-height: 100%;
+                padding: 20px 15px !important;
+            }
+
+            .lesson-complete-slide .menu-card.image-card {
+                width: 140px !important;
+                height: 160px !important;
+            }
+
+            .lesson-complete-slide .menu-card.image-card span {
+                font-size: 1.2rem !important;
+            }
+
+            /* Hide desktop arrows on mobile */
+            .slide-arrow {
+                display: none;
+            }
+
+            /* Mobile slide indicators */
+            .slide-indicators {
+                bottom: 10px;
+                gap: 6px;
+            }
+
+            .indicator-dot {
+                width: 8px;
+                height: 8px;
+            }
+
+            /* Vocabulary mobile */
+            .vocab-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .flashcard {
+                height: 160px;
+            }
+
+            .flashcard-term {
+                font-size: 1.5rem;
+            }
+
+            .flashcard-definition {
+                font-size: 1.1rem;
+            }
+
+            .flashcard-hint {
+                font-size: 0.9rem;
+            }
+
+            .reading-nav {
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .page-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            /* Quiz mobile */
+            #quiz {
+                overflow: hidden;
+                height: calc(100vh - 130px);
+            }
+
+            .quiz-container {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .quiz-nav {
+                order: 2;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .progress-container {
+                margin: 0;
+                width: 100%;
+                order: 1;
+            }
+
+            #quiz-counter {
+                font-size: 0.8rem;
+            }
+
+            .quiz-question {
+                padding: 15px 12px;
+                border-radius: 12px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+
+            .quiz-input {
+                font-size: 1rem;
+                padding: 10px 14px;
+                max-width: 100%;
+                margin: 12px auto;
+            }
+
+            .check-button {
+                font-size: 1rem;
+                padding: 10px 20px;
+                margin: 12px auto;
+            }
+
+            .nav-btn {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+
+            .feedback {
+                padding: 10px;
+                margin: 10px 0;
+                font-size: 0.9rem;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .choice {
+                padding: 15px;
+                font-size: 1rem;
+            }
+
+            .results-summary {
+                padding: 30px 20px;
+            }
+
+            .results-summary h3 {
+                font-size: 1.6rem;
+            }
+
+            .score {
+                font-size: 3rem;
+            }
+
+            /* Popup mobile */
+            .popup-content {
+                margin: 20px;
+                padding: 25px;
+                max-width: calc(100% - 40px);
+            }
+
+            .popup-word {
+                font-size: 1.8rem;
+            }
+
+            .popup-definition {
+                font-size: 1.1rem;
+            }
+
+            /* Vocab link */
+            .vocab-link {
+                padding: 2px 6px;
+                font-size: 0.9rem;
+            }
+
+            /* Menu card mobile */
+            .menu-card.image-card {
+                width: 150px !important;
+                height: 170px !important;
+            }
+
+            .menu-card.image-card span {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 380px) {
+            .game-title {
+                font-size: 1.6rem;
+            }
+
+            .level-card {
+                width: 180px;
+                height: 130px;
+            }
+
+            .level-name {
+                font-size: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 0.95rem;
+            }
+
+            .slide-text-section-left h3 {
+                font-size: 1.1rem;
+            }
+
+            .slide-text-section-left p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Swipe hint animation */
+        .swipe-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(45, 55, 72, 0.6);
+            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: swipeHintFade 2s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .swipe-hint {
+                display: flex;
+            }
+        }
+
+        @keyframes swipeHintFade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio elements -->
+    <audio id="flipSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="incorrectSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ========== LOADING SCREEN ========== -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">What Drives Civilization</h1>
+        <p class="game-subtitle">An Interactive Learning Experience</p>
+
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="powered-by">
+            Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a>
+        </div>
+    </div>
+
+    <!-- ========== MAIN APPLICATION ========== -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="header-title">
+                    <h1>What Drives Civilization</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website">
+                    <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+                </div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank">
+                    <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+                </a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <!-- Navigation Overlay -->
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+
+            <!-- Collapsible Navigation -->
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="openWritingForm(this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <!-- Navigation Arrows -->
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                            </button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+
+                            <!-- Slide 1 - Introduction Image -->
+                            <div class="discussion-slide active slide-image-only">
+                                <img src="https://static.wixstatic.com/media/593d03_e09c0e9f9c374910a0e642b0489908e4~mv2.jpg" alt="What Drives Civilization" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide slide-image-only">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/Ul2iW3mWl90?enablejsapi=1&origin=file://&start=150" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - Bicycle Scenario -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <h3>You see a bicycle on the road. Nobody is near it. You don't know who owns it.</h3>
+                                        <p>What do you do?</p>
+                                        <ul>
+                                            <li><a href="#" onclick="goToSlide(4); return false;" class="slide-choice-link">Leave it. I don't want trouble with police. Maybe it's a test.</a></li>
+                                            <li><a href="#" onclick="goToSlide(5); return false;" class="slide-choice-link">Leave it. I don't want people to think I'm a thief.</a></li>
+                                            <li><a href="#" onclick="goToSlide(6); return false;" class="slide-choice-link">Leave it. Nobody would see me take it... but stealing is wrong.</a></li>
+                                            <li><a href="#" onclick="goToSlide(7); return false;" class="slide-choice-link">A free bicycle! I need one. The owner doesn't need it now. Lucky me!</a></li>
+                                            <li><a href="#" onclick="goToSlide(8); return false;" class="slide-choice-link">If the owner is stupid to leave it here, someone will take it. It might as well be me!</a></li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <h3>You see an unattended bicycle while walking on the road. You're not sure who owns it but nobody seems to be around.</h3>
+                                        <p>What do you do?</p>
+                                        <ul>
+                                            <li><a href="#" onclick="goToSlide(4); return false;" class="slide-choice-link">Leave it alone. The last thing I need is problems with the law right now. It could be a trap or a setup.</a></li>
+                                            <li><a href="#" onclick="goToSlide(5); return false;" class="slide-choice-link">Leave it alone. I'd hate to have a reputation around town as a thief.</a></li>
+                                            <li><a href="#" onclick="goToSlide(6); return false;" class="slide-choice-link">Leave it alone. I wouldn't get caught... But stealing is just morally the wrong thing to do.</a></li>
+                                            <li><a href="#" onclick="goToSlide(7); return false;" class="slide-choice-link">Oh nice, a free bicycle! I need one badly and this owner obviously doesn't need it right now. It's my turn for some good luck!</a></li>
+                                            <li><a href="#" onclick="goToSlide(8); return false;" class="slide-choice-link">If the owner is stupid enough to leave it here and I can guarantee it will be stolen soon by someone. Then it may as well be me!</a></li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <h3>You encounter an unattended bicycle whilst traversing the thoroughfare. The ownership remains indeterminate and no proprietor appears to be in the vicinity.</h3>
+                                        <p>How do you proceed?</p>
+                                        <ul>
+                                            <li><a href="#" onclick="goToSlide(4); return false;" class="slide-choice-link">I shall refrain from interference. Legal entanglements are the last thing I require presently. This could conceivably constitute an entrapment scenario.</a></li>
+                                            <li><a href="#" onclick="goToSlide(5); return false;" class="slide-choice-link">I shall leave it undisturbed. The prospect of acquiring a reputation as a petty thief within my community is distinctly unappealing.</a></li>
+                                            <li><a href="#" onclick="goToSlide(6); return false;" class="slide-choice-link">I shall abstain from taking it. Detection seems improbable... nevertheless, theft remains fundamentally unconscionable from a moral standpoint.</a></li>
+                                            <li><a href="#" onclick="goToSlide(7); return false;" class="slide-choice-link">How fortuitous - a complimentary bicycle! My need is acute and the owner's apparent negligence suggests indifference to the asset. Fortune has smiled upon me!</a></li>
+                                            <li><a href="#" onclick="goToSlide(8); return false;" class="slide-choice-link">Given the owner's manifest carelessness in abandoning it thus, appropriation by some party is virtually inevitable. I might as well be the beneficiary!</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://t3.ftcdn.net/jpg/02/89/06/24/360_F_289062491_YqtJL165ZkOPyp5vEomsaScMwGiRu76J.jpg" alt="Bicycle" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Fear -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Fear</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('fear', 'a strong feeling of being scared or worried about danger')">Fear</span> is a feeling everyone knows. All people feel fear. Some societies use fear to <span class="vocab-link" onclick="showPopup('control', 'to have power over something or someone')">control</span> people. They say: "If you do bad things, we will <span class="vocab-link" onclick="showPopup('punish', 'to hurt or make someone suffer because they did something bad')">punish</span> you very badly." This can make society safe, but it can also hurt many people. Leaders like Draco and Genghis Khan used fear to control their people.</p>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Fear is the most basic emotion in the human brain. People in all cultures understand fear. A society built on fear works in one simple way: the threat of terrible punishment is the only sure way to keep order. In history, this system has created both great <span class="vocab-link" onclick="showPopup('stability', 'a situation where things stays the same and do not change suddenly')">stability</span> and great human suffering. When we look at leaders like Draco and Genghis Khan, we see the clear choice between using <span class="vocab-link" onclick="showPopup('terror', 'extreme fear caused by violence or threats')">terror</span> efficiently and destroying human <span class="vocab-link" onclick="showPopup('dignity', 'the quality of being worthy of respect')">dignity</span>.</p>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Fear constitutes perhaps the most <span class="vocab-link" onclick="showPopup('primordial', 'existing from the beginning of time; ancient and fundamental')">primordial</span> emotion encoded in human <span class="vocab-link" onclick="showPopup('neurobiology', 'the biology of the nervous system and brain')">neurobiology</span>, a universal constant <span class="vocab-link" onclick="showPopup('transcending', 'going beyond the limits of something')">transcending</span> cultural boundaries. Societies predicated upon fear operate through a straightforward mechanism: the implicit or explicit threat of severe retribution serves as the ultimate guarantor of social order. Historically, such systems have yielded paradoxical outcomes - simultaneously fostering remarkable stability whilst perpetuating profound human suffering. An examination of figures such as Draco of Athens and Genghis Khan illuminates the inherent tension between the pragmatic efficacy of terror and the erosion of human dignity it inevitably entails.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://bloodredreviews.com/wp-content/uploads/2018/05/draculauntold10.jpg" alt="Fear" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Efficiency of Fear -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Efficiency of Fear</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Fear can make society safe very quickly. In <span class="vocab-link" onclick="showPopup('ancient', 'very old; from a long time ago')">ancient</span> Athens, a man called Draco made new laws. His laws were very <span class="vocab-link" onclick="showPopup('strict', 'demanding that rules are obeyed; not allowing freedom')">strict</span> - you could die for stealing! But the laws stopped families from fighting each other.</p>
+                                        <p>Genghis Khan also used fear. He built a huge <span class="vocab-link" onclick="showPopup('empire', 'a group of countries ruled by one leader or government')">empire</span>. People were so scared that nobody stole anything. A person could walk across Asia with gold and be safe. Fear stopped <span class="vocab-link" onclick="showPopup('crime', 'an action that breaks the law')">crime</span> and helped <span class="vocab-link" onclick="showPopup('trade', 'buying and selling things between people or countries')">trade</span>.</p>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The main benefit of a fear-based system is that it can create quick and equal stability. In 7th-century BCE Athens, Draco replaced a <span class="vocab-link" onclick="showPopup('chaotic', 'completely disordered and confused')">chaotic</span> system of private family fights with written laws. His laws were very <span class="vocab-link" onclick="showPopup('harsh', 'severe, cruel, or strict')">harsh</span> - even small crimes like theft could get the death penalty - but they worked to <span class="vocab-link" onclick="showPopup('centralize', 'to bring under the control of one central authority')">centralize</span> power and stop the cycle of family revenge.</p>
+                                        <p>Similarly, Genghis Khan used fear of total destruction to build the Mongol Empire. This created the <span class="vocab-link" onclick="showPopup('Pax Mongolica', 'a period of peace and stability across the Mongol Empire (Latin for Mongol Peace)')">Pax Mongolica</span>, a time when people said a traveler could carry gold from one side of Asia to the other without being robbed. In these cases, fear worked to reduce crime and make trade safer.</p>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The principal virtue of fear-based governance lies in its capacity to establish rapid, <span class="vocab-link" onclick="showPopup('impartial', 'treating all people and groups equally; fair')">impartial</span> stability. In 7th-century BCE Athens, Draco's <span class="vocab-link" onclick="showPopup('codification', 'the process of organizing laws into a systematic written code')">codification</span> of law <span class="vocab-link" onclick="showPopup('supplanted', 'replaced something, especially something older or less effective')">supplanted</span> a fragmented system of private blood <span class="vocab-link" onclick="showPopup('feuds', 'long-running arguments or fights between families or groups')">feuds</span> with centralized <span class="vocab-link" onclick="showPopup('jurisprudence', 'the theory and philosophy of law')">jurisprudence</span>. Despite the <span class="vocab-link" onclick="showPopup('draconian', 'extremely harsh and severe (from Draco, the Athenian lawmaker)')">draconian</span> severity of these statutes - whereby even petty theft warranted capital punishment - they effectively consolidated state authority and terminated the perpetual cycle of <span class="vocab-link" onclick="showPopup('vendetta', 'a prolonged bitter quarrel with violent revenge')">vendetta</span> justice.</p>
+                                        <p>Analogously, Genghis Khan wielded the <span class="vocab-link" onclick="showPopup('spectre', 'a ghost; something widely feared as a possible unpleasant occurrence')">spectre</span> of <span class="vocab-link" onclick="showPopup('annihilation', 'complete destruction')">annihilation</span> as an instrument of empire-building. The resultant Pax Mongolica represented an unprecedented era of transcontinental security; contemporary accounts suggest a traveller might traverse the breadth of Asia bearing gold with <span class="vocab-link" onclick="showPopup('impunity', 'freedom from punishment or negative consequences')">impunity</span>. In such instances, fear demonstrably suppressed criminality and facilitated commercial exchange.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://www.gcdogtraining.com/wp-content/uploads/2016/07/Untitled-design-22.jpg" alt="Efficiency of Fear" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Costs of Fear -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Costs of Fear</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>But fear has big problems. It stops people from having new ideas. It makes <span class="vocab-link" onclick="showPopup('society', 'all the people living together in a country or area')">society</span> weak.</p>
+                                        <ul>
+                                            <li><strong>Not fair:</strong> Draco's laws <span class="vocab-link" onclick="showPopup('punished', 'made someone suffer because they did something wrong')">punished</span> <span class="vocab-link" onclick="showPopup('accidents', 'things that happen by chance, not on purpose')">accidents</span> the same as crimes. If you hurt someone by <span class="vocab-link" onclick="showPopup('mistake', 'something done wrong without meaning to')">mistake</span>, you got the same punishment as a <span class="vocab-link" onclick="showPopup('murderer', 'a person who kills another person on purpose')">murderer</span>. Later, Solon changed these bad laws.</li>
+                                            <li><strong>Not stable:</strong> People get used to fear. Then the <span class="vocab-link" onclick="showPopup('government', 'the group of people who control a country')">government</span> must be more and more <span class="vocab-link" onclick="showPopup('cruel', 'causing pain or suffering to others')">cruel</span>. This usually ends badly - people fight back or the system breaks.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>However, the problems of fear-based systems are very destructive. Fear-based government stops new ideas and creates a weak social system.</p>
+                                        <ul>
+                                            <li><strong>Injustice:</strong> Draco's laws did not separate accidents from crimes done on purpose. The law could not see the difference, so Solon eventually cancelled these laws.</li>
+                                            <li><strong>Instability:</strong> Ruling by terror needs to keep getting worse. When people get used to punishment, the state must use even more cruelty to stay in control. This often causes the system to collapse or people to revolt.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Nevertheless, the inherent deficiencies of fear-based governance prove ultimately corrosive. Such systems systematically stifle innovation and engender structural fragility within the social fabric.</p>
+                                        <ul>
+                                            <li><strong>Systemic Injustice:</strong> Draconian jurisprudence failed to distinguish between inadvertent harm and premeditated malice - a fundamental categorical error that Solon would subsequently rectify through comprehensive legal reform.</li>
+                                            <li><strong>Inherent Instability:</strong> Governance through terror operates according to a logic of escalation; as populations habituate to existing punitive measures, the state must perpetually intensify its coercive apparatus to maintain compliance. This trajectory invariably culminates in either systemic collapse or revolutionary upheaval.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://reginajeffers.blog/wp-content/uploads/2018/05/234234-47.jpg?w=640" alt="Costs of Fear" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Shame -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Shame</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>In some societies, people <span class="vocab-link" onclick="showPopup('behave', 'to act in a particular way')">behave</span> well because they don't want others to think badly of them. This is called a "<span class="vocab-link" onclick="showPopup('shame', 'a bad feeling when others think you did something wrong')">shame</span> culture." People care a lot about what their family and <span class="vocab-link" onclick="showPopup('neighbours', 'people who live near you')">neighbours</span> think. If you do something bad, everyone knows and you feel <span class="vocab-link" onclick="showPopup('ashamed', 'feeling embarrassed or guilty about something')">ashamed</span>. This is different from feeling <span class="vocab-link" onclick="showPopup('guilty', 'feeling bad because you did something wrong')">guilty</span> inside yourself - shame comes from other people <span class="vocab-link" onclick="showPopup('judging', 'forming an opinion about someone')">judging</span> you.</p>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>A shame-based society (also called an "honor-shame" culture) uses social pressure from others and the fear of being <span class="vocab-link" onclick="showPopup('excluded', 'kept out or prevented from joining a group')">excluded</span> to keep order. Unlike guilt-based societies, where people control themselves with their own <span class="vocab-link" onclick="showPopup('conscience', 'an inner sense of what is right or wrong')">conscience</span>, shame-based systems care most about how the group sees you. This creates a strong but often strict social system.</p>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Shame-based societies - frequently designated as "honour-shame" cultures in <span class="vocab-link" onclick="showPopup('anthropological', 'relating to the study of human societies and cultures')">anthropological</span> literature - derive their regulatory mechanisms from communal <span class="vocab-link" onclick="showPopup('surveillance', 'close observation, especially of a suspected person')">surveillance</span> and the implicit threat of social <span class="vocab-link" onclick="showPopup('ostracism', 'exclusion from a society or group')">ostracism</span>. In <span class="vocab-link" onclick="showPopup('contradistinction', 'distinction made by contrasting the different qualities of two things')">contradistinction</span> to guilt-based societies, wherein behavioural regulation proceeds through internalized conscience, shame-based systems privilege external perception as the primary <span class="vocab-link" onclick="showPopup('determinant', 'a factor which determines the nature or outcome of something')">determinant</span> of conduct. This configuration engenders cohesive yet frequently rigid social structures wherein individual <span class="vocab-link" onclick="showPopup('autonomy', 'the right or condition of self-government; independence')">autonomy</span> remains <span class="vocab-link" onclick="showPopup('circumscribed', 'restricted or limited')">circumscribed</span> by collective judgement.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.fastcompany.com/image/upload/f_webp,c_fit,w_1920,q_auto/wp-cms/uploads/2023/09/p-1-90948737-what-to-do-if-you-are-being-shamed-at-work.jpg" alt="Shame" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - The Case for Social Cohesion -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Case for Social Cohesion</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Shame cultures can be very strong. The Japanese <span class="vocab-link" onclick="showPopup('Samurai', 'a warrior in ancient Japan')">Samurai</span> had a code called <span class="vocab-link" onclick="showPopup('Bushido', 'the way of the warrior; the Samurai code of honour')">Bushido</span>. It was about <span class="vocab-link" onclick="showPopup('honour', 'respect from other people; a good reputation')">honour</span> and doing the right thing. If a Samurai was a <span class="vocab-link" onclick="showPopup('coward', 'someone who is not brave; someone afraid to do things')">coward</span> or a liar, he and his whole family would be shamed. Nobody would <span class="vocab-link" onclick="showPopup('respect', 'to think highly of someone; to admire')">respect</span> them anymore. This made Samurai very <span class="vocab-link" onclick="showPopup('brave', 'not afraid; willing to face danger')">brave</span> and honest.</p>
+                                        <p>Today, shame cultures often have less crime because people want to protect their family's good name.</p>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The main benefit of a shame-based system is its strong ability to create group responsibility and self-control. The Bushido code of the Japanese Samurai is a good historical example. Bushido focused on gi (doing what is right) and meiyo (honor). A warrior's value depended on his public honesty and integrity. Because one act of cowardice or dishonesty would bring "social death" to the person and their whole family, this code created very disciplined and loyal leaders. Today, this way of thinking can lead to high cooperation in society and low crime, because people are very motivated to protect their community's reputation.</p>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The paramount virtue of shame-based systems resides in their formidable capacity to cultivate collective accountability and autonomous self-regulation. The Bushido code of feudal Japan's Samurai class exemplifies this phenomenon. Centred upon the principles of gi (righteousness) and meiyo (honour), Bushido predicated a warrior's social standing upon demonstrable integrity and probity. Given that a single instance of cowardice or duplicity would precipitate "social death" for both the individual and their extended kinship network, this ethical framework produced extraordinarily disciplined and unwavering retainers.</p>
+                                        <p>In contemporary contexts, analogous cultural frameworks frequently correlate with elevated social cooperation and diminished crime rates, as individuals remain acutely motivated to safeguard their community's collective reputation.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://www.nippon.com/en/ncommon/contents/guide-to-japan/2490607/2490607.jpg" alt="Social Cohesion" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - The Cost of External Judgment -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Cost of External Judgment</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>But shame cultures have problems too. They can hurt people who are <span class="vocab-link" onclick="showPopup('weak', 'not having much power or strength')">weak</span>, especially women.</p>
+                                        <ul>
+                                            <li><strong>Unfair to women:</strong> In some countries, family honour depends on what women do. Women cannot choose their own <span class="vocab-link" onclick="showPopup('education', 'learning at school or university')">education</span> or husband.</li>
+                                            <li><strong>Dangerous control:</strong> If a woman does something the family doesn't like, they might stop her from going out, or worse. Some families even hurt or kill women to "save" their honour. This is very wrong.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The problems are found in limiting individual rights and keeping social inequality. Because "honor" is often connected to traditional power structures, it often hurts the most vulnerable people. In the end, while shame can create an orderly and loyal society, it often does this by sacrificing the individual to what the group thinks.</p>
+                                        <ul>
+                                            <li><strong>Gender Oppression:</strong> In parts of India and various Muslim-majority countries, the idea of izzat (honor) or sharaf is often unfairly placed on women's behavior.</li>
+                                            <li><strong>The "Honour" Trap:</strong> When a woman's actions—from her education choices to whom she marries—are seen as the only measure of a family's status, shame becomes a tool for extreme control.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The inherent limitations of shame-based governance manifest in the systematic curtailment of individual liberties and the perpetuation of structural inequities. Given that conceptions of "honour" typically remain tethered to established hierarchies of power, such systems disproportionately burden society's most vulnerable constituencies.</p>
+                                        <ul>
+                                            <li><strong>Gendered Oppression:</strong> Throughout South Asia and numerous Muslim-majority nations, concepts such as izzat or sharaf become disproportionately inscribed upon female comportment, rendering women the primary custodians of familial reputation.</li>
+                                            <li><strong>The Honour Apparatus:</strong> When feminine conduct constitutes the singular metric of familial standing, shame transmutes into an instrument of totalizing control.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://static.wikitide.net/allthetropeswiki/3/3e/SeppukuS.jpg" alt="Cost of External Judgment" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Pride -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Pride</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Some societies are built on <span class="vocab-link" onclick="showPopup('pride', 'a feeling of satisfaction from your own achievements')">pride</span>. People want to be <span class="vocab-link" onclick="showPopup('heroes', 'people admired for doing brave or great things')">heroes</span>! They want others to respect them for being brave or strong. They want people to <span class="vocab-link" onclick="showPopup('remember', 'to keep someone in your mind; not forget')">remember</span> them after they die. <span class="vocab-link" onclick="showPopup('Vikings', 'warriors and explorers from Scandinavia (Norway, Sweden, Denmark)')">Vikings</span> and <span class="vocab-link" onclick="showPopup('Celts', 'ancient people from Britain, Ireland, and parts of Europe')">Celts</span> were like this. They didn't follow rules because of fear or shame—they wanted to be the best and win <span class="vocab-link" onclick="showPopup('glory', 'fame and honour from doing great things')">glory</span>.</p>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>A pride-based society (often called "heroic" or "contest" cultures by <span class="vocab-link" onclick="showPopup('anthropologists', 'scientists who study human societies, cultures, and their development')">anthropologists</span>) is driven by the search for personal respect, fighting ability, and a lasting <span class="vocab-link" onclick="showPopup('legacy', 'something handed down from the past; what you leave behind')">legacy</span>. Unlike fear-based systems that demand obedience or shame-based systems that demand conformity, pride-based cultures encourage people to be better than their peers through extraordinary achievements.</p>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Pride-based societies—characterized in anthropological discourse as "heroic" or "contest" cultures—derive their animating force from the pursuit of personal honour, <span class="vocab-link" onclick="showPopup('martial', 'relating to fighting or war')">martial</span> <span class="vocab-link" onclick="showPopup('prowess', 'skill or expertise in a particular activity')">prowess</span>, and enduring legacy. In contradistinction to fear-based systems demanding compliance or shame-based configurations requiring conformity, pride-based cultures actively incentivize individuals to transcend their peers through superlative accomplishment.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://sevenswords.uk/wp-content/uploads/2025/04/stamford-bridge-scaled.jpg" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - For Blood and Glory -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>For Blood and Glory!</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Pride societies create amazing <span class="vocab-link" onclick="showPopup('achievements', 'things done successfully with effort and skill')">achievements</span>! Vikings and Celts earned their place by being brave, not by being born rich.</p>
+                                        <ul>
+                                            <li><strong>Be remembered forever:</strong> Vikings were not afraid of death—they were afraid of being forgotten! This made them explore new lands and do great things.</li>
+                                            <li><strong>Protect yourself:</strong> In some African tribes like the <span class="vocab-link" onclick="showPopup('Maasai', 'a people from Kenya and Tanzania known as warriors')">Maasai</span>, a man's pride in defending his animals means he doesn't need police.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The main benefit of a pride-based society is its amazing ability to drive individual achievement and community strength. In Viking and Celtic cultures, a person's social position was not just inherited but earned through drengskapr (courage and integrity) or bravery in battle.</p>
+                                        <ul>
+                                            <li><strong>The Immortality of Reputation:</strong> This belief created the "heroic age" mentality, where the fear of death was less important than the fear of being forgotten.</li>
+                                            <li><strong>Self-Governance:</strong> In many herder societies, like the Nuer or Maasai, a "culture of honor" based on pride works as protection without needing an army.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The cardinal virtue of pride-based societies lies in their remarkable capacity to galvanize individual accomplishment and communal resilience. Within Viking and Celtic cultural matrices, social stratification was not merely inherited but actively earned through demonstrations of drengskapr (courage coupled with integrity) or martial valour.</p>
+                                        <ul>
+                                            <li><strong>The Immortality of Reputation:</strong> This ideological framework engendered the "heroic age" mentality, wherein the apprehension of mortality paled before the dread of obscurity.</li>
+                                            <li><strong>Autonomous Governance:</strong> Among pastoral societies such as the Nuer or Maasai, honour cultures predicated upon pride function as de facto security apparatuses.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://www.pennlive.com/resizer/v2/https%3A%2F%2Fimage.pennlive.com%2Fhome%2Fpenn-media%2Fwidth2048%2Fimg%2Fmidstate_impact%2Fphoto%2Fiwo-jimajpg-23265b118bc8fbe3.jpg?auth=45dfc040d8eded1906cd4fcb67b5856afcd2c2aaae726207ce9d3f6892f4a274&width=800&smart=true&quality=90" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 12 - An Eternal Contest -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>An Eternal Contest</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>But pride has big problems. Everyone wants to be number one, so there is always fighting.</p>
+                                        <ul>
+                                            <li><strong>Never-ending fights:</strong> If someone <span class="vocab-link" onclick="showPopup('insults', 'says rude or offensive things to hurt someone')">insults</span> you, you must fight back or look weak. This creates long family wars that last for <span class="vocab-link" onclick="showPopup('generations', 'groups of people born around the same time')">generations</span>.</li>
+                                            <li><strong>Can't work together:</strong> The Celts were brilliant people, but they could never unite. When the Romans came, the Celts lost because they couldn't fight together.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The problem with this system is the natural instability of a society where everyone is competing for the top position.</p>
+                                        <ul>
+                                            <li><strong>The Cycle of Revenge:</strong> When pride is the most important thing, any insult must be answered to avoid losing status. This leads to endless "blood feuds."</li>
+                                            <li><strong>Weak Cooperation:</strong> Pride-based societies often struggle to form large, united countries. The Celts were famously unable to unite against the Roman Empire.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The fundamental liability of this paradigm resides in the inherent instability of societies predicated upon perpetual competition for supremacy.</p>
+                                        <ul>
+                                            <li><strong>The Vendetta Cycle:</strong> When pride constitutes the paramount value, every affront demands reciprocation to preserve standing. This imperative generates interminable "blood feuds."</li>
+                                            <li><strong>Cooperation Deficits:</strong> Pride-based societies characteristically struggle to coalesce into larger political formations. The Celts notoriously failed to mount unified resistance against Roman expansion.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://www.hindujagruti.org/wp-content/uploads/2016/04/img2-1.jpg" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 13 - Guilt -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Guilt</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>In <span class="vocab-link" onclick="showPopup('guilt', 'a bad feeling inside when you know you did something wrong')">guilt</span> cultures, people control themselves. You don't need police or neighbours watching you. You have a voice inside you—your <span class="vocab-link" onclick="showPopup('conscience', 'the part of your mind that tells you if something is right or wrong')">conscience</span>—that tells you what is right and wrong. If you do something bad, you feel guilty even if nobody knows. Western countries like America and Europe are mostly guilt cultures.</p>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>A guilt-based society depends on an internal moral code—a "conscience"—to control behavior. Unlike fear (enforced by the state) or shame (enforced by the community), guilt is self-controlled. It is the main force in <span class="vocab-link" onclick="showPopup('individualistic', 'favouring freedom of action for individuals over collective control')">individualistic</span> societies, where the person is an independent moral being responsible for their own good behavior.</p>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Guilt-based societies derive their regulatory mechanisms from internalized moral codes—the phenomenon commonly designated as "conscience." In contradistinction to fear (administered through state coercion) or shame (mediated by communal surveillance), guilt operates as an autonomous, self-governing faculty. It constitutes the predominant regulatory force within individualistic societies.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://cdn.indcatholicnews.com/articles/1677110071epwcbWEhV97KBmjHsvu0nZ8DXiFGoM.png?width=330" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 14 - The Case for Internalized Integrity -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Case for Internalized Integrity</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The good thing about guilt is that people behave well even when alone. Nobody is watching, but you still do the right thing.</p>
+                                        <ul>
+                                            <li><strong>Socrates said:</strong> Doing bad things hurts your <span class="vocab-link" onclick="showPopup('soul', 'the spiritual part of a person; your inner self')">soul</span>. If you really understand what is right, you won't want to do wrong.</li>
+                                            <li><strong>Christianity:</strong> Christians believe that sin is wrong against God, not just wrong against other people. So you feel guilty even if no human sees you.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The main benefit of a guilt-based system is its ability to keep order even when no one is watching. Because the "judge" is yourself, people are motivated to act ethically whether they are being watched or not.</p>
+                                        <ul>
+                                            <li><strong>The Philosophical Foundation:</strong> Socrates argued that doing wrong harms the soul more than any external punishment could.</li>
+                                            <li><strong>Stoic and Christian Development:</strong> Christianity developed this through the idea of "sin" as a personal wrong against God, moving morality from public performance to internal relationship.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The paramount virtue of guilt-based systems resides in their capacity to maintain social order absent external surveillance.</p>
+                                        <ul>
+                                            <li><strong>Philosophical Foundations:</strong> Socrates articulated this principle through his contention that wrongdoing inflicts greater harm upon the perpetrator's soul than any external sanction could impose.</li>
+                                            <li><strong>Stoic and Christian Elaborations:</strong> Christianity refined this through the doctrine of "sin" as personal offense against the divine, relocating morality from public performance to internal relationship.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://scontent.fbog19-1.fna.fbcdn.net/v/t1.6435-9/195919126_2202919083182594_113138238997502831_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeEsbcpT2pBy_fLIDFmq4RBNUizZQlSZFYNSLNlCVJkVg5qmH00XsKIiVstO5kmC7Yg&_nc_ohc=Tyz70kdWARcQ7kNvwGcDGb1&_nc_oc=AdmdUF7Pui_zZ9IvORKlVd-5F5IaDZLb5iN219vsrVioT5Bfo-25Ipvwu4XSljpEJyo&_nc_zt=23&_nc_ht=scontent.fbog19-1.fna&_nc_gid=G4oXrqjoWptCCCkmAHrURw&oh=00_AfowmxRWti8hRPhjsJBlDlWtkVhkcNtiUokMI2gU4Z9DXA&oe=699B6AD7" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 15 - The Cost of the Internal Judge -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Cost of the Internal Judge</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>But guilt has problems too. It can hurt your mind and make you lonely.</p>
+                                        <ul>
+                                            <li><strong>Too much pressure:</strong> If everything is your fault, you carry a heavy weight. People often get <span class="vocab-link" onclick="showPopup('anxiety', 'a feeling of worry and fear about what might happen')">anxiety</span> and <span class="vocab-link" onclick="showPopup('depression', 'a mental illness that makes you feel very sad and hopeless')">depression</span>.</li>
+                                            <li><strong>Lonely people:</strong> If everyone follows their own conscience, people stop caring about the group. Modern Western societies often have lonely people who have no community.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The problem with this system is the possibility of mental breakdown and social isolation.</p>
+                                        <ul>
+                                            <li><strong>Mental Burden:</strong> In a guilt-based culture, failure is completely your own responsibility. Guilt can become a constant, damaging weight, leading to anxiety and depression.</li>
+                                            <li><strong>Breaking Down Community:</strong> By making individual conscience more important than social harmony, these societies can become separated and isolated.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The inherent liabilities of this paradigm manifest in the potential for psychological deterioration and social atomization.</p>
+                                        <ul>
+                                            <li><strong>Psychological Burden:</strong> Within guilt-based cultures, failure constitutes an exclusively personal responsibility. Guilt may metastasize into a persistent, debilitating weight.</li>
+                                            <li><strong>Communal Dissolution:</strong> By privileging individual conscience over collective harmony, such societies risk fragmentation and isolation.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://media.tenor.com/DoV8k_X0lpUAAAAM/crying-arrested.gif" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 16 - Envy -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Envy</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Some societies are based on <span class="vocab-link" onclick="showPopup('envy', 'the feeling of wanting what someone else has')">envy</span>. This often happens in <span class="vocab-link" onclick="showPopup('communist', 'relating to a system where the government owns everything and shares it equally')">communist</span> countries. The idea is: everyone should be equal. But instead of making poor people richer, these societies make rich people poorer. If your neighbour has more than you, that's not good—it's a crime!</p>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>An envy-based society is often the unintended result of "basic communism" or extreme equality movements. While the stated goal is social justice, the working method often changes from "raising the bottom" to "pulling down the top." In this system, a neighbor's success is not seen as an example to copy, but as a crime against the <span class="vocab-link" onclick="showPopup('collective', 'a group of people acting together as one')">collective</span>.</p>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Envy-based societies frequently emerge as the inadvertent consequence of "primitive communism" or radical <span class="vocab-link" onclick="showPopup('egalitarian', 'believing in or based on the principle of equality for all people')">egalitarian</span> movements. Whilst the ostensible objective remains social justice, the operative methodology often transmutes from "elevating the disadvantaged" to "suppressing the successful."</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://i.guim.co.uk/img/media/89233eada04f583801f3d73b7c2bb397bfa745b7/0_0_2560_1847/master/2560.jpg?width=375&dpr=1&s=none&crop=none" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 17 - The Case for Radical Equality -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Case for Radical Equality</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Envy societies can do some good things. They can destroy unfair old systems and give everyone basic needs.</p>
+                                        <ul>
+                                            <li><strong>Soviet Union:</strong> At first, the USSR ended the old Russian class system. They gave everyone education and jobs.</li>
+                                            <li><strong>Everyone together:</strong> Because nobody can be much richer than others, people feel equal. There are no very rich or very poor people.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The main benefit of an envy-based structure is its effectiveness at destroying old aristocracies and making sure everyone has basic survival needs met.</p>
+                                        <ul>
+                                            <li><strong>The Promise of the Soviet Union:</strong> In its early stages, the USSR successfully destroyed the Tsarist class system, providing education and jobs for everyone.</li>
+                                            <li><strong>Social Safety Net:</strong> The "envy" of the group acts as a control that prevents huge wealth gaps from forming.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The principal virtue of envy-based structures resides in their efficacy at dismantling entrenched aristocracies and ensuring universal provision of basic necessities.</p>
+                                        <ul>
+                                            <li><strong>The Soviet Promise:</strong> During its initial phase, the USSR successfully obliterated the Tsarist class hierarchy, extending education and employment opportunities universally.</li>
+                                            <li><strong>Social Safety Mechanisms:</strong> Collective "envy" functions as a regulatory mechanism forestalling the emergence of pronounced wealth disparities.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://i.imgflip.com/61blbl.png" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 18 - The Cost of Stagnation -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Cost of Stagnation</h3>
+                                    <!-- B1 Version -->
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>But envy societies have big problems. These problems destroyed the Soviet Union.</p>
+                                        <ul>
+                                            <li><strong>No reason to work hard:</strong> If you work hard and do well, people punish you! Soviet workers said: "They pretend to pay us, we pretend to work."</li>
+                                            <li><strong>Everyone spies:</strong> The government told people to report their neighbours. Nobody could trust anyone.</li>
+                                            <li><strong>Secret rich people:</strong> The leaders said everyone was equal, but they had secret luxuries. When people found out, they became very angry.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- B2 Version -->
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The problems of envy-based government eventually led to the collapse of the Soviet Union.</p>
+                                        <ul>
+                                            <li><strong>The "Crab Mentality":</strong> When excellence is punished, people lose the reason to innovate. Workers said, "They pretend to pay us, and we pretend to work."</li>
+                                            <li><strong>Organized Spying:</strong> Citizens were encouraged to report neighbors who had "illegal" luxuries. This destroyed trust.</li>
+                                            <li><strong>The "Nomenklatura" Paradox:</strong> Ironically, these societies created a new elite—the Party bureaucrats—who enjoyed secret luxuries.</li>
+                                        </ul>
+                                    </div>
+                                    <!-- C1 Version -->
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The inherent deficiencies of envy-based governance ultimately precipitated the Soviet Union's dissolution.</p>
+                                        <ul>
+                                            <li><strong>The "Crab Mentality":</strong> When excellence invites punishment, the impetus for innovation evaporates. Soviet workers encapsulated this: "They pretend to pay us, and we pretend to work."</li>
+                                            <li><strong>Institutionalized Surveillance:</strong> Citizens were encouraged to denounce neighbours possessing "illicit" luxuries. This systematically eroded social trust.</li>
+                                            <li><strong>The Nomenklatura Paradox:</strong> Such societies invariably engendered new elites—the Party bureaucracy—who enjoyed clandestine privileges.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://media.licdn.com/dms/image/v2/D5622AQFnEC1VtofWIA/feedshare-shrink_800/B56Zg.FwMOHMAs-/0/1753388358022?e=2147483647&v=beta&t=LKjnOmZreZ1rrDJEhQ6NPVoFgV-Cktj5NGwg4WxBlXQ" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 19 - Continue Your Learning -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <!-- Vocabulary Card -->
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;">
+                                                <span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quiz Card -->
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;">
+                                                <span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Writing Card -->
+                                        <div onclick="openWritingForm(document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;">
+                                                <span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide Indicators -->
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(12)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(13)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(14)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(15)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(16)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(17)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(18)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(19)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <!-- B1 Vocabulary -->
+                        <div class="vocab-page" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Fear</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">A strong feeling of being scared or worried about danger</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Control</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">To have power over something or someone</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Punish</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">To hurt or make someone suffer because they did something bad</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Ancient</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Very old; from a long time ago</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Strict</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Demanding that rules are obeyed; not allowing freedom</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Empire</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">A group of countries ruled by one leader or government</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Crime</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">An action that breaks the law</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Trade</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Buying and selling things between people or countries</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Society</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">All the people living together in a country or area</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Government</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">The group of people who control a country</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Cruel</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Causing pain or suffering to others</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Behave</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">To act in a particular way</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Shame</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">A bad feeling when others think you did something wrong</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Guilt</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">A feeling that you have done something wrong</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- B2 Vocabulary -->
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Stability</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">A situation where things stay the same and do not change suddenly</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Terror</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Extreme fear caused by violence or threats</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Dignity</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">The quality of being worthy of respect</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Chaotic</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Completely disordered and confused</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Harsh</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Severe, cruel, or strict</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Centralize</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">To bring under the control of one central authority</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Pax Mongolica</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">A period of peace and stability across the Mongol Empire (Latin for "Mongol Peace")</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Excluded</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Kept out or prevented from joining a group</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Conscience</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">An inner sense of what is right or wrong</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Compass</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Something that helps you know what is right and what is wrong</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Internalize</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">To make attitudes or behavior part of your nature</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Surveillance</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Close observation, especially of a suspected person</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- C1 Vocabulary -->
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Primordial</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Existing from the beginning of time; ancient and fundamental</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Neurobiology</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">The biology of the nervous system and brain</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Transcending</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Going beyond the limits of something</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Codification</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">The process of organizing laws into a systematic written code</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Jurisprudence</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">The theory and philosophy of law</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Draconian</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Extremely harsh and severe (from Draco, the Athenian lawmaker)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Vendetta</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">A prolonged bitter quarrel with violent revenge</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Annihilation</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Complete destruction</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Impunity</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Freedom from punishment or negative consequences</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Anthropological</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Relating to the study of human societies and cultures</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Ostracism</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Exclusion from a society or group</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Autonomy</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">The right or condition of self-government; independence</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Circumscribed</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Restricted or limited</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Transgression</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">An act that goes against a law, rule, or code of conduct</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Indoctrination</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">The process of teaching a person or group to accept a set of beliefs uncritically</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flashcard" onclick="flipCard(this)">
+                                    <div class="flashcard-inner">
+                                        <div class="flashcard-front">
+                                            <div class="flashcard-term">Visceral</div>
+                                            <div class="flashcard-hint">Click to see definition</div>
+                                        </div>
+                                        <div class="flashcard-back">
+                                            <div class="flashcard-definition">Relating to deep feelings rather than to careful thought</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Vocabulary Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav">
+                                <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
+                            </div>
+                            <div class="progress-container">
+                                <div id="quiz-counter">Question 1 of 10</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="quizProgressFill"></div>
+                                </div>
+                            </div>
+                            <div class="quiz-nav">
+                                <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                            </div>
+                        </div>
+
+                        <div id="quiz-questions-container">
+                            <!-- Questions will be generated dynamically -->
+                        </div>
+
+                        <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="finalQuizScore">0/10</div>
+                                <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-content">
+                            <h3 class="writing-question">What Drives Civilization?</h3>
+
+                            <p class="writing-objective">
+                                In your opinion, which force is the most effective at maintaining order in society: Fear, Shame, Pride, Guilt, or Envy?<br><br>
+                                Write 150-250 words explaining your choice. Use examples from the lesson (Draco's laws, Genghis Khan, shame cultures, Viking pride, or guilt-based societies) to support your argument.<br><br>
+                                Consider: What are the advantages of your chosen force? What are the potential problems? Can you think of a real-world example from your own culture or experience?
+                            </p>
+
+                            <form id="writingForm" class="writing-form">
+                                <div class="form-group">
+                                    <label for="studentName">Student Name</label>
+                                    <input type="text" id="studentName" name="studentName" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="teacherEmail">Teacher's Email</label>
+                                    <input type="email" id="teacherEmail" name="teacherEmail" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="writingInput">Your Response</label>
+                                    <textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea>
+                                </div>
+
+                                <div class="button-container">
+                                    <button type="button" class="check-button" onclick="openMailto()">Send Response</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vocabulary Definition Popup -->
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+            <button class="popup-close" onclick="closeVocabPopup()">Close</button>
+        </div>
+    </div>
+
+    <!-- Vocab Popup (for inline vocab links) -->
+    <div id="vocabPopup" onclick="closePopup()">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <div class="popup-word" id="vocabPopupWord"></div>
+            <div class="popup-definition" id="vocabPopupDef"></div>
+            <button class="popup-close" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL STATE ==========
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 19;
+
+        // ========== LOADING SCREEN & GAME START ==========
+        function startGame(level) {
+            currentDifficulty = level;
+
+            // Update difficulty display
+            updateDifficultyDisplay();
+
+            // Hide loading screen
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.classList.add('hidden');
+
+            // Show app container
+            setTimeout(() => {
+                document.getElementById('appContainer').classList.add('visible');
+            }, 300);
+
+            // Set difficulty content visibility
+            setDifficultyContent(level);
+
+            // Set vocabulary page to match level
+            setVocabPage(level);
+
+            // Initialize quiz with level-specific vocabulary
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.remove('hidden');
+            }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            // Hide all difficulty content
+            document.querySelectorAll('.difficulty-content').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Show selected level content
+            document.querySelectorAll('.difficulty-' + level).forEach(el => {
+                el.style.display = 'block';
+            });
+        }
+
+        function updateDifficultyDisplay() {
+            const badge = document.getElementById('levelBadge');
+            const text = document.getElementById('currentLevelText');
+
+            badge.className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            text.textContent = currentDifficulty;
+        }
+
+        // ========== NAVIGATION ==========
+        function toggleNav() {
+            const nav = document.getElementById('navigation');
+            const overlay = document.getElementById('navOverlay');
+            const toggle = document.getElementById('menuToggle');
+
+            nav.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            toggle.classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+            // Show target section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            element.classList.add('active');
+
+            // Reinitialize quiz when navigating to quiz section
+            if (sectionId === 'quiz') {
+                // Reset quiz display state
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+
+            // Close nav
+            toggleNav();
+        }
+
+        function openWritingForm(element) {
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            element.classList.add('active');
+
+            // Show writing section
+            showSection('writing', element);
+
+            // Close nav
+            toggleNav();
+        }
+
+        // Writing section - send email
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+            const writingResponse = document.getElementById('writingInput').value.trim();
+
+            if (!studentName || !teacherEmail || !writingResponse) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const subject = encodeURIComponent('Writing Assignment - What Drives Civilization - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
+            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+        }
+
+        // ========== SLIDESHOW ==========
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const discussionSection = document.getElementById('discussion');
+            if (discussionSection && discussionSection.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        // ========== FLASHCARDS ==========
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const flipSound = document.getElementById('flipSound');
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => console.log('Audio playback failed:', e));
+            }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const vocabPage = document.getElementById('vocab-page-' + level);
+            if (vocabPage) {
+                vocabPage.classList.add('active');
+            }
+        }
+
+        // ========== POPUPS ==========
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('vocabPopup').style.display = 'none';
+        }
+
+        function closeVocabPopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+
+        // ========== VOCABULARY DATABASE FOR QUIZ ==========
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Fear", definition: "A strong feeling of being scared or worried about danger", sentences: ["___ is a powerful emotion that can control people's behavior.", "The government used ___ to keep citizens obedient.", "Living in constant ___ is not healthy for society."] },
+                { term: "Control", definition: "To have power over something or someone", sentences: ["Governments try to ___ their citizens through laws.", "Fear allows rulers to ___ people easily.", "Some leaders believe they must ___ every aspect of society."] },
+                { term: "Punish", definition: "To hurt or make someone suffer because they did something bad", sentences: ["Draco's laws would ___ even small crimes with death.", "Society must ___ those who break rules.", "Leaders often ___ citizens to maintain order."] },
+                { term: "Ancient", definition: "Very old; from a long time ago", sentences: ["___ Athens had very strict laws.", "Many ___ civilizations used fear to control people.", "These ___ methods are still studied today."] },
+                { term: "Strict", definition: "Demanding that rules are obeyed; not allowing freedom", sentences: ["Draco was known for his ___ laws.", "A ___ government doesn't allow much freedom.", "Parents can be too ___ with their children."] },
+                { term: "Empire", definition: "A group of countries ruled by one leader or government", sentences: ["The Mongol ___ was the largest in history.", "Genghis Khan built a powerful ___.", "Every ___ eventually falls."] },
+                { term: "Crime", definition: "An action that breaks the law", sentences: ["Under Draco's laws, any ___ could mean death.", "Fear of punishment reduces ___.", "Some people commit ___ when desperate."] },
+                { term: "Trade", definition: "Buying and selling things between people or countries", sentences: ["The Mongol Empire enabled safe ___ across Asia.", "___ increased during the Pax Mongolica.", "International ___ requires peace and stability."] },
+                { term: "Society", definition: "All the people living together in a country or area", sentences: ["Fear affects how ___ functions.", "A healthy ___ needs more than just fear.", "Every ___ has rules to follow."] },
+                { term: "Government", definition: "The group of people who control a country", sentences: ["The ___ creates laws for citizens.", "A strong ___ can maintain peace.", "People often fear their ___."] },
+                { term: "Cruel", definition: "Causing pain or suffering to others", sentences: ["Draco's punishments were considered ___.", "Some rulers are ___ to their people.", "___ treatment creates fear in society."] },
+                { term: "Shame", definition: "A bad feeling when others think you did something wrong", sentences: ["___ cultures focus on what others think of you.", "Public ___ can be a powerful control mechanism.", "In some societies, ___ is worse than guilt."] },
+                { term: "Guilt", definition: "A feeling that you have done something wrong", sentences: ["___ comes from inside yourself.", "Western cultures often rely on ___.", "___ makes people follow rules even alone."] }
+            ],
+            B2: [
+                { term: "Stability", definition: "A situation where things stay the same and do not change suddenly", sentences: ["Fear can create ___ in society.", "The empire brought ___ to the region.", "Political ___ is important for trade."] },
+                { term: "Terror", definition: "Extreme fear caused by violence or threats", sentences: ["Genghis Khan used ___ as a weapon.", "The threat of ___ kept enemies away.", "___ can be an effective but cruel tool."] },
+                { term: "Dignity", definition: "The quality of being worthy of respect", sentences: ["Everyone deserves to live with ___.", "Fear-based control destroys human ___.", "Shame attacks a person's ___."] },
+                { term: "Chaotic", definition: "Completely disordered and confused", sentences: ["Athens was ___ before Draco's laws.", "Without rules, society becomes ___.", "The ___ situation required strict measures."] },
+                { term: "Harsh", definition: "Severe, cruel, or strict", sentences: ["Draco's laws were extremely ___.", "___ punishments create fear.", "Some believe ___ measures are necessary."] },
+                { term: "Centralize", definition: "To bring under the control of one central authority", sentences: ["Empires need to ___ power to survive.", "Genghis Khan worked to ___ his rule.", "It's difficult to ___ a large territory."] },
+                { term: "Pax Mongolica", definition: "A period of peace and stability across the Mongol Empire", sentences: ["The ___ allowed trade to flourish.", "During the ___, merchants traveled safely.", "The ___ lasted for about 200 years."] },
+                { term: "Excluded", definition: "Kept out or prevented from joining a group", sentences: ["People who break norms are ___ from society.", "Being ___ is painful in shame cultures.", "Those who were ___ often faced hardship."] },
+                { term: "Conscience", definition: "An inner sense of what is right or wrong", sentences: ["Your ___ tells you when something is wrong.", "Guilt comes from your ___.", "A person without ___ is dangerous."] },
+                { term: "Compass", definition: "Something that helps you know what is right and what is wrong", sentences: ["Your moral ___ guides your decisions.", "Guilt acts as an internal ___.", "Without a moral ___, people can lose their way."] },
+                { term: "Internalize", definition: "To make attitudes or behavior part of your nature", sentences: ["We ___ rules from childhood.", "Guilt-based societies ___ moral values.", "It takes time to ___ new behaviors."] },
+                { term: "Surveillance", definition: "Close observation, especially of a suspected person", sentences: ["Modern ___ technology increases control.", "Constant ___ makes people feel watched.", "Guilt works without external ___."] }
+            ],
+            C1: [
+                { term: "Primordial", definition: "Existing from the beginning of time; ancient and fundamental", sentences: ["Fear is a ___ human emotion.", "These ___ instincts still affect us.", "The ___ drive for survival shapes society."] },
+                { term: "Neurobiology", definition: "The biology of the nervous system and brain", sentences: ["___ explains how fear affects the brain.", "Studies in ___ reveal our emotional responses.", "Understanding ___ helps explain human behavior."] },
+                { term: "Transcending", definition: "Going beyond the limits of something", sentences: ["Fear is capable of ___ rational thought.", "Some emotions are ___ cultural boundaries.", "The Mongol Empire succeeded in ___ traditional limits."] },
+                { term: "Codification", definition: "The process of organizing laws into a systematic written code", sentences: ["Draco's ___ of laws was revolutionary.", "The ___ of rules creates consistency.", "Legal ___ is essential for civilization."] },
+                { term: "Jurisprudence", definition: "The theory and philosophy of law", sentences: ["Western ___ was influenced by Draco.", "Studying ___ helps understand legal systems.", "Different cultures have different approaches to ___."] },
+                { term: "Draconian", definition: "Extremely harsh and severe (from Draco, the Athenian lawmaker)", sentences: ["The new policies were called ___.", "___ measures are often criticized.", "His ___ approach created fear but also order."] },
+                { term: "Vendetta", definition: "A prolonged bitter quarrel with violent revenge", sentences: ["Before formal laws, ___ cycles were common.", "A ___ can destroy families and communities.", "Legal systems help end ___ violence."] },
+                { term: "Annihilation", definition: "Complete destruction", sentences: ["Cities faced ___ if they resisted.", "The threat of ___ ensured compliance.", "Total ___ was Genghis Khan's warning to enemies."] },
+                { term: "Impunity", definition: "Freedom from punishment or negative consequences", sentences: ["Rulers often act with ___.", "No one should have complete ___.", "Power without limits leads to ___."] },
+                { term: "Anthropological", definition: "Relating to the study of human societies and cultures", sentences: ["___ research reveals patterns in societies.", "From an ___ perspective, shame varies by culture.", "___ evidence supports this theory."] },
+                { term: "Ostracism", definition: "Exclusion from a society or group", sentences: ["___ is a powerful punishment in shame cultures.", "Fear of ___ keeps people in line.", "Social ___ can be devastating."] },
+                { term: "Autonomy", definition: "The right or condition of self-government; independence", sentences: ["Guilt allows for personal ___.", "Individual ___ is valued in Western cultures.", "___ requires internal moral guidance."] },
+                { term: "Circumscribed", definition: "Restricted or limited", sentences: ["Behavior is ___ by social expectations.", "Freedom is ___ by law.", "Our choices are ___ by culture."] },
+                { term: "Transgression", definition: "An act that goes against a law, rule, or code of conduct", sentences: ["Every ___ was severely punished.", "Guilt follows a moral ___.", "Society must address each ___."] },
+                { term: "Indoctrination", definition: "The process of teaching a person or group to accept a set of beliefs uncritically", sentences: ["___ starts in childhood.", "Religious ___ instills guilt.", "Effective ___ shapes behavior for life."] },
+                { term: "Visceral", definition: "Relating to deep feelings rather than to careful thought", sentences: ["Fear produces a ___ response.", "The ___ reaction to danger is immediate.", "Shame can feel ___ and overwhelming."] }
+            ]
+        };
+
+        // Quiz System Variables
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 10;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+
+            // Get vocabulary for current level
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffledVocab = [...levelVocab].sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
+                const vocabItem = shuffledVocab[i];
+                const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
+                const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
+
+                quizQuestions.push({
+                    type: 'fill-blank',
+                    question: `Complete the sentence: "${sentence}"`,
+                    correctAnswer: vocabItem.term.toLowerCase(),
+                    hint: hint,
+                    correctTerm: vocabItem.term
+                });
+            }
+
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const questionNum = index + 1;
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'quiz-page';
+                questionDiv.id = `quiz-question-${questionNum}`;
+                if (questionNum === 1) questionDiv.classList.add('active');
+
+                questionDiv.innerHTML = `
+                    <div class="quiz-question">
+                        <h3>${q.question}</h3>
+                        <input type="text" class="quiz-input" id="quiz-answer-${questionNum}" placeholder="${q.hint}" onkeypress="handleQuizKeyPress(event, ${questionNum})">
+                        <button class="check-button" onclick="checkQuizAnswer(${questionNum})">Check Answer</button>
+                        <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
+                    </div>
+                `;
+
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function handleQuizKeyPress(event, questionNum) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+                if (!checkButton.disabled) {
+                    checkQuizAnswer(questionNum);
+                }
+            }
+        }
+
+        function checkQuizAnswer(questionNum) {
+            const question = quizQuestions[questionNum - 1];
+            const feedback = document.getElementById(`quiz-feedback-${questionNum}`);
+            const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
+            const userInput = document.getElementById(`quiz-answer-${questionNum}`);
+            const userAnswer = userInput.value.trim().toLowerCase();
+
+            if (!userAnswer) {
+                alert('Please enter an answer first!');
+                return;
+            }
+
+            const isCorrect = userAnswer === question.correctAnswer;
+
+            // Play sound effect
+            if (isCorrect) {
+                document.getElementById('correctSound').play();
+            } else {
+                document.getElementById('incorrectSound').play();
+            }
+
+            userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.textContent = isCorrect ? 'Correct! Well done!' :
+                `Incorrect. The correct answer is: ${question.correctTerm}`;
+
+            if (isCorrect && !userQuizAnswers[questionNum]) {
+                quizScore++;
+            }
+            userQuizAnswers[questionNum] = isCorrect;
+
+            checkButton.disabled = true;
+
+            updateQuizProgress();
+
+            setTimeout(() => {
+                if (currentQuizQuestion < totalQuizQuestions) {
+                    nextQuizQuestion();
+                } else {
+                    showQuizResults();
+                }
+            }, 2000);
+        }
+
+        function showQuizQuestion(questionNum) {
+            const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
+            questions.forEach(q => q.classList.remove('active'));
+
+            const currentQ = document.getElementById(`quiz-question-${questionNum}`);
+            if (currentQ) {
+                currentQ.classList.add('active');
+                const inputField = document.getElementById(`quiz-answer-${questionNum}`);
+                if (inputField && !inputField.disabled) {
+                    setTimeout(() => inputField.focus(), 100);
+                }
+            }
+
+            currentQuizQuestion = questionNum;
+            updateQuizProgress();
+            updateQuizNavButtons();
+        }
+
+        function nextQuizQuestion() {
+            if (currentQuizQuestion < totalQuizQuestions) {
+                showQuizQuestion(currentQuizQuestion + 1);
+            }
+        }
+
+        function previousQuizQuestion() {
+            if (currentQuizQuestion > 1) {
+                showQuizQuestion(currentQuizQuestion - 1);
+            }
+        }
+
+        function updateQuizProgress() {
+            const counter = document.getElementById('quiz-counter');
+            const progressBar = document.getElementById('quizProgressFill');
+
+            if (counter) {
+                counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            }
+
+            if (progressBar) {
+                const answeredCount = Object.keys(userQuizAnswers).length;
+                const progressPercent = (answeredCount / totalQuizQuestions) * 100;
+                progressBar.style.width = progressPercent + '%';
+            }
+        }
+
+        function updateQuizNavButtons() {
+            const prevBtn = document.getElementById('prevQuizBtn');
+            const nextBtn = document.getElementById('nextQuizBtn');
+
+            if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
+            if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'block';
+            document.getElementById('finalQuizScore').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+
+        function restartVocabQuiz() {
+            document.getElementById('quiz-results-page').style.display = 'none';
+            document.getElementById('quiz-questions-container').style.display = 'block';
+            document.getElementById('quiz-header').style.display = 'flex';
+            initializeVocabQuiz();
+        }
+
+        // ========== TOUCH SWIPE FOR MOBILE ==========
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        const minSwipeDistance = 50;
+        const maxVerticalDistance = 100;
+
+        function initTouchSwipe() {
+            const slideshowContainer = document.querySelector('.slideshow-container');
+            if (!slideshowContainer) return;
+
+            slideshowContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+            slideshowContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
+        }
+
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipeGesture();
+        }
+
+        function handleSwipeGesture() {
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = Math.abs(touchEndY - touchStartY);
+
+            // Only register horizontal swipes (not vertical scrolling)
+            if (Math.abs(deltaX) > minSwipeDistance && deltaY < maxVerticalDistance) {
+                if (deltaX > 0) {
+                    // Swipe right - go to previous slide
+                    changeSlide(-1);
+                } else {
+                    // Swipe left - go to next slide
+                    changeSlide(1);
+                }
+            }
+        }
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVocabQuiz();
+
+            // Set default difficulty content (hidden until game starts)
+            setDifficultyContent('B2');
+
+            // Set default vocab page
+            setVocabPage('B2');
+
+            // Initialize touch swipe for mobile
+            initTouchSwipe();
+        });
+    </script>
+</body>
+</html>
