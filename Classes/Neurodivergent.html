@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Understanding Neurodivergency - MIM Language Services</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -19,51 +19,331 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             overflow: hidden;
+        }
+
+        /* ========== LOADING SCREEN STYLES ========== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%),
+                        url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1920');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            transform: scale(1.1);
+            pointer-events: none;
+        }
+
+        .game-title {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5);
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        .game-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 60px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); }
+            50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); }
+        }
+
+        .level-select-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .select-prompt {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease 0.5s both;
+        }
+
+        .level-cards {
+            display: flex;
+            gap: 30px;
+            perspective: 1000px;
+        }
+
+        .level-card {
+            width: 200px;
+            height: 280px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: cardFloat 3s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+        }
+
+        .level-card:nth-child(1) { animation-delay: 0s; }
+        .level-card:nth-child(2) { animation-delay: 0.5s; }
+        .level-card:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+
+        .level-card:hover::before {
+            animation: shine 0.8s ease;
+        }
+
+        @keyframes shine {
+            0% { left: -50%; opacity: 1; }
+            100% { left: 150%; opacity: 0; }
+        }
+
+        .level-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            border-color: rgba(102, 126, 234, 0.8);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+
+        /* Image Card Hover Effects */
+        .image-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: #f472b6;
+            box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4);
+        }
+        .image-card:hover .image-card-bg {
+            filter: grayscale(0%) !important;
+        }
+        .image-card:hover .image-card-overlay {
+            background: rgba(0,0,0,0.1) !important;
+        }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+
+        .level-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .b1-card .level-icon { color: #4ade80; }
+        .b2-card .level-icon { color: #60a5fa; }
+        .c1-card .level-icon { color: #f472b6; }
+
+        .level-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .level-desc {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            padding: 0 15px;
+        }
+
+        .level-difficulty {
+            margin-top: 15px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .difficulty-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .b1-card .difficulty-dot:nth-child(-n+1) { background: #4ade80; }
+        .b2-card .difficulty-dot:nth-child(-n+2) { background: #60a5fa; }
+        .c1-card .difficulty-dot:nth-child(-n+3) { background: #f472b6; }
+
+        .powered-by {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .powered-by a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .powered-by a:hover {
+            color: #fff;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== MAIN APP STYLES ========== */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.3s;
+        }
+
+        .app-container.visible {
+            opacity: 1;
         }
 
         .header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 20px 40px;
+            padding: 15px 40px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 100;
         }
 
         .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .menu-toggle span {
+            width: 22px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        .header-title {
             display: flex;
             flex-direction: column;
         }
 
         .header h1 {
             color: #2d3748;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             margin: 0;
             letter-spacing: -0.5px;
         }
 
-        .header-image {
-            width: 120px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: cover;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        .current-level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .header .website {
-            text-align: center;
-            margin-top: 8px;
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+
+        .current-level-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .header .website a {
             color: #4c51bf;
             text-decoration: none;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 500;
             transition: color 0.3s ease;
         }
@@ -72,17 +352,40 @@
             color: #553c9a;
         }
 
-        .container {
-            display: flex;
-            height: calc(100vh - 120px);
+        .header-image {
+            width: 100px;
+            height: 65px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
 
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 95px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Collapsible Navigation */
         .navigation {
             width: 280px;
-            background: rgba(45, 55, 72, 0.95);
+            background: rgba(45, 55, 72, 0.98);
             backdrop-filter: blur(10px);
             padding: 30px 20px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
+            position: absolute;
+            left: -280px;
+            top: 0;
+            height: 100%;
+            z-index: 50;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .navigation.open {
+            left: 0;
         }
 
         .nav-item {
@@ -114,6 +417,24 @@
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 40;
+        }
+
+        .nav-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
         .content {
             flex: 1;
             display: flex;
@@ -140,7 +461,7 @@
         .section h2 {
             color: #2d3748;
             margin-bottom: 30px;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 700;
             text-align: center;
             letter-spacing: -0.5px;
@@ -167,8 +488,8 @@
         .slide-content-wrapper {
             position: relative;
             width: 100%;
-            max-width: 1400px;
-            height: 85%;
+            max-width: 1800px;
+            height: 95%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -180,7 +501,7 @@
             height: 100%;
             background: white;
             border-radius: 20px;
-            padding: 40px;
+            padding: 60px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
@@ -191,12 +512,17 @@
             animation: slideIn 0.5s ease-in-out;
         }
 
-        /* Image-only slide (Slide 1) */
-        .slide-image-only {
-            padding: 0;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Horizontal layout slides (Slides 2-5) */
+        /* Difficulty content - hide by default */
+        .difficulty-content {
+            display: none;
+        }
+
+        /* Horizontal layout slides */
         .slide-horizontal {
             flex-direction: row !important;
             gap: 30px;
@@ -206,221 +532,126 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             padding-right: 20px;
             max-width: 50%;
+            max-height: 100%;
+            overflow-y: auto;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .slide-text-section-left::-webkit-scrollbar {
+            width: 8px;
+        }
+        .slide-text-section-left::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .slide-text-section-left::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
         }
 
         .slide-text-section-left h3 {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             color: #2d3748;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: 600;
         }
 
         .slide-text-section-left p {
-            font-size: 1.05rem;
+            font-size: 1.15rem;
+            line-height: 1.8;
             color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .slide-text-section-left ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+            margin-top: 15px;
+            padding-left: 25px;
         }
 
         .slide-text-section-left li {
-            font-size: 1rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
             color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 8px;
-            padding-left: 22px;
-            position: relative;
-        }
-
-        .slide-text-section-left li:before {
-            content: "•";
-            color: #667eea;
-            font-weight: bold;
-            position: absolute;
-            left: 8px;
+            margin-bottom: 12px;
         }
 
         .slide-image-section-right {
-            width: 45%;
-            max-width: 50%;
+            flex: 1;
+            max-width: 45%;
             height: 100%;
-            position: relative;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
             border-radius: 16px;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         }
 
         .slide-image-section-right img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 14px;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Navigation Arrows - Outside the white box */
+        /* Navigation Arrows */
         .slide-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
             width: 50px;
             height: 50px;
-            border-radius: 50%;
-            background: #8B7EC8;
-            color: white;
+            background: rgba(45, 55, 72, 0.9);
             border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
             transition: all 0.3s ease;
             z-index: 10;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .slide-arrow:hover {
-            background: #7366B0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             transform: translateY(-50%) scale(1.1);
         }
 
-        .slide-arrow.prev {
-            left: -60px;
-        }
-
-        .slide-arrow.next {
-            right: -60px;
-        }
+        .slide-arrow.prev { left: -70px; }
+        .slide-arrow.next { right: -70px; }
 
         /* Slide Indicators */
         .slide-indicators {
             position: absolute;
-            bottom: 40px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            z-index: 10;
         }
 
         .indicator-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: #D1D5DB;
+            background: rgba(45, 55, 72, 0.3);
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .indicator-dot.active {
-            background: #667eea;
-            transform: scale(1.3);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scale(1.2);
         }
 
         .indicator-dot:hover {
-            background: #9CA3AF;
+            background: rgba(102, 126, 234, 0.6);
         }
 
-        /* Reading Section */
-        .reading-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 120px);
-        }
-
-        .reading-nav {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .reading-subnav {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 30px;
-        }
-
-        .reading-level {
-            flex: 1;
-        }
-
-        .page-btn {
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            color: #4c51bf;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .page-btn.active, .page-btn:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border-color: transparent;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .reading-page {
-            display: none;
-            flex: 1;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 40px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            height: 100%;
-            max-height: calc(100vh - 280px);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-        }
-
-        .reading-page.active {
-            display: block;
-        }
-
-        .reading-page p {
-            color: #2d3748;
-            line-height: 1.8;
-            margin-bottom: 25px;
-            font-size: 1.15rem;
-            font-weight: 400;
-        }
-
-        .reading-page h3 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            margin-top: 35px;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
+        /* Vocabulary Highlight Links */
         .vocab-link {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #ffffff;
@@ -430,8 +661,6 @@
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s ease;
-            position: relative;
-            font-size: 1.15rem;
         }
 
         .vocab-link:hover {
@@ -439,84 +668,50 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
+        /* Vocabulary Section */
+        .reading-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .reading-nav {
+            display: flex;
+            gap: 15px;
             justify-content: center;
-        }
-
-        .popup-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 35px;
-            max-width: 450px;
-            margin: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        .popup-word {
-            color: #2d3748;
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 8px;
-        }
-
-        .popup-definition {
-            color: #4a5568;
-            line-height: 1.7;
             margin-bottom: 25px;
-            font-size: 1.25rem;
+            flex-wrap: wrap;
         }
 
-        .popup-close {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border: none;
-            padding: 12px 24px;
+        .page-btn {
+            padding: 12px 28px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(102, 126, 234, 0.3);
             border-radius: 25px;
+            color: #2d3748;
             cursor: pointer;
             font-weight: 500;
-            float: right;
             font-size: 1.1rem;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
         }
 
-        .popup-close:hover {
+        .page-btn:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
             transform: translateY(-2px);
         }
 
-        /* Vocabulary Section */
-        .vocab-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 120px);
-        }
-
-        .vocab-nav {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+        .page-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
         }
 
         .vocab-page {
             display: none;
             flex: 1;
             overflow-y: auto;
-            overflow-x: hidden;
         }
 
         .vocab-page.active {
@@ -527,7 +722,6 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 25px;
-            height: auto;
             padding: 20px 0;
         }
 
@@ -592,7 +786,17 @@
             font-size: 1.5rem;
         }
 
-        /* NEW QUIZ SYSTEM STYLES */
+        .flashcard-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+            color: #a0aec0;
+            opacity: 0.8;
+        }
+
+        /* Quiz Section */
         .quiz-container {
             display: flex;
             flex-direction: column;
@@ -674,7 +878,6 @@
             display: block;
             font-weight: 500;
             background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(5px);
             transition: all 0.3s ease;
         }
 
@@ -684,14 +887,29 @@
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
         }
 
+        .quiz-input.correct {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .quiz-input.incorrect {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        #quiz-counter {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
         .multiple-choice {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin: 35px 0;
+            margin: 35px auto;
             max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         .choice {
@@ -704,7 +922,6 @@
             font-weight: 500;
             color: #2d3748;
             font-size: 1.25rem;
-            backdrop-filter: blur(5px);
         }
 
         .choice:hover {
@@ -717,6 +934,16 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #ffffff;
             border-color: transparent;
+        }
+
+        .choice.correct {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: #ffffff;
+        }
+
+        .choice.incorrect {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #ffffff;
         }
 
         .check-button {
@@ -756,15 +983,38 @@
             transform: translateY(-2px);
         }
 
+        .nav-btn:disabled {
+            background: rgba(160, 174, 192, 0.5);
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
         .results-summary {
             background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
             padding: 50px;
             text-align: center;
             max-width: 700px;
             margin: 0 auto;
-            backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
@@ -772,7 +1022,6 @@
             color: #2d3748;
             font-size: 2.2rem;
             margin-bottom: 25px;
-            font-weight: 700;
         }
 
         .score {
@@ -781,24 +1030,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
             margin: 25px 0;
-        }
-
-        /* Video Section */
-        .video-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 120px);
-            padding: 15px;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            overflow: visible;
-        }
-
-        #video {
-            overflow: visible;
         }
 
         /* Writing Section */
@@ -845,11 +1077,11 @@
             margin-bottom: 30px;
         }
 
-        .form-group {
+        .writing-form .form-group {
             margin-bottom: 20px;
         }
 
-        .form-group label {
+        .writing-form .form-group label {
             display: block;
             color: #2d3748;
             font-weight: 600;
@@ -857,7 +1089,8 @@
             font-size: 1.1rem;
         }
 
-        .form-group input {
+        .writing-form .form-group input,
+        .writing-form .form-group textarea {
             width: 100%;
             padding: 12px 20px;
             border: 2px solid rgba(102, 126, 234, 0.3);
@@ -867,126 +1100,351 @@
             transition: all 0.3s ease;
         }
 
-        .form-group input:focus {
+        .writing-form .form-group input:focus,
+        .writing-form .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
         }
 
-        .button-container {
+        .writing-form .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* Popup Overlay */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
             text-align: center;
-            margin-top: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
-        .feedback {
-            margin-top: 15px;
-            padding: 12px 20px;
-            border-radius: 12px;
+        .popup-word {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .popup-definition {
+            font-size: 1.3rem;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
             font-size: 1.1rem;
-            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .feedback.correct {
-            background: #48bb78;
-            color: white;
+        .popup-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .feedback.incorrect {
-            background: #f56565;
-            color: white;
+        /* Vocab Popup */
+        #vocabPopup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
         }
 
-        /* Mobile Responsive Styles */
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .header h1 {
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+                touch-action: pan-y;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            body::-webkit-scrollbar {
+                display: none;
+            }
+
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+
+            .app-container {
+                padding-top: 60px;
+            }
+
+            .loading-screen {
+                padding: 20px;
+            }
+
+            .game-title {
+                font-size: 2rem;
+                padding: 0 10px;
+            }
+
+            .game-subtitle {
+                display: none;
+            }
+
+            .level-cards {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .level-card {
+                width: 220px;
+                height: 150px;
+            }
+
+            .level-icon {
+                font-size: 2rem;
+                margin-bottom: 8px;
+            }
+
+            .level-name {
                 font-size: 1.8rem;
             }
 
-            .header-image {
-                width: 80px;
-                height: 60px;
+            .level-desc {
+                font-size: 0.85rem;
             }
 
-            .container {
-                flex-direction: column;
+            .select-prompt {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+
+            .header {
+                padding: 10px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+            }
+
+            .header-image {
+                width: 60px;
+                height: 40px;
+            }
+
+            .header .website {
+                display: none;
+            }
+
+            .powered-by {
+                display: none;
+            }
+
+            .menu-toggle {
+                width: 40px;
+                height: 40px;
+            }
+
+            .current-level-badge {
+                font-size: 0.75rem;
+                padding: 3px 8px;
+            }
+
+            .current-level-badge span[style*="click to change"],
+            .current-level-badge span:last-child {
+                display: none;
             }
 
             .navigation {
                 width: 100%;
-                padding: 15px 10px;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
+                left: -100%;
             }
 
-            .nav-item {
-                flex: 1 1 auto;
-                min-width: 120px;
-                padding: 12px 16px;
-                font-size: 0.95rem;
+            .main-container {
+                height: auto;
+                min-height: calc(100vh - 70px);
+                overflow-y: auto;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .main-container::-webkit-scrollbar {
+                display: none;
+            }
+
+            .section {
+                padding: 15px;
+                overflow-y: auto;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .section::-webkit-scrollbar {
+                display: none;
             }
 
             .section h2 {
-                font-size: 1.8rem;
-                margin-bottom: 20px;
+                font-size: 1.5rem;
+                margin-bottom: 15px;
             }
 
             .slideshow-container {
-                padding: 20px;
+                padding: 10px 8px;
+                touch-action: pan-y pinch-zoom;
+                height: calc(100vh - 130px);
+                overflow: hidden;
+            }
+
+            .slide-content-wrapper {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .discussion-slide {
+                padding: 15px 12px;
+                border-radius: 12px;
+                overflow: hidden;
+                height: auto;
+                max-height: none;
             }
 
             .slide-horizontal {
                 flex-direction: column !important;
+                gap: 10px;
             }
 
             .slide-text-section-left {
                 max-width: 100%;
                 padding-right: 0;
+                max-height: none;
+                overflow-y: visible;
+            }
+
+            .slide-text-section-left h3 {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+            }
+
+            .slide-text-section-left p {
+                font-size: 0.85rem;
+                line-height: 1.5;
+                margin-bottom: 8px;
+            }
+
+            .slide-text-section-left li {
+                font-size: 0.8rem;
+                margin-bottom: 6px;
             }
 
             .slide-image-section-right {
-                width: 100%;
                 max-width: 100%;
-                height: 250px;
+                height: 120px;
+                flex-shrink: 0;
+            }
+
+            .slide-image-section-right iframe {
+                height: 120px !important;
+            }
+
+            .slide-image-only {
+                height: calc(100vh - 180px) !important;
+                padding: 10px !important;
+            }
+
+            .slide-image-only > div {
+                height: 100% !important;
+                min-height: 200px;
+            }
+
+            .slide-image-only iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            .slide-image-only img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .lesson-complete-slide {
+                overflow-y: auto !important;
+                height: auto !important;
+                max-height: none !important;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .lesson-complete-slide::-webkit-scrollbar {
+                display: none;
+            }
+
+            .lesson-complete-slide > div {
+                height: auto !important;
+                min-height: 100%;
+                padding: 20px 15px !important;
+            }
+
+            .lesson-complete-slide .menu-card.image-card {
+                width: 140px !important;
+                height: 160px !important;
+            }
+
+            .lesson-complete-slide .menu-card.image-card span {
+                font-size: 1.2rem !important;
             }
 
             .slide-arrow {
-                width: 40px;
-                height: 40px;
+                display: none;
             }
 
-            .slide-arrow.prev {
-                left: 10px;
+            .slide-indicators {
+                bottom: 10px;
+                gap: 6px;
             }
 
-            .slide-arrow.next {
-                right: 10px;
+            .indicator-dot {
+                width: 8px;
+                height: 8px;
             }
 
             .vocab-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
 
-            .multiple-choice {
-                grid-template-columns: 1fr;
-            }
-
-            .reading-page p {
-                font-size: 1rem;
-            }
-
-            .quiz-question {
-                padding: 30px 20px;
-            }
-
-            .quiz-question h3 {
-                font-size: 1.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.4rem;
+            .flashcard {
+                height: 160px;
             }
 
             .flashcard-term {
@@ -994,592 +1452,858 @@
             }
 
             .flashcard-definition {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
+            }
+
+            .flashcard-hint {
+                font-size: 0.9rem;
+            }
+
+            .reading-nav {
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .page-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            #quiz {
+                overflow: hidden;
+                height: calc(100vh - 130px);
+            }
+
+            .quiz-container {
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .quiz-nav {
+                order: 2;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .progress-container {
+                margin: 0;
+                width: 100%;
+                order: 1;
+            }
+
+            #quiz-counter {
+                font-size: 0.8rem;
+            }
+
+            .quiz-question {
+                padding: 15px 12px;
+                border-radius: 12px;
+            }
+
+            .quiz-question h3 {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+
+            .quiz-input {
+                font-size: 1rem;
+                padding: 10px 14px;
+                max-width: 100%;
+                margin: 12px auto;
+            }
+
+            .check-button {
+                font-size: 1rem;
+                padding: 10px 20px;
+                margin: 12px auto;
+            }
+
+            .nav-btn {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+
+            .feedback {
+                padding: 10px;
+                margin: 10px 0;
+                font-size: 0.9rem;
+            }
+
+            .multiple-choice {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .choice {
+                padding: 15px;
+                font-size: 1rem;
+            }
+
+            .results-summary {
+                padding: 30px 20px;
+            }
+
+            .results-summary h3 {
+                font-size: 1.6rem;
+            }
+
+            .score {
+                font-size: 3rem;
+            }
+
+            .popup-content {
+                margin: 20px;
+                padding: 25px;
+                max-width: calc(100% - 40px);
+            }
+
+            .popup-word {
+                font-size: 1.8rem;
+            }
+
+            .popup-definition {
+                font-size: 1.1rem;
+            }
+
+            .vocab-link {
+                padding: 2px 6px;
+                font-size: 0.9rem;
+            }
+
+            .menu-card.image-card {
+                width: 150px !important;
+                height: 170px !important;
+            }
+
+            .menu-card.image-card span {
+                font-size: 1.4rem !important;
             }
         }
 
+        /* Extra small devices */
+        @media (max-width: 380px) {
+            .game-title {
+                font-size: 1.6rem;
+            }
+
+            .level-card {
+                width: 180px;
+                height: 130px;
+            }
+
+            .level-name {
+                font-size: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 0.95rem;
+            }
+
+            .slide-text-section-left h3 {
+                font-size: 1.1rem;
+            }
+
+            .slide-text-section-left p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Swipe hint animation */
+        .swipe-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(45, 55, 72, 0.6);
+            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: swipeHintFade 2s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .swipe-hint {
+                display: flex;
+            }
+        }
+
+        @keyframes swipeHintFade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <h1>Understanding Neurodivergency</h1>
-            <div class="website">
-                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+    <!-- Audio elements -->
+    <audio id="flipSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="incorrectSound" preload="auto">
+        <source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ========== LOADING SCREEN ========== -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Understanding Neurodivergency</h1>
+        <p class="game-subtitle">An Interactive Learning Experience</p>
+
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
             </div>
         </div>
-        <a href="https://www.mimlanguageservices.com/" target="_blank">
-            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
-        </a>
+
+        <div class="powered-by">
+            Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a>
+        </div>
     </div>
 
-    <div class="container">
-        <div class="navigation">
-            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
-            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
-            <div class="nav-item" onclick="showSection('video', this)">Video</div>
-            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
-            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
-            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
-            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+    <!-- ========== MAIN APPLICATION ========== -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="header-title">
+                    <h1>Understanding Neurodivergency</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website">
+                    <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+                </div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank">
+                    <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
+                </a>
+            </div>
         </div>
 
-        <div class="content">
-            <!-- Discussion Section with Slideshow -->
-            <div class="section active" id="discussion">
-                <div class="slideshow-container">
+        <div class="main-container">
+            <!-- Navigation Overlay -->
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
 
-                    <div class="slide-content-wrapper">
-                        <button class="slide-arrow prev" onclick="changeSlide(-1)">&#10094;</button>
-                        <button class="slide-arrow next" onclick="changeSlide(1)">&#10095;</button>
-
-                        <!-- Slide 1 - Image Only -->
-                        <div class="discussion-slide active slide-image-only">
-                            <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1200&h=800&fit=crop" alt="Brain diversity illustration" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
-                        </div>
-
-                        <!-- Slide 2 -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>What is Neurodivergency?</h3>
-                                <p>Neurodivergency refers to natural variations in how human brains work. The term recognises that there is no single "correct" way for a brain to function. People whose brains work differently from what society considers "typical" are called neurodivergent. This includes people with autism, ADHD, dyslexia, and other neurological differences. Rather than viewing these differences as disorders to be fixed, neurodiversity celebrates them as part of natural human variation - much like having different eye colours or being left-handed.</p>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=800&h=600&fit=crop" alt="Brain illustration" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 3 -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Autism as a Spectrum</h3>
-                                <p>Autism is described as a "spectrum" because it affects people in vastly different ways. The spectrum is not a line from "mild" to "severe" - instead, think of it as a colour wheel with many different dimensions. One autistic person might excel at verbal communication but struggle with sensory processing. Another might have exceptional memory but find social situations overwhelming.</p>
-                                <ul>
-                                    <li>Social communication differences</li>
-                                    <li>Sensory sensitivities (light, sound, texture)</li>
-                                    <li>Deep, focused interests</li>
-                                    <li>Preference for routines and predictability</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                               <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&h=600&fit=crop" alt="Colorful spectrum" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 4 -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Understanding ADHD</h3>
-                                <p>ADHD (Attention Deficit Hyperactivity Disorder) affects how people regulate attention, impulses, and energy levels. Despite the name, people with ADHD don't lack attention - they often struggle to direct it where needed. They may hyperfocus intensely on interesting tasks while finding routine tasks extremely difficult. ADHD brains often seek stimulation and novelty, leading to creativity and quick thinking, but also challenges with organisation and time management.</p>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=600&fit=crop" alt="Focus and attention" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 5 -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Common Patterns and Strengths</h3>
-                                <p>Neurodivergent people often share certain traits that can be both challenging and advantageous. Many experience "masking" - hiding their natural behaviours to fit in, which can be exhausting. However, neurodivergent minds often bring unique strengths: pattern recognition, creative problem-solving, attention to detail, honest communication, and the ability to think outside conventional boundaries. Many successful scientists, artists, and entrepreneurs are neurodivergent.</p>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop" alt="Teamwork and diversity" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="slide-indicators">
-                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
-                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
-                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
-                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
-                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
-                    </div>
-                </div>
+            <!-- Collapsible Navigation -->
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="openWritingForm(this)">Writing</div>
             </div>
 
-            <!-- Reading Section -->
-            <div class="section" id="reading">
-                <h2>Reading Practice</h2>
-                <div class="reading-container">
-                    <div class="reading-nav">
-                        <button class="page-btn active" onclick="showReadingLevel('A2', this)">A2 Reading</button>
-                        <button class="page-btn" onclick="showReadingLevel('B1', this)">B1 Reading</button>
-                        <button class="page-btn" onclick="showReadingLevel('B2', this)">B2 Reading</button>
-                        <button class="page-btn" onclick="showReadingLevel('C1', this)">C1 Reading</button>
-                    </div>
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <!-- Navigation Arrows -->
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                            </button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
 
-                    <!-- A2 Level -->
-                    <div class="reading-level" id="A2-level">
-                        <div class="reading-page active">
-                            <h3>Different Brains, Different Strengths</h3>
-                            <p>Everyone's brain is <span class="vocab-link" onclick="showPopup('unique', 'the only one of its kind; special')">unique</span>. Some people's brains work differently from most other people. We call these people <span class="vocab-link" onclick="showPopup('neurodivergent', 'having a brain that works differently from most people')">neurodivergent</span>. This is not a bad thing - it is just different.</p>
-                            <p>People with <span class="vocab-link" onclick="showPopup('autism', 'a condition that affects how people communicate and experience the world')">autism</span> often notice small details that others miss. They might have a favourite <span class="vocab-link" onclick="showPopup('topic', 'a subject that someone talks or writes about')">topic</span> that they know very well. Some autistic people don't like loud noises or bright lights.</p>
-                            <p>People with <span class="vocab-link" onclick="showPopup('ADHD', 'Attention Deficit Hyperactivity Disorder - affects focus and energy')">ADHD</span> have lots of energy and many ideas. They can be very <span class="vocab-link" onclick="showPopup('creative', 'good at thinking of new ideas')">creative</span>. Sometimes they find it hard to sit still or wait their turn.</p>
-                            <p>Neurodivergent people have many <span class="vocab-link" onclick="showPopup('strengths', 'things someone is good at')">strengths</span>. They see the world in interesting ways. We can all learn from each other!</p>
-                        </div>
-                    </div>
-
-                    <!-- B1 Level -->
-                    <div class="reading-level" id="B1-level" style="display: none;">
-                        <div class="reading-page active">
-                            <h3>Understanding Neurodiversity</h3>
-                            <p>The word "neurodiversity" comes from two words: "neuro" (brain) and "diversity" (variety). It's the idea that human brains naturally come in many different types, and that's perfectly <span class="vocab-link" onclick="showPopup('normal', 'usual, typical, or expected')">normal</span>. Just as people have different personalities, people have different brain types too.</p>
-                            <p>Autism is often described as a "<span class="vocab-link" onclick="showPopup('spectrum', 'a range of different things, from one extreme to another')">spectrum</span>." This means that autism affects people in many different ways. Some autistic people need a lot of support in daily life, while others live <span class="vocab-link" onclick="showPopup('independently', 'without needing help from others')">independently</span>. What they share is a different way of experiencing the world - often more <span class="vocab-link" onclick="showPopup('intensely', 'with strong feelings or sensations')">intensely</span> than others.</p>
-                            <p>ADHD affects how people pay attention and <span class="vocab-link" onclick="showPopup('regulate', 'control or manage something')">regulate</span> their energy. People with ADHD might find boring tasks extremely difficult, but they can focus for hours on something that interests them. This is called "<span class="vocab-link" onclick="showPopup('hyperfocus', 'very intense concentration on one thing')">hyperfocus</span>."</p>
-                            <p>Other types of neurodivergence include <span class="vocab-link" onclick="showPopup('dyslexia', 'difficulty with reading and spelling')">dyslexia</span> (difficulty with reading), <span class="vocab-link" onclick="showPopup('dyspraxia', 'difficulty with coordination and movement')">dyspraxia</span> (difficulty with movement and coordination), and <span class="vocab-link" onclick="showPopup('dyscalculia', 'difficulty with numbers and mathematics')">dyscalculia</span> (difficulty with numbers).</p>
-                            <p>Understanding neurodiversity helps us create a more <span class="vocab-link" onclick="showPopup('inclusive', 'including everyone; welcoming to all')">inclusive</span> world where everyone can succeed.</p>
-                        </div>
-                    </div>
-
-                    <!-- B2 Level -->
-                    <div class="reading-level" id="B2-level" style="display: none;">
-                        <div class="reading-page active">
-                            <h3>The Neurodiversity Paradigm</h3>
-                            <p>The neurodiversity movement has <span class="vocab-link" onclick="showPopup('fundamentally', 'in a basic and important way')">fundamentally</span> changed how we understand neurological differences. Rather than viewing conditions like autism and ADHD as <span class="vocab-link" onclick="showPopup('deficits', 'lacks or shortages of something')">deficits</span> to be corrected, the neurodiversity <span class="vocab-link" onclick="showPopup('paradigm', 'a way of thinking about something')">paradigm</span> recognises them as natural variations in human <span class="vocab-link" onclick="showPopup('cognition', 'the mental process of thinking and understanding')">cognition</span>.</p>
-                            <p>The autism spectrum is perhaps better understood as a "<span class="vocab-link" onclick="showPopup('constellation', 'a group of related things')">constellation</span>" of traits rather than a linear scale. An autistic person might have exceptional abilities in pattern recognition and systematic thinking while experiencing significant challenges with <span class="vocab-link" onclick="showPopup('sensory processing', 'how the brain handles information from the senses')">sensory processing</span>. Another might be highly verbal but struggle with <span class="vocab-link" onclick="showPopup('executive function', 'brain skills for planning, organizing, and completing tasks')">executive function</span> tasks like organisation and planning.</p>
-                            <p>ADHD, similarly, is characterised by differences in dopamine <span class="vocab-link" onclick="showPopup('regulation', 'control or management of something')">regulation</span> that affect motivation and attention. While <span class="vocab-link" onclick="showPopup('neurotypical', 'having a brain that functions in the way society considers typical')">neurotypical</span> individuals can often force themselves to complete uninteresting tasks, ADHD brains require more <span class="vocab-link" onclick="showPopup('stimulation', 'something that causes interest or excitement')">stimulation</span> to engage. This isn't laziness - it's neurology.</p>
-                            <p>Many neurodivergent people engage in "<span class="vocab-link" onclick="showPopup('masking', 'hiding natural behaviours to appear normal')">masking</span>" - <span class="vocab-link" onclick="showPopup('suppressing', 'preventing or hiding something')">suppressing</span> their natural behaviours to fit in with neurotypical expectations. While this can help in certain situations, chronic masking often leads to <span class="vocab-link" onclick="showPopup('burnout', 'exhaustion from too much stress or work')">burnout</span> and mental health challenges. Increasingly, advocates argue for <span class="vocab-link" onclick="showPopup('accommodation', 'changes made to help someone')">accommodation</span> rather than assimilation.</p>
-                            <p>The workplace is gradually adapting to neurodiversity. Forward-thinking companies recognise that neurodivergent employees often bring unique strengths: <span class="vocab-link" onclick="showPopup('innovation', 'new ideas and methods')">innovation</span>, attention to detail, and the ability to spot patterns others miss.</p>
-                        </div>
-                    </div>
-
-                    <!-- C1 Level -->
-                    <div class="reading-level" id="C1-level" style="display: none;">
-                        <div class="reading-page active">
-                            <h3>Neurodivergence: Challenging the Medical Model</h3>
-                            <p>The concept of neurodiversity represents a <span class="vocab-link" onclick="showPopup('paradigm shift', 'a fundamental change in thinking')">paradigm shift</span> from the traditional medical model of disability. Where the medical model frames neurological differences as <span class="vocab-link" onclick="showPopup('pathologies', 'conditions viewed as diseases or disorders')">pathologies</span> requiring treatment, the neurodiversity framework positions them as natural variations that have always existed within the human population - variations that may actually <span class="vocab-link" onclick="showPopup('confer', 'give or provide')">confer</span> evolutionary advantages.</p>
-                            <p>The spectrum conceptualisation of autism has evolved considerably since its <span class="vocab-link" onclick="showPopup('inception', 'the beginning of something')">inception</span>. Contemporary understanding rejects the notion of a linear progression from "high-functioning" to "low-functioning" - terms now widely considered <span class="vocab-link" onclick="showPopup('reductive', 'oversimplifying complex things')">reductive</span> and <span class="vocab-link" onclick="showPopup('pejorative', 'expressing disapproval')">pejorative</span>. Instead, autism is increasingly understood as a <span class="vocab-link" onclick="showPopup('multidimensional', 'having many different aspects')">multidimensional</span> profile where an individual may present with vastly different abilities across domains such as social communication, sensory processing, executive function, and verbal expression.</p>
-                            <p>This <span class="vocab-link" onclick="showPopup('heterogeneity', 'diversity; being made up of different things')">heterogeneity</span> explains why autistic individuals can appear so different from one another. A tech <span class="vocab-link" onclick="showPopup('entrepreneur', 'someone who starts a business')">entrepreneur</span> who struggles with small talk and an individual requiring full-time care may share the same diagnosis, yet their lived experiences <span class="vocab-link" onclick="showPopup('diverge', 'differ or separate')">diverge</span> dramatically.</p>
-                            <p>ADHD presents similar complexity. The <span class="vocab-link" onclick="showPopup('nomenclature', 'a system of names or terms')">nomenclature</span> itself is contested - "deficit" implies something lacking, when in reality ADHD brains simply <span class="vocab-link" onclick="showPopup('allocate', 'distribute or assign')">allocate</span> attention differently. The ability to <span class="vocab-link" onclick="showPopup('hyperfocus', 'concentrate intensely on one thing')">hyperfocus</span> on stimulating activities whilst struggling with <span class="vocab-link" onclick="showPopup('mundane', 'ordinary and unexciting')">mundane</span> tasks reflects differences in dopaminergic reward systems, not moral failing or insufficient effort.</p>
-                            <p>The phenomenon of masking - also termed "camouflaging" - has received considerable research attention. Studies indicate that chronic masking <span class="vocab-link" onclick="showPopup('correlates', 'is connected with')">correlates</span> strongly with anxiety, depression, and <span class="vocab-link" onclick="showPopup('suicidal ideation', 'thoughts about suicide')">suicidal ideation</span>, particularly among autistic women, who historically have been <span class="vocab-link" onclick="showPopup('underdiagnosed', 'not diagnosed when they should be')">underdiagnosed</span> due to presenting differently from the male-centric diagnostic criteria.</p>
-                            <p>The <span class="vocab-link" onclick="showPopup('implications', 'possible effects or results')">implications</span> for society are profound. Rather than expecting neurodivergent individuals to <span class="vocab-link" onclick="showPopup('assimilate', 'become similar to; absorb into')">assimilate</span> into neurotypical norms, the neurodiversity movement advocates for environmental and societal adaptations that enable all neurotypes to thrive. This represents not merely accommodation but a fundamental reimagining of what we consider "normal" human cognition.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Video Section -->
-            <div class="section" id="video">
-                <h2>Video: Understanding Neurodiversity</h2>
-                <div class="video-container">
-                    <div style="width: 98%; max-width: 1400px; position: relative; padding-bottom: 52%; height: 0;">
-                        <iframe
-                            src="https://www.youtube.com/embed/Qvvrme5CACk"
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid #34495E; border-radius: 10px; box-shadow: 0 4px 8px rgba(52, 73, 94, 0.2);"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Video Discussions Section -->
-            <div class="section" id="video-discussions">
-                <div class="slideshow-container">
-
-                    <div class="slide-content-wrapper">
-                        <button class="slide-arrow prev" onclick="changeVideoSlide(-1)">&#10094;</button>
-                        <button class="slide-arrow next" onclick="changeVideoSlide(1)">&#10095;</button>
-
-                        <!-- Slide 1: Understanding the Spectrum -->
-                        <div class="discussion-slide active slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Understanding the Spectrum</h3>
-                                <p>The autism <span class="vocab-link" onclick="showPopup('spectrum', 'a range of different things')">spectrum</span> includes people with very different abilities and challenges. No two autistic people are exactly alike.</p>
-                                <ul>
-                                    <li>Why do you think autism is called a "spectrum"?</li>
-                                    <li>What are the dangers of using labels like "mild" or "severe" autism?</li>
-                                    <li>How can we better understand individual differences?</li>
-                                </ul>
+                            <!-- Slide 1 - Introduction Image -->
+                            <div class="discussion-slide active slide-image-only">
+                                <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1920" alt="Understanding Neurodivergency" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
                             </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&h=600&fit=crop" alt="Colorful spectrum" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide slide-image-only">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/Qvvrme5CACk?enablejsapi=1&origin=file://" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What is Neurodivergency? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What is Neurodivergency?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('neurodivergent', 'having a brain that works differently from most people')">Neurodivergency</span> means that people's brains work in different ways. Some brains work differently from most people. We call these people neurodivergent. This is not a bad thing - it is just different.</p>
+                                        <p>The word "neurodiversity" means that there are many types of brains, and all types are <span class="vocab-link" onclick="showPopup('normal', 'usual, typical, or expected')">normal</span>. People with <span class="vocab-link" onclick="showPopup('autism', 'a condition that affects how people communicate and experience the world')">autism</span>, <span class="vocab-link" onclick="showPopup('ADHD', 'Attention Deficit Hyperactivity Disorder - affects focus and energy')">ADHD</span>, and dyslexia are neurodivergent. Rather than seeing these differences as problems, neurodiversity says they are a natural part of being human.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Neurodivergency refers to natural variations in how human brains work. The term recognises that there is no single "correct" way for a brain to function. People whose brains work differently from what society considers "typical" are called <span class="vocab-link" onclick="showPopup('neurodivergent', 'having a brain that works differently from what is considered typical')">neurodivergent</span>.</p>
+                                        <p>This includes people with autism, ADHD, <span class="vocab-link" onclick="showPopup('dyslexia', 'a learning difference that affects reading and spelling')">dyslexia</span>, and other neurological differences. The neurodiversity movement has fundamentally changed how we understand these differences - rather than viewing them as <span class="vocab-link" onclick="showPopup('deficits', 'lacks or shortages of something')">deficits</span> to be corrected, the neurodiversity <span class="vocab-link" onclick="showPopup('paradigm', 'a way of thinking about something')">paradigm</span> recognises them as natural variations in human <span class="vocab-link" onclick="showPopup('cognition', 'the mental process of thinking and understanding')">cognition</span>.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The concept of neurodiversity represents a <span class="vocab-link" onclick="showPopup('paradigm shift', 'a fundamental change in thinking')">paradigm shift</span> from the traditional medical model of disability. Where the medical model frames neurological differences as <span class="vocab-link" onclick="showPopup('pathologies', 'conditions viewed as diseases or disorders')">pathologies</span> requiring treatment, the neurodiversity framework positions them as natural variations that have always existed within the human population.</p>
+                                        <p>These variations may actually <span class="vocab-link" onclick="showPopup('confer', 'give or provide')">confer</span> evolutionary advantages. This <span class="vocab-link" onclick="showPopup('reconceptualisation', 'thinking about something in a new or different way')">reconceptualisation</span> challenges deeply embedded assumptions about what constitutes "normal" <span class="vocab-link" onclick="showPopup('cognition', 'the mental process of thinking and understanding')">cognition</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=800" alt="Brain illustration" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Autism as a Spectrum -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Autism as a Spectrum</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('autism', 'a condition that affects how people communicate and experience the world')">Autism</span> is described as a "<span class="vocab-link" onclick="showPopup('spectrum', 'a range of different things, from one extreme to another')">spectrum</span>" because it affects people in many different ways. Some autistic people are very good at talking and making friends, but find loud noises very difficult. Others might have amazing memory but find social situations hard.</p>
+                                        <p>Autistic people often notice small details that others miss. They might have a favourite <span class="vocab-link" onclick="showPopup('topic', 'a subject that someone talks or writes about')">topic</span> that they know very well. Some autistic people don't like loud noises or bright lights.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Autism is described as a "<span class="vocab-link" onclick="showPopup('spectrum', 'a range of different things, from one extreme to another')">spectrum</span>" because it affects people in vastly different ways. The spectrum is not a line from "mild" to "severe" - instead, think of it as a colour wheel with many different dimensions.</p>
+                                        <p>One autistic person might excel at verbal communication but struggle with <span class="vocab-link" onclick="showPopup('sensory', 'related to the five senses: sight, sound, touch, taste, and smell')">sensory</span> processing. Another might have exceptional memory but find social situations overwhelming. What autistic people share is a different way of experiencing the world - often more <span class="vocab-link" onclick="showPopup('intensely', 'with strong feelings or sensations')">intensely</span> than others.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The spectrum conceptualisation of autism has evolved considerably since its <span class="vocab-link" onclick="showPopup('inception', 'the beginning of something')">inception</span>. Contemporary understanding rejects the notion of a linear progression from "high-functioning" to "low-functioning" - terms now widely considered <span class="vocab-link" onclick="showPopup('reductive', 'oversimplifying complex things')">reductive</span> and <span class="vocab-link" onclick="showPopup('pejorative', 'expressing disapproval')">pejorative</span>.</p>
+                                        <p>Instead, autism is increasingly understood as a <span class="vocab-link" onclick="showPopup('multidimensional', 'having many different aspects')">multidimensional</span> profile where an individual may present with vastly different abilities across domains such as social communication, sensory processing, <span class="vocab-link" onclick="showPopup('executive function', 'brain skills for planning, organizing, and completing tasks')">executive function</span>, and verbal expression. This <span class="vocab-link" onclick="showPopup('heterogeneity', 'diversity; being made up of different things')">heterogeneity</span> explains why autistic individuals can appear so different from one another.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800" alt="Colorful spectrum" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Understanding ADHD -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Understanding ADHD</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('ADHD', 'Attention Deficit Hyperactivity Disorder - affects focus and energy')">ADHD</span> means Attention Deficit Hyperactivity Disorder. People with ADHD have lots of energy and many ideas. They can be very <span class="vocab-link" onclick="showPopup('creative', 'good at thinking of new ideas')">creative</span>. Sometimes they find it hard to sit still or wait their turn.</p>
+                                        <p>People with ADHD don't lack attention - they often struggle to direct it where needed. They may focus very hard on interesting tasks but find boring tasks extremely difficult.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>ADHD (Attention Deficit Hyperactivity Disorder) affects how people <span class="vocab-link" onclick="showPopup('regulate', 'control or manage something')">regulate</span> attention, impulses, and energy levels. Despite the name, people with ADHD don't lack attention - they often struggle to direct it where needed.</p>
+                                        <p>They may <span class="vocab-link" onclick="showPopup('hyperfocus', 'very intense concentration on one thing')">hyperfocus</span> intensely on interesting tasks while finding routine tasks extremely difficult. ADHD brains often seek <span class="vocab-link" onclick="showPopup('stimulation', 'something that causes interest or excitement')">stimulation</span> and novelty, leading to creativity and quick thinking, but also challenges with organisation and time management.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>ADHD presents similar complexity to autism. The <span class="vocab-link" onclick="showPopup('nomenclature', 'a system of names or terms')">nomenclature</span> itself is contested - "deficit" implies something lacking, when in reality ADHD brains simply allocate attention differently.</p>
+                                        <p>The ability to <span class="vocab-link" onclick="showPopup('hyperfocus', 'concentrate intensely on one thing')">hyperfocus</span> on stimulating activities whilst struggling with <span class="vocab-link" onclick="showPopup('mundane', 'ordinary and unexciting')">mundane</span> tasks reflects differences in dopaminergic reward systems, not moral failing or insufficient effort. ADHD affects how people regulate attention, impulses, and energy levels through differences in dopamine regulation that affect motivation and attention.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800" alt="Focus and attention" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Masking -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Masking</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('masking', 'hiding natural behaviours to appear normal')">Masking</span> is when neurodivergent people hide their natural behaviours to seem "normal." This takes a lot of energy. Many neurodivergent people learn to copy what other people do so they fit in.</p>
+                                        <p>But pretending to be someone you are not is very tiring. Over time, masking can make people feel exhausted and unhappy.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Many neurodivergent people engage in "<span class="vocab-link" onclick="showPopup('masking', 'hiding natural behaviours to appear more neurotypical')">masking</span>" - hiding their natural behaviours to fit in with <span class="vocab-link" onclick="showPopup('neurotypical', 'having a brain that functions in the way society considers typical')">neurotypical</span> expectations. While this can help in certain situations, chronic masking often leads to <span class="vocab-link" onclick="showPopup('burnout', 'extreme exhaustion from prolonged stress')">burnout</span> and mental health challenges.</p>
+                                        <p>Masking is especially common in women, who may not receive a diagnosis because their masking makes their differences less visible. Increasingly, advocates argue for accommodation rather than <span class="vocab-link" onclick="showPopup('assimilation', 'becoming similar to the majority')">assimilation</span>.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The phenomenon of masking - also termed "camouflaging" - has received considerable research attention. Studies indicate that chronic masking <span class="vocab-link" onclick="showPopup('correlates', 'is connected with')">correlates</span> strongly with anxiety, depression, and suicidal ideation, particularly among autistic women, who historically have been underdiagnosed due to presenting differently from the male-centric diagnostic criteria.</p>
+                                        <p>While masking can facilitate social navigation, it suppresses authentic self-expression and exacts a considerable psychological toll. The <span class="vocab-link" onclick="showPopup('implications', 'possible effects or results')">implications</span> extend beyond individual wellbeing to broader questions about societal expectations and the pressure to <span class="vocab-link" onclick="showPopup('assimilate', 'become similar to; absorb into')">assimilate</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1504439904031-93ded9f93e4e?w=800" alt="Masking and authenticity" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Sensory Experiences -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Sensory Experiences</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Many neurodivergent people experience things differently through their senses. Some people find loud sounds, bright lights, or certain textures very uncomfortable. A busy shopping centre might feel overwhelming.</p>
+                                        <p>Other people might need more <span class="vocab-link" onclick="showPopup('sensory', 'relating to the senses')">sensory</span> input and enjoy strong flavours or firm pressure. Understanding these differences helps us create better spaces for everyone.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Many neurodivergent people experience <span class="vocab-link" onclick="showPopup('sensory', 'related to the five senses: sight, sound, touch, taste, and smell')">sensory</span> information differently. What seems normal to one person might be overwhelming to another. Sensory sensitivities can affect all five senses - light, sound, touch, taste, and smell.</p>
+                                        <p>Some people are hypersensitive (over-responsive) while others are hyposensitive (under-responsive). These sensory differences are not preferences - they reflect genuine neurological differences in how the brain processes information.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Sensory processing differences constitute a fundamental aspect of many neurodivergent experiences. These differences operate across a spectrum from hypersensitivity to hyposensitivity, affecting proprioception, vestibular processing, and interoception alongside the conventional five senses.</p>
+                                        <p>The neurological basis of these differences has been well-established, with research demonstrating altered connectivity in sensory processing regions of the brain. Environmental modifications that accommodate these differences represent a relatively straightforward yet profoundly impactful intervention.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800" alt="Sensory experience" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>                            <!-- Slide 8 - Strengths and Challenges -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Strengths and Challenges</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Neurodivergent people often have <span class="vocab-link" onclick="showPopup('unique', 'the only one of its kind; special')">unique</span> <span class="vocab-link" onclick="showPopup('strengths', 'things someone is good at')">strengths</span>. They see the world in interesting ways. Many are very <span class="vocab-link" onclick="showPopup('creative', 'good at thinking of new ideas')">creative</span>, good at solving problems, or excellent at noticing details.</p>
+                                        <p>Some famous scientists, artists, and business people are neurodivergent. Neurodivergent minds often bring new ideas and different ways of thinking to a team.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Neurodivergent people often share certain traits that can be both challenging and advantageous. Neurodivergent minds often bring unique strengths: pattern recognition, creative problem-solving, attention to detail, honest communication, and the ability to think outside conventional boundaries.</p>
+                                        <p>Many successful scientists, artists, and entrepreneurs are neurodivergent. The workplace is gradually adapting to neurodiversity, recognising that neurodivergent employees often bring unique and valuable <span class="vocab-link" onclick="showPopup('innovation', 'new ideas and methods')">innovation</span>.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Neurodivergent <span class="vocab-link" onclick="showPopup('cognition', 'the mental process of thinking and understanding')">cognition</span> frequently <span class="vocab-link" onclick="showPopup('confers', 'gives or provides')">confers</span> distinctive capabilities: enhanced pattern recognition, novel problem-solving approaches, meticulous attention to detail, and the capacity to challenge conventional thinking.</p>
+                                        <p>These strengths have contributed significantly to human progress - numerous innovations in science, technology, art, and commerce can be attributed to neurodivergent thinkers. Forward-thinking organisations increasingly recognise that cognitive diversity enhances collective intelligence and drives innovation.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800" alt="Teamwork and diversity" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Communication Differences -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Communication Differences</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Neurodivergent people may communicate in different ways. Some people are very direct and honest. Others might prefer writing instead of talking. Some might find it hard to understand jokes or sarcasm.</p>
+                                        <p>These are not wrong ways to communicate - they are just different. We can all learn to communicate better with each other.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Neurodivergent people may communicate differently - more directly, or through different channels like writing instead of speaking. Autistic people, for example, may struggle with implied meaning and prefer explicit, clear communication.</p>
+                                        <p>People with ADHD might interrupt not from rudeness but because their thoughts move quickly. Understanding these differences allows us to adapt our communication for different people and build more effective relationships.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Communication differences represent a significant dimension of neurodivergent experience. Autistic individuals frequently favour direct, literal communication, which can be misconstrued as bluntness within <span class="vocab-link" onclick="showPopup('neurotypical', 'having a brain that functions in the way society considers typical')">neurotypical</span> frameworks that privilege indirect, contextually-dependent expression.</p>
+                                        <p>Similarly, the communicative patterns associated with ADHD - tangential thinking, interruption, and rapid topic-switching - reflect neurological processing differences rather than social deficiency. Recognising communication as a bidirectional responsibility represents a more equitable <span class="vocab-link" onclick="showPopup('paradigm', 'a way of thinking about something')">paradigm</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1573497620053-ea5300f94f21?w=800" alt="Communication" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Support and Accommodation -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Support and Accommodation</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('accommodation', 'changes made to help someone')">Accommodations</span> are changes that help neurodivergent people succeed. These might include:</p>
+                                        <ul>
+                                            <li>Quiet spaces to work</li>
+                                            <li>Written instructions instead of spoken ones</li>
+                                            <li>Flexible schedules</li>
+                                            <li>Noise-cancelling headphones</li>
+                                            <li>Extra time for tasks</li>
+                                        </ul>
+                                        <p>Small changes can make big differences for neurodivergent people.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('accommodation', 'changes made to help someone participate fully')">Accommodations</span> are changes made to help neurodivergent people participate fully and succeed. These might include flexible schedules, quiet spaces, written instructions, or sensory-friendly environments.</p>
+                                        <p>Rather than expecting neurodivergent individuals to simply "try harder," accommodations recognise that the environment plays a crucial role. Should students with ADHD get extra time on tests? Many educators argue yes, as time pressure disproportionately affects ADHD brains.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The <span class="vocab-link" onclick="showPopup('implications', 'possible effects or results')">implications</span> for society are profound. Rather than expecting neurodivergent individuals to <span class="vocab-link" onclick="showPopup('assimilate', 'become similar to; absorb into')">assimilate</span> into neurotypical norms, the neurodiversity movement advocates for environmental and societal adaptations that enable all neurotypes to thrive.</p>
+                                        <p>This represents not merely accommodation but a fundamental reimagining of what we consider "normal" human cognition. Effective accommodations address the interaction between individual differences and environmental demands, recognising that disability is often a product of poor environmental fit rather than inherent deficit.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800" alt="Support and accommodation" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Creating Inclusive Spaces -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Creating Inclusive Spaces</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>An <span class="vocab-link" onclick="showPopup('inclusive', 'including everyone; welcoming to all')">inclusive</span> world is better for everyone. When we design spaces and rules for different kinds of people, we help everyone. Here are some things we can do:</p>
+                                        <ul>
+                                            <li>Learn about neurodiversity</li>
+                                            <li>Ask people what they need</li>
+                                            <li>Be patient and understanding</li>
+                                            <li>Celebrate differences</li>
+                                            <li>Create quiet spaces in schools and offices</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>An <span class="vocab-link" onclick="showPopup('inclusive', 'welcoming and accessible to all people')">inclusive</span> society benefits everyone. When we design for diversity, we create better environments for all people. Universal design principles - creating environments accessible to the widest range of people - often benefit everyone, not just those they were designed for.</p>
+                                        <p>Becoming a better ally to neurodivergent people starts with education, empathy, and a willingness to adapt.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Creating genuinely inclusive environments necessitates a paradigmatic shift from individual adaptation to systemic redesign. Universal design principles offer a compelling framework: environments designed to accommodate the widest possible range of human variation inherently benefit all users.</p>
+                                        <p>This extends beyond physical space to encompass pedagogical approaches, workplace cultures, and social norms. The ultimate aspiration of the neurodiversity movement transcends mere tolerance or accommodation, envisioning a society that genuinely <span class="vocab-link" onclick="showPopup('valorises', 'gives value or importance to something')">valorises</span> cognitive diversity.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800" alt="Inclusive community" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 12 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Remember these main points about neurodivergency:</p>
+                                        <ul>
+                                            <li><strong>Brains are different:</strong> Everyone's brain works in its own way</li>
+                                            <li><strong>Not a problem:</strong> Being neurodivergent is not bad - it's just different</li>
+                                            <li><strong>Many strengths:</strong> Neurodivergent people have unique abilities</li>
+                                            <li><strong>Be understanding:</strong> Small changes can help everyone</li>
+                                            <li><strong>Celebrate diversity:</strong> Different minds make the world better</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Essential points about neurodivergency to remember:</p>
+                                        <ul>
+                                            <li><strong>Natural variation:</strong> Neurodiversity is a natural part of human biology</li>
+                                            <li><strong>Spectrum thinking:</strong> Conditions like autism and ADHD affect people in many different ways</li>
+                                            <li><strong>Masking has costs:</strong> Hiding neurodivergent traits causes stress and burnout</li>
+                                            <li><strong>Accommodation matters:</strong> Environmental changes help neurodivergent people thrive</li>
+                                            <li><strong>Unique strengths:</strong> Neurodivergent minds bring valuable perspectives and skills</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Salient principles of neurodiversity:</p>
+                                        <ul>
+                                            <li><strong>Paradigm reconceptualisation:</strong> Neurological differences represent natural variation, not pathology</li>
+                                            <li><strong>Multidimensional profiles:</strong> Reject linear conceptualisations in favour of nuanced, individualised understanding</li>
+                                            <li><strong>Masking consequences:</strong> Chronic camouflaging exacts significant psychological costs</li>
+                                            <li><strong>Environmental responsibility:</strong> Disability often reflects environmental barriers rather than individual deficits</li>
+                                            <li><strong>Cognitive diversity value:</strong> Neurodivergent perspectives drive innovation and enrich collective problem-solving</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800" alt="Key Takeaways" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 13 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;">
+                                                <span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span>
+                                            </div>
+                                        </div>
+
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;">
+                                                <span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span>
+                                            </div>
+                                        </div>
+
+                                        <div onclick="openWritingForm(document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;">
+                                                <span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Slide 2: ADHD Misconceptions -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>ADHD Misconceptions</h3>
-                                <p>Many people <span class="vocab-link" onclick="showPopup('misunderstand', 'understand incorrectly')">misunderstand</span> ADHD. It's not just about being hyperactive or unable to focus - it's about how the brain regulates attention.</p>
-                                <ul>
-                                    <li>What common misconceptions about ADHD have you heard?</li>
-                                    <li>Why might someone with ADHD focus well on video games but struggle with homework?</li>
-                                    <li>How could schools better support students with ADHD?</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&h=600&fit=crop" alt="Focus and learning" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 3: Sensory Experiences -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Sensory Experiences</h3>
-                                <p>Many neurodivergent people experience <span class="vocab-link" onclick="showPopup('sensory', 'relating to the senses')">sensory</span> information differently. What seems normal to one person might be overwhelming to another.</p>
-                                <ul>
-                                    <li>Can you think of sounds, lights, or textures that bother you?</li>
-                                    <li>How might a busy shopping centre feel to someone with sensory sensitivities?</li>
-                                    <li>What accommodations could help people with sensory differences?</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop" alt="Sensory experience" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 4: Masking -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Masking and Authenticity</h3>
-                                <p><span class="vocab-link" onclick="showPopup('masking', 'hiding natural behaviours to fit in')">Masking</span> is when neurodivergent people hide their natural behaviours to seem "normal." This takes a lot of energy.</p>
-                                <ul>
-                                    <li>Have you ever felt you had to hide part of who you are? How did it feel?</li>
-                                    <li>Why might someone feel pressure to mask their differences?</li>
-                                    <li>How can we create spaces where people feel safe being themselves?</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1504439904031-93ded9f93e4e?w=800&h=600&fit=crop" alt="Authenticity" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 5: Strengths and Challenges -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Strengths and Challenges</h3>
-                                <p>Neurodivergent people often have unique <span class="vocab-link" onclick="showPopup('strengths', 'things someone is especially good at')">strengths</span> alongside their challenges. Many successful people in science, art, and business are neurodivergent.</p>
-                                <ul>
-                                    <li>What strengths might come with seeing the world differently?</li>
-                                    <li>Do you know any famous people who are neurodivergent?</li>
-                                    <li>How can workplaces benefit from neurodivergent employees?</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop" alt="Teamwork success" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 6: Communication Differences -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Communication Differences</h3>
-                                <p>Neurodivergent people may <span class="vocab-link" onclick="showPopup('communicate', 'share information or express ideas')">communicate</span> differently - more directly, or through different channels like writing instead of speaking.</p>
-                                <ul>
-                                    <li>What are some different ways people communicate?</li>
-                                    <li>Is direct communication always bad? When might it be helpful?</li>
-                                    <li>How can we adapt our communication for different people?</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1573497620053-ea5300f94f21?w=800&h=600&fit=crop" alt="Communication" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 7: Support and Accommodation -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Support and Accommodation</h3>
-                                <p><span class="vocab-link" onclick="showPopup('accommodation', 'changes made to help someone')">Accommodations</span> are changes that help neurodivergent people succeed. These might include flexible schedules, quiet spaces, or written instructions.</p>
-                                <ul>
-                                    <li>What accommodations might help someone with sensory sensitivities at work?</li>
-                                    <li>Should students with ADHD get extra time on tests? Why or why not?</li>
-                                    <li>How can small changes make big differences for neurodivergent people?</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&h=600&fit=crop" alt="Support and help" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 8: Creating Inclusive Spaces -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Creating Inclusive Spaces</h3>
-                                <p>An <span class="vocab-link" onclick="showPopup('inclusive', 'welcoming to everyone')">inclusive</span> society benefits everyone. When we design for diversity, we create better environments for all people.</p>
-                                <ul>
-                                    <li>What would a truly inclusive classroom or workplace look like?</li>
-                                    <li>How can we become better allies to neurodivergent people?</li>
-                                    <li>What changes would you like to see in society regarding neurodiversity?</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=600&fit=crop" alt="Inclusive community" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="slide-indicators">
-                        <span class="indicator-dot active" onclick="goToVideoSlide(1)"></span>
-                        <span class="indicator-dot" onclick="goToVideoSlide(2)"></span>
-                        <span class="indicator-dot" onclick="goToVideoSlide(3)"></span>
-                        <span class="indicator-dot" onclick="goToVideoSlide(4)"></span>
-                        <span class="indicator-dot" onclick="goToVideoSlide(5)"></span>
-                        <span class="indicator-dot" onclick="goToVideoSlide(6)"></span>
-                        <span class="indicator-dot" onclick="goToVideoSlide(7)"></span>
-                        <span class="indicator-dot" onclick="goToVideoSlide(8)"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vocabulary Section -->
-            <div class="section" id="vocabulary">
-                <h2>Vocabulary</h2>
-                <div class="vocab-container">
-                    <div class="vocab-nav">
-                        <button class="page-btn active" onclick="showVocabPage(1, this)">Core Concepts</button>
-                        <button class="page-btn" onclick="showVocabPage(2, this)">Traits & Behaviours</button>
-                    </div>
-
-                    <div class="vocab-page active" id="vocab-page-1">
-                        <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Neurodivergent</div></div><div class="flashcard-back"><div class="flashcard-definition">Having a brain that works differently from what is considered typical</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Neurotypical</div></div><div class="flashcard-back"><div class="flashcard-definition">Having a brain that functions in the way society considers typical or standard</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Spectrum</div></div><div class="flashcard-back"><div class="flashcard-definition">A range of different conditions or traits, not a single fixed state</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Autism</div></div><div class="flashcard-back"><div class="flashcard-definition">A neurological difference affecting social communication and sensory processing</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">ADHD</div></div><div class="flashcard-back"><div class="flashcard-definition">Attention Deficit Hyperactivity Disorder - affects focus, impulse control, and energy</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Dyslexia</div></div><div class="flashcard-back"><div class="flashcard-definition">A learning difference that affects reading, writing, and spelling abilities</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accommodation</div></div><div class="flashcard-back"><div class="flashcard-definition">Changes or adjustments made to help someone participate fully</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Inclusive</div></div><div class="flashcard-back"><div class="flashcard-definition">Welcoming and accessible to all people, regardless of differences</div></div></div></div>
-                        </div>
-                    </div>
-
-                    <div class="vocab-page" id="vocab-page-2">
-                        <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Masking</div></div><div class="flashcard-back"><div class="flashcard-definition">Hiding natural behaviours to appear more neurotypical or fit in</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hyperfocus</div></div><div class="flashcard-back"><div class="flashcard-definition">Intense concentration on one activity, often for long periods</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sensory</div></div><div class="flashcard-back"><div class="flashcard-definition">Related to the five senses: sight, sound, touch, taste, and smell</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stimming</div></div><div class="flashcard-back"><div class="flashcard-definition">Repetitive movements or sounds used for self-regulation or comfort</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Executive Function</div></div><div class="flashcard-back"><div class="flashcard-definition">Brain skills for planning, organising, and completing tasks</div></div></div></div>
-                            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Burnout</div></div><div class="flashcard-back"><div class="flashcard-definition">Extreme exhaustion from prolonged stress, often from masking</div></div></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- NEW VOCABULARY-BASED QUIZ SECTION -->
-            <div class="section" id="quiz">
-                <h2>Vocabulary Quiz</h2>
-                <div class="quiz-container">
-                    <div class="quiz-header" id="quiz-header">
-                        <div class="quiz-nav">
-                            <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
-                        </div>
-                        <div class="progress-container">
-                            <div id="quiz-counter">Question 1 of 10</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="quizProgressFill"></div>
-                            </div>
-                        </div>
-                        <div class="quiz-nav">
-                            <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
-                        </div>
-                    </div>
-
-                    <div id="quiz-questions-container">
-                        <!-- Questions will be generated dynamically -->
-                    </div>
-
-                    <div class="quiz-page" id="quiz-results-page" style="display: none;">
-                        <div class="results-summary">
-                            <h3>Quiz Complete!</h3>
-                            <div class="score" id="finalQuizScore">0/10</div>
-                            <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                        <!-- Slide Indicators -->
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(12)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(13)"></div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Writing Section -->
-            <div class="section" id="writing">
-                <h2>Writing Practice</h2>
-                <div class="writing-container">
-                    <div class="writing-content">
-                        <h3 class="writing-question">Neurodiversity and Society</h3>
-
-                        <p class="writing-objective">
-                            Write a paragraph (100-150 words) about neurodiversity and inclusion. Consider questions like: Why is it important to understand that people's brains work differently? How can schools, workplaces, or society be more accommodating to neurodivergent people? What strengths might neurodivergent people bring to a team? Share your thoughts with your teacher.
-                        </p>
-
-                        <form id="writingForm" class="writing-form">
-                            <div class="form-group">
-                                <label for="studentName">Student Name</label>
-                                <input type="text" id="studentName" name="studentName" required>
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <!-- B1 Vocabulary -->
+                        <div class="vocab-page" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Neurodivergent</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Having a brain that works differently from most people</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Autism</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A condition that affects how people communicate and experience the world</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">ADHD</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Attention Deficit Hyperactivity Disorder - affects focus and energy</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Spectrum</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A range of different things, from one extreme to another</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Unique</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The only one of its kind; special</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Creative</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Good at thinking of new ideas</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Strengths</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Things someone is good at</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Normal</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Usual, typical, or expected</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Independently</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Without needing help from others</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Inclusive</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Including everyone; welcoming to all</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accommodation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Changes made to help someone</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sensory</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Relating to the senses: sight, sound, touch, taste, and smell</div></div></div></div>
                             </div>
+                        </div>
 
-                            <div class="form-group">
-                                <label for="teacherEmail">Teacher's Email</label>
-                                <input type="email" id="teacherEmail" name="teacherEmail" required>
+                        <!-- B2 Vocabulary -->
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Neurotypical</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Having a brain that functions in the way society considers typical</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Masking</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Hiding natural behaviours to appear more neurotypical</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hyperfocus</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Very intense concentration on one thing</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stimming</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Repetitive movements or sounds used for self-regulation</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Executive Function</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Brain skills for planning, organizing, and completing tasks</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Burnout</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Extreme exhaustion from prolonged stress</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Regulate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Control or manage something</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Paradigm</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A way of thinking about something</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Dyslexia</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A learning difference that affects reading and spelling</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Innovation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">New ideas and methods</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stimulation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Something that causes interest or excitement</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sensory Processing</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">How the brain handles information from the senses</div></div></div></div>
                             </div>
+                        </div>
 
-                            <div class="form-group">
-                                <label for="writingInput">Your Response</label>
-                                <input type="text" id="writingInput" name="writingInput" required>
+                        <!-- C1 Vocabulary -->
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Pathologies</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Conditions viewed as diseases or disorders</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cognition</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The mental process of thinking and understanding</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Heterogeneity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Diversity; being made up of different things</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Nomenclature</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A system of names or terms</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Assimilate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Become similar to; absorb into</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Correlates</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Is connected with</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Multidimensional</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Having many different aspects</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Pejorative</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Expressing disapproval</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Paradigm Shift</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A fundamental change in thinking</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Reductive</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Oversimplifying complex things</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Confer</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Give or provide</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Inception</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The beginning of something</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Implications</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Possible effects or results</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Valorises</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Gives value or importance to something</div></div></div></div>
                             </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="button-container">
-                                <button type="button" class="check-button" id="beginBtn" onclick="openMailto()">Send Response</button>
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Vocabulary Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav">
+                                <button class="nav-btn" onclick="previousQuizQuestion()" id="prevQuizBtn">Previous</button>
                             </div>
-                        </form>
+                            <div class="progress-container">
+                                <div id="quiz-counter">Question 1 of 10</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="quizProgressFill"></div>
+                                </div>
+                            </div>
+                            <div class="quiz-nav">
+                                <button class="nav-btn" onclick="nextQuizQuestion()" id="nextQuizBtn">Next</button>
+                            </div>
+                        </div>
+
+                        <div id="quiz-questions-container"></div>
+
+                        <div class="quiz-page" id="quiz-results-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="finalQuizScore">0/10</div>
+                                <button class="check-button" onclick="restartVocabQuiz()">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-content">
+                            <h3 class="writing-question">Neurodiversity and Society</h3>
+
+                            <p class="writing-objective">
+                                Think about neurodiversity and inclusion in your daily life.<br><br>
+                                Write 150-250 words discussing one of these topics: Why is it important to understand that people's brains work differently? How can schools, workplaces, or society be more accommodating to neurodivergent people? What strengths might neurodivergent people bring to a team?<br><br>
+                                Use vocabulary from the lesson in your response.
+                            </p>
+
+                            <form id="writingForm" class="writing-form">
+                                <div class="form-group">
+                                    <label for="studentName">Student Name</label>
+                                    <input type="text" id="studentName" name="studentName" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="teacherEmail">Teacher's Email</label>
+                                    <input type="email" id="teacherEmail" name="teacherEmail" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="writingInput">Your Response</label>
+                                    <textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea>
+                                </div>
+
+                                <div class="button-container">
+                                    <button type="button" class="check-button" onclick="openMailto()">Send Response</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <!-- Vocabulary Definition Popup -->
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+            <button class="popup-close" onclick="closeVocabPopup()">Close</button>
+        </div>
+    </div>
 
-            <!-- Vocabulary Popup -->
-            <div class="popup-overlay" id="vocabPopup">
-                <div class="popup-content">
-                    <div class="popup-word" id="popupWord"></div>
-                    <div class="popup-definition" id="popupDefinition"></div>
-                    <button class="popup-close" onclick="closePopup()">Close</button>
-                </div>
-            </div>
+    <!-- Vocab Popup (for inline vocab links) -->
+    <div id="vocabPopup" onclick="closePopup()">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <div class="popup-word" id="vocabPopupWord"></div>
+            <div class="popup-definition" id="vocabPopupDef"></div>
+            <button class="popup-close" onclick="closePopup()">Close</button>
         </div>
     </div>
 
     <script>
-        // Slideshow variables
+        // ========== GLOBAL STATE ==========
+        let currentDifficulty = 'B2';
         let currentSlide = 1;
-        let totalSlides = 5;
+        const totalSlides = 13;
 
-        // Vocabulary database for the quiz
-        const vocabularyDatabase = [
-            {
-                term: "neurodivergent",
-                definition: "Having a brain that works differently from what is considered typical.",
-                category: "concepts",
-                sentences: [
-                    "Many ___ people have unique strengths and perspectives.",
-                    "Being ___ is not a disease - it's a natural variation.",
-                    "The company actively recruits ___ employees."
-                ]
-            },
-            {
-                term: "neurotypical",
-                definition: "Having a brain that functions in the way society considers typical.",
-                category: "concepts",
-                sentences: [
-                    "The test was designed with ___ students in mind.",
-                    "___ people may not understand sensory sensitivities.",
-                    "Both ___ and neurodivergent people can work together effectively."
-                ]
-            },
-            {
-                term: "spectrum",
-                definition: "A range of different conditions or traits.",
-                category: "concepts",
-                sentences: [
-                    "Autism is described as a ___ because it affects everyone differently.",
-                    "The ___ includes people with very different abilities.",
-                    "There's a wide ___ of experiences within the autistic community."
-                ]
-            },
-            {
-                term: "masking",
-                definition: "Hiding natural behaviours to appear more neurotypical.",
-                category: "behaviours",
-                sentences: [
-                    "___ can be exhausting for neurodivergent people.",
-                    "She realised she had been ___ her whole life to fit in.",
-                    "Chronic ___ often leads to burnout."
-                ]
-            },
-            {
-                term: "hyperfocus",
-                definition: "Intense concentration on one activity for long periods.",
-                category: "behaviours",
-                sentences: [
-                    "His ___ on programming helped him solve the problem.",
-                    "People with ADHD can experience ___ on interesting tasks.",
-                    "During ___, she lost track of time completely."
-                ]
-            },
-            {
-                term: "sensory",
-                definition: "Related to the five senses: sight, sound, touch, taste, and smell.",
-                category: "traits",
-                sentences: [
-                    "The bright lights caused ___ overload.",
-                    "Many autistic people have ___ sensitivities.",
-                    "The ___ room was designed to be calming."
-                ]
-            },
-            {
-                term: "accommodation",
-                definition: "Changes made to help someone participate fully.",
-                category: "concepts",
-                sentences: [
-                    "The school provided ___ for students with ADHD.",
-                    "Noise-cancelling headphones are a common ___.",
-                    "Reasonable ___ can make a huge difference."
-                ]
-            },
-            {
-                term: "inclusive",
-                definition: "Welcoming and accessible to all people.",
-                category: "concepts",
-                sentences: [
-                    "We want to create an ___ classroom environment.",
-                    "The event was designed to be ___ for everyone.",
-                    "An ___ workplace values neurodiversity."
-                ]
-            },
-            {
-                term: "stimming",
-                definition: "Repetitive movements or sounds used for self-regulation.",
-                category: "behaviours",
-                sentences: [
-                    "___ helps many autistic people manage their emotions.",
-                    "Hand-flapping is a common form of ___.",
-                    "She uses ___ to calm herself when anxious."
-                ]
-            },
-            {
-                term: "burnout",
-                definition: "Extreme exhaustion from prolonged stress.",
-                category: "traits",
-                sentences: [
-                    "Years of masking led to severe ___.",
-                    "Autistic ___ can take months to recover from.",
-                    "Preventing ___ requires adequate rest and support."
-                ]
-            }
-        ];
-
-        // Section switching
-        function showSection(sectionId, navItem) {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => section.classList.remove('active'));
-
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-
-
-            document.getElementById(sectionId).classList.add('active');
-            navItem.classList.add('active');
+        // ========== LOADING SCREEN & GAME START ==========
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                document.getElementById('appContainer').classList.add('visible');
+            }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
         }
 
-        // Slideshow functionality
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.remove('hidden');
+            }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => {
+                el.style.display = 'block';
+            });
+        }
+
+        function updateDifficultyDisplay() {
+            const badge = document.getElementById('levelBadge');
+            const text = document.getElementById('currentLevelText');
+            badge.className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            text.textContent = currentDifficulty;
+        }
+
+        // ========== NAVIGATION ==========
+        function toggleNav() {
+            const nav = document.getElementById('navigation');
+            const overlay = document.getElementById('navOverlay');
+            const toggle = document.getElementById('menuToggle');
+            nav.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            toggle.classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openWritingForm(element) {
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            element.classList.add('active');
+            showSection('writing', element);
+            toggleNav();
+        }
+
+        function openMailto() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const teacherEmail = document.getElementById('teacherEmail').value.trim();
+            const writingResponse = document.getElementById('writingInput').value.trim();
+            if (!studentName || !teacherEmail || !writingResponse) {
+                alert('Please fill in all fields!');
+                return;
+            }
+            const subject = encodeURIComponent('Writing Assignment - Neurodivergency - ' + studentName);
+            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
+            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+        }
+
+        // ========== SLIDESHOW ==========
         function changeSlide(direction) {
             const slides = document.querySelectorAll('.discussion-slide');
             const dots = document.querySelectorAll('.indicator-dot');
-
             slides[currentSlide - 1].classList.remove('active');
             dots[currentSlide - 1].classList.remove('active');
-
             currentSlide += direction;
-
-            if (currentSlide > totalSlides) {
-                currentSlide = 1;
-            }
-            if (currentSlide < 1) {
-                currentSlide = totalSlides;
-            }
-
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
             slides[currentSlide - 1].classList.add('active');
             dots[currentSlide - 1].classList.add('active');
         }
@@ -1587,87 +2311,101 @@
         function goToSlide(slideNum) {
             const slides = document.querySelectorAll('.discussion-slide');
             const dots = document.querySelectorAll('.indicator-dot');
-
             slides[currentSlide - 1].classList.remove('active');
             dots[currentSlide - 1].classList.remove('active');
-
             currentSlide = slideNum;
-
             slides[currentSlide - 1].classList.add('active');
             dots[currentSlide - 1].classList.add('active');
         }
 
-        // Video Discussions Slideshow
-        let currentVideoSlide = 1;
-        let totalVideoSlides = 8;
-
-        function changeVideoSlide(direction) {
-            const videoSection = document.getElementById('video-discussions');
-            const slides = videoSection.querySelectorAll('.discussion-slide');
-            const dots = videoSection.querySelectorAll('.indicator-dot');
-
-            slides[currentVideoSlide - 1].classList.remove('active');
-            dots[currentVideoSlide - 1].classList.remove('active');
-
-            currentVideoSlide += direction;
-
-            if (currentVideoSlide > totalVideoSlides) {
-                currentVideoSlide = 1;
+        document.addEventListener('keydown', function(e) {
+            const discussionSection = document.getElementById('discussion');
+            if (discussionSection && discussionSection.classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
             }
-            if (currentVideoSlide < 1) {
-                currentVideoSlide = totalVideoSlides;
-            }
+        });
 
-            slides[currentVideoSlide - 1].classList.add('active');
-            dots[currentVideoSlide - 1].classList.add('active');
-        }
-
-        function goToVideoSlide(slideNum) {
-            const videoSection = document.getElementById('video-discussions');
-            const slides = videoSection.querySelectorAll('.discussion-slide');
-            const dots = videoSection.querySelectorAll('.indicator-dot');
-
-            slides[currentVideoSlide - 1].classList.remove('active');
-            dots[currentVideoSlide - 1].classList.remove('active');
-
-            currentVideoSlide = slideNum;
-
-            slides[currentVideoSlide - 1].classList.add('active');
-            dots[currentVideoSlide - 1].classList.add('active');
-        }
-
-        // Reading section management
-        function showReadingLevel(level, button) {
-            document.querySelectorAll('.reading-nav .page-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            document.querySelectorAll('.reading-level').forEach(levelDiv => levelDiv.style.display = 'none');
-            document.getElementById(level + '-level').style.display = 'block';
-        }
-
-        // Vocabulary section management
-        function showVocabPage(pageNum, element) {
-            document.querySelectorAll('.vocab-page').forEach(page => page.classList.remove('active'));
-            document.querySelectorAll('.vocab-nav .page-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('vocab-page-' + pageNum).classList.add('active');
-            if (element) {
-                element.classList.add('active');
-            }
-        }
-
+        // ========== FLASHCARDS ==========
         function flipCard(card) {
             card.classList.toggle('flipped');
+            const flipSound = document.getElementById('flipSound');
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => console.log('Audio playback failed:', e));
+            }
         }
 
-        // Vocabulary popup system
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const vocabPage = document.getElementById('vocab-page-' + level);
+            if (vocabPage) {
+                vocabPage.classList.add('active');
+            }
+        }
+
+        // ========== POPUPS ==========
         function showPopup(word, definition) {
-            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
-            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
             document.getElementById('vocabPopup').style.display = 'flex';
         }
 
         function closePopup() {
             document.getElementById('vocabPopup').style.display = 'none';
         }
+
+        function closeVocabPopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+
+        // ========== VOCABULARY DATABASE FOR QUIZ ==========
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Neurodivergent", definition: "Having a brain that works differently from most people", sentences: ["Many ___ people have unique strengths.", "Being ___ is not a disease - it's a natural variation.", "The school supports ___ students."] },
+                { term: "Autism", definition: "A condition that affects how people communicate and experience the world", sentences: ["___ is described as a spectrum.", "People with ___ often notice small details.", "___ affects people in many different ways."] },
+                { term: "ADHD", definition: "Attention Deficit Hyperactivity Disorder - affects focus and energy", sentences: ["People with ___ have lots of energy and ideas.", "___ affects how people pay attention.", "Students with ___ can be very creative."] },
+                { term: "Spectrum", definition: "A range of different things, from one extreme to another", sentences: ["Autism is described as a ___.", "The ___ includes people with very different abilities.", "There's a wide ___ of experiences."] },
+                { term: "Unique", definition: "The only one of its kind; special", sentences: ["Everyone's brain is ___.", "Each person has ___ strengths.", "Neurodivergent people see the world in ___ ways."] },
+                { term: "Creative", definition: "Good at thinking of new ideas", sentences: ["People with ADHD can be very ___.", "Neurodivergent minds are often ___.", "___ thinking solves many problems."] },
+                { term: "Strengths", definition: "Things someone is good at", sentences: ["Neurodivergent people have many ___.", "Focus on ___ rather than weaknesses.", "Everyone has different ___."] },
+                { term: "Normal", definition: "Usual, typical, or expected", sentences: ["All brain types are ___.", "There is no single ___ way for a brain to work.", "Being different is completely ___."] },
+                { term: "Independently", definition: "Without needing help from others", sentences: ["Some autistic people live ___.", "She works ___ on her projects.", "Many neurodivergent people live ___."] },
+                { term: "Inclusive", definition: "Including everyone; welcoming to all", sentences: ["We want to create an ___ classroom.", "An ___ workplace values everyone.", "The event was designed to be ___."] },
+                { term: "Accommodation", definition: "Changes made to help someone", sentences: ["The school provided ___ for students.", "Noise-cancelling headphones are a common ___.", "Reasonable ___ can make a huge difference."] },
+                { term: "Sensory", definition: "Relating to the senses", sentences: ["Some people have ___ sensitivities.", "The ___ room was designed to be calming.", "Bright lights caused ___ overload."] }
+            ],
+            B2: [
+                { term: "Neurotypical", definition: "Having a brain that functions in the way society considers typical", sentences: ["___ people may not understand sensory sensitivities.", "Both ___ and neurodivergent people can work together.", "The test was designed with ___ students in mind."] },
+                { term: "Masking", definition: "Hiding natural behaviours to appear more neurotypical", sentences: ["___ can be exhausting for neurodivergent people.", "She realised she had been ___ her whole life.", "Chronic ___ often leads to burnout."] },
+                { term: "Hyperfocus", definition: "Very intense concentration on one thing", sentences: ["His ___ on programming helped him solve the problem.", "People with ADHD can experience ___ on interesting tasks.", "During ___, she lost track of time completely."] },
+                { term: "Stimming", definition: "Repetitive movements or sounds used for self-regulation", sentences: ["___ helps many autistic people manage emotions.", "Hand-flapping is a common form of ___.", "She uses ___ to calm herself when anxious."] },
+                { term: "Executive Function", definition: "Brain skills for planning, organizing, and completing tasks", sentences: ["___ challenges affect daily life.", "Difficulties with ___ are common in ADHD.", "Improving ___ skills takes practice."] },
+                { term: "Burnout", definition: "Extreme exhaustion from prolonged stress", sentences: ["Years of masking led to severe ___.", "Autistic ___ can take months to recover from.", "Preventing ___ requires adequate rest."] },
+                { term: "Regulate", definition: "Control or manage something", sentences: ["ADHD affects how people ___ their attention.", "Learning to ___ emotions takes time.", "Stimming helps ___ sensory input."] },
+                { term: "Paradigm", definition: "A way of thinking about something", sentences: ["The neurodiversity ___ changed how we see differences.", "This ___ shift is important.", "A new ___ of understanding emerged."] },
+                { term: "Dyslexia", definition: "A learning difference that affects reading and spelling", sentences: ["___ does not affect intelligence.", "People with ___ often think in pictures.", "___ is a type of neurodivergence."] },
+                { term: "Innovation", definition: "New ideas and methods", sentences: ["Neurodivergent minds drive ___.", "___ comes from thinking differently.", "The company values ___ from diverse thinkers."] },
+                { term: "Stimulation", definition: "Something that causes interest or excitement", sentences: ["ADHD brains need more ___ to focus.", "Without enough ___, attention wanders.", "The right ___ helps productivity."] },
+                { term: "Sensory Processing", definition: "How the brain handles information from the senses", sentences: ["___ differences affect daily life.", "Challenges with ___ are common in autism.", "___ varies from person to person."] }
+            ],
+            C1: [
+                { term: "Pathologies", definition: "Conditions viewed as diseases or disorders", sentences: ["The medical model frames differences as ___.", "Rejecting the concept of ___ is central to neurodiversity.", "These are not ___ but natural variations."] },
+                { term: "Cognition", definition: "The mental process of thinking and understanding", sentences: ["There is no single 'correct' form of ___.", "Variations in ___ are natural.", "Human ___ takes many forms."] },
+                { term: "Heterogeneity", definition: "Diversity; being made up of different things", sentences: ["The ___ of autism explains its complexity.", "This ___ makes simple labels inadequate.", "The ___ within neurodivergent groups is vast."] },
+                { term: "Nomenclature", definition: "A system of names or terms", sentences: ["The ___ of ADHD is contested.", "Medical ___ often pathologises difference.", "Changing the ___ changes perception."] },
+                { term: "Assimilate", definition: "Become similar to; absorb into", sentences: ["Neurodivergent people shouldn't have to ___.", "The pressure to ___ causes burnout.", "Society expects everyone to ___."] },
+                { term: "Correlates", definition: "Is connected with", sentences: ["Chronic masking ___ with anxiety.", "Research shows burnout ___ with masking.", "Support ___ with better outcomes."] },
+                { term: "Multidimensional", definition: "Having many different aspects", sentences: ["Autism is a ___ profile.", "Understanding requires a ___ approach.", "The spectrum is ___ not linear."] },
+                { term: "Pejorative", definition: "Expressing disapproval", sentences: ["Terms like 'high-functioning' are considered ___.", "Avoid ___ language about neurodivergence.", "___ labels harm neurodivergent people."] },
+                { term: "Paradigm Shift", definition: "A fundamental change in thinking", sentences: ["Neurodiversity represents a ___.", "This ___ changed medical understanding.", "A ___ in education is needed."] },
+                { term: "Reductive", definition: "Oversimplifying complex things", sentences: ["Linear models of autism are ___.", "Such ___ thinking ignores diversity.", "___ labels don't capture reality."] },
+                { term: "Confer", definition: "Give or provide", sentences: ["Neurodivergent traits may ___ advantages.", "Different thinking can ___ unique benefits.", "These variations ___ evolutionary value."] },
+                { term: "Inception", definition: "The beginning of something", sentences: ["Since its ___, the spectrum concept has evolved.", "From its ___, the movement challenged norms.", "The ___ of these ideas changed medicine."] },
+                { term: "Implications", definition: "Possible effects or results", sentences: ["The ___ for society are profound.", "Understanding these ___ drives change.", "The ___ extend beyond individual cases."] },
+                { term: "Valorises", definition: "Gives value or importance to something", sentences: ["Society should create systems that ___ diversity.", "The movement ___ cognitive differences.", "An inclusive culture ___ all minds."] }
+            ]
+        };
 
         // Quiz System Variables
         let currentQuizQuestion = 1;
@@ -1681,14 +2419,12 @@
             userQuizAnswers = {};
             quizScore = 0;
             quizQuestions = [];
-
-            const shuffledVocab = [...vocabularyDatabase].sort(() => Math.random() - 0.5);
-
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffledVocab = [...levelVocab].sort(() => Math.random() - 0.5);
             for (let i = 0; i < Math.min(totalQuizQuestions, shuffledVocab.length); i++) {
                 const vocabItem = shuffledVocab[i];
                 const sentence = vocabItem.sentences[Math.floor(Math.random() * vocabItem.sentences.length)];
                 const hint = vocabItem.term.toLowerCase().substring(0, 2) + '...';
-
                 quizQuestions.push({
                     type: 'fill-blank',
                     question: `Complete the sentence: "${sentence}"`,
@@ -1697,7 +2433,6 @@
                     correctTerm: vocabItem.term
                 });
             }
-
             generateQuizHTML();
             showQuizQuestion(1);
             updateQuizProgress();
@@ -1706,14 +2441,12 @@
         function generateQuizHTML() {
             const container = document.getElementById('quiz-questions-container');
             container.innerHTML = '';
-
             quizQuestions.forEach((q, index) => {
                 const questionNum = index + 1;
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'quiz-page';
                 questionDiv.id = `quiz-question-${questionNum}`;
                 if (questionNum === 1) questionDiv.classList.add('active');
-
                 questionDiv.innerHTML = `
                     <div class="quiz-question">
                         <h3>${q.question}</h3>
@@ -1722,11 +2455,9 @@
                         <div class="feedback" id="quiz-feedback-${questionNum}" style="display: none;"></div>
                     </div>
                 `;
-
                 container.appendChild(questionDiv);
             });
         }
-
 
         function handleQuizKeyPress(event, questionNum) {
             if (event.key === 'Enter') {
@@ -1744,30 +2475,27 @@
             const checkButton = document.querySelector(`#quiz-question-${questionNum} .check-button`);
             const userInput = document.getElementById(`quiz-answer-${questionNum}`);
             const userAnswer = userInput.value.trim().toLowerCase();
-
             if (!userAnswer) {
                 alert('Please enter an answer first!');
                 return;
             }
-
             const isCorrect = userAnswer === question.correctAnswer;
-
+            if (isCorrect) {
+                document.getElementById('correctSound').play();
+            } else {
+                document.getElementById('incorrectSound').play();
+            }
             userInput.classList.add(isCorrect ? 'correct' : 'incorrect');
-
             feedback.style.display = 'block';
             feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
             feedback.textContent = isCorrect ? 'Correct! Well done!' :
                 `Incorrect. The correct answer is: ${question.correctTerm}`;
-
             if (isCorrect && !userQuizAnswers[questionNum]) {
-                 quizScore++;
+                quizScore++;
             }
             userQuizAnswers[questionNum] = isCorrect;
-
             checkButton.disabled = true;
-
             updateQuizProgress();
-
             setTimeout(() => {
                 if (currentQuizQuestion < totalQuizQuestions) {
                     nextQuizQuestion();
@@ -1780,7 +2508,6 @@
         function showQuizQuestion(questionNum) {
             const questions = document.querySelectorAll('#quiz-questions-container .quiz-page');
             questions.forEach(q => q.classList.remove('active'));
-
             const currentQ = document.getElementById(`quiz-question-${questionNum}`);
             if (currentQ) {
                 currentQ.classList.add('active');
@@ -1789,7 +2516,6 @@
                     setTimeout(() => inputField.focus(), 100);
                 }
             }
-
             currentQuizQuestion = questionNum;
             updateQuizProgress();
             updateQuizNavButtons();
@@ -1810,11 +2536,9 @@
         function updateQuizProgress() {
             const counter = document.getElementById('quiz-counter');
             const progressBar = document.getElementById('quizProgressFill');
-
             if (counter) {
                 counter.textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
             }
-
             if (progressBar) {
                 const answeredCount = Object.keys(userQuizAnswers).length;
                 const progressPercent = (answeredCount / totalQuizQuestions) * 100;
@@ -1825,7 +2549,6 @@
         function updateQuizNavButtons() {
             const prevBtn = document.getElementById('prevQuizBtn');
             const nextBtn = document.getElementById('nextQuizBtn');
-
             if (prevBtn) prevBtn.disabled = (currentQuizQuestion === 1);
             if (nextBtn) nextBtn.disabled = (currentQuizQuestion === totalQuizQuestions);
         }
@@ -1844,47 +2567,50 @@
             initializeVocabQuiz();
         }
 
-        // Vocabulary popup system
-        function showPopup(word, definition) {
-            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
-            document.getElementById('popupDefinition').textContent = definition;
-            document.getElementById('vocabPopup').style.display = 'flex';
+        // ========== TOUCH SWIPE FOR MOBILE ==========
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        const minSwipeDistance = 50;
+        const maxVerticalDistance = 100;
+
+        function initTouchSwipe() {
+            const slideshowContainer = document.querySelector('.slideshow-container');
+            if (!slideshowContainer) return;
+            slideshowContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+            slideshowContainer.addEventListener('touchend', handleTouchEnd, { passive: true });
         }
 
-        function closePopup() {
-            document.getElementById('vocabPopup').style.display = 'none';
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
         }
 
-        // Writing section management
-        function openMailto() {
-            const studentName = document.getElementById('studentName').value.trim();
-            const teacherEmail = document.getElementById('teacherEmail').value.trim();
-            const writingResponse = document.getElementById('writingInput').value.trim();
+        function handleTouchEnd(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipeGesture();
+        }
 
-            if (!studentName || !teacherEmail || !writingResponse) {
-                alert('Please fill in all fields!');
-                return;
+        function handleSwipeGesture() {
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = Math.abs(touchEndY - touchStartY);
+            if (Math.abs(deltaX) > minSwipeDistance && deltaY < maxVerticalDistance) {
+                if (deltaX > 0) {
+                    changeSlide(-1);
+                } else {
+                    changeSlide(1);
+                }
             }
-
-            const subject = encodeURIComponent('Neurodiversity & Society Assignment - ' + studentName);
-            const body = encodeURIComponent('Student Name: ' + studentName + '\n\nResponse:\n' + writingResponse);
-            window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
         }
 
-        // Initialize
+        // ========== INITIALIZATION ==========
         document.addEventListener('DOMContentLoaded', function() {
             initializeVocabQuiz();
-            showReadingLevel('A2', document.querySelector('.reading-nav .page-btn'));
-
-            // Close popup when clicking outside
-            const vocabPopup = document.getElementById('vocabPopup');
-            if (vocabPopup) {
-                vocabPopup.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        closePopup();
-                    }
-                });
-            }
+            setDifficultyContent('B2');
+            setVocabPage('B2');
+            initTouchSwipe();
         });
     </script>
 </body>
