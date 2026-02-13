@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Photography - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Photography</h1>
+        <p class="game-subtitle">Capturing the World Through the Lens</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>Photography</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title Image -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">Photography</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Capturing the World Through the Lens</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/V7z7BAZdt2M?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What is Photography? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What is Photography?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('photography', 'the art or practice of taking and processing photographs')">Photography</span> is the art of capturing images using a camera. The word comes from Greek and means "writing with light." A <span class="vocab-link" onclick="showPopup('photographer', 'a person who takes photographs')">photographer</span> uses light to create pictures.</p>
+                                        <p>Today, almost everyone takes photos with their phones, but professional photography requires knowledge of <span class="vocab-link" onclick="showPopup('composition', 'how elements are arranged in a photograph')">composition</span>, lighting, and camera settings.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('photography', 'the art, application, and practice of creating images by recording light')">Photography</span> is both a technical craft and an artistic <span class="vocab-link" onclick="showPopup('medium', 'a means of expression or communication')">medium</span> that captures moments in time through the <span class="vocab-link" onclick="showPopup('manipulation', 'skillful handling or control')">manipulation</span> of light.</p>
+                                        <p>Since its invention in the early 19th century, photography has <span class="vocab-link" onclick="showPopup('evolved', 'developed gradually over time')">evolved</span> from cumbersome chemical processes to sophisticated digital systems, <span class="vocab-link" onclick="showPopup('democratizing', 'making something accessible to everyone')">democratizing</span> image-making worldwide.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('photography', 'the art and science of capturing electromagnetic radiation to produce durable visual representations')">Photography</span> constitutes a <span class="vocab-link" onclick="showPopup('multifaceted', 'having many different aspects or elements')">multifaceted</span> discipline that <span class="vocab-link" onclick="showPopup('synthesizes', 'combines elements to form a coherent whole')">synthesizes</span> technical <span class="vocab-link" onclick="showPopup('proficiency', 'a high degree of skill or competence')">proficiency</span> with artistic vision.</p>
+                                        <p>From the <span class="vocab-link" onclick="showPopup('daguerreotype', 'an early photographic process using silver-coated copper plates')">daguerreotype</span> to contemporary computational photography, the medium has undergone <span class="vocab-link" onclick="showPopup('paradigmatic', 'serving as a typical example or model')">paradigmatic</span> shifts that have fundamentally altered our relationship with visual <span class="vocab-link" onclick="showPopup('representation', 'the depiction of something in a particular way')">representation</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800" alt="Photography" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Shutter Speed & Exposure -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Shutter Speed & Exposure</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The <span class="vocab-link" onclick="showPopup('shutter speed', 'how long the camera lets light in when you take a photo')">shutter speed</span> controls how long the camera opens to let light in. A fast shutter speed freezes movement. A slow shutter speed creates <span class="vocab-link" onclick="showPopup('motion blur', 'a blurry effect caused by movement during a photo')">motion blur</span>.</p>
+                                        <ul>
+                                            <li><strong>Fast shutter speed (1/1000s):</strong> Great for sports and action photos — everything looks frozen</li>
+                                            <li><strong>Slow shutter speed (1s or more):</strong> Great for waterfalls and light trails — movement looks smooth</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('shutter speed', 'the duration for which the camera sensor is exposed to light')">Shutter speed</span> is one of the three pillars of <span class="vocab-link" onclick="showPopup('exposure', 'the amount of light that reaches the camera sensor')">exposure</span>, alongside <span class="vocab-link" onclick="showPopup('aperture', 'the opening in a lens through which light passes')">aperture</span> and <span class="vocab-link" onclick="showPopup('ISO', 'a measure of the camera sensor sensitivity to light')">ISO</span>.</p>
+                                        <ul>
+                                            <li><strong>High-speed capture (1/4000s):</strong> Freezes <span class="vocab-link" onclick="showPopup('fleeting', 'lasting for a very short time')">fleeting</span> moments like splashing water or hummingbird wings</li>
+                                            <li><strong>Long exposure (30s+):</strong> Creates <span class="vocab-link" onclick="showPopup('ethereal', 'extremely delicate and light; heavenly')">ethereal</span> effects in landscapes and astrophotography</li>
+                                            <li><strong>Panning technique:</strong> A medium shutter speed combined with camera movement to convey <span class="vocab-link" onclick="showPopup('dynamism', 'the quality of being full of energy and movement')">dynamism</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('shutter speed', 'the temporal duration of sensor exposure governing motion rendition and light accumulation')">Shutter speed</span> governs the <span class="vocab-link" onclick="showPopup('temporal', 'relating to time')">temporal</span> dimension of image capture, functioning in <span class="vocab-link" onclick="showPopup('reciprocity', 'a mutual relationship between two things')">reciprocity</span> with aperture and ISO within the exposure <span class="vocab-link" onclick="showPopup('triangle', 'the three interconnected camera settings that control exposure')">triangle</span>.</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Instantaneous', 'happening immediately')">Instantaneous</span> capture:</strong> Ultra-fast speeds <span class="vocab-link" onclick="showPopup('arrest', 'to stop or bring to a halt')">arrest</span> motion imperceptible to the human eye</li>
+                                            <li><strong>Protracted exposure:</strong> Extended durations render movement as <span class="vocab-link" onclick="showPopup('luminous', 'giving off light; bright')">luminous</span> streaks, transforming the <span class="vocab-link" onclick="showPopup('mundane', 'ordinary; lacking interest')">mundane</span> into the <span class="vocab-link" onclick="showPopup('sublime', 'of outstanding spiritual or artistic worth')">sublime</span></li>
+                                            <li><strong>Kinetic panning:</strong> <span class="vocab-link" onclick="showPopup('Deliberate', 'done consciously and intentionally')">Deliberate</span> camera translation synchronized with subject velocity to isolate foreground <span class="vocab-link" onclick="showPopup('acuity', 'sharpness or keenness')">acuity</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=800" alt="Shutter Speed" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Wildlife Photography -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Wildlife Photography</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('wildlife photography', 'taking photographs of animals in their natural environment')">Wildlife photography</span> is about capturing animals in nature. It requires patience and a good <span class="vocab-link" onclick="showPopup('telephoto lens', 'a camera lens that makes faraway things look closer')">telephoto lens</span> to photograph animals from a safe distance.</p>
+                                        <ul>
+                                            <li><strong>Patience:</strong> You might wait for hours to get the perfect <span class="vocab-link" onclick="showPopup('shot', 'a photograph')">shot</span></li>
+                                            <li><strong>Fast shutter speed:</strong> Animals move quickly, so you need to freeze the action</li>
+                                            <li><strong>Camouflage:</strong> Wearing natural colours helps you stay hidden</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('wildlife photography', 'a genre of photography focused on documenting animals and their behaviors in natural habitats')">Wildlife photography</span> demands both technical <span class="vocab-link" onclick="showPopup('expertise', 'expert skill or knowledge')">expertise</span> and deep knowledge of animal behaviour. Photographers must <span class="vocab-link" onclick="showPopup('anticipate', 'to expect and be ready for something')">anticipate</span> their subjects' movements.</p>
+                                        <ul>
+                                            <li><strong>Equipment:</strong> <span class="vocab-link" onclick="showPopup('Telephoto', 'relating to a lens that magnifies distant objects')">Telephoto</span> lenses (300mm–600mm) allow safe, <span class="vocab-link" onclick="showPopup('non-intrusive', 'not causing disruption or disturbance')">non-intrusive</span> observation</li>
+                                            <li><strong>Burst mode:</strong> Continuous shooting captures the decisive <span class="vocab-link" onclick="showPopup('fraction', 'a very small part of something')">fraction</span> of a second</li>
+                                            <li><strong>Ethics:</strong> Responsible photographers never <span class="vocab-link" onclick="showPopup('disturb', 'to interfere with the normal activities of')">disturb</span> or bait wildlife</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('wildlife photography', 'a demanding photographic discipline requiring mastery of fieldcraft, ethology, and optical technology')">Wildlife photography</span> represents the <span class="vocab-link" onclick="showPopup('confluence', 'the junction or coming together of things')">confluence</span> of <span class="vocab-link" onclick="showPopup('ethological', 'relating to the scientific study of animal behaviour')">ethological</span> understanding and photographic <span class="vocab-link" onclick="showPopup('virtuosity', 'great skill in music or another artistic pursuit')">virtuosity</span>.</p>
+                                        <ul>
+                                            <li><strong>Optical considerations:</strong> Super-telephoto <span class="vocab-link" onclick="showPopup('optics', 'the lenses or other components of an optical instrument')">optics</span> paired with high-ISO <span class="vocab-link" onclick="showPopup('capability', 'the power or ability to do something')">capability</span> for low-light environments</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Behavioural', 'relating to the way an animal acts')">Behavioural</span> prediction:</strong> <span class="vocab-link" onclick="showPopup('Intimate', 'very close and detailed')">Intimate</span> knowledge of species enables <span class="vocab-link" onclick="showPopup('preemptive', 'taken as a measure against something anticipated')">preemptive</span> compositional decisions</li>
+                                            <li><strong>Conservation ethics:</strong> The <span class="vocab-link" onclick="showPopup('imperative', 'something that is absolutely necessary')">imperative</span> to document without <span class="vocab-link" onclick="showPopup('perturbing', 'disturbing or causing anxiety to')">perturbing</span> ecological dynamics</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1549366021-9f761d450615?w=800" alt="Wildlife Photography" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Cityscape Photography -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Cityscape Photography</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('cityscape', 'a photograph of a city skyline or urban area')">Cityscape</span> photography captures the beauty of cities — buildings, streets, and lights. The best time to shoot is during the <span class="vocab-link" onclick="showPopup('golden hour', 'the time just after sunrise or before sunset when the light is warm and soft')">golden hour</span> or at night.</p>
+                                        <ul>
+                                            <li><strong>Use a <span class="vocab-link" onclick="showPopup('tripod', 'a three-legged stand that holds the camera steady')">tripod</span>:</strong> It keeps the camera steady for sharp night photos</li>
+                                            <li><strong>Wide-angle lens:</strong> Shows more of the city in one photo</li>
+                                            <li><strong>Leading lines:</strong> Roads and bridges guide the viewer's eye through the image</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('cityscape', 'urban landscape photography emphasizing architecture, infrastructure, and the interplay of light')">Cityscape</span> photography transforms urban environments into <span class="vocab-link" onclick="showPopup('compelling', 'evoking interest or attention in a powerful way')">compelling</span> visual narratives. Mastering <span class="vocab-link" onclick="showPopup('ambient', 'relating to the surrounding environment')">ambient</span> and artificial light is essential.</p>
+                                        <ul>
+                                            <li><strong>Blue hour:</strong> The <span class="vocab-link" onclick="showPopup('twilight', 'the period of soft light after sunset')">twilight</span> period creates a striking balance between artificial city lights and the remaining sky glow</li>
+                                            <li><strong>Long exposure:</strong> Transforms traffic into <span class="vocab-link" onclick="showPopup('luminous', 'giving off light; bright')">luminous</span> light trails</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Perspective', 'the way objects appear based on the viewer position')">Perspective</span> control:</strong> Tilt-shift lenses correct <span class="vocab-link" onclick="showPopup('converging', 'coming together at a point')">converging</span> vertical lines in tall buildings</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('cityscape', 'a genre exploring the aesthetic and documentary dimensions of the built environment')">Cityscape</span> photography <span class="vocab-link" onclick="showPopup('interrogates', 'examines closely and critically')">interrogates</span> the relationship between <span class="vocab-link" onclick="showPopup('vernacular', 'relating to the language or style of ordinary people')">vernacular</span> architecture, urban planning, and the <span class="vocab-link" onclick="showPopup('ephemeral', 'lasting for a very short time')">ephemeral</span> qualities of atmospheric light.</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Crepuscular', 'relating to twilight')">Crepuscular</span> illumination:</strong> The <span class="vocab-link" onclick="showPopup('juxtaposition', 'the act of placing things side by side for contrast')">juxtaposition</span> of natural and artificial light sources during transitional periods</li>
+                                            <li><strong>Temporal <span class="vocab-link" onclick="showPopup('abstraction', 'the process of removing something from a concrete context')">abstraction</span>:</strong> Extended exposures <span class="vocab-link" onclick="showPopup('render', 'to cause to become')">render</span> vehicular movement as <span class="vocab-link" onclick="showPopup('incandescent', 'emitting light as a result of being heated')">incandescent</span> trajectories</li>
+                                            <li><strong>Architectural <span class="vocab-link" onclick="showPopup('rectification', 'the process of correcting or putting right')">rectification</span>:</strong> Perspective-correcting optics or post-processing to maintain <span class="vocab-link" onclick="showPopup('rectilinear', 'contained by or moving in straight lines')">rectilinear</span> integrity</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800" alt="Cityscape Photography" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Composition Techniques -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Composition Techniques</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('composition', 'how elements are arranged in a photograph')">Composition</span> is how you arrange things inside your photo. Good composition makes a photo more interesting and beautiful.</p>
+                                        <ul>
+                                            <li><strong>Rule of thirds:</strong> Imagine your photo divided into 9 squares — place important things where the lines meet</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('foreground', 'the part of the image closest to the viewer')">Foreground</span> interest:</strong> Put something interesting in front to add <span class="vocab-link" onclick="showPopup('depth', 'the appearance of distance in a photo')">depth</span></li>
+                                            <li><strong>Framing:</strong> Use doors, windows, or trees to create a natural <span class="vocab-link" onclick="showPopup('frame', 'a border around the main subject')">frame</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('composition', 'the deliberate arrangement of visual elements to guide the viewer through an image')">Composition</span> is the visual grammar of photography. It determines how a viewer's eye <span class="vocab-link" onclick="showPopup('navigates', 'finds a way through')">navigates</span> the image.</p>
+                                        <ul>
+                                            <li><strong>Rule of thirds:</strong> An <span class="vocab-link" onclick="showPopup('asymmetrical', 'not identical on both sides')">asymmetrical</span> framework that creates dynamic tension</li>
+                                            <li><strong>Leading lines:</strong> Natural or architectural lines that <span class="vocab-link" onclick="showPopup('converge', 'to come together from different directions')">converge</span> toward the focal point</li>
+                                            <li><strong>Negative space:</strong> Deliberate <span class="vocab-link" onclick="showPopup('emptiness', 'the state of containing nothing')">emptiness</span> that emphasizes the subject through <span class="vocab-link" onclick="showPopup('isolation', 'being separated from other things')">isolation</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('composition', 'the orchestration of pictorial elements according to aesthetic principles governing visual perception')">Composition</span> <span class="vocab-link" onclick="showPopup('underpins', 'provides the foundation for')">underpins</span> photographic <span class="vocab-link" onclick="showPopup('eloquence', 'fluent and persuasive expression')">eloquence</span>, governing how viewers <span class="vocab-link" onclick="showPopup('apprehend', 'to understand or perceive')">apprehend</span> and <span class="vocab-link" onclick="showPopup('interpret', 'to explain the meaning of')">interpret</span> visual information.</p>
+                                        <ul>
+                                            <li><strong>Golden ratio:</strong> A mathematically <span class="vocab-link" onclick="showPopup('derived', 'obtained from a particular source')">derived</span> <span class="vocab-link" onclick="showPopup('proportional', 'corresponding in size or amount')">proportional</span> framework rooted in classical aesthetics</li>
+                                            <li><strong>Visual <span class="vocab-link" onclick="showPopup('hierarchy', 'a system of ranking by importance')">hierarchy</span>:</strong> The <span class="vocab-link" onclick="showPopup('stratification', 'the arrangement of something into layers')">stratification</span> of elements to establish <span class="vocab-link" onclick="showPopup('primacy', 'the state of being first in importance')">primacy</span> and subordination</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Juxtaposition', 'the act of placing things side by side for contrast')">Juxtaposition</span>:</strong> The <span class="vocab-link" onclick="showPopup('deliberate', 'done consciously and intentionally')">deliberate</span> placement of <span class="vocab-link" onclick="showPopup('disparate', 'essentially different in kind')">disparate</span> elements to generate visual <span class="vocab-link" onclick="showPopup('tension', 'a feeling of strain or suspense')">tension</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1500051638674-ff996a0ec29e?w=800" alt="Composition" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Aperture & Depth of Field -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Aperture & Depth of Field</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The <span class="vocab-link" onclick="showPopup('aperture', 'the hole in the lens that lets light into the camera')">aperture</span> is the opening in the lens. It controls how much light enters and how much of the photo is in <span class="vocab-link" onclick="showPopup('focus', 'the sharpness of an image')">focus</span>.</p>
+                                        <ul>
+                                            <li><strong>Wide aperture (f/1.8):</strong> The background is <span class="vocab-link" onclick="showPopup('blurry', 'not clear or sharp')">blurry</span> — perfect for portraits</li>
+                                            <li><strong>Narrow aperture (f/16):</strong> Everything is sharp — perfect for landscapes</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Bokeh', 'the pleasant blur in the out-of-focus areas of a photo')">Bokeh</span>:</strong> The beautiful blurry circles you see in the background of portrait photos</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('aperture', 'the adjustable diaphragm opening that regulates light transmission and depth of field')">Aperture</span>, measured in <span class="vocab-link" onclick="showPopup('f-stops', 'numerical values representing the ratio of focal length to aperture diameter')">f-stops</span>, governs <span class="vocab-link" onclick="showPopup('depth of field', 'the range of distance within a photo that appears acceptably sharp')">depth of field</span> — a critical creative tool.</p>
+                                        <ul>
+                                            <li><strong>Shallow depth of field (f/1.4–f/2.8):</strong> Isolates subjects from distracting backgrounds with <span class="vocab-link" onclick="showPopup('creamy', 'smooth and pleasing in quality')">creamy</span> bokeh</li>
+                                            <li><strong>Deep depth of field (f/11–f/22):</strong> Maximizes sharpness across the entire <span class="vocab-link" onclick="showPopup('focal plane', 'the area in front of the camera that is in focus')">focal plane</span></li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Hyperfocal', 'the closest focus distance at which everything to infinity is acceptably sharp')">Hyperfocal</span> distance:</strong> A technique landscape photographers use to maximize sharpness</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('aperture', 'the iris-like mechanism controlling luminous flux and the geometric depth of the zone of acceptable sharpness')">Aperture</span> represents perhaps the most <span class="vocab-link" onclick="showPopup('consequential', 'having important results or effects')">consequential</span> creative variable, simultaneously modulating <span class="vocab-link" onclick="showPopup('luminance', 'the intensity of light emitted from a surface')">luminance</span> and spatial <span class="vocab-link" onclick="showPopup('delineation', 'the description or portrayal of something in detail')">delineation</span>.</p>
+                                        <ul>
+                                            <li><strong>Selective focus:</strong> Employing <span class="vocab-link" onclick="showPopup('razor-thin', 'extremely narrow')">razor-thin</span> focal planes to <span class="vocab-link" onclick="showPopup('decontextualize', 'to remove from the original context')">decontextualize</span> subjects from their environment</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Diffraction', 'the bending of light waves around the edges of an obstacle')">Diffraction</span> limitations:</strong> Excessively narrow apertures introduce optical <span class="vocab-link" onclick="showPopup('degradation', 'the condition of becoming worse')">degradation</span> through diffraction effects</li>
+                                            <li><strong>Bokeh <span class="vocab-link" onclick="showPopup('morphology', 'the study of the form and structure of things')">morphology</span>:</strong> Lens design <span class="vocab-link" onclick="showPopup('dictates', 'determines or controls')">dictates</span> the character of out-of-focus <span class="vocab-link" onclick="showPopup('rendition', 'the way something is presented or performed')">rendition</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1495745966610-2a67f2297e5e?w=800" alt="Aperture" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Portrait & Street Photography -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Portrait & Street Photography</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('portrait photography', 'taking photographs of people, usually focusing on the face')">Portrait photography</span> captures people's faces and expressions. <span class="vocab-link" onclick="showPopup('street photography', 'taking photographs of everyday life in public places')">Street photography</span> captures everyday life in public places.</p>
+                                        <ul>
+                                            <li><strong>Portraits:</strong> Use a wide aperture to blur the background and make the person stand out</li>
+                                            <li><strong>Natural light:</strong> Soft light from a window creates beautiful <span class="vocab-link" onclick="showPopup('shadows', 'dark areas created when light is blocked')">shadows</span></li>
+                                            <li><strong>Street photos:</strong> Be ready to shoot quickly — interesting moments happen fast!</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('portrait photography', 'a genre focused on capturing the personality and mood of a subject')">Portrait photography</span> aims to reveal character, while <span class="vocab-link" onclick="showPopup('street photography', 'candid documentation of public life and human interaction')">street photography</span> documents the <span class="vocab-link" onclick="showPopup('spontaneous', 'performed without planning; natural')">spontaneous</span> theatre of daily life.</p>
+                                        <ul>
+                                            <li><strong>Environmental portraits:</strong> Subjects photographed in their natural <span class="vocab-link" onclick="showPopup('habitat', 'the natural environment of a person or thing')">habitat</span> to add narrative context</li>
+                                            <li><strong>Candid vs. posed:</strong> <span class="vocab-link" onclick="showPopup('Candid', 'taken without the subject being aware')">Candid</span> shots often feel more authentic than <span class="vocab-link" onclick="showPopup('staged', 'arranged for effect')">staged</span> portraits</li>
+                                            <li><strong>The decisive moment:</strong> Henri Cartier-Bresson's philosophy of capturing <span class="vocab-link" onclick="showPopup('fleeting', 'lasting for a very short time')">fleeting</span> instants</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('portrait photography', 'an intimate genre that excavates the psychological and emotional dimensions of human subjects')">Portrait photography</span> and <span class="vocab-link" onclick="showPopup('street photography', 'a documentary genre capturing the serendipitous choreography of public existence')">street photography</span> occupy <span class="vocab-link" onclick="showPopup('complementary', 'combining in such a way as to enhance each other')">complementary</span> positions on the spectrum of human <span class="vocab-link" onclick="showPopup('documentation', 'the process of recording information')">documentation</span>.</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Physiognomic', 'relating to facial features and expressions')">Physiognomic</span> revelation:</strong> Masterful portraiture <span class="vocab-link" onclick="showPopup('excavates', 'uncovers or reveals through careful investigation')">excavates</span> psychological depth through nuanced lighting and <span class="vocab-link" onclick="showPopup('rapport', 'a close and harmonious relationship')">rapport</span></li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Serendipitous', 'occurring by happy chance')">Serendipitous</span> encounters:</strong> Street photography <span class="vocab-link" onclick="showPopup('distills', 'extracts the essential meaning of')">distills</span> the chaotic urban experience into singular, <span class="vocab-link" onclick="showPopup('evocative', 'bringing strong feelings to mind')">evocative</span> frames</li>
+                                            <li><strong>Ethical <span class="vocab-link" onclick="showPopup('considerations', 'careful thought about something')">considerations</span>:</strong> Navigating consent and <span class="vocab-link" onclick="showPopup('voyeurism', 'the practice of gaining pleasure from observing others')">voyeurism</span> in public documentation</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800" alt="Portrait Photography" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Remember these important points:</p>
+                                        <ul>
+                                            <li><strong>Shutter speed:</strong> Controls how movement looks — fast freezes, slow blurs</li>
+                                            <li><strong>Aperture:</strong> Controls background blur — wide for portraits, narrow for landscapes</li>
+                                            <li><strong>Composition:</strong> Arrange elements carefully using the rule of thirds</li>
+                                            <li><strong>Practice:</strong> The best way to improve is to take lots of photos!</li>
+                                            <li><strong>Light is everything:</strong> Golden hour and blue hour produce the most beautiful light</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Essential takeaways from this lesson:</p>
+                                        <ul>
+                                            <li><strong>The exposure triangle:</strong> Shutter speed, aperture, and ISO work together — mastering their <span class="vocab-link" onclick="showPopup('interplay', 'the way in which things have an effect on each other')">interplay</span> is fundamental</li>
+                                            <li><strong>Genre diversity:</strong> Wildlife, cityscapes, portraits, and street photography each demand distinct skills</li>
+                                            <li><strong>Composition matters:</strong> Technical perfection without strong composition produces <span class="vocab-link" onclick="showPopup('forgettable', 'easily forgotten; not memorable')">forgettable</span> images</li>
+                                            <li><strong>Light awareness:</strong> Understanding natural and artificial light <span class="vocab-link" onclick="showPopup('elevates', 'raises to a higher level')">elevates</span> every genre of photography</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('Salient', 'most noticeable or important')">Salient</span> conclusions:</p>
+                                        <ul>
+                                            <li><strong>Technical <span class="vocab-link" onclick="showPopup('fluency', 'the ability to express oneself easily and articulately')">fluency</span>:</strong> <span class="vocab-link" onclick="showPopup('Internalizing', 'making attitudes or behaviour part of one\'s nature')">Internalizing</span> exposure mechanics liberates creative bandwidth for artistic decision-making</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Interdisciplinary', 'involving two or more branches of knowledge')">Interdisciplinary</span> knowledge:</strong> Superior photography demands understanding of optics, psychology, and aesthetics</li>
+                                            <li><strong>Ethical <span class="vocab-link" onclick="showPopup('stewardship', 'the responsible management of something entrusted to one\'s care')">stewardship</span>:</strong> Photographers bear responsibility for how they represent subjects and environments</li>
+                                            <li><strong>Perpetual <span class="vocab-link" onclick="showPopup('refinement', 'the process of making small changes to improve something')">refinement</span>:</strong> Mastery emerges through <span class="vocab-link" onclick="showPopup('iterative', 'involving repetition of a process')">iterative</span> practice and critical self-assessment</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1471341971476-ae15ff5dd4ea?w=800" alt="Takeaways" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Shutter speed</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">How long the camera lets light in when you take a photo</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Aperture</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The hole in the lens that lets light into the camera</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Composition</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">How elements are arranged in a photograph</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Tripod</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A three-legged stand that holds the camera steady</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Golden hour</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The time just after sunrise or before sunset when light is warm and soft</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Bokeh</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The pleasant blur in the out-of-focus areas of a photo</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Foreground</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The part of the image closest to the viewer</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Telephoto lens</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A camera lens that makes faraway things look closer</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Exposure</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The amount of light that reaches the camera sensor</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Depth of field</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The range of distance within a photo that appears acceptably sharp</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">ISO</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A measure of the camera sensor's sensitivity to light</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Candid</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Taken without the subject being aware or posed</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Perspective</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The way objects appear based on the viewer's position</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ambient</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Relating to the surrounding environment or existing light</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hyperfocal</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The closest focus distance at which everything to infinity is sharp</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ethereal</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Extremely delicate and light; heavenly in quality</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Daguerreotype</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An early photographic process using silver-coated copper plates</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Diffraction</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The bending of light waves around edges, causing softness at narrow apertures</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Juxtaposition</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The act of placing things side by side for contrast or comparison</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ephemeral</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Lasting for a very short time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Rectilinear</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Contained by or moving in straight lines</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Luminance</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The intensity of light emitted from a surface</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Serendipitous</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Occurring by happy chance; fortunate</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Paradigmatic</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Serving as a typical example or model of something</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>Choose a type of photography that interests you (wildlife, cityscape, portrait, or street photography). Describe why it appeals to you, what equipment and techniques you would need, and what kind of photo you would most like to capture. Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Photography - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Shutter speed", definition: "How long the camera lets light in", sentences: ["A fast ___ freezes movement.", "Adjust the ___ for night photos.", "The ___ controls motion blur."] },
+                { term: "Aperture", definition: "The hole in the lens that lets light in", sentences: ["A wide ___ blurs the background.", "Set the ___ to f/16 for landscapes.", "The ___ controls depth of field."] },
+                { term: "Composition", definition: "How elements are arranged in a photo", sentences: ["Good ___ makes photos more interesting.", "The rule of thirds improves ___.", "Think about ___ before you shoot."] },
+                { term: "Tripod", definition: "A three-legged stand for the camera", sentences: ["Use a ___ for night photography.", "A ___ keeps the camera steady.", "Set up your ___ on flat ground."] },
+                { term: "Golden hour", definition: "The warm light just after sunrise or before sunset", sentences: ["Photographers love the ___.", "The ___ gives photos warm colours.", "Shoot portraits during the ___."] },
+                { term: "Bokeh", definition: "The pleasant blur in out-of-focus areas", sentences: ["Portrait photos have beautiful ___.", "The ___ makes the subject stand out.", "A wide aperture creates smooth ___."] },
+                { term: "Foreground", definition: "The part of the image closest to the viewer", sentences: ["Add a rock in the ___ for depth.", "The ___ should be interesting.", "Place flowers in the ___ of your shot."] },
+                { term: "Telephoto lens", definition: "A lens that makes faraway things look closer", sentences: ["Use a ___ for wildlife photos.", "A ___ lets you shoot from a distance.", "The ___ is heavy but powerful."] }
+            ],
+            B2: [
+                { term: "Exposure", definition: "The amount of light reaching the sensor", sentences: ["Correct ___ is essential for good photos.", "Adjust your ___ for bright conditions.", "The ___ triangle balances three settings."] },
+                { term: "Depth of field", definition: "The range of distance that appears sharp", sentences: ["A shallow ___ isolates the subject.", "Landscapes need a deep ___.", "Control ___ with your aperture setting."] },
+                { term: "ISO", definition: "The sensor's sensitivity to light", sentences: ["Raise the ___ in dark conditions.", "High ___ can introduce noise.", "Keep the ___ as low as possible."] },
+                { term: "Candid", definition: "Taken without the subject being aware", sentences: ["___ photos feel more natural.", "Street photographers prefer ___ shots.", "A ___ portrait reveals true emotion."] },
+                { term: "Perspective", definition: "The way objects appear based on position", sentences: ["Change your ___ for a unique shot.", "Low ___ makes subjects look powerful.", "Aerial ___ shows patterns from above."] },
+                { term: "Ambient", definition: "Relating to surrounding or existing light", sentences: ["Use ___ light for natural portraits.", "___ lighting creates atmosphere.", "Balance flash with ___ light."] },
+                { term: "Hyperfocal", definition: "The focus distance maximizing overall sharpness", sentences: ["Set the ___ distance for landscapes.", "The ___ technique ensures front-to-back sharpness.", "Calculate the ___ point for your lens."] },
+                { term: "Ethereal", definition: "Extremely delicate and light; heavenly", sentences: ["Long exposures create an ___ effect.", "The mist gave the scene an ___ quality.", "Soft light produces ___ portraits."] }
+            ],
+            C1: [
+                { term: "Daguerreotype", definition: "An early photographic process on metal plates", sentences: ["The ___ was the first commercial photo process.", "A ___ requires long exposure times.", "Museums preserve original ___ images."] },
+                { term: "Diffraction", definition: "Light bending that softens images at narrow apertures", sentences: ["___ limits sharpness at f/22.", "Avoid ___ by not closing the aperture too far.", "Lens ___ is a physical limitation."] },
+                { term: "Juxtaposition", definition: "Placing contrasting elements side by side", sentences: ["The ___ of old and new creates interest.", "Use ___ to tell a visual story.", "Strong ___ evokes emotional responses."] },
+                { term: "Ephemeral", definition: "Lasting for a very short time", sentences: ["Photography captures ___ moments.", "The ___ light of dawn disappeared quickly.", "Street photography documents ___ scenes."] },
+                { term: "Rectilinear", definition: "Contained by or moving in straight lines", sentences: ["A ___ lens corrects barrel distortion.", "Architecture demands ___ precision.", "___ projection preserves straight lines."] },
+                { term: "Luminance", definition: "The intensity of light from a surface", sentences: ["High ___ areas draw the viewer's eye.", "Balance ___ across the frame.", "The ___ range exceeded the sensor's capacity."] },
+                { term: "Serendipitous", definition: "Occurring by happy chance", sentences: ["The best street photos are ___.", "A ___ encounter produced a stunning image.", "Photography rewards ___ observation."] },
+                { term: "Paradigmatic", definition: "Serving as a typical example or model", sentences: ["Ansel Adams is a ___ landscape photographer.", "The image became ___ of the genre.", "A ___ shift occurred with digital photography."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
