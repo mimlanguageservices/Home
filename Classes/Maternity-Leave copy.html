@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Maternity Leave - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Maternity Leave</h1>
+        <p class="game-subtitle">Balancing Work and Family Around the World</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>Maternity Leave</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title Image -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">Maternity Leave</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Balancing Work and Family Around the World</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/JhClkCvnKMU?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What is Maternity Leave? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What is Maternity Leave?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('maternity leave', 'time off work given to a mother before and after having a baby')">Maternity leave</span> is time off work that a woman gets when she has a baby. During this time, the mother can rest and take care of her <span class="vocab-link" onclick="showPopup('newborn', 'a baby that has just been born')">newborn</span>.</p>
+                                        <p>In most countries, the government or the <span class="vocab-link" onclick="showPopup('employer', 'a person or company that pays people to work for them')">employer</span> pays the mother during her leave. This is called <span class="vocab-link" onclick="showPopup('paid leave', 'time off work when you still receive your salary')">paid leave</span>. The amount of time and money varies from country to country.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('maternity leave', 'a period of authorized absence from work granted to a mother before and after childbirth')">Maternity leave</span> is a fundamental <span class="vocab-link" onclick="showPopup('entitlement', 'the right to receive something, guaranteed by law')">entitlement</span> that allows mothers to recover from childbirth and bond with their newborn children. It is protected by <span class="vocab-link" onclick="showPopup('legislation', 'laws made by a government')">legislation</span> in nearly every country worldwide.</p>
+                                        <p>The International Labour Organization (ILO) recommends a minimum of 14 weeks of <span class="vocab-link" onclick="showPopup('statutory', 'required or set by law')">statutory</span> maternity leave. However, the duration, payment rate, and eligibility criteria differ dramatically between nations.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('maternity leave', 'a legally protected period of absence from employment granted to birthing parents, situated at the intersection of labour law, reproductive rights, and social policy')">Maternity leave</span> represents a critical <span class="vocab-link" onclick="showPopup('provision', 'the act of supplying or making something available')">provision</span> at the intersection of labour law, reproductive rights, and socioeconomic policy. Its implementation reflects a society's commitment to <span class="vocab-link" onclick="showPopup('equitable', 'fair and just for everyone involved')">equitable</span> treatment of working parents.</p>
+                                        <p>The <span class="vocab-link" onclick="showPopup('disparity', 'a great difference or inequality')">disparity</span> in global maternity leave frameworks reveals deep ideological divisions regarding the role of the state in family life, the <span class="vocab-link" onclick="showPopup('remuneration', 'payment or compensation for work or services')">remuneration</span> of caregiving labour, and the <span class="vocab-link" onclick="showPopup('socioeconomic', 'relating to both social and economic factors')">socioeconomic</span> value placed on parenthood.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800" alt="Mother and Baby" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Maternity Leave Around the World -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Maternity Leave Around the World</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Different countries give mothers very different amounts of time off. Some countries are very generous, while others give very little — or nothing at all.</p>
+                                        <ul>
+                                            <li><strong>Sweden:</strong> Parents share 480 days of <span class="vocab-link" onclick="showPopup('paid leave', 'time off work when you still receive your salary')">paid leave</span> — one of the most generous in the world</li>
+                                            <li><strong>United Kingdom:</strong> Mothers can take up to 52 weeks, but only 39 weeks are paid</li>
+                                            <li><strong>United States:</strong> There is no national <span class="vocab-link" onclick="showPopup('paid leave', 'time off work when you still receive your salary')">paid leave</span> — only 12 weeks of unpaid leave</li>
+                                            <li><strong>Brazil:</strong> Mothers receive 120 days of fully paid leave</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Global maternity leave <span class="vocab-link" onclick="showPopup('legislation', 'laws made by a government')">legislation</span> reveals striking <span class="vocab-link" onclick="showPopup('discrimination', 'unfair treatment of a person based on their group or characteristics')">inequalities</span>. While Nordic countries set the gold standard, several nations offer minimal or no protections.</p>
+                                        <ul>
+                                            <li><strong>Estonia:</strong> Offers 86 weeks of leave — the longest in the world — with 20 weeks at 100% pay</li>
+                                            <li><strong>Bulgaria:</strong> Provides 58 weeks at 90% pay, reflecting strong state support for <span class="vocab-link" onclick="showPopup('caregiving', 'the act of looking after someone who needs help, such as a baby or elderly person')">caregiving</span></li>
+                                            <li><strong>Japan:</strong> Offers 14 weeks of <span class="vocab-link" onclick="showPopup('statutory', 'required or set by law')">statutory</span> leave, but cultural pressure discourages many women from taking it</li>
+                                            <li><strong>India:</strong> 26 weeks of paid leave for women in the formal sector, though millions in informal work receive nothing</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The global landscape of maternity leave <span class="vocab-link" onclick="showPopup('provision', 'the act of supplying or making something available')">provision</span> is characterised by profound <span class="vocab-link" onclick="showPopup('disparity', 'a great difference or inequality')">disparities</span> that mirror broader <span class="vocab-link" onclick="showPopup('socioeconomic', 'relating to both social and economic factors')">socioeconomic</span> and ideological fault lines.</p>
+                                        <ul>
+                                            <li><strong>Nordic model:</strong> Comprehensive, state-funded systems offering extensive leave with high <span class="vocab-link" onclick="showPopup('remuneration', 'payment or compensation for work or services')">remuneration</span> rates, underpinned by a philosophy of shared parental responsibility</li>
+                                            <li><strong>Anglo-Saxon model:</strong> Moderate <span class="vocab-link" onclick="showPopup('statutory', 'required or set by law')">statutory</span> minimums supplemented by employer discretion, creating a two-tier system favouring privileged workers</li>
+                                            <li><strong>United States:</strong> A conspicuous outlier among developed nations, lacking any federal <span class="vocab-link" onclick="showPopup('mandate', 'an official order or requirement given by an authority')">mandate</span> for paid leave — a <span class="vocab-link" onclick="showPopup('contentious', 'causing or likely to cause disagreement or argument')">contentious</span> political issue</li>
+                                            <li><strong>Developing nations:</strong> Formal-sector protections frequently fail to reach the vast informal workforce, producing <span class="vocab-link" onclick="showPopup('disproportionate', 'too large or too small in comparison to something else')">disproportionate</span> coverage gaps</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800" alt="World Globe" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - The Best & Worst Policies -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Best & Worst Policies</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Scandinavian countries like Sweden, Norway, and Finland have the best <span class="vocab-link" onclick="showPopup('policy', 'a set of rules or a plan made by a company or government')">policies</span>. They believe that both parents should spend time with their children.</p>
+                                        <ul>
+                                            <li><strong>Best:</strong> Norway gives 49 weeks at full pay or 59 weeks at 80% pay</li>
+                                            <li><strong>Best:</strong> Finland recently gave both parents equal leave — about 7 months each</li>
+                                            <li><strong>Worst:</strong> The USA gives no <span class="vocab-link" onclick="showPopup('paid leave', 'time off work when you still receive your salary')">paid leave</span> at the national level</li>
+                                            <li><strong>Worst:</strong> Papua New Guinea has no maternity leave law at all</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The gap between the most and least generous maternity leave systems is enormous. Countries with strong social safety nets tend to offer the best <span class="vocab-link" onclick="showPopup('entitlement', 'the right to receive something, guaranteed by law')">entitlements</span>, while those with market-driven approaches lag behind.</p>
+                                        <ul>
+                                            <li><strong>Norway:</strong> Pioneered the "daddy quota" — weeks reserved exclusively for fathers to promote shared <span class="vocab-link" onclick="showPopup('caregiving', 'the act of looking after someone who needs help, such as a baby or elderly person')">caregiving</span></li>
+                                            <li><strong>Germany:</strong> Offers 14 months of shared parental leave at 65% pay, encouraging <span class="vocab-link" onclick="showPopup('gender gap', 'the difference between men and women in areas like pay or opportunities')">gender equality</span></li>
+                                            <li><strong>United States:</strong> One of only seven countries worldwide with zero guaranteed paid parental leave</li>
+                                            <li><strong>Impact:</strong> Countries with poor leave policies see higher rates of maternal depression and infant health problems</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The <span class="vocab-link" onclick="showPopup('disparity', 'a great difference or inequality')">disparity</span> between progressive and regressive parental leave frameworks illuminates fundamental ideological tensions between collectivist welfare states and individualist market economies.</p>
+                                        <ul>
+                                            <li><strong>Nordic excellence:</strong> Policies deliberately engineered to <span class="vocab-link" onclick="showPopup('mandate', 'an official order or requirement given by an authority')">mandate</span> paternal participation, thereby disrupting traditional gender roles at a structural level</li>
+                                            <li><strong>Eastern European generosity:</strong> Extended leave periods (Hungary: 160 weeks) that, paradoxically, can reinforce gendered divisions of labour by keeping women out of the workforce</li>
+                                            <li><strong>American exceptionalism:</strong> The absence of federal paid leave reflects a deeply <span class="vocab-link" onclick="showPopup('contentious', 'causing or likely to cause disagreement or argument')">contentious</span> political landscape where family policy is framed as private rather than public responsibility</li>
+                                            <li><strong>Unintended consequences:</strong> Overly generous leave can paradoxically produce <span class="vocab-link" onclick="showPopup('disproportionate', 'too large or too small in comparison to something else')">disproportionate</span> career penalties for women if not paired with shared parental incentives</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1504439468489-c8920d796a29?w=800" alt="Family Support" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Workplace Conflicts & Discrimination -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Workplace Conflicts & Discrimination</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Unfortunately, many women face problems at work because of <span class="vocab-link" onclick="showPopup('maternity leave', 'time off work given to a mother before and after having a baby')">maternity leave</span>. Some <span class="vocab-link" onclick="showPopup('employer', 'a person or company that pays people to work for them')">employers</span> treat <span class="vocab-link" onclick="showPopup('pregnant', 'carrying a baby inside the body')">pregnant</span> women unfairly.</p>
+                                        <ul>
+                                            <li><strong>Job loss:</strong> Some women lose their jobs when they tell their boss they are pregnant</li>
+                                            <li><strong>Fewer opportunities:</strong> After returning, mothers may not get promotions or raises</li>
+                                            <li><strong>Pressure to return early:</strong> Some women feel they must go back to work too soon because they need the money</li>
+                                            <li><strong>Judgement:</strong> Colleagues may think a mother is less committed to her work</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Pregnancy <span class="vocab-link" onclick="showPopup('discrimination', 'unfair treatment of a person based on their group or characteristics')">discrimination</span> remains widespread despite legal protections. The so-called "motherhood penalty" refers to the systematic disadvantages women face in their careers after having children.</p>
+                                        <ul>
+                                            <li><strong>The "motherhood penalty":</strong> Studies show mothers earn 5–10% less per child compared to childless women, widening the <span class="vocab-link" onclick="showPopup('gender gap', 'the difference between men and women in areas like pay or opportunities')">gender gap</span></li>
+                                            <li><strong>Hiring bias:</strong> Research shows <span class="vocab-link" onclick="showPopup('pregnant', 'carrying a baby inside the body')">pregnant</span> women and mothers are less likely to be called for job interviews</li>
+                                            <li><strong>Career derailment:</strong> Many women are moved to less important roles after <span class="vocab-link" onclick="showPopup('reintegration', 'the process of returning and adjusting back to a previous situation')">reintegration</span>, a practice known as "mommy-tracking"</li>
+                                            <li><strong>Legal battles:</strong> Despite <span class="vocab-link" onclick="showPopup('legislation', 'laws made by a government')">legislation</span>, proving workplace discrimination is notoriously difficult</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Workplace <span class="vocab-link" onclick="showPopup('discrimination', 'unfair treatment of a person based on their group or characteristics')">discrimination</span> against pregnant women and new mothers constitutes one of the most pervasive yet underreported forms of labour rights violations. The phenomenon operates through both overt and insidious mechanisms.</p>
+                                        <ul>
+                                            <li><strong>Structural bias:</strong> The "motherhood penalty" reflects deeply embedded institutional norms that <span class="vocab-link" onclick="showPopup('disproportionate', 'too large or too small in comparison to something else')">disproportionately</span> penalise women's career trajectories while conferring a "fatherhood bonus" on men</li>
+                                            <li><strong>Intersectional vulnerability:</strong> Women of lower <span class="vocab-link" onclick="showPopup('socioeconomic', 'relating to both social and economic factors')">socioeconomic</span> status, racial minorities, and informal workers face compounded disadvantages</li>
+                                            <li><strong>Constructive dismissal:</strong> Employers may circumvent legal protections through role reassignment, reduced responsibilities, or hostile work environments that compel voluntary resignation</li>
+                                            <li><strong>Evidentiary challenges:</strong> The burden of proof in <span class="vocab-link" onclick="showPopup('discrimination', 'unfair treatment of a person based on their group or characteristics')">discrimination</span> cases remains prohibitively high, rendering legal <span class="vocab-link" onclick="showPopup('provision', 'the act of supplying or making something available')">provisions</span> inadequate in practice</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800" alt="Workplace" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Paternity Leave & Shared Parental Leave -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Paternity Leave & Shared Parental Leave</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('paternity leave', 'time off work given to a father after his baby is born')">Paternity leave</span> is time off work for fathers. In many countries, fathers get very little time off — sometimes just a few days. But things are changing.</p>
+                                        <ul>
+                                            <li><strong>Sweden:</strong> Fathers must take at least 90 days of leave — it cannot be given to the mother</li>
+                                            <li><strong>Spain:</strong> Since 2021, fathers get 16 weeks of fully paid leave — equal to mothers</li>
+                                            <li><strong>Japan:</strong> Offers generous <span class="vocab-link" onclick="showPopup('paternity leave', 'time off work given to a father after his baby is born')">paternity leave</span> on paper, but very few fathers actually take it</li>
+                                            <li><strong>Why it matters:</strong> When fathers take leave, it helps mothers return to work and creates stronger family <span class="vocab-link" onclick="showPopup('benefits', 'money or other help provided by the government or an employer')">bonds</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The expansion of <span class="vocab-link" onclick="showPopup('paternity leave', 'time off work given to a father after his baby is born')">paternity leave</span> is increasingly recognised as essential for closing the <span class="vocab-link" onclick="showPopup('gender gap', 'the difference between men and women in areas like pay or opportunities')">gender gap</span>. When both parents share <span class="vocab-link" onclick="showPopup('caregiving', 'the act of looking after someone who needs help, such as a baby or elderly person')">caregiving</span> responsibilities, women's career outcomes improve significantly.</p>
+                                        <ul>
+                                            <li><strong>The Nordic approach:</strong> "Use-it-or-lose-it" policies reserve weeks exclusively for fathers, combating the stigma of men taking leave</li>
+                                            <li><strong>Cultural resistance:</strong> In Japan, only 14% of eligible fathers took paternity leave in 2022, despite generous <span class="vocab-link" onclick="showPopup('statutory', 'required or set by law')">statutory</span> provisions — a phenomenon known as "patahara" (paternity harassment)</li>
+                                            <li><strong>The <span class="vocab-link" onclick="showPopup('breadwinner', 'the person who earns the most money in a family')">breadwinner</span> myth:</strong> Traditional expectations that men should prioritise earning over <span class="vocab-link" onclick="showPopup('caregiving', 'the act of looking after someone who needs help, such as a baby or elderly person')">caregiving</span> persist worldwide</li>
+                                            <li><strong>Evidence:</strong> Countries with strong paternity leave see higher female workforce participation and lower divorce rates</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The evolution of paternity and shared parental leave constitutes a <span class="vocab-link" onclick="showPopup('contentious', 'causing or likely to cause disagreement or argument')">contentious</span> frontier in the pursuit of <span class="vocab-link" onclick="showPopup('equitable', 'fair and just for everyone involved')">equitable</span> labour practices, challenging entrenched cultural paradigms surrounding masculinity and <span class="vocab-link" onclick="showPopup('caregiving', 'the act of looking after someone who needs help, such as a baby or elderly person')">caregiving</span>.</p>
+                                        <ul>
+                                            <li><strong>Behavioural economics:</strong> Non-transferable "daddy quotas" leverage loss aversion to overcome cultural inertia — when leave is designated "use-it-or-lose-it," uptake increases dramatically</li>
+                                            <li><strong>Japanese paradox:</strong> The <span class="vocab-link" onclick="showPopup('disparity', 'a great difference or inequality')">disparity</span> between Japan's generous statutory <span class="vocab-link" onclick="showPopup('provision', 'the act of supplying or making something available')">provisions</span> and abysmal uptake rates illustrates that legislation alone is insufficient without cultural transformation</li>
+                                            <li><strong>Redistributive potential:</strong> Shared leave <span class="vocab-link" onclick="showPopup('mandate', 'an official order or requirement given by an authority')">mandates</span> function as structural interventions against the <span class="vocab-link" onclick="showPopup('disproportionate', 'too large or too small in comparison to something else')">disproportionate</span> allocation of unpaid domestic labour</li>
+                                            <li><strong>Corporate resistance:</strong> Employers in competitive industries frequently create implicit penalties for fathers who exercise their <span class="vocab-link" onclick="showPopup('entitlement', 'the right to receive something, guaranteed by law')">entitlements</span>, perpetuating gendered norms</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800" alt="Father and Baby" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - The Economic Argument -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Economic Argument</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Some people think maternity leave is expensive for companies. But research shows that good <span class="vocab-link" onclick="showPopup('policy', 'a set of rules or a plan made by a company or government')">policies</span> actually help businesses in many ways.</p>
+                                        <ul>
+                                            <li><strong>Keeping workers:</strong> Women are more likely to return to the same company if they receive good <span class="vocab-link" onclick="showPopup('benefits', 'money or other help provided by the government or an employer')">benefits</span></li>
+                                            <li><strong>Saving money:</strong> Replacing a worker costs much more than paying for maternity leave</li>
+                                            <li><strong>Happier workers:</strong> Employees who feel supported work harder and stay longer</li>
+                                            <li><strong>Better for everyone:</strong> When mothers can work, the whole economy grows</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The economic case for comprehensive parental leave is compelling. Far from being merely a cost, well-designed leave policies generate significant returns for employers, workers, and national economies alike.</p>
+                                        <ul>
+                                            <li><strong>Retention savings:</strong> Replacing an employee costs 50–200% of their annual salary; paid leave dramatically reduces turnover among skilled workers</li>
+                                            <li><strong>GDP impact:</strong> McKinsey estimates that closing the <span class="vocab-link" onclick="showPopup('gender gap', 'the difference between men and women in areas like pay or opportunities')">gender gap</span> in workforce participation could add $12 trillion to global GDP</li>
+                                            <li><strong>Health economics:</strong> Adequate leave reduces healthcare costs by improving maternal and infant health outcomes, lowering <span class="vocab-link" onclick="showPopup('statutory', 'required or set by law')">public health</span> expenditure</li>
+                                            <li><strong>Competitive advantage:</strong> Companies offering strong parental <span class="vocab-link" onclick="showPopup('benefits', 'money or other help provided by the government or an employer')">benefits</span> attract top talent in competitive labour markets</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The macroeconomic implications of parental leave policy extend far beyond individual firms, constituting a significant determinant of national productivity, labour force composition, and <span class="vocab-link" onclick="showPopup('socioeconomic', 'relating to both social and economic factors')">socioeconomic</span> mobility.</p>
+                                        <ul>
+                                            <li><strong>Human capital preservation:</strong> Inadequate leave <span class="vocab-link" onclick="showPopup('provision', 'the act of supplying or making something available')">provisions</span> precipitate the permanent departure of skilled women from the workforce, representing a substantial loss of institutional knowledge and training investment</li>
+                                            <li><strong>Fiscal multiplier effects:</strong> State-funded parental leave generates positive fiscal returns through sustained tax revenue from retained workers, reduced welfare dependency, and decreased healthcare expenditure</li>
+                                            <li><strong>Demographic sustainability:</strong> Nations with <span class="vocab-link" onclick="showPopup('equitable', 'fair and just for everyone involved')">equitable</span> leave frameworks maintain healthier birth rates, mitigating the economic challenges of population ageing</li>
+                                            <li><strong>The cost of inaction:</strong> The absence of <span class="vocab-link" onclick="showPopup('mandate', 'an official order or requirement given by an authority')">mandated</span> leave produces <span class="vocab-link" onclick="showPopup('disproportionate', 'too large or too small in comparison to something else')">disproportionate</span> burdens on lower-income families, exacerbating inequality and constraining intergenerational mobility</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800" alt="Business Economics" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Cultural Perspectives & Challenges -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Cultural Perspectives & Challenges</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Different cultures have different ideas about maternity leave. In some places, it is normal for mothers to stay home for a long time. In others, women feel pressure to return to work quickly.</p>
+                                        <ul>
+                                            <li><strong>Traditional views:</strong> In some cultures, people believe mothers should stay home and the father should be the <span class="vocab-link" onclick="showPopup('breadwinner', 'the person who earns the most money in a family')">breadwinner</span></li>
+                                            <li><strong>Modern views:</strong> Many people now believe both parents should share the work of raising a child</li>
+                                            <li><strong>Social pressure:</strong> Some mothers feel guilty for working, while others feel guilty for not working</li>
+                                            <li><strong>Single mothers:</strong> Women raising children alone face the biggest challenges with leave and money</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Cultural attitudes toward maternity leave are shaped by deeply rooted beliefs about gender roles, family structure, and the relationship between work and <span class="vocab-link" onclick="showPopup('caregiving', 'the act of looking after someone who needs help, such as a baby or elderly person')">caregiving</span>. These perspectives often conflict with modern <span class="vocab-link" onclick="showPopup('legislation', 'laws made by a government')">legislation</span>.</p>
+                                        <ul>
+                                            <li><strong>East Asian paradox:</strong> Countries like Japan and South Korea offer generous leave but face cultural barriers — women who take full leave risk being seen as uncommitted to their careers</li>
+                                            <li><strong>Latin American approach:</strong> Strong family-oriented cultures support extended leave but often reinforce the <span class="vocab-link" onclick="showPopup('breadwinner', 'the person who earns the most money in a family')">breadwinner</span>–homemaker model</li>
+                                            <li><strong>The stigma of <span class="vocab-link" onclick="showPopup('reintegration', 'the process of returning and adjusting back to a previous situation')">reintegration</span>:</strong> Returning mothers frequently report feeling "out of the loop" and struggling to reassert their professional identity</li>
+                                            <li><strong>Informal economies:</strong> In many developing countries, the majority of women work in sectors where <span class="vocab-link" onclick="showPopup('statutory', 'required or set by law')">statutory</span> protections simply do not apply</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The cultural dimensions of maternity leave reveal the <span class="vocab-link" onclick="showPopup('contentious', 'causing or likely to cause disagreement or argument')">contentious</span> negotiation between progressive policy frameworks and deeply ingrained societal norms regarding gender, labour, and familial obligation.</p>
+                                        <ul>
+                                            <li><strong>Cognitive dissonance in East Asia:</strong> The <span class="vocab-link" onclick="showPopup('disparity', 'a great difference or inequality')">disparity</span> between statutory generosity and cultural uptake in Japan and South Korea exemplifies how legal <span class="vocab-link" onclick="showPopup('provision', 'the act of supplying or making something available')">provisions</span> alone cannot override patriarchal workplace cultures</li>
+                                            <li><strong>The double bind:</strong> Working mothers navigate irreconcilable expectations — penalised professionally for prioritising family, and judged socially for prioritising career — a <span class="vocab-link" onclick="showPopup('disproportionate', 'too large or too small in comparison to something else')">disproportionate</span> burden not faced by fathers</li>
+                                            <li><strong>Post-colonial legacies:</strong> Many developing nations inherited labour frameworks from colonial administrations that were never designed for <span class="vocab-link" onclick="showPopup('equitable', 'fair and just for everyone involved')">equitable</span> treatment of women workers</li>
+                                            <li><strong>Religious and ideological tensions:</strong> Conservative religious frameworks frequently resist <span class="vocab-link" onclick="showPopup('mandate', 'an official order or requirement given by an authority')">mandated</span> parental equality, framing gendered caregiving divisions as natural rather than constructed</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800" alt="Diverse Families" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Remember these important points:</p>
+                                        <ul>
+                                            <li><strong>Maternity leave</strong> is time off work for mothers to care for their newborn babies</li>
+                                            <li><strong>Different countries</strong> have very different rules — from zero paid leave in the USA to over a year in some European countries</li>
+                                            <li><strong>Discrimination</strong> against pregnant women at work is illegal in most countries, but it still happens</li>
+                                            <li><strong>Paternity leave</strong> for fathers is growing — it helps families and promotes equality</li>
+                                            <li><strong>Good leave policies</strong> benefit everyone — workers, businesses, and the economy</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Essential takeaways from this lesson:</p>
+                                        <ul>
+                                            <li><strong>Global inequality:</strong> Maternity leave <span class="vocab-link" onclick="showPopup('entitlement', 'the right to receive something, guaranteed by law')">entitlements</span> vary enormously — from 86 weeks in Estonia to zero paid weeks in the USA</li>
+                                            <li><strong>The motherhood penalty:</strong> Workplace <span class="vocab-link" onclick="showPopup('discrimination', 'unfair treatment of a person based on their group or characteristics')">discrimination</span> against mothers persists despite legal protections, widening the <span class="vocab-link" onclick="showPopup('gender gap', 'the difference between men and women in areas like pay or opportunities')">gender gap</span></li>
+                                            <li><strong>Shared responsibility:</strong> Effective paternity leave reduces gender inequality and supports better <span class="vocab-link" onclick="showPopup('reintegration', 'the process of returning and adjusting back to a previous situation')">reintegration</span> for mothers</li>
+                                            <li><strong>Economic sense:</strong> Paid leave generates returns through retention, productivity, and workforce participation</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('salient', 'most noticeable or important')">Salient</span> conclusions:</p>
+                                        <ul>
+                                            <li><strong>Systemic <span class="vocab-link" onclick="showPopup('disparity', 'a great difference or inequality')">disparities</span>:</strong> The global patchwork of maternity leave frameworks reflects fundamental ideological divisions about the state's role in <span class="vocab-link" onclick="showPopup('remuneration', 'payment or compensation for work or services')">remunerating</span> reproductive and caregiving labour</li>
+                                            <li><strong>Policy-culture gap:</strong> <span class="vocab-link" onclick="showPopup('legislation', 'laws made by a government')">Legislation</span> is necessary but insufficient — cultural transformation is required to achieve <span class="vocab-link" onclick="showPopup('equitable', 'fair and just for everyone involved')">equitable</span> outcomes in practice</li>
+                                            <li><strong>Intersectional impact:</strong> <span class="vocab-link" onclick="showPopup('socioeconomic', 'relating to both social and economic factors')">Socioeconomic</span> status, race, and sector of employment compound the <span class="vocab-link" onclick="showPopup('disproportionate', 'too large or too small in comparison to something else')">disproportionate</span> burden borne by the most vulnerable mothers</li>
+                                            <li><strong>Economic imperative:</strong> The macroeconomic case for comprehensive, <span class="vocab-link" onclick="showPopup('equitable', 'fair and just for everyone involved')">equitable</span> parental leave is irrefutable — inaction entails measurable costs to productivity, fiscal revenue, and human capital</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=800" alt="Family" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Maternity leave</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Time off work given to a mother before and after having a baby</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Paternity leave</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Time off work given to a father after his baby is born</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Newborn</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A baby that has just been born</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Benefits</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Money or other help provided by the government or an employer</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Policy</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A set of rules or a plan made by a company or government</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Pregnant</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Carrying a baby inside the body</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Employer</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person or company that pays people to work for them</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Paid leave</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Time off work when you still receive your salary</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Discrimination</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Unfair treatment of a person based on their group or characteristics</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Legislation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Laws made by a government</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Statutory</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Required or set by law</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Breadwinner</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The person who earns the most money in a family</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Gender gap</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The difference between men and women in areas like pay or opportunities</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Reintegration</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of returning and adjusting back to a previous situation</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Entitlement</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The right to receive something, guaranteed by law</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Caregiving</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The act of looking after someone who needs help, such as a baby or elderly person</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Remuneration</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Payment or compensation for work or services</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Equitable</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Fair and just for everyone involved</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Disparity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A great difference or inequality</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Mandate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An official order or requirement given by an authority</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Socioeconomic</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Relating to both social and economic factors</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Contentious</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Causing or likely to cause disagreement or argument</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Provision</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The act of supplying or making something available</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Disproportionate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Too large or too small in comparison to something else</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>Compare maternity leave policies in two different countries. Discuss how these policies affect families, gender equality, and the economy. Do you think your country's maternity leave policy is fair? What changes would you recommend, and why? Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Maternity Leave - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Maternity leave", definition: "Time off work for a mother having a baby", sentences: ["She took ___ after her baby was born.", "In many countries, women are entitled to ___.", "Her ___ lasted for six months."] },
+                { term: "Paternity leave", definition: "Time off work for a father after his baby is born", sentences: ["He took two weeks of ___ to be with his newborn.", "Some countries offer very short ___.", "His company provides paid ___."] },
+                { term: "Newborn", definition: "A baby that has just been born", sentences: ["The ___ slept for most of the day.", "Taking care of a ___ requires a lot of energy.", "The hospital has a special ward for ___ babies."] },
+                { term: "Benefits", definition: "Money or help from the government or employer", sentences: ["The government provides ___ to new mothers.", "Her company offers good maternity ___.", "Financial ___ help families during parental leave."] },
+                { term: "Policy", definition: "A set of rules made by a company or government", sentences: ["The company changed its parental leave ___.", "Every country has a different maternity leave ___.", "The new ___ gives parents more time off."] },
+                { term: "Pregnant", definition: "Carrying a baby inside the body", sentences: ["She found out she was ___ in January.", "Many ___ women continue working until the last month.", "It is illegal to fire someone because they are ___."] },
+                { term: "Employer", definition: "A person or company that pays people to work", sentences: ["Her ___ was supportive when she announced her pregnancy.", "The ___ must follow maternity leave laws.", "A good ___ offers paid parental leave."] },
+                { term: "Paid leave", definition: "Time off work when you still receive your salary", sentences: ["In Sweden, parents receive generous ___.", "The US has no guaranteed ___.", "She received full salary during her ___."] }
+            ],
+            B2: [
+                { term: "Discrimination", definition: "Unfair treatment based on group or characteristics", sentences: ["Pregnancy ___ in the workplace is illegal.", "Many women face ___ when they return from leave.", "Laws exist to protect against ___ based on pregnancy."] },
+                { term: "Legislation", definition: "Laws made by a government", sentences: ["New ___ was introduced to extend parental leave.", "The ___ requires companies to offer maternity benefits.", "Changes in ___ have improved conditions for parents."] },
+                { term: "Statutory", definition: "Required or set by law", sentences: ["The ___ minimum for maternity leave varies by country.", "Employees are entitled to ___ maternity pay.", "___ rights protect pregnant workers."] },
+                { term: "Breadwinner", definition: "The person who earns the most money in a family", sentences: ["When the ___ takes leave, the family income drops.", "In many households, both parents are ___s.", "Traditionally, the father was considered the ___."] },
+                { term: "Gender gap", definition: "The difference between men and women in pay or opportunities", sentences: ["Maternity leave policies can widen the ___.", "Reducing the ___ requires shared parental leave.", "The ___ in pay affects women throughout their careers."] },
+                { term: "Reintegration", definition: "The process of returning and adjusting back", sentences: ["Successful ___ after leave requires employer support.", "The ___ process can be challenging for new mothers.", "Companies should have a ___ plan for returning parents."] },
+                { term: "Entitlement", definition: "The right to receive something guaranteed by law", sentences: ["Workers have a legal ___ to maternity leave.", "The ___ to paid leave varies between countries.", "She checked her ___ before requesting time off."] },
+                { term: "Caregiving", definition: "Looking after someone who needs help", sentences: ["Shared ___ responsibilities benefit the whole family.", "___ duties should not fall on one parent alone.", "Professional ___ services can help working parents."] }
+            ],
+            C1: [
+                { term: "Remuneration", definition: "Payment or compensation for work or services", sentences: ["The level of ___ during leave varies significantly.", "Adequate ___ ensures financial stability for families.", "Some countries guarantee full ___ during maternity leave."] },
+                { term: "Equitable", definition: "Fair and just for everyone involved", sentences: ["Creating an ___ parental leave system benefits all workers.", "___ distribution of duties promotes gender equality.", "The policy aims to be ___ for both mothers and fathers."] },
+                { term: "Disparity", definition: "A great difference or inequality", sentences: ["There is a significant ___ in maternity leave policies globally.", "The ___ between paid and unpaid leave affects families.", "Regional ___ in parental benefits persist across Europe."] },
+                { term: "Mandate", definition: "An official order or requirement from an authority", sentences: ["The government introduced a ___ for minimum parental leave.", "A federal ___ would standardize leave across all states.", "The EU's ___ requires member states to offer parental leave."] },
+                { term: "Socioeconomic", definition: "Relating to both social and economic factors", sentences: ["___ factors influence how families experience maternity leave.", "The impact of leave policies varies across ___ groups.", "___ inequality determines who can afford unpaid leave."] },
+                { term: "Contentious", definition: "Causing or likely to cause disagreement", sentences: ["Maternity leave remains a ___ issue in many countries.", "The debate over paid leave is particularly ___.", "___ policies often face opposition from business groups."] },
+                { term: "Provision", definition: "The act of supplying or making something available", sentences: ["The ___ of adequate childcare supports working parents.", "Government ___ for parental leave has improved over time.", "The ___ of paid leave is essential for gender equality."] },
+                { term: "Disproportionate", definition: "Too large or too small in comparison", sentences: ["Women bear a ___ share of caregiving responsibilities.", "The career impact of parenthood falls ___ on mothers.", "___ penalties affect women's long-term earnings."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
