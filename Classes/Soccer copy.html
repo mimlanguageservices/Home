@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>The Beautiful Game - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">The Beautiful Game</h1>
+        <p class="game-subtitle">The Beautiful Game — History, Rules, and Global Culture</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>The Beautiful Game</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title Image -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">The Beautiful Game</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">The Beautiful Game — History, Rules, and Global Culture</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/gKR5IYkhk1M?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What Is Soccer? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What Is Soccer?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Soccer (also called football in most of the world) is a sport played between two teams of eleven players. The game is played on a large grass field called a <span class="vocab-link" onclick="showPopup('pitch', 'the large grass field where a soccer match is played')">pitch</span>.</p>
+                                        <p>Players try to kick a round ball into the other team's <span class="vocab-link" onclick="showPopup('goal', 'a point scored when the ball crosses the line into the net')">goal</span>. The team that scores the most goals wins the match. Only the goalkeeper can touch the ball with their hands.</p>
+                                        <p>Soccer is the most popular sport in the world. It is played in almost every country, by men, women, and children of all ages. You only need a ball and some space to play, which is why it is loved everywhere.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Association football, universally known as football (or "soccer" in North America, Australia, and parts of Asia), is a team sport contested between two sides of eleven players on a rectangular <span class="vocab-link" onclick="showPopup('pitch', 'the large grass field where a soccer match is played')">pitch</span>. The objective is to score by propelling the ball into the opposing team's <span class="vocab-link" onclick="showPopup('goal', 'a point scored when the ball crosses the line into the net')">goal</span>, with outfield players prohibited from using their hands or arms.</p>
+                                        <p>Governed globally by FIFA (Fédération Internationale de Football Association), the sport boasts an estimated 4 billion followers worldwide, making it the most widely followed and played sport on Earth. Its simplicity — requiring minimal equipment — combined with its tactical depth has ensured its universal appeal across cultures, socioeconomic classes, and generations.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Association football — colloquially "football" across most of the globe and "soccer" in nations where the term distinguishes it from indigenous football codes — is a codified team sport contested between two sides of eleven players per side on a rectangular <span class="vocab-link" onclick="showPopup('pitch', 'the large grass field where a soccer match is played')">pitch</span>.</p>
+                                        <p>The game's fundamental simplicity — propelling a spherical ball into the opponent's goal using any body part except the hands and arms (goalkeepers excepted within their penalty area) — belies a sport of extraordinary tactical complexity and cultural significance. Governed by FIFA since 1904 and codified under the Laws of the Game maintained by the International Football Association Board (IFAB), it commands an estimated global following of over 4 billion people, functioning simultaneously as a sport, a cultural institution, and a multi-billion-dollar <span class="vocab-link" onclick="showPopup('fixture', 'a scheduled match between two teams in a competition')">industry</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800" alt="Soccer Ball" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - The Rules of the Game -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Rules of the Game</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The rules of soccer are simple to learn. Here are the most important ones:</p>
+                                        <ul>
+                                            <li><strong>Match length:</strong> A match lasts 90 minutes, divided into two halves of 45 minutes each</li>
+                                            <li><strong>Teams:</strong> Each team has 11 players, including one goalkeeper</li>
+                                            <li><strong>Hands:</strong> Only the goalkeeper can touch the ball with their hands, and only inside the penalty area</li>
+                                            <li><strong>Fouls:</strong> If a player breaks a rule, the <span class="vocab-link" onclick="showPopup('referee', 'the official who enforces the rules during a match')">referee</span> gives a <span class="vocab-link" onclick="showPopup('foul', 'an action by a player that breaks the rules of the game')">foul</span>. A yellow card is a warning. Two yellow cards, or one red card, means the player must leave the match</li>
+                                            <li><strong>Goals:</strong> If the ball crosses the goal line between the goalposts, it counts as a <span class="vocab-link" onclick="showPopup('goal', 'a point scored when the ball crosses the line into the net')">goal</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The Laws of the Game, maintained by IFAB, govern all aspects of competitive football:</p>
+                                        <ul>
+                                            <li><strong>Duration:</strong> A standard match consists of two 45-minute halves with a 15-minute interval. The <span class="vocab-link" onclick="showPopup('referee', 'the official who enforces the rules during a match')">referee</span> adds <span class="vocab-link" onclick="showPopup('stoppage time', 'additional minutes added by the referee at the end of each half to compensate for delays')">stoppage time</span> to compensate for delays. In knockout competitions, extra time (two 15-minute periods) and penalty shootouts resolve draws</li>
+                                            <li><strong>Player conduct:</strong> <span class="vocab-link" onclick="showPopup('foul', 'an action by a player that breaks the rules of the game')">Fouls</span> are penalised with free kicks or penalty kicks (if committed inside the penalty area). Yellow cards serve as cautions; accumulation of two results in a red card and dismissal</li>
+                                            <li><strong>The <span class="vocab-link" onclick="showPopup('offside', 'a rule that prevents attackers from positioning themselves behind the last defender when the ball is played')">offside</span> rule:</strong> A player is in an offside position if they are nearer to the opponent's goal line than both the ball and the second-last defender at the moment the ball is played to them</li>
+                                            <li><strong>VAR:</strong> Video Assistant Referee technology was introduced in 2018 to review match-changing decisions — goals, penalty decisions, direct red cards, and mistaken identity</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The Laws of the Game, comprising 17 laws maintained by IFAB, represent one of sport's most enduring regulatory frameworks:</p>
+                                        <ul>
+                                            <li><strong>Temporal structure:</strong> The regulation 90-minute format belies considerable variability — effective playing time in elite matches averages approximately 55-60 minutes, with the remainder consumed by set-pieces, substitutions, and gamesmanship, a disparity that has fuelled ongoing debates about implementing effective time-keeping measures</li>
+                                            <li><strong>The <span class="vocab-link" onclick="showPopup('offside', 'a rule that prevents attackers from positioning themselves behind the last defender when the ball is played')">offside</span> rule:</strong> Perhaps the most debated law in sport — the offside rule has been revised numerous times since its codification. The current interpretation, requiring involvement in "active play," introduces considerable officiating discretion. The introduction of semi-automated offside technology at the 2022 World Cup represented a paradigm shift in enforcement precision</li>
+                                            <li><strong>VAR and technological governance:</strong> The implementation of Video Assistant Referee technology has fundamentally altered the epistemology of officiating — shifting from real-time human judgement to technologically mediated review, a transition that has generated philosophical debates about the nature of sporting justice and the acceptable margin of error</li>
+                                            <li><strong>The principle of "minimal interference":</strong> Officiating philosophy is guided by the maxim of minimal interference for maximum benefit, though its application remains inherently subjective and culturally variable across different footballing traditions</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800" alt="Soccer Match" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - A Brief History of Soccer -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>A Brief History of Soccer</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>People have been kicking balls for thousands of years. Here is a short history of the sport:</p>
+                                        <ul>
+                                            <li><strong>Ancient times:</strong> Games similar to soccer were played in China, Greece, and Central America thousands of years ago</li>
+                                            <li><strong>1863:</strong> The Football Association (FA) was created in England. This was the first time the official rules of soccer were written down</li>
+                                            <li><strong>1930:</strong> The first FIFA World Cup was held in Uruguay. Only 13 teams played. Uruguay won the tournament</li>
+                                            <li><strong>1958–1970:</strong> The Brazilian player Pelé became the most famous soccer player in the world, winning three World Cups</li>
+                                            <li><strong>Today:</strong> Soccer is played in over 200 countries. The FIFA World Cup is the biggest sporting event on Earth, watched by billions of people</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The history of football spans millennia, from ancient ball games to the global spectacle we know today:</p>
+                                        <ul>
+                                            <li><strong>Ancient origins:</strong> Various forms of football have been documented across civilisations — <em>cuju</em> in Han Dynasty China, <em>episkyros</em> in ancient Greece, and the Mesoamerican ball game. These ancestral forms, though bearing little resemblance to the modern sport, reflect humanity's enduring fascination with competitive ball games</li>
+                                            <li><strong>1863:</strong> The formation of the Football Association in London established the first standardised set of rules, crucially separating "association football" from "rugby football." This codification laid the foundation for the modern game</li>
+                                            <li><strong>1904:</strong> FIFA was founded in Paris by representatives of seven nations. The organisation would grow to become one of the most powerful sporting bodies in history, with more member associations than the United Nations</li>
+                                            <li><strong>1930–1970:</strong> The inaugural World Cup in Uruguay through to Brazil's dominance in the 1958, 1962, and 1970 tournaments established the competition as the premier global sporting event</li>
+                                            <li><strong>1992–present:</strong> The creation of the English Premier League and the UEFA Champions League in its modern format transformed football into a multi-billion-dollar global entertainment industry</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The historiography of association football reveals a sport shaped by codification, commercialisation, and cultural contestation:</p>
+                                        <ul>
+                                            <li><strong>Pre-modern antecedents:</strong> The archaeological record documents ball games across disparate civilisations — from <em>cuju</em> during the Han Dynasty (206 BCE – 220 CE) to the violent medieval mob football of England and the ritualised Mesoamerican <em>ullamaliztli</em>. These proto-football forms, while lacking codification, illuminate the anthropological universality of competitive ball play</li>
+                                            <li><strong>The codification era (1848–1863):</strong> The establishment of the Cambridge Rules in 1848 and the subsequent formation of the Football Association in 1863 represented the decisive moment of sporting codification — a process driven by the Victorian public school system's need to standardise inter-institutional competition. The schism between "association" and "rugby" codes reflected fundamental disagreements about the permissibility of handling</li>
+                                            <li><strong>FIFA and global governance (1904–present):</strong> The Fédération Internationale de Football Association, founded by seven European nations, evolved into arguably the most influential non-governmental organisation in global sport — its 211 member associations exceeding UN membership. The organisation's history is marked by both extraordinary expansion and endemic governance controversies</li>
+                                            <li><strong>The commercialisation epoch (1992–present):</strong> The formation of the Premier League and the Bosman ruling (1995) — which established freedom of movement for out-of-contract players within the EU — fundamentally restructured the political economy of professional football, catalysing an era of unprecedented capital influx, wage inflation, and competitive imbalance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43fbb4d6?w=800" alt="Football History" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Famous Tournaments & Competitions -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Famous Tournaments & Competitions</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>There are many exciting soccer competitions around the world:</p>
+                                        <ul>
+                                            <li><strong>The FIFA World Cup</strong> is the biggest soccer tournament in the world. It takes place every four years. National teams from around the world compete to win the trophy</li>
+                                            <li><strong>The UEFA Champions League</strong> is the most important club competition in Europe. The best teams from each European country play against each other</li>
+                                            <li><strong>The Copa América</strong> is the oldest international soccer tournament. South American national teams compete in this event</li>
+                                            <li><strong>The Women's World Cup</strong> has grown rapidly. The 2023 tournament attracted record audiences and helped grow women's soccer worldwide</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Football's competitive structure spans national and international levels:</p>
+                                        <ul>
+                                            <li><strong>FIFA World Cup:</strong> Held quadrennially since 1930, the tournament has expanded from 13 to 48 teams (from 2026). It generates billions in revenue and commands television audiences exceeding 3 billion cumulative viewers</li>
+                                            <li><strong>UEFA Champions League:</strong> Europe's premier club competition has evolved from the European Cup (1955) into a commercially dominant sporting property. The tournament generates over €3 billion annually and features the continent's most elite clubs competing across group and knockout stages</li>
+                                            <li><strong>Domestic leagues:</strong> The English Premier League, La Liga (Spain), Serie A (Italy), Bundesliga (Germany), and Ligue 1 (France) constitute the "Big Five" European leagues, attracting the world's best talent and commanding enormous broadcasting revenues</li>
+                                            <li><strong>Women's football:</strong> The exponential growth of women's football — accelerated by the 2023 World Cup, record-breaking attendances, and increasing investment — represents one of the most significant developments in modern sport</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The architecture of competitive football reflects a complex hierarchy of governance, commercial interests, and sporting tradition:</p>
+                                        <ul>
+                                            <li><strong>The FIFA World Cup:</strong> The quadrennial tournament remains the preeminent event in global sport, functioning simultaneously as a sporting competition, geopolitical spectacle, and commercial enterprise. The expansion to 48 teams from 2026 and the controversial awarding of the 2022 tournament to Qatar illustrate the tensions between sporting tradition, commercial imperatives, and geopolitical influence within FIFA's governance structure</li>
+                                            <li><strong>The Champions League industrial complex:</strong> The transformation of the European Cup into the Champions League (1992) and its subsequent format revisions — most recently the 36-team "Swiss model" from 2024-25 — reflect the progressive commercialisation of elite football, driven by broadcasting rights that now exceed €3.5 billion per cycle</li>
+                                            <li><strong>The Super League crisis (2021):</strong> The aborted European Super League proposal by twelve founding clubs exposed fundamental fault lines in football governance — between open sporting competition and closed commercial franchises, between national football associations and transnational club cartels</li>
+                                            <li><strong>Women's football:</strong> The professionalisation of women's football has accelerated dramatically, with the 2023 Women's World Cup attracting 1.97 million in-stadium spectators. Yet structural inequities in investment, wages, and media coverage persist</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800" alt="Stadium" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Soccer Culture Around the World -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Soccer Culture Around the World</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Soccer is much more than just a sport in many countries:</p>
+                                        <ul>
+                                            <li><strong>Brazil:</strong> Soccer is a way of life. Children play in the streets, on the beach, and in small fields. Brazil has won the World Cup five times — more than any other country</li>
+                                            <li><strong>England:</strong> Soccer fans are very passionate. Many families have supported the same club for generations. Going to a match on Saturday is an important tradition</li>
+                                            <li><strong>Argentina:</strong> The atmosphere in stadiums is famous for its energy. Fans sing and chant throughout the entire match. Soccer <span class="vocab-link" onclick="showPopup('squad', 'the full group of players available for a team')">teams</span> are a huge part of local identity</li>
+                                            <li><strong>Africa:</strong> Soccer unites people from different backgrounds. The 2010 World Cup in South Africa was a historic moment for the entire continent</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Football's cultural significance varies dramatically across regions, yet its power to unite — and divide — is universal:</p>
+                                        <ul>
+                                            <li><strong>South America:</strong> Football is deeply embedded in the cultural identity of nations like Brazil and Argentina. The sport serves as a vehicle for social mobility, national pride, and collective expression. Iconic stadiums like the Maracanã and La Bombonera are temples of devotion</li>
+                                            <li><strong>Europe:</strong> Fan culture varies dramatically — from the organised supporter groups of Italy and the Balkans to the pub culture of English football and the <em>socios</em> (member-ownership) model in Spain and Germany. The <span class="vocab-link" onclick="showPopup('derby', 'a match between two local rival teams from the same city or region')">derby</span> match remains the centrepiece of local footballing identity</li>
+                                            <li><strong>Africa:</strong> Football serves as both a unifying force and a pathway out of poverty for millions. The 2010 World Cup in South Africa represented a landmark moment, yet the continent's football infrastructure remains underdeveloped relative to its enormous talent output</li>
+                                            <li><strong>Asia and North America:</strong> Rapid growth in investment and interest — from the expansion of Major League Soccer to the growing enthusiasm for the sport in the United States ahead of the 2026 World Cup — is reshaping the global football landscape</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Football fandom constitutes one of the most significant forms of collective identity in the modern world:</p>
+                                        <ul>
+                                            <li><strong>The sociology of fandom:</strong> Football fandom functions as a surrogate for community, class solidarity, and — in some contexts — political resistance. The semiotics of supporter culture — chants, tifos, choreographies — represent sophisticated forms of cultural production that transcend the sporting event itself</li>
+                                            <li><strong>Latin American football as cultural text:</strong> In nations like Brazil and Argentina, football operates as what the anthropologist Eduardo Archetti termed a "moral territory" — a space where national identity, masculinity, social class, and racial dynamics are negotiated and contested. The favela-to-fame narrative, while often romanticised, reflects genuine pathways of social mobility</li>
+                                            <li><strong>The European <span class="vocab-link" onclick="showPopup('ultras', 'highly organized and passionate fan groups known for elaborate choreographies and vocal support')">ultra</span> phenomenon:</strong> The ultra movement, originating in 1960s Italy, represents the most organised and politically engaged form of football fandom. Characterised by self-financed choreographies, vocal opposition to commercialisation, and — in some instances — links to political extremism, the movement occupies a contested space between authentic cultural expression and organised disorder</li>
+                                            <li><strong>Football as soft power:</strong> Nations and sovereign wealth funds increasingly deploy football as an instrument of soft power and <span class="vocab-link" onclick="showPopup('sportswashing', 'the use of sport by states or organisations to improve their public image or distract from controversies')">sportswashing</span> — from Qatar's World Cup hosting to Abu Dhabi and Saudi Arabia's acquisition of elite European clubs — raising fundamental questions about the sport's complicity in legitimising authoritarian governance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800" alt="Soccer Fans" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Legendary Players & Managers -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Legendary Players & Managers</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Some players have become legends of the sport:</p>
+                                        <ul>
+                                            <li><strong>Pelé (Brazil)</strong> is often called the greatest soccer player ever. He won three World Cups (1958, 1962, 1970) and scored over 1,000 <span class="vocab-link" onclick="showPopup('goal', 'a point scored when the ball crosses the line into the net')">goals</span> in his career</li>
+                                            <li><strong>Diego Maradona (Argentina)</strong> was famous for his incredible skill. His "Hand of God" goal and his amazing solo run against England in the 1986 World Cup are two of the most famous moments in soccer history</li>
+                                            <li><strong>Lionel Messi (Argentina)</strong> has won the Ballon d'Or award more times than any other player. He finally won the World Cup in 2022 at the age of 35</li>
+                                            <li><strong>Marta (Brazil)</strong> is considered the greatest female soccer player of all time. She has scored more World Cup goals than any other woman</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The sport's history is defined by individuals who transcended their era:</p>
+                                        <ul>
+                                            <li><strong>Pelé:</strong> The Brazilian forward's three World Cup victories and estimated 1,283 career goals established an almost mythological legacy. His cultural impact transcended sport, making him a global ambassador and symbol of Brazilian excellence</li>
+                                            <li><strong>Diego Maradona:</strong> The Argentine genius combined extraordinary technical ability with a combustible personality. His 1986 World Cup performance — featuring both the infamous "Hand of God" and the "Goal of the Century" within the same match — encapsulated the contradictions that defined his career</li>
+                                            <li><strong>The Messi-Ronaldo era:</strong> The parallel careers of Lionel Messi and Cristiano Ronaldo produced an unprecedented period of individual excellence. Between them, they won 13 Ballon d'Or awards, fundamentally raising expectations of individual performance and sparking an era-defining debate about sporting greatness</li>
+                                            <li><strong>Women's football pioneers:</strong> Players like Marta Vieira da Silva, Megan Rapinoe, and Ada Hegerberg have not only demonstrated extraordinary sporting ability but have used their platforms to advocate for gender equality and equal pay — expanding the cultural significance of football beyond the <span class="vocab-link" onclick="showPopup('pitch', 'the large grass field where a soccer match is played')">pitch</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The mythology of football is inseparable from the individuals who have shaped its cultural and tactical evolution:</p>
+                                        <ul>
+                                            <li><strong>The mythology of Pelé:</strong> The construction of Pelé as the "King of Football" represents a case study in sporting hagiography — his actual career statistics, contested due to the inclusion of unofficial matches, are secondary to his function as a symbol of Brazilian footballing identity and the sport's global expansion during the televisual age</li>
+                                            <li><strong>Maradona as cultural phenomenon:</strong> Diego Maradona transcended sporting achievement to become a figure of quasi-religious significance — literally so in the case of the Iglesia Maradoniana. His 1986 World Cup performance against England, laden with post-Falklands geopolitical symbolism, demonstrated how individual sporting moments can acquire historical and political resonance far exceeding their immediate context</li>
+                                            <li><strong>The GOAT discourse:</strong> The Messi-Ronaldo dialectic, sustained over nearly two decades, has functioned as more than a sporting debate — it represents competing philosophies of excellence (innate genius versus manufactured perfection), divergent cultural values, and fundamentally different conceptions of what constitutes sporting greatness in an era of data-driven analysis</li>
+                                            <li><strong>Tactical evolution:</strong> Managers from Herbert Chapman's WM <span class="vocab-link" onclick="showPopup('formation', 'the tactical arrangement of players on the pitch')">formation</span> to Pep Guardiola's positional play have driven continuous tactical innovation. Guardiola's influence — drawing on Johan Cruyff's total football philosophy — has reshaped the sport more profoundly than any individual since the codification era, establishing possession-based, high-pressing football as the dominant tactical paradigm</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800" alt="Soccer Players" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - The Business of Soccer -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Business of Soccer</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Professional soccer is a very big business today:</p>
+                                        <ul>
+                                            <li><strong>Money:</strong> The biggest clubs earn billions of dollars every year from selling tickets, television rights, sponsorship deals, and merchandise (shirts, scarves, etc.)</li>
+                                            <li><strong>Transfers:</strong> Player transfers can cost hundreds of millions of dollars. In 2017, Neymar moved from Barcelona to Paris Saint-Germain for 222 million euros — the most expensive transfer ever</li>
+                                            <li><strong>Leagues:</strong> The English Premier League is the richest soccer league in the world. Clubs receive enormous amounts of money from television companies</li>
+                                            <li><strong>Problems:</strong> However, many smaller clubs struggle financially. Some clubs go bankrupt because they spend more money than they earn. The gap between rich and poor clubs is growing</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Modern football operates as a vast commercial enterprise:</p>
+                                        <ul>
+                                            <li><strong>The football economy:</strong> Elite football generates an estimated €30 billion annually across Europe's top leagues alone. Revenue streams include broadcasting rights, matchday income, commercial partnerships, and — increasingly — digital and streaming platforms</li>
+                                            <li><strong>The transfer market:</strong> The transfer system, governed by FIFA regulations, facilitates player movement between clubs in exchange for transfer fees. The market has experienced dramatic inflation, with the record fee reaching €222 million (Neymar, 2017). Agent fees and intermediary payments add significant additional costs</li>
+                                            <li><strong>Ownership models:</strong> Football club ownership spans a spectrum — from fan-owned models (e.g., Barcelona's <em>socios</em> model, German clubs under the 50+1 rule) to state-funded projects (Manchester City, PSG, Newcastle United) — each raising distinct questions about governance and competition</li>
+                                            <li><strong>Financial Fair Play:</strong> UEFA's Financial Fair Play regulations (2011) were designed to prevent clubs from spending beyond their means. Critics argue the regulations have failed to prevent wealthy owners from circumventing the rules through inflated sponsorship deals</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The political economy of football reflects broader patterns of contemporary capitalism:</p>
+                                        <ul>
+                                            <li><strong>Structural economics:</strong> The sport's financial architecture reflects patterns of neoliberal capitalism — deregulated labour markets (post-Bosman), the concentration of capital among a narrow elite, the commodification of cultural assets, and the tension between local community institutions and global entertainment brands</li>
+                                            <li><strong>Sovereign wealth and <span class="vocab-link" onclick="showPopup('sportswashing', 'the use of sport by states or organisations to improve their public image or distract from controversies')">sportswashing</span>:</strong> The acquisition of elite football clubs by sovereign wealth funds — Abu Dhabi's City Football Group, Qatar Sports Investments' PSG, Saudi Arabia's Public Investment Fund at Newcastle — represents a strategic deployment of soft power that raises fundamental ethical questions about the instrumentalisation of sport for geopolitical legitimacy</li>
+                                            <li><strong>Broadcasting rights as economic engine:</strong> Television rights constitute approximately 60% of elite club revenue, creating a dependency structure that grants broadcasters enormous influence over scheduling, competition format, and the aesthetic character of the sport itself</li>
+                                            <li><strong>The sustainability paradox:</strong> Football faces a fundamental contradiction — competitive integrity requires financial equilibrium, yet the sport's economic model incentivises perpetual growth, wage inflation, and calendar expansion. The proliferation of competitions reflects the relentless logic of revenue maximisation at the expense of player welfare and competitive meaning</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800" alt="Soccer Stadium Business" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Remember these important points:</p>
+                                        <ul>
+                                            <li><strong>Soccer</strong> is the most popular sport in the world, played in almost every country by people of all ages</li>
+                                            <li><strong>The rules are simple:</strong> two teams of 11 players try to score <span class="vocab-link" onclick="showPopup('goal', 'a point scored when the ball crosses the line into the net')">goals</span> by kicking the ball into the net. The team with the most goals wins</li>
+                                            <li><strong>The FIFA World Cup</strong> is the biggest soccer tournament, held every four years</li>
+                                            <li><strong>Great players</strong> like Pelé, Maradona, and Messi have become legends of the sport</li>
+                                            <li><strong>Soccer brings people together</strong> and is an important part of culture in many countries around the world</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Essential takeaways from this lesson:</p>
+                                        <ul>
+                                            <li><strong>Football's global reach is unmatched</strong> — with over 4 billion followers and 200+ FIFA member nations, it transcends cultural, linguistic, and political boundaries</li>
+                                            <li><strong>Tactical evolution</strong> — from rudimentary <span class="vocab-link" onclick="showPopup('formation', 'the tactical arrangement of players on the pitch')">formations</span> to sophisticated pressing systems — reflects continuous innovation in strategy and athlete development</li>
+                                            <li><strong>The tension between tradition and commercialisation</strong> defines modern football — fan ownership models coexist with state-funded mega-clubs in an increasingly unequal landscape</li>
+                                            <li><strong>Women's football</strong> is experiencing unprecedented growth, though structural inequities in investment and visibility remain significant barriers to parity</li>
+                                            <li><strong>The transfer market and broadcasting economics</strong> demonstrate that modern football is as much a business and political institution as it is a sport</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Salient conclusions:</p>
+                                        <ul>
+                                            <li><strong>Football's cultural significance</strong> extends far beyond sport — it functions as a vehicle for national identity, social mobility, political expression, and collective belonging in ways that few other cultural phenomena can match</li>
+                                            <li><strong>The sport's governance structure</strong> — FIFA's global monopoly, continental confederations, national associations, and increasingly powerful club cartels — creates a complex and often contradictory political landscape</li>
+                                            <li><strong>The commercialisation of football</strong> has generated extraordinary wealth but has simultaneously eroded competitive balance, commodified fan culture, and created dependency structures that prioritise capital accumulation over sporting integrity</li>
+                                            <li><strong>The intersection of football with geopolitics</strong> — through <span class="vocab-link" onclick="showPopup('sportswashing', 'the use of sport by states or organisations to improve their public image or distract from controversies')">sportswashing</span>, hosting mega-events, and the instrumentalisation of clubs as soft power vehicles — raises urgent questions about the sport's role in legitimising authoritarian governance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800" alt="Soccer Celebration" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Pitch</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The large grass field where a soccer match is played</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Referee</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The official who enforces the rules during a match</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Foul</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An action by a player that breaks the rules of the game</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Goal</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A point scored when the ball crosses the line into the net</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Dribble</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To move the ball forward using small, controlled kicks</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Tackle</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To try to take the ball away from an opponent using your feet</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Draw</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A result where both teams finish with the same score</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Squad</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The full group of players available for a team</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Offside</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A rule that prevents attackers from positioning themselves behind the last defender when the ball is played</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Formation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The tactical arrangement of players on the pitch</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Fixture</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A scheduled match between two teams in a competition</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Relegation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The demotion of a team to a lower division due to poor performance</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Aggregate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The combined score from two legs of a knockout tie</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Derby</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A match between two local rival teams from the same city or region</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Clean sheet</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A match in which a team concedes no goals</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stoppage time</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Additional minutes added by the referee at the end of each half to compensate for delays</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Tiki-taka</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A possession-based playing style emphasizing short passing and movement</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Gegenpressing</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A tactical approach involving immediate collective pressing upon losing possession</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">False nine</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A centre-forward who drops into midfield positions rather than occupying the traditional striker's role</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ultras</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Highly organized and passionate fan groups known for elaborate choreographies and vocal support</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Panenka</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A penalty kick technique involving a delicate chip down the centre of the goal</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sweeper-keeper</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A goalkeeper who actively plays outside the penalty area to support defensive and build-up play</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sportswashing</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The use of sport by states or organisations to improve their public image or distract from controversies</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Catenaccio</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A defensive tactical system originating in Italy that prioritizes rigid organisation and counter-attacking football</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>Describe the role of soccer (football) in global culture. Discuss how the sport has evolved from its origins to the modern game, including changes in rules, tactics, and commercialisation. What impact does soccer have on communities, and what challenges does the modern game face? Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - The Beautiful Game - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Pitch", definition: "The large grass field where a soccer match is played", sentences: ["The players ran onto the ___ before the match started.", "A soccer ___ is usually about 100 meters long.", "The ___ was wet after the rain, making the ball move faster."] },
+                { term: "Referee", definition: "The official who enforces the rules during a match", sentences: ["The ___ blew the whistle to start the game.", "The ___ showed a yellow card to the player who committed a foul.", "Without a ___, the players would not follow the rules."] },
+                { term: "Foul", definition: "An action by a player that breaks the rules of the game", sentences: ["The defender committed a ___ by tripping the attacker.", "The ___ resulted in a free kick for the other team.", "A dangerous ___ can result in a red card."] },
+                { term: "Goal", definition: "A point scored when the ball crosses the line into the net", sentences: ["The striker scored a ___ in the last minute of the match.", "The ___ was celebrated by all the fans in the stadium.", "She kicked the ball into the ___ from outside the box."] },
+                { term: "Dribble", definition: "To move the ball forward using small, controlled kicks", sentences: ["The winger used her speed to ___ past two defenders.", "Learning to ___ well is one of the first skills in soccer.", "He can ___ the ball with both feet equally well."] },
+                { term: "Tackle", definition: "To try to take the ball away from an opponent using your feet", sentences: ["The defender made a perfect ___ to win the ball.", "A poorly timed ___ can injure another player.", "She had to ___ the attacker before he reached the goal."] },
+                { term: "Draw", definition: "A result where both teams finish with the same score", sentences: ["The match ended in a 1-1 ___.", "A ___ means both teams get one point in the league.", "Neither team could score, so the result was a 0-0 ___."] },
+                { term: "Squad", definition: "The full group of players available for a team", sentences: ["The coach selected a ___ of 23 players for the tournament.", "Every player in the ___ must be ready to play.", "The team's ___ includes players from many different countries."] }
+            ],
+            B2: [
+                { term: "Offside", definition: "A rule that prevents attackers from positioning behind the last defender", sentences: ["The goal was disallowed because the striker was ___.", "The ___ rule is one of the hardest rules to understand in soccer.", "VAR confirmed the attacker was in an ___ position."] },
+                { term: "Formation", definition: "The tactical arrangement of players on the pitch", sentences: ["The manager changed the ___ from 4-3-3 to 4-4-2 at halftime.", "A team's ___ determines how players are positioned on the pitch.", "The 4-3-3 ___ allows for attacking play with three forwards."] },
+                { term: "Fixture", definition: "A scheduled match between two teams in a competition", sentences: ["The next ___ is scheduled for Saturday afternoon.", "The league ___ list shows all the matches for the season.", "The ___ between the two rivals is always the most exciting match."] },
+                { term: "Relegation", definition: "The demotion of a team to a lower division due to poor performance", sentences: ["The team fought hard to avoid ___ to the second division.", "___ means a club must play in a lower league the following season.", "Three teams face ___ at the end of every Premier League season."] },
+                { term: "Aggregate", definition: "The combined score from two legs of a knockout tie", sentences: ["The team won 4-2 on ___ after two legs.", "The ___ score determines which team advances in the knockout round.", "Despite losing the second leg, they progressed on ___."] },
+                { term: "Derby", definition: "A match between two local rival teams", sentences: ["The city ___ between the two clubs always sells out.", "A ___ match is often more intense than a regular league game.", "Fans look forward to the ___ more than any other match of the season."] },
+                { term: "Clean sheet", definition: "A match in which a team concedes no goals", sentences: ["The goalkeeper kept a ___ for the fifth match in a row.", "Earning a ___ requires the entire team to defend well.", "The defender's performance helped the team keep a ___."] },
+                { term: "Stoppage time", definition: "Additional minutes added at the end of each half for delays", sentences: ["The winning goal came deep into ___.", "The referee added five minutes of ___.", "___ is added to make up for injuries and substitutions."] }
+            ],
+            C1: [
+                { term: "Tiki-taka", definition: "A possession-based playing style emphasizing short passing and movement", sentences: ["___ was perfected by Barcelona under Pep Guardiola.", "The ___ style requires exceptional passing accuracy and movement.", "Critics argue that ___ can become predictable against well-organised defences."] },
+                { term: "Gegenpressing", definition: "A tactical approach involving immediate pressing upon losing possession", sentences: ["___ requires extraordinary fitness levels from all outfield players.", "The ___ system was popularised by Jürgen Klopp at Borussia Dortmund.", "Effective ___ forces opponents into mistakes high up the pitch."] },
+                { term: "False nine", definition: "A centre-forward who drops into midfield rather than staying up front", sentences: ["Messi's deployment as a ___ transformed Barcelona's attacking play.", "The ___ role requires a player comfortable dropping deep into midfield.", "A ___ can create confusion among defenders unsure whether to follow."] },
+                { term: "Ultras", definition: "Highly organized fan groups known for choreographies and vocal support", sentences: ["The ___ group organised an impressive choreography for the derby.", "___ culture in Italian football dates back to the 1960s.", "The ___ are known for their unwavering support regardless of results."] },
+                { term: "Panenka", definition: "A penalty kick technique involving a delicate chip down the centre", sentences: ["He scored with a ___ in the penalty shootout, chipping the ball down the centre.", "A ___ requires immense confidence and composure under pressure.", "The ___ technique is named after Czech player Antonín Panenka."] },
+                { term: "Sweeper-keeper", definition: "A goalkeeper who plays outside the penalty area to support build-up play", sentences: ["The modern ___ is expected to be comfortable with the ball at their feet.", "Manuel Neuer revolutionised the ___ role in contemporary football.", "A ___ plays far from the goal line and helps build attacks from the back."] },
+                { term: "Sportswashing", definition: "The use of sport to improve a government's or organisation's public image", sentences: ["Critics accuse the club's new owners of using football for ___.", "___ refers to the use of sport to improve a government's image.", "The debate around ___ has intensified as more state-backed entities invest in football."] },
+                { term: "Catenaccio", definition: "An Italian defensive tactical system prioritizing organisation and counter-attacks", sentences: ["___ was the dominant tactical system in Italian football during the 1960s.", "The ___ approach prioritizes defensive solidity above all else.", "Modern football has moved away from pure ___, though its principles still influence defensive tactics."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
