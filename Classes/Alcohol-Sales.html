@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Dark Patterns - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Dark Patterns</h1>
+        <p class="game-subtitle">Where Marketing Meets Psychological Manipulation</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>Dark Patterns</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title Image -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">Dark Patterns</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Where Marketing Meets Psychological Manipulation</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/kxkrdLI6e6M?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What are Dark Patterns? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What are Dark Patterns?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('dark patterns', 'tricks used in websites and apps to make you do things you did not plan to do')">Dark patterns</span> are tricks that websites and apps use to make you do things you didn't want to do. Companies design these tricks to <span class="vocab-link" onclick="showPopup('manipulate', 'to control or influence someone cleverly or unfairly')">manipulate</span> you.</p>
+                                        <p>For example, they might hide the "unsubscribe" button, or make you feel bad for not buying something. These tricks are everywhere on the internet!</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('dark patterns', 'deceptive design practices that trick users into unintended actions')">Dark patterns</span> are <span class="vocab-link" onclick="showPopup('deceptive', 'giving a false impression; misleading')">deceptive</span> design techniques used in websites and apps to <span class="vocab-link" onclick="showPopup('manipulate', 'to control or influence someone in a clever but unfair way')">manipulate</span> users into taking actions they didn't intend to take.</p>
+                                        <p>Coined by UX designer Harry Brignull in 2010, these patterns <span class="vocab-link" onclick="showPopup('exploit', 'to use something unfairly for your own advantage')">exploit</span> human psychology to benefit companies at the user's expense.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('dark patterns', 'user interface design choices that benefit an online service by coercing users into unintended actions')">Dark patterns</span> constitute <span class="vocab-link" onclick="showPopup('deceptive', 'deliberately causing someone to believe something that is not true')">deceptive</span> user interface design <span class="vocab-link" onclick="showPopup('paradigms', 'typical examples or patterns of something')">paradigms</span> that <span class="vocab-link" onclick="showPopup('coerce', 'to persuade someone by using force or threats')">coerce</span> users into unintended actions.</p>
+                                        <p>Coined by UX researcher Harry Brignull in 2010, these <span class="vocab-link" onclick="showPopup('insidious', 'proceeding in a subtle way but with harmful effects')">insidious</span> techniques <span class="vocab-link" onclick="showPopup('exploit', 'to take advantage of unfairly')">exploit</span> cognitive biases and psychological <span class="vocab-link" onclick="showPopup('vulnerabilities', 'weaknesses that can be taken advantage of')">vulnerabilities</span> to prioritize corporate interests over user <span class="vocab-link" onclick="showPopup('autonomy', 'the right or condition of self-government; independence')">autonomy</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=800" alt="Dark Patterns" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - The Roach Motel -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Roach Motel</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>A <span class="vocab-link" onclick="showPopup('roach motel', 'a trap where it is easy to get in but very hard to get out')">roach motel</span> is when it's very easy to sign up for something, but very hard to leave. Like a real roach trap - easy to enter, impossible to exit!</p>
+                                        <ul>
+                                            <li><strong>Example:</strong> You can sign up for a <span class="vocab-link" onclick="showPopup('subscription', 'a regular payment to receive a service')">subscription</span> with one click, but to cancel, you must call a phone number and wait for hours.</li>
+                                            <li><strong>Example:</strong> Creating an account takes 30 seconds, but deleting it requires sending emails and waiting weeks.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The <span class="vocab-link" onclick="showPopup('roach motel', 'a dark pattern where signing up is easy but canceling is intentionally difficult')">roach motel</span> pattern makes enrollment <span class="vocab-link" onclick="showPopup('effortless', 'requiring no physical or mental effort')">effortless</span> while making <span class="vocab-link" onclick="showPopup('cancellation', 'the act of deciding that something will not happen')">cancellation</span> deliberately <span class="vocab-link" onclick="showPopup('arduous', 'involving a lot of effort and energy')">arduous</span>.</p>
+                                        <ul>
+                                            <li><strong>Amazon Prime:</strong> Easy one-click signup, but cancellation requires navigating multiple pages with <span class="vocab-link" onclick="showPopup('guilt-trip', 'making someone feel bad to influence their decision')">guilt-trip</span> messages.</li>
+                                            <li><strong>Gym memberships:</strong> Online registration takes minutes; cancellation often requires in-person visits or certified letters.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The <span class="vocab-link" onclick="showPopup('roach motel', 'an asymmetric design pattern facilitating enrollment while obstructing disengagement')">roach motel</span> <span class="vocab-link" onclick="showPopup('paradigm', 'a typical pattern or model')">paradigm</span> creates <span class="vocab-link" onclick="showPopup('asymmetric', 'having parts that are not equal or equivalent')">asymmetric</span> friction: enrollment is <span class="vocab-link" onclick="showPopup('frictionless', 'achieved without difficulty or effort')">frictionless</span>, while <span class="vocab-link" onclick="showPopup('disengagement', 'the process of withdrawing from involvement')">disengagement</span> is deliberately <span class="vocab-link" onclick="showPopup('labyrinthine', 'like a maze; complicated')">labyrinthine</span>.</p>
+                                        <ul>
+                                            <li><strong>Subscription services:</strong> One-click enrollment <span class="vocab-link" onclick="showPopup('juxtaposed', 'placed side by side for contrast')">juxtaposed</span> with multi-step cancellation <span class="vocab-link" onclick="showPopup('gauntlets', 'series of difficulties that must be overcome')">gauntlets</span> designed to induce abandonment.</li>
+                                            <li><strong>Data deletion:</strong> Account creation is <span class="vocab-link" onclick="showPopup('instantaneous', 'happening immediately')">instantaneous</span>; data erasure requests face <span class="vocab-link" onclick="showPopup('bureaucratic', 'involving complicated official procedures')">bureaucratic</span> obstacles and extended processing periods.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800" alt="Roach Motel" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Confirmshaming -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Confirmshaming</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('confirmshaming', 'using guilt or shame to make someone agree to something')">Confirmshaming</span> is when a website makes you feel bad for saying "no." The "no" option uses <span class="vocab-link" onclick="showPopup('shame', 'a feeling of embarrassment or guilt')">shame</span> to change your mind.</p>
+                                        <ul>
+                                            <li>"Yes, I want to save money!" vs. "No, I prefer to pay full price"</li>
+                                            <li>"Sign me up!" vs. "No thanks, I don't want to be successful"</li>
+                                            <li>"Get the discount!" vs. "No, I hate saving money"</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('confirmshaming', 'guilting users into opting in by making the decline option feel shameful')">Confirmshaming</span> uses <span class="vocab-link" onclick="showPopup('guilt', 'a feeling of having done something wrong')">guilt</span> and shame to <span class="vocab-link" onclick="showPopup('manipulate', 'to control in a clever but unfair way')">manipulate</span> users into compliance. The decline option is worded to make users feel foolish or <span class="vocab-link" onclick="showPopup('inadequate', 'not good enough; lacking')">inadequate</span>.</p>
+                                        <ul>
+                                            <li>"Yes, I want better results!" vs. "No, I'm satisfied with mediocrity"</li>
+                                            <li>"Join 50,000 smart subscribers!" vs. "No, I don't like learning new things"</li>
+                                        </ul>
+                                        <p>This <span class="vocab-link" onclick="showPopup('tactic', 'a planned way of doing something')">tactic</span> exploits our natural desire to avoid negative self-perception.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('confirmshaming', 'a manipulative design pattern that weaponizes shame to influence user decisions')">Confirmshaming</span> <span class="vocab-link" onclick="showPopup('weaponizes', 'uses something as a weapon or tool for attack')">weaponizes</span> self-image <span class="vocab-link" onclick="showPopup('preservation', 'the act of maintaining something')">preservation</span> instincts by framing rejection as an <span class="vocab-link" onclick="showPopup('admission', 'a statement acknowledging something')">admission</span> of personal <span class="vocab-link" onclick="showPopup('inadequacy', 'the state of being not good enough')">inadequacy</span>.</p>
+                                        <ul>
+                                            <li>The affirmative option: aspirational, empowering language</li>
+                                            <li>The negative option: self-<span class="vocab-link" onclick="showPopup('deprecating', 'expressing disapproval or criticism of oneself')">deprecating</span>, <span class="vocab-link" onclick="showPopup('demeaning', 'causing someone to lose dignity or respect')">demeaning</span> phrasing</li>
+                                        </ul>
+                                        <p>This <span class="vocab-link" onclick="showPopup('insidious', 'gradually harmful')">insidious</span> technique exploits fundamental cognitive biases around self-perception and social <span class="vocab-link" onclick="showPopup('validation', 'the recognition of something as acceptable')">validation</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800" alt="Confirmshaming" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - False Urgency & Scarcity -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>False Urgency & Scarcity</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('false urgency', 'making something seem more urgent than it really is')">False urgency</span> and <span class="vocab-link" onclick="showPopup('scarcity', 'when something is rare or in short supply')">scarcity</span> make you think you must buy NOW or you'll miss out. But often, these are lies!</p>
+                                        <ul>
+                                            <li>"Only 2 items left!" (but they have thousands in stock)</li>
+                                            <li>"Sale ends in 10 minutes!" (but the timer resets every day)</li>
+                                            <li>"15 people are looking at this right now!" (not always true)</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('false urgency', 'artificially creating time pressure to force quick decisions')">False urgency</span> and <span class="vocab-link" onclick="showPopup('artificial scarcity', 'deliberately limiting supply to increase demand')">artificial scarcity</span> exploit FOMO (Fear Of Missing Out) to bypass <span class="vocab-link" onclick="showPopup('rational', 'based on logic and reason')">rational</span> decision-making.</p>
+                                        <ul>
+                                            <li><strong>Countdown timers:</strong> Often reset or are completely <span class="vocab-link" onclick="showPopup('fabricated', 'invented; not true')">fabricated</span></li>
+                                            <li><strong>Low stock warnings:</strong> May not reflect actual <span class="vocab-link" onclick="showPopup('inventory', 'the goods available for sale')">inventory</span></li>
+                                            <li><strong>"Limited time" offers:</strong> Frequently <span class="vocab-link" onclick="showPopup('recurring', 'happening again and again')">recurring</span> or permanent</li>
+                                        </ul>
+                                        <p>These tactics trigger <span class="vocab-link" onclick="showPopup('impulsive', 'acting without thinking about consequences')">impulsive</span> purchasing behavior.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('synthetic', 'artificially created')">Synthetic</span> urgency and <span class="vocab-link" onclick="showPopup('contrived', 'deliberately created; artificial')">contrived</span> scarcity <span class="vocab-link" onclick="showPopup('circumvent', 'to avoid or get around')">circumvent</span> deliberative cognition by activating loss-<span class="vocab-link" onclick="showPopup('aversion', 'a strong dislike or unwillingness')">aversion</span> mechanisms.</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Ephemeral', 'lasting for a very short time')">Ephemeral</span> pricing:</strong> Countdown mechanisms that perpetually reset, creating <span class="vocab-link" onclick="showPopup('illusory', 'based on an illusion; not real')">illusory</span> deadlines</li>
+                                            <li><strong>Inventory <span class="vocab-link" onclick="showPopup('obfuscation', 'making something unclear or difficult to understand')">obfuscation</span>:</strong> Stock warnings <span class="vocab-link" onclick="showPopup('decoupled', 'separated from')">decoupled</span> from actual availability</li>
+                                            <li><strong>Social proof <span class="vocab-link" onclick="showPopup('fabrication', 'the act of inventing something false')">fabrication</span>:</strong> Fictitious concurrent viewer counts</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1501139083538-0139583c060f?w=800" alt="False Urgency" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Misdirection -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Misdirection</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('misdirection', 'drawing attention away from something important')">Misdirection</span> is when a website makes you look at one thing so you miss something important. Like a magic trick!</p>
+                                        <ul>
+                                            <li>Big colorful "Accept All" button, tiny grey "Manage Settings"</li>
+                                            <li>The option you DON'T want is already selected for you</li>
+                                            <li>Important information hidden in small text at the bottom</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('misdirection', 'using design to focus attention on one thing while hiding another')">Misdirection</span> uses visual <span class="vocab-link" onclick="showPopup('hierarchy', 'a system of ranking things by importance')">hierarchy</span> and design psychology to draw attention toward <span class="vocab-link" onclick="showPopup('preferred', 'favored; chosen over others')">preferred</span> actions while obscuring alternatives.</p>
+                                        <ul>
+                                            <li><strong>Cookie banners:</strong> "Accept All" is <span class="vocab-link" onclick="showPopup('prominent', 'easily seen; standing out')">prominent</span>; privacy options are hidden</li>
+                                            <li><strong>Pre-selected options:</strong> Extra services or <span class="vocab-link" onclick="showPopup('add-ons', 'extra items added to a main product')">add-ons</span> checked by default</li>
+                                            <li><strong>Trick questions:</strong> Double negatives that <span class="vocab-link" onclick="showPopup('confuse', 'to make unclear or difficult to understand')">confuse</span> users</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('misdirection', 'strategic manipulation of attention through design elements')">Misdirection</span> <span class="vocab-link" onclick="showPopup('leverages', 'uses to maximum advantage')">leverages</span> visual <span class="vocab-link" onclick="showPopup('salience', 'the quality of being particularly noticeable')">salience</span> and cognitive load management to <span class="vocab-link" onclick="showPopup('channel', 'to direct toward a particular purpose')">channel</span> user behavior toward organizationally <span class="vocab-link" onclick="showPopup('advantageous', 'beneficial; favorable')">advantageous</span> outcomes.</p>
+                                        <ul>
+                                            <li><strong>Asymmetric <span class="vocab-link" onclick="showPopup('prominence', 'the state of being important or famous')">prominence</span>:</strong> Desired actions rendered visually <span class="vocab-link" onclick="showPopup('conspicuous', 'clearly visible; attracting attention')">conspicuous</span>; alternatives <span class="vocab-link" onclick="showPopup('de-emphasized', 'made to seem less important')">de-emphasized</span></li>
+                                            <li><strong>Default <span class="vocab-link" onclick="showPopup('manipulation', 'the action of controlling something cleverly')">manipulation</span>:</strong> Exploiting status quo bias through strategic pre-selection</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Linguistic', 'relating to language')">Linguistic</span> obfuscation:</strong> Deliberately convoluted phrasing to induce errors</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800" alt="Misdirection" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Unbroken Streaks -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Unbroken Streaks</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('streak', 'a continuous series of events')">Streaks</span> are used by apps like Duolingo to keep you coming back every day. If you miss one day, you lose your streak and feel bad!</p>
+                                        <ul>
+                                            <li><strong>Duolingo:</strong> "You have a 50-day streak! Don't break it!"</li>
+                                            <li><strong>Snapchat:</strong> "You and your friend have a 100-day streak!"</li>
+                                            <li><strong>Video games:</strong> "Log in every day for <span class="vocab-link" onclick="showPopup('rewards', 'things given for doing something good')">rewards</span>!"</li>
+                                        </ul>
+                                        <p>These tricks create <span class="vocab-link" onclick="showPopup('anxiety', 'a feeling of worry or nervousness')">anxiety</span> about losing progress.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('streak mechanics', 'game features that reward consecutive daily engagement')">Streak mechanics</span> exploit loss <span class="vocab-link" onclick="showPopup('aversion', 'a strong dislike')">aversion</span> and the <span class="vocab-link" onclick="showPopup('sunk cost fallacy', 'continuing something because of past investment')">sunk cost fallacy</span> to ensure daily <span class="vocab-link" onclick="showPopup('engagement', 'the fact of being involved with something')">engagement</span>.</p>
+                                        <ul>
+                                            <li><strong>Duolingo:</strong> Uses a sad owl mascot to <span class="vocab-link" onclick="showPopup('guilt-trip', 'make someone feel guilty')">guilt-trip</span> users who miss practice</li>
+                                            <li><strong>Snapchat:</strong> <span class="vocab-link" onclick="showPopup('Gamifies', 'applies game elements to non-game contexts')">Gamifies</span> friendships with streak counts, creating social pressure</li>
+                                            <li><strong>Mobile games:</strong> Daily login <span class="vocab-link" onclick="showPopup('bonuses', 'extra rewards')">bonuses</span> that escalate with consecutive days</li>
+                                        </ul>
+                                        <p>Breaking a streak triggers <span class="vocab-link" onclick="showPopup('disproportionate', 'too large or too small compared to something else')">disproportionate</span> negative emotions.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Streak <span class="vocab-link" onclick="showPopup('mechanics', 'the way something works')">mechanics</span> represent a <span class="vocab-link" onclick="showPopup('potent', 'having great power or influence')">potent</span> <span class="vocab-link" onclick="showPopup('behavioral', 'relating to behavior')">behavioral</span> <span class="vocab-link" onclick="showPopup('intervention', 'action taken to improve a situation')">intervention</span> that <span class="vocab-link" onclick="showPopup('capitalizes', 'takes advantage of')">capitalizes</span> on loss aversion and sunk cost <span class="vocab-link" onclick="showPopup('fallacies', 'mistaken beliefs')">fallacies</span>.</p>
+                                        <ul>
+                                            <li><strong>Duolingo:</strong> <span class="vocab-link" onclick="showPopup('Anthropomorphizes', 'gives human characteristics to non-human things')">Anthropomorphizes</span> guilt through its owl mascot's <span class="vocab-link" onclick="showPopup('melancholic', 'sad; depressed')">melancholic</span> expressions</li>
+                                            <li><strong>Snapchat:</strong> <span class="vocab-link" onclick="showPopup('Commodifies', 'treats something as a tradeable product')">Commodifies</span> interpersonal relationships into <span class="vocab-link" onclick="showPopup('quantifiable', 'able to be measured')">quantifiable</span> metrics</li>
+                                            <li><strong>Gaming:</strong> <span class="vocab-link" onclick="showPopup('Exponential', 'increasing more and more rapidly')">Exponential</span> reward structures that <span class="vocab-link" onclick="showPopup('penalize', 'to punish for breaking a rule')">penalize</span> non-participation</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800" alt="Streaks" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Protecting Yourself -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>How to Protect Yourself</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Now that you know about dark patterns, here's how to protect yourself:</p>
+                                        <ul>
+                                            <li><strong>Take your time:</strong> Don't let timers make you rush</li>
+                                            <li><strong>Read carefully:</strong> Check all the boxes before you click</li>
+                                            <li><strong>Look for the small text:</strong> Important things are often hidden</li>
+                                            <li><strong>Ask yourself:</strong> "Do I really need this?"</li>
+                                            <li><strong>Use browser <span class="vocab-link" onclick="showPopup('extensions', 'programs that add features to your browser')">extensions</span>:</strong> Some can block dark patterns</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('Awareness', 'knowledge or understanding of something')">Awareness</span> is your first line of defense against dark patterns:</p>
+                                        <ul>
+                                            <li><strong>Pause before acting:</strong> <span class="vocab-link" onclick="showPopup('Artificial', 'made by humans; not natural')">Artificial</span> urgency loses power when you wait</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('Scrutinize', 'to examine closely')">Scrutinize</span> defaults:</strong> Uncheck pre-selected options</li>
+                                            <li><strong>Use privacy tools:</strong> Ad blockers and cookie managers can help</li>
+                                            <li><strong>Report violations:</strong> Many <span class="vocab-link" onclick="showPopup('jurisdictions', 'areas where laws apply')">jurisdictions</span> now have laws against deceptive design</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('Metacognitive', 'relating to awareness of one&apos;s own thought processes')">Metacognitive</span> awareness serves as the primary <span class="vocab-link" onclick="showPopup('bulwark', 'a defensive wall')">bulwark</span> against manipulative design:</p>
+                                        <ul>
+                                            <li><strong>Temporal <span class="vocab-link" onclick="showPopup('decoupling', 'separating from')">decoupling</span>:</strong> Introduce <span class="vocab-link" onclick="showPopup('deliberate', 'done consciously and intentionally')">deliberate</span> delays to <span class="vocab-link" onclick="showPopup('neutralize', 'to make ineffective')">neutralize</span> urgency tactics</li>
+                                            <li><strong>Default <span class="vocab-link" onclick="showPopup('interrogation', 'the act of questioning')">interrogation</span>:</strong> Systematically review pre-selected options</li>
+                                            <li><strong>Regulatory <span class="vocab-link" onclick="showPopup('recourse', 'a source of help in a difficult situation')">recourse</span>:</strong> GDPR, CCPA, and emerging legislation <span class="vocab-link" onclick="showPopup('proscribe', 'to forbid by law')">proscribe</span> many dark patterns</li>
+                                            <li><strong>Technical <span class="vocab-link" onclick="showPopup('countermeasures', 'actions taken to oppose something')">countermeasures</span>:</strong> Browser extensions can <span class="vocab-link" onclick="showPopup('mitigate', 'to make less severe')">mitigate</span> exposure</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800" alt="Protection" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Remember these important points:</p>
+                                        <ul>
+                                            <li><strong>Dark patterns are tricks:</strong> Websites use them to control you</li>
+                                            <li><strong>Know the types:</strong> Roach motel, confirmshaming, fake urgency, misdirection, streaks</li>
+                                            <li><strong>Stay alert:</strong> When something feels wrong, it probably is</li>
+                                            <li><strong>Take your time:</strong> Never let a website rush you</li>
+                                            <li><strong>You have rights:</strong> Laws are starting to protect consumers</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Essential takeaways from this lesson:</p>
+                                        <ul>
+                                            <li><strong>Recognition is power:</strong> Understanding dark patterns helps you <span class="vocab-link" onclick="showPopup('resist', 'to fight against')">resist</span> them</li>
+                                            <li><strong>Psychology matters:</strong> These patterns exploit universal cognitive <span class="vocab-link" onclick="showPopup('biases', 'tendencies to think in a certain way')">biases</span></li>
+                                            <li><strong>Ethical design exists:</strong> Support companies that respect users</li>
+                                            <li><strong>Legislation is evolving:</strong> Consumer protection laws are increasingly <span class="vocab-link" onclick="showPopup('addressing', 'dealing with')">addressing</span> dark patterns</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('Salient', 'most noticeable or important')">Salient</span> conclusions:</p>
+                                        <ul>
+                                            <li><strong>Cognitive <span class="vocab-link" onclick="showPopup('inoculation', 'protection against something harmful')">inoculation</span>:</strong> Pattern recognition <span class="vocab-link" onclick="showPopup('diminishes', 'makes smaller or less')">diminishes</span> manipulation <span class="vocab-link" onclick="showPopup('efficacy', 'the ability to produce a desired result')">efficacy</span></li>
+                                            <li><strong>Ethical <span class="vocab-link" onclick="showPopup('imperative', 'something that is absolutely necessary')">imperative</span>:</strong> Advocate for transparent, user-<span class="vocab-link" onclick="showPopup('centric', 'centered on')">centric</span> design</li>
+                                            <li><strong>Regulatory <span class="vocab-link" onclick="showPopup('trajectory', 'the path followed by something')">trajectory</span>:</strong> Legal frameworks are <span class="vocab-link" onclick="showPopup('converging', 'coming together')">converging</span> toward dark pattern <span class="vocab-link" onclick="showPopup('prohibition', 'the act of forbidding something')">prohibition</span></li>
+                                            <li><strong>Consumer <span class="vocab-link" onclick="showPopup('empowerment', 'the process of becoming stronger')">empowerment</span>:</strong> Informed users <span class="vocab-link" onclick="showPopup('constitute', 'form or make up')">constitute</span> the ultimate market correction</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800" alt="Takeaways" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Manipulate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To control or influence someone cleverly or unfairly</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Trick</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A cunning act designed to deceive someone</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Subscription</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A regular payment to receive a service</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Shame</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A feeling of embarrassment or guilt</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Scarcity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">When something is rare or in short supply</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Urgency</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The need to act quickly</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Streak</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A continuous series of events</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Anxiety</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A feeling of worry or nervousness</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Deceptive</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Giving a false impression; misleading</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Exploit</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To use something unfairly for your own advantage</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Fabricated</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Invented; not true</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Impulsive</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Acting without thinking about consequences</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hierarchy</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A system of ranking things by importance</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Gamifies</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Applies game elements to non-game contexts</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Scrutinize</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To examine closely</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cognitive bias</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A systematic error in thinking that affects decisions</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Insidious</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Proceeding in a subtle way but with harmful effects</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Coerce</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To persuade someone by using force or threats</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Asymmetric</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Having parts that are not equal or equivalent</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Obfuscation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Making something unclear or difficult to understand</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Circumvent</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To avoid or get around something</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Commodifies</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Treats something as a tradeable product</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Metacognitive</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Relating to awareness of one's own thought processes</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Proscribe</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To forbid by law</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>Think about a time when you encountered a dark pattern online. Describe what happened, how the website or app tried to manipulate you, and whether you recognized the trick at the time. What would you do differently now?</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Dark Patterns - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Manipulate", definition: "To control someone cleverly or unfairly", sentences: ["Websites try to ___ users into clicking.", "Dark patterns ___ our decisions.", "Companies ___ consumers for profit."] },
+                { term: "Trick", definition: "A cunning act to deceive someone", sentences: ["This is a ___ to make you subscribe.", "Don't fall for this ___.", "It's a common ___ used by websites."] },
+                { term: "Subscription", definition: "A regular payment to receive a service", sentences: ["Cancel your ___ before it renews.", "The ___ is easy to start.", "Check your ___ settings carefully."] },
+                { term: "Shame", definition: "A feeling of embarrassment or guilt", sentences: ["They use ___ to change your mind.", "Don't feel ___ for saying no.", "Confirmshaming uses ___ as a weapon."] },
+                { term: "Scarcity", definition: "When something is rare or limited", sentences: ["False ___ creates urgency.", "___ makes things seem more valuable.", "They fake ___ to pressure buyers."] },
+                { term: "Urgency", definition: "The need to act quickly", sentences: ["Fake ___ makes you rush.", "Don't let ___ control your decisions.", "The timer creates false ___."] },
+                { term: "Streak", definition: "A continuous series of events", sentences: ["Don't break your ___!", "The app tracks your daily ___.", "Losing a ___ feels terrible."] },
+                { term: "Anxiety", definition: "A feeling of worry or nervousness", sentences: ["Streaks create ___ about missing days.", "___ makes us act without thinking.", "Dark patterns exploit our ___."] }
+            ],
+            B2: [
+                { term: "Deceptive", definition: "Giving a false impression; misleading", sentences: ["___ design tricks users.", "This is a ___ practice.", "The website uses ___ patterns."] },
+                { term: "Exploit", definition: "To use unfairly for your own advantage", sentences: ["Companies ___ human psychology.", "They ___ our fear of missing out.", "Dark patterns ___ cognitive biases."] },
+                { term: "Fabricated", definition: "Invented; not true", sentences: ["The countdown timer is ___.", "___ scarcity is a common trick.", "Those viewer counts are ___."] },
+                { term: "Impulsive", definition: "Acting without thinking about consequences", sentences: ["Urgency triggers ___ buying.", "___ decisions benefit companies.", "Take time to avoid ___ choices."] },
+                { term: "Hierarchy", definition: "A system of ranking by importance", sentences: ["Visual ___ guides your attention.", "They manipulate the design ___.", "Color ___ highlights preferred options."] },
+                { term: "Gamifies", definition: "Applies game elements to non-game contexts", sentences: ["Duolingo ___ language learning.", "The app ___ daily engagement.", "Snapchat ___ friendships with streaks."] },
+                { term: "Scrutinize", definition: "To examine closely", sentences: ["___ all pre-checked boxes.", "Always ___ terms and conditions.", "___ the options before clicking."] },
+                { term: "Bias", definition: "A tendency to think in a certain way", sentences: ["Dark patterns exploit cognitive ___.", "Loss aversion is a psychological ___.", "Our ___ makes us vulnerable."] }
+            ],
+            C1: [
+                { term: "Insidious", definition: "Proceeding subtly with harmful effects", sentences: ["Dark patterns are ___ by design.", "The ___ nature of these tricks.", "An ___ manipulation technique."] },
+                { term: "Coerce", definition: "To persuade using force or threats", sentences: ["Websites ___ users into compliance.", "They ___ through emotional pressure.", "Don't let them ___ you."] },
+                { term: "Asymmetric", definition: "Having unequal parts", sentences: ["___ friction favors the company.", "The process is deliberately ___.", "___ design makes cancellation hard."] },
+                { term: "Obfuscation", definition: "Making something unclear", sentences: ["Privacy settings use ___.", "___ hides the true cost.", "Deliberate ___ confuses users."] },
+                { term: "Circumvent", definition: "To avoid or get around", sentences: ["These patterns ___ rational thinking.", "Urgency helps ___ deliberation.", "They ___ our critical faculties."] },
+                { term: "Commodifies", definition: "Treats as a tradeable product", sentences: ["Snapchat ___ friendships.", "This ___ human relationships.", "The app ___ attention."] },
+                { term: "Metacognitive", definition: "Awareness of one's own thinking", sentences: ["___ awareness protects you.", "Develop ___ skills to resist.", "___ reflection helps identify tricks."] },
+                { term: "Proscribe", definition: "To forbid by law", sentences: ["Laws now ___ dark patterns.", "GDPR ___ deceptive practices.", "Regulations ___ manipulative design."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
