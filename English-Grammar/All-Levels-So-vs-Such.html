@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Levels: English Phonetics - Sound Patterns</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background: white;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 100px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -70px;
+        }
+
+        .slide-arrow.next {
+            right: -70px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        .slide h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .explanation-box {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 10px;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .explanation-box h3 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .explanation-box p {
+            color: #2d3748;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+        }
+
+        .sound-part {
+            display: inline-block;
+            padding: 5px 12px;
+            margin: 0 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .vowel-long {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .vowel-short {
+            background: #ff9ff3;
+            color: white;
+        }
+
+        .consonant-voiced {
+            background: #48dbfb;
+            color: white;
+        }
+
+        .consonant-unvoiced {
+            background: #feca57;
+            color: #333;
+        }
+
+        .silent {
+            background: #95afc0;
+            color: white;
+            text-decoration: line-through;
+        }
+
+        .diphthong {
+            background: #26de81;
+            color: white;
+        }
+
+        .r-controlled {
+            background: #fd79a8;
+            color: white;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .example-box {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .example-box p {
+            margin: 8px 0;
+            font-size: 1.05rem;
+            color: #2d3748;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .note-box strong {
+            color: #856404;
+            font-size: 1.1rem;
+        }
+
+        .note-box p {
+            color: #856404;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .exercise-container {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 10px;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .exercise-container h3 {
+            color: #764ba2;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 0;
+        }
+
+        .question-box p {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 18px;
+            margin: 8px 0;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 15px 5px 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .feedback {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: 500;
+            font-size: 1.05rem;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+            display: block;
+        }
+
+        ul {
+            margin-left: 25px;
+            line-height: 1.6;
+        }
+
+        li {
+            margin: 6px 0;
+            font-size: 1.05rem;
+            color: #2d3748;
+        }
+
+        li strong {
+            color: #667eea;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            padding: 15px 60px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+                margin-top: 15px;
+            }
+
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 20px 15px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 120px;
+                margin: 5px;
+                font-size: 0.95rem;
+                padding: 12px 16px;
+            }
+
+            .content {
+                height: auto;
+                overflow: visible;
+            }
+
+            .section {
+                padding: 25px 15px;
+                height: auto;
+                overflow: visible;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+                margin-bottom: 25px;
+            }
+
+            .explanation-box {
+                padding: 20px;
+            }
+
+            .exercise-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>English Phonetics: Sound Patterns</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">mimlanguageservices</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="ESL Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('explanation', this)">Explanation</div>
+            <div class="nav-item" onclick="showSection('examples', this)">Examples</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('media', this)">Media</div>
+            <div class="nav-item" onclick="showSection('practice', this)">Practice</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Explanation Section -->
+            <div class="section active" id="explanation">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="explanation">
+                            <h2>English Sound Patterns</h2>
+                            <div class="explanation-box">
+                                <h3>Understanding How English Sounds Work</h3>
+                                <p>English has predictable patterns for how letters sound. Learning these patterns helps you read and pronounce words correctly!</p>
+                                <div class="legend">
+                                    <span class="sound-part vowel-long">Long Vowels</span>
+                                    <span class="sound-part vowel-short">Short Vowels</span>
+                                    <span class="sound-part diphthong">Diphthongs</span>
+                                    <span class="sound-part r-controlled">R-Controlled</span>
+                                    <span class="sound-part silent">Silent Letters</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>1. Short Vowels (Quick Sounds)</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.3rem; margin-bottom: 25px;">Short vowels make quick, simple sounds. They usually appear in words with one vowel in the middle.</p>
+                                <div class="example-box">
+                                    <p><span class="sound-part vowel-short">a</span> as in c<span class="sound-part vowel-short">a</span>t, h<span class="sound-part vowel-short">a</span>t, m<span class="sound-part vowel-short">a</span>t (sounds like "ah")</p>
+                                    <p><span class="sound-part vowel-short">e</span> as in b<span class="sound-part vowel-short">e</span>d, p<span class="sound-part vowel-short">e</span>t, r<span class="sound-part vowel-short">e</span>d (sounds like "eh")</p>
+                                    <p><span class="sound-part vowel-short">i</span> as in s<span class="sound-part vowel-short">i</span>t, h<span class="sound-part vowel-short">i</span>t, p<span class="sound-part vowel-short">i</span>t (sounds like "ih")</p>
+                                    <p><span class="sound-part vowel-short">o</span> as in h<span class="sound-part vowel-short">o</span>t, p<span class="sound-part vowel-short">o</span>t, d<span class="sound-part vowel-short">o</span>t (sounds like "ah" or "oh")</p>
+                                    <p><span class="sound-part vowel-short">u</span> as in c<span class="sound-part vowel-short">u</span>p, r<span class="sound-part vowel-short">u</span>n, s<span class="sound-part vowel-short">u</span>n (sounds like "uh")</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>2. Long Vowels (Say Their Name)</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.3rem; margin-bottom: 25px;">Long vowels "say their name" - they sound like the letter itself. Often with silent 'e' at the end!</p>
+                                <div class="example-box">
+                                    <p><span class="sound-part vowel-long">a</span> as in c<span class="sound-part vowel-long">a</span>k<span class="sound-part silent">e</span>, m<span class="sound-part vowel-long">a</span>k<span class="sound-part silent">e</span>, n<span class="sound-part vowel-long">a</span>m<span class="sound-part silent">e</span> (sounds like "ay")</p>
+                                    <p><span class="sound-part vowel-long">e</span> as in <span class="sound-part vowel-long">e</span>v<span class="sound-part vowel-long">e</span>n, m<span class="sound-part vowel-long">e</span>, sh<span class="sound-part vowel-long">e</span> (sounds like "ee")</p>
+                                    <p><span class="sound-part vowel-long">i</span> as in b<span class="sound-part vowel-long">i</span>k<span class="sound-part silent">e</span>, k<span class="sound-part vowel-long">i</span>t<span class="sound-part silent">e</span>, l<span class="sound-part vowel-long">i</span>k<span class="sound-part silent">e</span> (sounds like "eye")</p>
+                                    <p><span class="sound-part vowel-long">o</span> as in h<span class="sound-part vowel-long">o</span>m<span class="sound-part silent">e</span>, h<span class="sound-part vowel-long">o</span>p<span class="sound-part silent">e</span>, n<span class="sound-part vowel-long">o</span>t<span class="sound-part silent">e</span> (sounds like "oh")</p>
+                                    <p><span class="sound-part vowel-long">u</span> as in c<span class="sound-part vowel-long">u</span>t<span class="sound-part silent">e</span>, <span class="sound-part vowel-long">u</span>s<span class="sound-part silent">e</span>, m<span class="sound-part vowel-long">u</span>t<span class="sound-part silent">e</span> (sounds like "yoo")</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>3. Diphthongs (Gliding Sounds)</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.3rem; margin-bottom: 25px;">Diphthongs are two vowel sounds that blend together smoothly in one syllable.</p>
+                                <div class="example-box">
+                                    <p><span class="sound-part diphthong">oi/oy</span> as in b<span class="sound-part diphthong">oy</span>, t<span class="sound-part diphthong">oy</span>, c<span class="sound-part diphthong">oi</span>n</p>
+                                    <p><span class="sound-part diphthong">ou/ow</span> as in c<span class="sound-part diphthong">ow</span>, h<span class="sound-part diphthong">ow</span>, l<span class="sound-part diphthong">ou</span>d</p>
+                                    <p><span class="sound-part diphthong">au/aw</span> as in s<span class="sound-part diphthong">aw</span>, p<span class="sound-part diphthong">aw</span>, <span class="sound-part diphthong">au</span>tumn</p>
+                                    <p><span class="sound-part diphthong">ai/ay</span> as in r<span class="sound-part diphthong">ai</span>n, d<span class="sound-part diphthong">ay</span>, pl<span class="sound-part diphthong">ay</span></p>
+                                    <p><span class="sound-part diphthong">oo</span> as in m<span class="sound-part diphthong">oo</span>n, b<span class="sound-part diphthong">oo</span>k, f<span class="sound-part diphthong">oo</span>d</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>4. R-Controlled Vowels</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.3rem; margin-bottom: 25px;">When 'r' comes after a vowel, it changes the vowel's sound. The 'r' "controls" it!</p>
+                                <div class="example-box">
+                                    <p><span class="sound-part r-controlled">ar</span> as in c<span class="sound-part r-controlled">ar</span>, st<span class="sound-part r-controlled">ar</span>, f<span class="sound-part r-controlled">ar</span></p>
+                                    <p><span class="sound-part r-controlled">er</span> as in h<span class="sound-part r-controlled">er</span>, nev<span class="sound-part r-controlled">er</span>, und<span class="sound-part r-controlled">er</span></p>
+                                    <p><span class="sound-part r-controlled">ir</span> as in b<span class="sound-part r-controlled">ir</span>d, f<span class="sound-part r-controlled">ir</span>st, g<span class="sound-part r-controlled">ir</span>l</p>
+                                    <p><span class="sound-part r-controlled">or</span> as in f<span class="sound-part r-controlled">or</span>, st<span class="sound-part r-controlled">or</span>m, c<span class="sound-part r-controlled">or</span>n</p>
+                                    <p><span class="sound-part r-controlled">ur</span> as in t<span class="sound-part r-controlled">ur</span>n, b<span class="sound-part r-controlled">ur</span>n, n<span class="sound-part r-controlled">ur</span>se</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>5. Silent Letters</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.3rem; margin-bottom: 25px;">Some letters don't make any sound! We write them but don't say them.</p>
+                                <div class="example-box">
+                                    <p>Silent <span class="sound-part silent">e</span>: mak<span class="sound-part silent">e</span>, hom<span class="sound-part silent">e</span>, tak<span class="sound-part silent">e</span></p>
+                                    <p>Silent <span class="sound-part silent">k</span>: <span class="sound-part silent">k</span>nife, <span class="sound-part silent">k</span>now, <span class="sound-part silent">k</span>nee</p>
+                                    <p>Silent <span class="sound-part silent">w</span>: <span class="sound-part silent">w</span>rite, <span class="sound-part silent">w</span>rong, ans<span class="sound-part silent">w</span>er</p>
+                                    <p>Silent <span class="sound-part silent">b</span>: lam<span class="sound-part silent">b</span>, clim<span class="sound-part silent">b</span>, thum<span class="sound-part silent">b</span></p>
+                                    <p>Silent <span class="sound-part silent">h</span>: <span class="sound-part silent">h</span>onest, <span class="sound-part silent">h</span>our, g<span class="sound-part silent">h</span>ost</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="explanation-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(6)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Examples Section -->
+            <div class="section" id="examples">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="examples">
+                            <h2>Complete Word Examples</h2>
+                            <div class="explanation-box">
+                                <h3>Common Words with Color-Coded Sounds</h3>
+                                <div class="example-box">
+                                    <p><span class="sound-part vowel-short">a</span>pple - Short 'a' sound</p>
+                                    <p>gr<span class="sound-part vowel-long">a</span>p<span class="sound-part silent">e</span> - Long 'a' sound with silent 'e'</p>
+                                    <p>r<span class="sound-part diphthong">ai</span>n - 'ai' diphthong</p>
+                                    <p>c<span class="sound-part r-controlled">ar</span> - R-controlled vowel</p>
+                                    <p><span class="sound-part silent">k</span>n<span class="sound-part vowel-long">i</span>f<span class="sound-part silent">e</span> - Silent 'k' and 'e', long 'i'</p>
+                                    <p>t<span class="sound-part diphthong">oy</span> - 'oy' diphthong</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="examples">
+                            <h2>Word Families</h2>
+                            <div class="explanation-box">
+                                <h3>Words That Follow the Same Pattern</h3>
+                                <div class="example-box">
+                                    <p style="margin-bottom: 15px;"><strong>-ake Family (long 'a'):</strong></p>
+                                    <p>b<span class="sound-part vowel-long">a</span>k<span class="sound-part silent">e</span>, c<span class="sound-part vowel-long">a</span>k<span class="sound-part silent">e</span>, m<span class="sound-part vowel-long">a</span>k<span class="sound-part silent">e</span>, l<span class="sound-part vowel-long">a</span>k<span class="sound-part silent">e</span>, t<span class="sound-part vowel-long">a</span>k<span class="sound-part silent">e</span></p>
+
+                                    <p style="margin: 15px 0;"><strong>-ight Family (long 'i'):</strong></p>
+                                    <p>n<span class="sound-part vowel-long">i</span>g<span class="sound-part silent">h</span>t, l<span class="sound-part vowel-long">i</span>g<span class="sound-part silent">h</span>t, r<span class="sound-part vowel-long">i</span>g<span class="sound-part silent">h</span>t, f<span class="sound-part vowel-long">i</span>g<span class="sound-part silent">h</span>t, s<span class="sound-part vowel-long">i</span>g<span class="sound-part silent">h</span>t</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="examples">
+                            <h2>Tricky Words</h2>
+                            <div class="note-box">
+                                <strong>Some words break the rules!</strong>
+                                <p>English has irregular words that don't follow normal patterns. You just have to memorize these:</p>
+                                <div class="example-box" style="background: white; margin-top: 20px;">
+                                    <p><strong>said</strong> - sounds like "sed" (not "sayd")</p>
+                                    <p><strong>busy</strong> - 'u' sounds like short 'i'</p>
+                                    <p><strong>enough</strong> - 'ough' sounds like "uff"</p>
+                                    <p><strong>through</strong> - 'ough' sounds like "oo"</p>
+                                    <p><strong>people</strong> - 'eo' sounds like "ee"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="examples-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="writing" style="overflow-y: auto;">
+                            <h2>Writing Practice</h2>
+                            <div class="explanation-box">
+                                <h3>Write Words with Different Sound Patterns</h3>
+                                <p style="margin-bottom: 20px;">Write 5 words for each category. Try to think of different examples!</p>
+                                <div class="question-box">
+                                    <p><strong>1. Words with SHORT vowel sounds (like cat, bed, sit):</strong></p>
+                                    <input type="text" id="writing-short" placeholder="Example: cat, dog, pet, sit, run">
+
+                                    <p style="margin-top: 15px;"><strong>2. Words with LONG vowel sounds (like cake, bike, home):</strong></p>
+                                    <input type="text" id="writing-long" placeholder="Example: make, time, hope, use">
+
+                                    <p style="margin-top: 15px;"><strong>3. Words with SILENT letters (like knife, write, climb):</strong></p>
+                                    <input type="text" id="writing-silent" placeholder="Example: know, answer, thumb">
+
+                                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                        <button class="check-button" onclick="checkWriting()">Check My Words</button>
+                                    </div>
+                                    <div id="writing-feedback" style="margin-top: 15px; padding: 15px; border-radius: 8px; display: none;"></div>
+                                    <p style="font-size: 0.95rem; color: #666; margin-top: 10px;">Try your best! There are many correct answers.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="writing-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Section -->
+            <div class="section" id="practice">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="practice">
+                            <h2>Practice: Identify the Sound Pattern</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>What type of vowel sound is in the word "CAKE"?</p>
+                                    <p style="font-size: 2rem; color: #667eea; margin: 20px 0;">CAKE</p>
+                                    <input type="text" id="q1-sound" placeholder="Type: short, long, diphthong, or r-controlled" onkeypress="if(event.key==='Enter') checkAnswer1()">
+                                    <button class="check-button" onclick="checkAnswer1()">Check Answer</button>
+                                    <div id="feedback1" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice: Identify the Sound Pattern</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>What type of vowel sound is in the word "CAT"?</p>
+                                    <p style="font-size: 2rem; color: #667eea; margin: 20px 0;">CAT</p>
+                                    <input type="text" id="q2-sound" placeholder="Type: short, long, diphthong, or r-controlled" onkeypress="if(event.key==='Enter') checkAnswer2()">
+                                    <button class="check-button" onclick="checkAnswer2()">Check Answer</button>
+                                    <div id="feedback2" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice: Identify the Sound Pattern</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>What type of vowel sound is in the word "STAR"?</p>
+                                    <p style="font-size: 2rem; color: #667eea; margin: 20px 0;">STAR</p>
+                                    <input type="text" id="q3-sound" placeholder="Type: short, long, diphthong, or r-controlled" onkeypress="if(event.key==='Enter') checkAnswer3()">
+                                    <button class="check-button" onclick="checkAnswer3()">Check Answer</button>
+                                    <div id="feedback3" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice: Identify the Sound Pattern</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>What type of vowel sound is in the word "COIN"?</p>
+                                    <p style="font-size: 2rem; color: #667eea; margin: 20px 0;">COIN</p>
+                                    <input type="text" id="q4-sound" placeholder="Type: short, long, diphthong, or r-controlled" onkeypress="if(event.key==='Enter') checkAnswer4()">
+                                    <button class="check-button" onclick="checkAnswer4()">Check Answer</button>
+                                    <div id="feedback4" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice: Find the Silent Letter</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Which letter is SILENT in the word "KNIFE"?</p>
+                                    <p style="font-size: 2rem; color: #667eea; margin: 20px 0;">KNIFE</p>
+                                    <input type="text" id="q5-sound" placeholder="Type the silent letter" onkeypress="if(event.key==='Enter') checkAnswer5()">
+                                    <button class="check-button" onclick="checkAnswer5()">Check Answer</button>
+                                    <div id="feedback5" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice: Find the Silent Letter</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Which letter is SILENT in the word "WRITE"?</p>
+                                    <p style="font-size: 2rem; color: #667eea; margin: 20px 0;">WRITE</p>
+                                    <input type="text" id="q6-sound" placeholder="Type the silent letter" onkeypress="if(event.key==='Enter') checkAnswer6()">
+                                    <button class="check-button" onclick="checkAnswer6()">Check Answer</button>
+                                    <div id="feedback6" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice: Identify the Sound Pattern</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>What type of vowel sound is in the word "MOON"?</p>
+                                    <p style="font-size: 2rem; color: #667eea; margin: 20px 0;">MOON</p>
+                                    <input type="text" id="q7-sound" placeholder="Type: short, long, diphthong, or r-controlled" onkeypress="if(event.key==='Enter') checkAnswer7()">
+                                    <button class="check-button" onclick="checkAnswer7()">Check Answer</button>
+                                    <div id="feedback7" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice: Find the Silent Letter</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>Which letter is SILENT in the word "CLIMB"?</p>
+                                    <p style="font-size: 2rem; color: #667eea; margin: 20px 0;">CLIMB</p>
+                                    <input type="text" id="q8-sound" placeholder="Type the silent letter" onkeypress="if(event.key==='Enter') checkAnswer8()">
+                                    <button class="check-button" onclick="checkAnswer8()">Check Answer</button>
+                                    <div id="feedback8" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="practice-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(6)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(7)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(8)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="reading">
+                            <h2>Reading Practice</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.2rem; margin-bottom: 25px;">Read the text and notice the different sound patterns:</p>
+                                <div class="example-box" style="background: white; padding: 30px;">
+                                    <h3 style="color: #667eea; margin-bottom: 20px;">The Rainy Day</h3>
+                                    <p style="font-size: 1.25rem; line-height: 2.2;">
+                                        One day, Jake woke up late. He looked outside and saw rain falling on the street. He made himself a hot cup of tea and some toast. Jake knew he couldn't go to the park today. Instead, he decided to write a letter to his friend and read his new book about cars.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="reading">
+                            <h2>Sound Patterns in the Story</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.15rem; margin-bottom: 20px;">Let's identify the sound patterns:</p>
+                                <div class="example-box">
+                                    <p><strong>Long Vowels:</strong> J<span class="sound-part vowel-long">a</span>k<span class="sound-part silent">e</span>, l<span class="sound-part vowel-long">a</span>t<span class="sound-part silent">e</span>, m<span class="sound-part vowel-long">a</span>d<span class="sound-part silent">e</span>, t<span class="sound-part vowel-long">ea</span></p>
+                                    <p><strong>Short Vowels:</strong> <span class="sound-part vowel-short">o</span>ne, h<span class="sound-part vowel-short">o</span>t, c<span class="sound-part vowel-short">u</span>p</p>
+                                    <p><strong>Diphthongs:</strong> r<span class="sound-part diphthong">ai</span>n, d<span class="sound-part diphthong">ay</span>, n<span class="sound-part diphthong">ew</span>, b<span class="sound-part diphthong">oo</span>k</p>
+                                    <p><strong>R-Controlled:</strong> l<span class="sound-part r-controlled">oo</span>ked, p<span class="sound-part r-controlled">ar</span>k, c<span class="sound-part r-controlled">ar</span>s, lett<span class="sound-part r-controlled">er</span></p>
+                                    <p><strong>Silent Letters:</strong> <span class="sound-part silent">k</span>new, <span class="sound-part silent">w</span>rite, mak<span class="sound-part silent">e</span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="reading">
+                            <h2>Another Reading</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.2rem; margin-bottom: 25px;">Read this story and look for sound patterns:</p>
+                                <div class="example-box" style="background: white; padding: 30px;">
+                                    <h3 style="color: #667eea; margin-bottom: 20px;">The Toy Store</h3>
+                                    <p style="font-size: 1.25rem; line-height: 2.2;">
+                                        The boy went to the toy store with his mom. He saw a bright red car and a cute brown bear. The store had books, games, and bikes too. He could hear music playing softly. His mom said he could choose one toy to take home.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="reading-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Section -->
+            <div class="section" id="media">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="media">
+                            <h2>Phonics Video: Long vs Short Vowels</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.15rem; margin-bottom: 25px;">Watch this video to hear the difference between long and short vowel sounds:</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <iframe width="800" height="450"
+                                        src="https://www.youtube.com/embed/dEnfugP88hs"
+                                        style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <div class="note-box">
+                                    <strong>Key Points:</strong>
+                                    <p>Listen carefully to how vowels change sounds. Short vowels are quick. Long vowels "say their name"!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="media">
+                            <h2>Silent Letters Song</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.15rem; margin-bottom: 25px;">Learn about silent letters in a fun way:</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <iframe width="800" height="450"
+                                        src="https://www.youtube.com/embed/YslFD2FbwY8"
+                                        style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <div class="example-box">
+                                    <h3 style="color: #667eea;">Common Silent Letter Patterns:</h3>
+                                    <p><strong>kn-</strong> knife, knee, know, knock</p>
+                                    <p><strong>wr-</strong> write, wrong, wrap, wrist</p>
+                                    <p><strong>-mb</strong> climb, thumb, lamb, comb</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="media">
+                            <h2>Diphthongs and R-Controlled Vowels</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.15rem; margin-bottom: 25px;">Understanding complex vowel patterns:</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <iframe width="800" height="450"
+                                        src="https://www.youtube.com/embed/wxC6pMuLcNY"
+                                        style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <div class="example-box">
+                                    <h3 style="color: #667eea;">Practice Words:</h3>
+                                    <p><span class="sound-part diphthong">oi/oy</span>: coin, boy, soil, joy</p>
+                                    <p><span class="sound-part diphthong">ou/ow</span>: house, cow, loud, town</p>
+                                    <p><span class="sound-part r-controlled">ar/or/er</span>: star, corn, her, bird</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="media-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        let currentSection = 'explanation';
+
+        function showSection(sectionName, element) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            document.getElementById(sectionName).classList.add('active');
+
+            if (element) {
+                element.classList.add('active');
+            }
+
+            currentSection = sectionName;
+            currentSlide = 1;
+
+            setTimeout(() => {
+                const activeSection = document.querySelector('.section.active');
+                const inputField = activeSection.querySelector('input[type="text"]');
+                if (inputField) {
+                    inputField.focus();
+                }
+            }, 100);
+        }
+
+        function changeSlide(direction) {
+            const activeSection = document.querySelector('.section.active');
+            const slides = activeSection.querySelectorAll('.slide');
+            const dots = activeSection.querySelectorAll('.indicator-dot');
+
+            if (slides.length === 1) return;
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > slides.length) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = slides.length;
+            }
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+
+            setTimeout(() => {
+                const activeSlide = slides[currentSlide - 1];
+                const inputField = activeSlide.querySelector('input[type="text"]');
+                if (inputField) {
+                    inputField.focus();
+                    inputField.value = '';
+                }
+            }, 100);
+        }
+
+        function goToSlide(slideNum) {
+            const activeSection = document.querySelector('.section.active');
+            const slides = activeSection.querySelectorAll('.slide');
+            const dots = activeSection.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        function checkAnswer1() {
+            const answer = document.getElementById('q1-sound').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback1');
+
+            if (answer === 'long') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! CAKE has a long "a" sound because of the silent "e"!';
+                setTimeout(() => changeSlide(1), 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Try again. Listen to how you say the "a" in CAKE. Does it say its name?';
+            }
+        }
+
+        function checkAnswer2() {
+            const answer = document.getElementById('q2-sound').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback2');
+
+            if (answer === 'short') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Perfect! CAT has a short "a" sound!';
+                setTimeout(() => changeSlide(1), 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Try again. The "a" in CAT makes a quick "ah" sound.';
+            }
+        }
+
+        function checkAnswer3() {
+            const answer = document.getElementById('q3-sound').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback3');
+
+            if (answer === 'r-controlled' || answer === 'r controlled') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Excellent! STAR has an r-controlled vowel (ar)!';
+                setTimeout(() => changeSlide(1), 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Try again. Notice how the "r" changes the "a" sound?';
+            }
+        }
+
+        function checkAnswer4() {
+            const answer = document.getElementById('q4-sound').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback4');
+
+            if (answer === 'diphthong') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Great! COIN has a diphthong (oi)!';
+                setTimeout(() => changeSlide(1), 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Try again. The "oi" makes two vowel sounds blended together.';
+            }
+        }
+
+        function checkAnswer5() {
+            const answer = document.getElementById('q5-sound').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback5');
+
+            if (answer === 'k') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Perfect! The "k" is silent in KNIFE!';
+                setTimeout(() => changeSlide(1), 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Try again. Which letter do you write but not say?';
+            }
+        }
+
+        function checkAnswer6() {
+            const answer = document.getElementById('q6-sound').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback6');
+
+            if (answer === 'w') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Excellent! The "w" is silent in WRITE!';
+                setTimeout(() => changeSlide(1), 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Try again. Listen carefully when you say WRITE.';
+            }
+        }
+
+        function checkAnswer7() {
+            const answer = document.getElementById('q7-sound').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback7');
+
+            if (answer === 'diphthong') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! MOON has a diphthong (oo)!';
+                setTimeout(() => changeSlide(1), 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Try again. The "oo" makes a special blended sound.';
+            }
+        }
+
+        function checkAnswer8() {
+            const answer = document.getElementById('q8-sound').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback8');
+
+            if (answer === 'b') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Outstanding! The "b" is silent in CLIMB!';
+                setTimeout(() => changeSlide(1), 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ Try again. Which letter at the end do you not pronounce?';
+            }
+        }
+
+        function checkWriting() {
+            const shortWords = document.getElementById('writing-short').value.trim();
+            const longWords = document.getElementById('writing-long').value.trim();
+            const silentWords = document.getElementById('writing-silent').value.trim();
+            const feedbackDiv = document.getElementById('writing-feedback');
+
+            if (!shortWords || !longWords || !silentWords) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Please fill in all three categories!';
+                return;
+            }
+
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+            feedbackDiv.style.border = '1px solid rgba(72, 187, 120, 0.3)';
+            feedbackDiv.style.color = '#2f855a';
+            feedbackDiv.innerHTML = `
+                ✓ Great job! You've identified words with different sound patterns!<br><br>
+                <strong>Your answers:</strong><br>
+                Short vowels: ${shortWords}<br>
+                Long vowels: ${longWords}<br>
+                Silent letters: ${silentWords}<br><br>
+                <em>Keep practicing to become a phonics expert!</em>
+            `;
+        }
+    </script>
+</body>
+</html>
