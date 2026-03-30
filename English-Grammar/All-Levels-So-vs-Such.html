@@ -1241,15 +1241,12 @@
 
         let wheelCooldown = false;
         document.addEventListener('wheel', function(e) {
+            e.preventDefault();
             if (wheelCooldown) return;
             wheelCooldown = true;
             setTimeout(() => { wheelCooldown = false; }, 600);
-            if (e.deltaY > 0) {
-                changeSlide(1);
-            } else {
-                changeSlide(-1);
-            }
-        });
+            changeSlide(e.deltaY > 0 ? 1 : -1);
+        }, { passive: false });
 
         function checkAnswer1() {
             const answer = document.getElementById('q1-ans').value.trim().toLowerCase();
