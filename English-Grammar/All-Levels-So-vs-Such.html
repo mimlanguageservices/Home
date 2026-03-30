@@ -1239,6 +1239,18 @@
             }
         });
 
+        let wheelCooldown = false;
+        document.addEventListener('wheel', function(e) {
+            if (wheelCooldown) return;
+            wheelCooldown = true;
+            setTimeout(() => { wheelCooldown = false; }, 600);
+            if (e.deltaY > 0) {
+                changeSlide(1);
+            } else {
+                changeSlide(-1);
+            }
+        });
+
         function checkAnswer1() {
             const answer = document.getElementById('q1-ans').value.trim().toLowerCase();
             const feedback = document.getElementById('feedback1');
