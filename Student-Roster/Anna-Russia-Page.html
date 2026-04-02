@@ -847,7 +847,10 @@
                             <div class="fc-face fc-front">
                                 <img id="fc-img" src="" alt="" />
                                 <div class="fc-word" id="fc-l1"></div>
-                                <div class="fc-tag" id="fc-front-lang"></div>
+                                <div style="display:flex; align-items:center; gap:0.6rem;">
+                                    <div class="fc-tag" id="fc-front-lang"></div>
+                                    <button class="fc-audio-btn" onclick="event.stopPropagation(); fcSpeak()" title="Listen">&#128266;</button>
+                                </div>
                             </div>
                             <div class="fc-face fc-back">
                                 <div class="fc-tag" id="fc-back-lang"></div>
@@ -907,6 +910,12 @@
                 }
                 .fc-btn:hover { opacity: 0.88; }
                 .fc-btn:disabled { background: #cbd5e0; cursor: default; }
+                .fc-audio-btn {
+                    background: none; border: none; cursor: pointer;
+                    font-size: 1.1rem; padding: 2px 4px; line-height: 1;
+                    opacity: 0.6; transition: opacity 0.2s; border-radius: 4px;
+                }
+                .fc-audio-btn:hover { opacity: 1; }
             </style>
 
             <script>
@@ -945,6 +954,7 @@
                         const rows = text.trim().split('\n').map(parseRow);
                         if (rows.length < 2) { document.getElementById('fc-status').textContent = 'No vocabulary added yet.'; return; }
                         const lang1 = rows[0][0] || 'Language 1', lang2 = rows[0][1] || 'Language 2';
+                        lang1Code = SPEECH_LANGS[lang1.toLowerCase().trim()] || 'en-US';
                         document.getElementById('fc-lang-label').textContent = lang1 + ' → ' + lang2;
                         document.getElementById('fc-front-lang').textContent = lang1;
                         document.getElementById('fc-back-lang').textContent  = lang2;
@@ -986,6 +996,25 @@
                             src.start();
                         } catch(e) {}
                     }
+
+                    const SPEECH_LANGS = {
+                        'english':'en-US','spanish':'es-ES','french':'fr-FR','german':'de-DE',
+                        'italian':'it-IT','portuguese':'pt-BR','japanese':'ja-JP','chinese':'zh-CN',
+                        'korean':'ko-KR','arabic':'ar-SA','russian':'ru-RU','dutch':'nl-NL',
+                        'swedish':'sv-SE','turkish':'tr-TR','polish':'pl-PL','greek':'el-GR',
+                        'hindi':'hi-IN','thai':'th-TH','vietnamese':'vi-VN','indonesian':'id-ID'
+                    };
+                    let lang1Code = 'en-US';
+
+                    window.fcSpeak = function() {
+                        const word = document.getElementById('fc-l1').textContent;
+                        if (!word || !window.speechSynthesis) return;
+                        window.speechSynthesis.cancel();
+                        const utter = new SpeechSynthesisUtterance(word);
+                        utter.lang = lang1Code;
+                        utter.rate = 0.9;
+                        window.speechSynthesis.speak(utter);
+                    };
 
                     window.fcFlip     = () => { playFlip(); document.getElementById('fc-card').classList.toggle('flipped'); };
                     window.fcNavigate = dir => { const n = current + dir; if (n >= 0 && n < cards.length) { playFlip(); show(current = n); } };
