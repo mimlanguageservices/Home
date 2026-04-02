@@ -916,10 +916,15 @@
 
                     async function load() {
                         const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&cachebust=' + Date.now();
+                        console.log('[Flashcard] SHEET_RAW:', SHEET_RAW);
+                        console.log('[Flashcard] SHEET_ID:', SHEET_ID);
+                        console.log('[Flashcard] Fetching:', url);
                         try {
                             const text = await (await fetch(url)).text();
+                            console.log('[Flashcard] Response length:', text.length, '| First 200 chars:', text.substring(0, 200));
                             parse(text);
                         } catch (e) {
+                            console.error('[Flashcard] Fetch error:', e);
                             document.getElementById('fc-status').textContent = 'Could not load vocabulary. Make sure the sheet is shared publicly.';
                         }
                     }
