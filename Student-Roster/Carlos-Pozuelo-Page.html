@@ -980,34 +980,13 @@
                         document.getElementById('fc-next').disabled = i === cards.length - 1;
                     }
 
+                    const flipSound = new Audio('https://music.wixstatic.com/mp3/593d03_067ca72b08f1412eae427c86254b4491.mp3');
+                    flipSound.volume = 0.6;
+
                     function playFlip() {
                         try {
-                            const ctx      = new (window.AudioContext || window.webkitAudioContext)();
-                            const duration = 0.22;
-                            const buf      = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
-                            const d        = buf.getChannelData(0);
-                            for (let i = 0; i < d.length; i++) {
-                                const t   = i / ctx.sampleRate;
-                                // Bell-curve envelope — soft rise then fade, no sharp attack
-                                const env = Math.sin(Math.PI * t / duration) * Math.exp(-t * 6) * 0.18;
-                                d[i]      = (Math.random() * 2 - 1) * env;
-                            }
-                            const src = ctx.createBufferSource();
-                            src.buffer = buf;
-                            // Highpass at 3kHz removes all low "drum" frequencies
-                            const hpf = ctx.createBiquadFilter();
-                            hpf.type            = 'highpass';
-                            hpf.frequency.value = 3000;
-                            // Gentle shelf to brighten the paper rustle
-                            const shelf = ctx.createBiquadFilter();
-                            shelf.type            = 'peaking';
-                            shelf.frequency.value = 6000;
-                            shelf.gain.value      = 6;
-                            shelf.Q.value         = 0.8;
-                            src.connect(hpf);
-                            hpf.connect(shelf);
-                            shelf.connect(ctx.destination);
-                            src.start();
+                            flipSound.currentTime = 0;
+                            flipSound.play();
                         } catch(e) {}
                     }
 
