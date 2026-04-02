@@ -910,7 +910,8 @@
 
             <script>
                 (function () {
-                    const SHEET_ID = '1FPIYBHYkamL19scAQCET3lxxZBBCYAnjx0af41vSGU8';
+                    const SHEET_RAW = '{{FLASHCARD_SHEET_URL}}';
+                    const SHEET_ID  = (SHEET_RAW.match(/\/d\/([a-zA-Z0-9_-]+)/) || [, SHEET_RAW])[1];
                     let cards = [], current = 0;
 
                     async function load() {
