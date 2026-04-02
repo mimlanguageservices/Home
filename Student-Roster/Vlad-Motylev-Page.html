@@ -982,17 +982,31 @@
 
                     function playFlip() {
                         try {
-                            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                            const buf = ctx.createBuffer(1, ctx.sampleRate * 0.12, ctx.sampleRate);
-                            const d   = buf.getChannelData(0);
+                            const ctx      = new (window.AudioContext || window.webkitAudioContext)();
+                            const duration = 0.22;
+                            const buf      = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
+                            const d        = buf.getChannelData(0);
                             for (let i = 0; i < d.length; i++) {
-                                const t = i / ctx.sampleRate;
-                                d[i] = (Math.random() * 2 - 1) * Math.exp(-t * 40) * 0.35
-                                     + Math.sin(2 * Math.PI * 800 * t) * Math.exp(-t * 30) * 0.1;
+                                const t   = i / ctx.sampleRate;
+                                // Bell-curve envelope — soft rise then fade, no sharp attack
+                                const env = Math.sin(Math.PI * t / duration) * Math.exp(-t * 6) * 0.18;
+                                d[i]      = (Math.random() * 2 - 1) * env;
                             }
                             const src = ctx.createBufferSource();
                             src.buffer = buf;
-                            src.connect(ctx.destination);
+                            // Highpass at 3kHz removes all low "drum" frequencies
+                            const hpf = ctx.createBiquadFilter();
+                            hpf.type            = 'highpass';
+                            hpf.frequency.value = 3000;
+                            // Gentle shelf to brighten the paper rustle
+                            const shelf = ctx.createBiquadFilter();
+                            shelf.type            = 'peaking';
+                            shelf.frequency.value = 6000;
+                            shelf.gain.value      = 6;
+                            shelf.Q.value         = 0.8;
+                            src.connect(hpf);
+                            hpf.connect(shelf);
+                            shelf.connect(ctx.destination);
                             src.start();
                         } catch(e) {}
                     }
