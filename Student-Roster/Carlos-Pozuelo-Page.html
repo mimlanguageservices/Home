@@ -866,6 +866,16 @@
                         <button class="fc-btn" id="fc-next" onclick="fcNavigate(1)">Next &#8594;</button>
                     </div>
 
+                    <!-- Master link -->
+                    <a href="https://docs.google.com/spreadsheets/d/12YDagoUClnm4RUYRmo_1R72YsS-ZNkosZfINVy_FXg0/edit?usp=sharing" target="_blank" id="fc-master-btn"
+                       style="display:none; margin-top:1rem; font-size:0.78rem; color:#a0aec0; text-decoration:none;
+                              border:1px solid #e2e8f0; border-radius:6px; padding:4px 12px;
+                              transition: all 0.2s;"
+                       onmouseover="this.style.color='#667eea';this.style.borderColor='#667eea';"
+                       onmouseout="this.style.color='#a0aec0';this.style.borderColor='#e2e8f0';">
+                        Master ↗
+                    </a>
+
                     <p id="fc-hint" style="display:none; margin-top:1rem; font-size:0.8rem; color:#a0aec0;">Click the card to reveal the translation</p>
                 </div>
             </div>
@@ -961,9 +971,10 @@
                         cards = rows.slice(1).filter(r => r[0]).map(r => ({ l1: r[0], l2: r[1] || '—', img: r[2] || '' }));
                         if (!cards.length) { document.getElementById('fc-status').textContent = 'No vocabulary added yet.'; return; }
                         document.getElementById('fc-status').textContent = '';
-                        document.getElementById('fc-scene').style.display    = '';
-                        document.getElementById('fc-controls').style.display = 'flex';
-                        document.getElementById('fc-hint').style.display     = '';
+                        document.getElementById('fc-scene').style.display      = '';
+                        document.getElementById('fc-controls').style.display   = 'flex';
+                        document.getElementById('fc-hint').style.display       = '';
+                        document.getElementById('fc-master-btn').style.display = '';
                         show(0);
                     }
 
