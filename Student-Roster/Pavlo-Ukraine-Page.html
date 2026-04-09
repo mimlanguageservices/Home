@@ -1190,22 +1190,31 @@
 
                     if (!url) return;
 
+                    const btn = document.querySelector('#activities button[onclick="addLesson()"]');
+                    btn.disabled = true;
+                    btn.textContent = 'Saving...';
+                    status.style.display = 'none';
+
                     const endpoint = LESSONS_SCRIPT_URL
                         + '?studentName=' + encodeURIComponent(STUDENT_NAME_FOR_LESSONS)
                         + '&lessonUrl='   + encodeURIComponent(url);
 
-                    fetch(endpoint, { mode: 'no-cors' })
-                        .then(() => {
-                            input.value = '';
-                            status.textContent = 'Saved!';
-                            status.style.display = 'inline';
-                            setTimeout(() => { status.style.display = 'none'; }, 3000);
-                        })
-                        .catch(() => {
-                            status.textContent = 'Error — check console';
-                            status.style.color  = '#e53e3e';
-                            status.style.display = 'inline';
-                        });
+                    // Use an Image request — avoids CORS entirely for GET calls to Apps Script
+                    const img = new Image();
+                    img.onload = img.onerror = function() {
+                        btn.disabled = false;
+                        btn.textContent = 'Add Lesson';
+                    };
+                    img.src = endpoint;
+
+                    // Optimistically clear input and show confirmation after a short delay
+                    setTimeout(() => {
+                        input.value = '';
+                        status.textContent = 'Sent!';
+                        status.style.color  = '#48bb78';
+                        status.style.display = 'inline';
+                        setTimeout(() => { status.style.display = 'none'; }, 3000);
+                    }, 1500);
                 }
             </script>
 
