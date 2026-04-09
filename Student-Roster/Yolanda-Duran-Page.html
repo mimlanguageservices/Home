@@ -1084,9 +1084,58 @@
                 </div>
             </div>
                         </div>
+                        <!-- Add Lesson Input -->
+                        <div style="padding: 16px 20px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; gap: 10px; align-items: center;">
+                            <input
+                                type="text"
+                                id="lessonInput"
+                                placeholder="Paste lesson URL..."
+                                style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s;"
+                                onfocus="this.style.borderColor='#4c51bf'"
+                                onblur="this.style.borderColor='#cbd5e0'"
+                                onkeydown="if(event.key==='Enter') addLesson()"
+                            />
+                            <button
+                                onclick="addLesson()"
+                                style="padding: 10px 20px; background: #4c51bf; color: white; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
+                                onmouseover="this.style.background='#434190'"
+                                onmouseout="this.style.background='#4c51bf'"
+                            >Add Lesson</button>
+                            <span id="lessonStatus" style="font-size: 0.85rem; color: #48bb78; display: none;"></span>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <script>
+                const STUDENT_NAME_FOR_LESSONS = 'Yolanda Duran';
+                const LESSONS_SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+
+                function addLesson() {
+                    const input  = document.getElementById('lessonInput');
+                    const status = document.getElementById('lessonStatus');
+                    const url    = input.value.trim();
+
+                    if (!url) return;
+
+                    const endpoint = LESSONS_SCRIPT_URL
+                        + '?studentName=' + encodeURIComponent(STUDENT_NAME_FOR_LESSONS)
+                        + '&lessonUrl='   + encodeURIComponent(url);
+
+                    fetch(endpoint, { mode: 'no-cors' })
+                        .then(() => {
+                            input.value = '';
+                            status.textContent = 'Saved!';
+                            status.style.display = 'inline';
+                            setTimeout(() => { status.style.display = 'none'; }, 3000);
+                        })
+                        .catch(() => {
+                            status.textContent = 'Error — check console';
+                            status.style.color  = '#e53e3e';
+                            status.style.display = 'inline';
+                        });
+                }
+            </script>
 
             <!-- Writing Section -->
             <div class="section" id="writing">
