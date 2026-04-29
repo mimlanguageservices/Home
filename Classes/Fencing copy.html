@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>The Art of the Sword - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">The Art of the Sword</h1>
+        <p class="game-subtitle">Fencing, HEMA, Kendo & the Global Revival of Sword Fighting</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>The Art of the Sword</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title Image -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">The Art of the Sword</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Fencing, HEMA, Kendo & the Global Revival of Sword Fighting</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/7SBGYrR7e4k?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What Is Sport Fencing? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What Is Sport Fencing?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Sport fencing is a combat sport where two athletes fight with swords. It is one of only five sports that have been part of every modern Olympic Games since 1896. Fencers wear protective white jackets, masks, and gloves to stay safe.</p>
+                                        <p>There are three types of fencing weapons. The <span class="vocab-link" onclick="showPopup('foil', 'a light fencing sword where only the torso counts as a target')">foil</span> is a light, thin sword used for thrusting. The <span class="vocab-link" onclick="showPopup('épée', 'the heaviest fencing sword where the entire body is the target')">épée</span> is heavier and the whole body is the target. The <span class="vocab-link" onclick="showPopup('sabre', 'a fencing weapon where both cuts and thrusts can score points')">sabre</span> is the fastest weapon and allows cutting actions.</p>
+                                        <p>A fencing match is called a <span class="vocab-link" onclick="showPopup('bout', 'a single match or competition period in fencing')">bout</span>. Athletes score points called "touches" by hitting their opponent with the tip or blade of the sword. The first to reach 15 touches wins.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Olympic fencing is a precision combat sport governed by the Fédération Internationale d'Escrime (FIE). It is one of the founding Olympic sports, present at every Summer Games since Athens 1896. Competitors score points — called "touches" — by striking a valid target on their opponent's body with their weapon.</p>
+                                        <p>Each of the three disciplines has distinct rules. The <span class="vocab-link" onclick="showPopup('foil', 'a light fencing sword where only the torso counts as a target')">foil</span> targets the torso only and follows the "right of way" rule, which determines which fencer has priority to score. The <span class="vocab-link" onclick="showPopup('épée', 'the heaviest fencing sword where the entire body is the target')">épée</span> awards a touch for hitting any part of the body and has no right of way — simultaneous hits both score. The <span class="vocab-link" onclick="showPopup('sabre', 'a fencing weapon where both cuts and thrusts can score points')">sabre</span> targets the upper body and is the fastest and most aggressive discipline, allowing cutting actions in addition to thrusts.</p>
+                                        <p>Bouts are contested on a long, narrow strip called the <span class="vocab-link" onclick="showPopup('piste', 'the long narrow strip on which fencing bouts take place')">piste</span>, and electronic scoring systems register touches automatically through conductive equipment.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Olympic fencing represents the most institutionalised expression of Western sword-fighting tradition — a sport that emerged from the systematic codification of dueling practices developed in Renaissance Europe and subsequently transformed by the demands of modern athletic competition. Governed by the FIE since 1913, the sport maintains three disciplines that preserve distinct lineages of European swordsmanship.</p>
+                                        <p>The rules governing each weapon encode fundamentally different philosophies of combat. The <span class="vocab-link" onclick="showPopup('foil', 'a light fencing sword where only the torso counts as a target')">foil</span>'s "right of way" convention — awarding priority to the first fencer to initiate a correctly formed attack — reflects an 18th-century pedagogical framework designed to teach tactical decision-making rather than simulate realistic combat. The <span class="vocab-link" onclick="showPopup('épée', 'the heaviest fencing sword where the entire body is the target')">épée</span>, by contrast, rewards any touch on any surface, producing a more attritional, tactically complex game where defensive excellence is paramount. The <span class="vocab-link" onclick="showPopup('sabre', 'a fencing weapon where both cuts and thrusts can score points')">sabre</span>'s cavalry heritage — targeting the upper body to simulate mounted combat — produces the most explosive, high-tempo bouts of all three disciplines.</p>
+                                        <p>The sport's evolution has been shaped by a persistent tension between its martial heritage and the imperatives of athletic spectacle — a tension most visible in ongoing debates about the increasing speed and decreasing readability of modern fencing.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800" alt="Fencing" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - HEMA: Historical European Martial Arts -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>HEMA: Historical European Martial Arts</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>HEMA stands for Historical European Martial Arts. It is a movement where people study and practice old European fighting styles. Practitioners use ancient books and manuscripts from the Middle Ages and Renaissance to learn how knights and soldiers once fought.</p>
+                                        <p>The most popular weapon in HEMA is the <span class="vocab-link" onclick="showPopup('longsword', 'a large European sword designed to be used with two hands')">longsword</span> — a large, two-handed sword used in medieval Europe. Fighters also study the use of daggers, shields, pole weapons, and even wrestling techniques.</p>
+                                        <p>HEMA is growing quickly around the world. There are now thousands of clubs in Europe, North America, and Latin America, including Mexico. Participants wear protective armor during sparring and compete in tournaments.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Historical European Martial Arts (HEMA) is an academic and athletic movement dedicated to reconstructing and practising the fighting systems of medieval and Renaissance Europe. Practitioners study original combat manuals — known as <em>fechtbücher</em> (fighting books) — written by master swordsmen between the 13th and 17th centuries.</p>
+                                        <p>Key historical sources include the works of Italian master Fiore dei Liberi (<em>Flos Duellatorum</em>, c. 1410), German masters Johannes Liechtenauer and Joachim Meyer, and the anonymous English manual <em>I.33</em> — the oldest known European sword-fighting manual, dating to around 1300. These texts describe systematic techniques for the <span class="vocab-link" onclick="showPopup('longsword', 'a large European sword designed to be used with two hands')">longsword</span>, dagger, spear, and unarmored wrestling.</p>
+                                        <p>Modern HEMA tournaments use steel simulators — replica swords with blunted edges — alongside protective masks, gloves, and jackets. The HEMA Alliance and the International Federation of Historical European Martial Arts (IFHEMA) now oversee a global competitive circuit with participants from over 50 countries.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Historical European Martial Arts represents a fascinating intersection of historical scholarship, athletic practice, and cultural identity — a movement that challenges the assumption that the martial traditions of medieval and Renaissance Europe were lost. The <span class="vocab-link" onclick="showPopup('codification', 'the process of formally recording and organising a set of rules or techniques')">codification</span> of European swordsmanship in the surviving corpus of <em>fechtbücher</em> is, paradoxically, more extensive than the documentary record preserved for many Asian martial arts.</p>
+                                        <p>The interpretive challenge at the heart of HEMA is significant: practitioners must reconstruct kinetic, embodied knowledge from static text and illustrations, inevitably producing competing interpretations of the same source material. This epistemological tension — between scholarly fidelity to historical sources and the pragmatic demands of athletic competition — generates ongoing methodological debates within the community about the relative authority of textual evidence versus empirical testing through <span class="vocab-link" onclick="showPopup('sparring', 'practice fighting with a partner to develop and test techniques')">sparring</span>.</p>
+                                        <p>The movement's rapid globalisation — particularly its growth in Latin America, where clubs have proliferated in Mexico, Argentina, and Brazil — raises interesting questions about the relationship between cultural heritage and martial practice: who has the right to practise a tradition, and what does that practice mean when it occurs far from the culture that produced it?</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800" alt="HEMA Sword Fighting" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Bohurt & Armored Combat -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Bohurt & Armored Combat Sports</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Bohurt (also written "buhurt") is a sport where competitors fight in full metal <span class="vocab-link" onclick="showPopup('armor', 'protective metal clothing worn in combat')">armor</span>, using blunted steel weapons. It looks like a real medieval battle. The goal is to knock your opponent to the ground or throw them off their feet.</p>
+                                        <p>Fighters wear authentic-looking plate armor that can weigh between 30 and 50 kilograms. Despite the heavy equipment, bohurt athletes are extremely fit and strong. Matches can be one-on-one duels or large team battles with up to 21 fighters on each side.</p>
+                                        <p>The most famous international bohurt competition is called the Battle of the Nations. Teams from over 40 countries compete every year in a large medieval-style arena. The sport has grown very popular in Mexico and across Latin America in recent years.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Bohurt — also known as armored combat sport or Historical Medieval Battles (HMB) — is a full-contact combat sport in which competitors fight wearing authentic reproductions of medieval <span class="vocab-link" onclick="showPopup('armor', 'protective metal clothing worn in combat')">armor</span>. Unlike HEMA, which focuses on technical swordsmanship, bohurt prioritises physical dominance: the objective is to knock opponents to the ground using strikes, grappling, and throws, with points awarded for takedowns or eliminations.</p>
+                                        <p>Equipment requirements are strictly regulated by the International Medieval Combat Federation (IMCF). Competitors must wear period-accurate armor made from steel — typically 14th or 15th-century European plate designs — and fight with blunted steel weapons including swords, maces, pole axes, and shields. Full sets of armor weigh between 25 and 55 kilograms, demanding extraordinary levels of strength and cardiovascular fitness from athletes.</p>
+                                        <p>The Battle of the Nations — the sport's premier annual championship — attracts national teams from over 40 countries and has been held in locations including Israel, Croatia, France, and Spain. The sport has found a particularly enthusiastic following in Eastern Europe, Russia, and increasingly in Latin America, where the visual drama of armored combat resonates strongly with audiences.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Bohurt occupies a fascinating and contested position within the broader spectrum of historical martial arts — a discipline that consciously prioritises spectacle, physicality, and competitive intensity over historical fidelity. Critics within the HEMA community argue that the sport's emphasis on attrition and athleticism over technical swordsmanship produces fighting patterns that bear little resemblance to historical combat methodology; proponents counter that full-contact armored fighting demands a form of embodied engagement with medieval martial culture that no amount of scholarly reconstruction can replicate.</p>
+                                        <p>The sport's governance has been complicated by jurisdictional disputes between rival international bodies — the IMCF, the HMB International, and various national federations — reflecting broader tensions about authority, standardisation, and the commercialisation of historical martial identity. The question of <span class="vocab-link" onclick="showPopup('armor', 'protective metal clothing worn in combat')">armor</span> authenticity is particularly contentious: the requirement for period-accurate equipment creates significant financial barriers to participation, while the production of functional replica armor has generated a substantial artisan economy.</p>
+                                        <p>The sport's rapid growth in Mexico and Latin America — where it intersects with existing traditions of historical costuming, role-playing gaming culture, and a growing appetite for alternative combat sports — illustrates how medieval European martial heritage can acquire new cultural meanings when transplanted into radically different social and historical contexts.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1595131697480-d9b13a71e6b6?w=800" alt="Armored Combat" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Kendo -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Kendo — The Way of the Sword</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Kendo is a Japanese martial art that means "the way of the sword." It developed from the training methods of samurai warriors. Today, kendo is practiced by millions of people around the world, both as a sport and as a path of personal development.</p>
+                                        <p>In kendo, practitioners use a <span class="vocab-link" onclick="showPopup('shinai', 'a practice sword made of bamboo used in kendo')">shinai</span> — a practice sword made of four bamboo staves — and wear protective armor called <em>bogu</em>, which covers the head, wrists, body, and waist. Competitors score points by striking valid targets with the correct technique and spirit.</p>
+                                        <p>Kendo is not only about fighting. Students learn <span class="vocab-link" onclick="showPopup('kata', 'a pre-arranged sequence of movements used to train techniques and principles')">kata</span> — formal sequences of movements performed with a wooden sword — which teach the fundamental principles of the art. Respect, discipline, and self-improvement are central values in kendo.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Kendo — literally "the way of the sword" — is a modern Japanese martial art descended from the swordsmanship traditions of the samurai class. It emerged in its current form during the Meiji era (1868–1912), when the abolition of the samurai class created a need to preserve sword training as a cultural and moral practice rather than a military necessity.</p>
+                                        <p>The practice environment of kendo is structured around two complementary pillars. <em>Keiko</em> (training), conducted with the <span class="vocab-link" onclick="showPopup('shinai', 'a practice sword made of bamboo used in kendo')">shinai</span> and full <em>bogu</em> armor, develops speed, timing, and competitive technique. <span class="vocab-link" onclick="showPopup('kata', 'a pre-arranged sequence of movements used to train techniques and principles')">Kata</span> practice, performed with a wooden <em>bokken</em>, preserves the classical principles and historical techniques of Japanese swordsmanship. Together, these two elements reflect kendo's dual identity as both a competitive sport and a <em>budō</em> — a martial "way" focused on character formation.</p>
+                                        <p>The All Japan Kendo Federation (AJKF) and the International Kendo Federation (FIK) govern the sport globally. The World Kendo Championships have been held every three years since 1970, with Japan historically dominant. Kendo has experienced significant growth in Latin America, particularly in Mexico, Brazil, and Argentina, where Japanese diaspora communities established the first clubs.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Kendo's historical trajectory illuminates the complex process by which a martial tradition is transformed under the pressures of modernisation, nationalism, and globalisation. The Meiji-era systematisation of swordsmanship into a unified national practice was explicitly ideological — kendo was incorporated into the Japanese school curriculum as an instrument of militarist nationalism, a role that led to its prohibition by Allied occupation authorities following Japan's defeat in 1945.</p>
+                                        <p>The postwar reconstruction of kendo as a <em>budō</em> — emphasising character development, mutual respect, and the philosophical concept of <em>do</em> (way) — represented a deliberate distancing from its militarist past. This reconstitution as a sport-and-philosophy rather than a combat system enabled kendo's reintegration into Japanese education and its subsequent internationalisation. The tension between kendo's identity as a uniquely Japanese cultural heritage and its aspirations to universal sportive values continues to generate debate, particularly around proposals for its inclusion in the Olympic Games.</p>
+                                        <p>The concept of <span class="vocab-link" onclick="showPopup('martial lineage', 'the tradition of passing down fighting knowledge from teacher to student across generations')">martial lineage</span> — the unbroken transmission of knowledge through teacher-student relationships across centuries — distinguishes kendo from HEMA, which must reconstruct knowledge from historical texts. This living continuity of tradition is central to kendo's cultural authority, though scholars note that modern kendo is itself a relatively recent construction shaped as much by 19th-century nationalism as by authentic samurai practice.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800" alt="Kendo" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Weapons & Equipment -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Weapons & Equipment</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Different sword fighting sports use different weapons and protective equipment. Here are some of the most important:</p>
+                                        <ul>
+                                            <li><strong>Foil, épée, and sabre:</strong> The three Olympic fencing weapons are made of lightweight flexible steel. The <span class="vocab-link" onclick="showPopup('blade', 'the long metal part of a sword used for cutting or thrusting')">blade</span> is the long metal part, and a bell-shaped hand guard called a "guard" protects the hand</li>
+                                            <li><strong>Shinai:</strong> The kendo practice sword is made of four bamboo staves held together by leather fittings. It is designed to absorb impact safely during full-force strikes</li>
+                                            <li><strong>Longsword simulators:</strong> HEMA practitioners use steel swords with blunted edges and rounded tips, weighing between 1.2 and 1.6 kilograms</li>
+                                            <li><strong>Protective gear:</strong> All sword sports use protective masks, gloves, and jackets. Kendo uses full <em>bogu</em> armor; bohurt uses complete plate armor made of steel</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The diversity of weapons across sword fighting disciplines reflects both their different historical origins and the distinct demands of safe athletic practice:</p>
+                                        <ul>
+                                            <li><strong>Olympic fencing weapons:</strong> All three weapons feature a flexible maraging steel <span class="vocab-link" onclick="showPopup('blade', 'the long metal part of a sword used for cutting or thrusting')">blade</span> with a blunted tip. The foil (weight: ~500g) and épée (~770g) are thrusting weapons; the sabre (~500g) has a cut-and-thrust design. Electronic scoring systems detect touches through conductive lamé jackets and blade-tip sensors</li>
+                                            <li><strong>Kendo equipment:</strong> The shinai consists of four bamboo slats bound by leather, typically 114–120cm in length for adults. The bogu armor set — comprising the men (head), kote (gloves), dō (chest), and tare (waist) — is crafted from lacquered bamboo, leather, and cloth. Kata practice uses a solid oak or red oak bokken</li>
+                                            <li><strong>HEMA simulators:</strong> Steel longsword simulators are engineered for safety while retaining realistic handling. Protective gear for HEMA sparring typically combines a fencing mask reinforced to 1600N+ puncture resistance, padded jacket, thick gloves, and forearm guards</li>
+                                            <li><strong>Bohurt armor:</strong> Full plate armor reproductions are typically based on 14th–15th century European designs and must meet IMCF specifications. Sets can cost between $2,000 and $10,000 depending on craftsmanship and materials</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The material culture of sword fighting sports encodes the philosophical and functional priorities of each tradition in ways that reward close analysis:</p>
+                                        <ul>
+                                            <li><strong>The paradox of the training weapon:</strong> Every sword sport faces the fundamental challenge of enabling full-intensity practice while preventing serious injury — a problem solved through different compromises in each tradition. The foil and épée achieve safety through flexibility and a blunted tip; the shinai through the energy-absorbing properties of bamboo; HEMA simulators through mass reduction and edge-blunting; bohurt through the protective enclosure of plate <span class="vocab-link" onclick="showPopup('armor', 'protective metal clothing worn in combat')">armor</span>. Each solution shapes the resulting fighting style in ways that diverge from the historical combat it purports to represent</li>
+                                            <li><strong>The <span class="vocab-link" onclick="showPopup('blade', 'the long metal part of a sword used for cutting or thrusting')">blade</span> as cultural object:</strong> The design of sword blades across cultures reflects distinct metallurgical traditions and combat philosophies — the differential hardening of Japanese blades (<em>hamon</em>), the spring-tempered flexibility of European fencing blades, and the high-carbon construction of historical longswords each embody centuries of accumulated technical knowledge</li>
+                                            <li><strong>The economics of equipment:</strong> Access to sword sports is significantly shaped by material costs. Olympic fencing gear costs between $500 and $2,000; a full kendo bogu set between $300 and $3,000; HEMA equipment between $500 and $1,500; bohurt armor between $2,000 and $10,000. These cost differentials create structural inequalities in participation that intersect with geography, social class, and national sporting infrastructure</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1518611540400-6b85a0704342?w=800" alt="Sword Equipment" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Other Sword Fighting Styles -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Other Sword Fighting Styles</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>There are many other sword fighting traditions practiced around the world:</p>
+                                        <ul>
+                                            <li><strong>Iaido:</strong> A Japanese art focused on the smooth and controlled drawing of the sword from its scabbard. Practitioners perform slow, precise movements called <span class="vocab-link" onclick="showPopup('kata', 'a pre-arranged sequence of movements used to train techniques and principles')">kata</span> against imaginary opponents. The goal is mental calm and perfect technique</li>
+                                            <li><strong>Eskrima / Arnis:</strong> A Filipino martial art that uses sticks, knives, and swords. It is the national martial art of the Philippines. Practitioners train with rattan sticks before moving to bladed weapons</li>
+                                            <li><strong>Wushu:</strong> Chinese martial arts include many sword forms using the <em>jiàn</em> (straight sword) and the <em>dāo</em> (curved sword). These arts combine athletic skill with artistic expression</li>
+                                            <li><strong>Esgrima criolla:</strong> A traditional Argentine knife and sword fighting style. It is part of the <em>gaucho</em> (cowboy) cultural heritage of the South American pampas</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Beyond the major disciplines, a rich diversity of sword and blade fighting traditions exists worldwide, each reflecting a distinct cultural context:</p>
+                                        <ul>
+                                            <li><strong>Iaido:</strong> The Japanese art of the sword draw emphasises meditative precision over combative application. Practitioners perform solo <span class="vocab-link" onclick="showPopup('kata', 'a pre-arranged sequence of movements used to train techniques and principles')">kata</span> against imaginary opponents using either a live-bladed katana (<em>iaito</em>) or a training sword (<em>mogito</em>). Judged competitions assess technical correctness, posture, and mental presence</li>
+                                            <li><strong>Eskrima / Arnis / Kali:</strong> The national martial art of the Philippines is distinctive for its "weapons-first" pedagogy — practitioners develop stick and blade skills before empty-hand techniques, on the principle that armed combat is more likely than unarmed. Its efficiency and adaptability have made it highly influential in military and law enforcement training worldwide</li>
+                                            <li><strong>Chinese sword arts:</strong> The <em>jiàn</em> (double-edged straight sword) and <em>dāo</em> (single-edged curved sword) feature prominently in both competitive wushu and traditional <em>gongfu</em> practice. Chinese sword arts emphasise flowing, circular movements and have been shaped by Taoist philosophical principles</li>
+                                            <li><strong>Silat:</strong> Southeast Asian martial traditions, particularly from Malaysia and Indonesia, incorporate sophisticated blade work using the <em>keris</em> (a ceremonially significant wavy-bladed dagger) alongside straight swords and machetes</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The global diversity of sword fighting traditions offers a remarkable lens through which to examine how different cultures encode martial knowledge, philosophical values, and social identity into the practice of armed combat:</p>
+                                        <ul>
+                                            <li><strong>The contrast between iaido and kendo:</strong> These two Japanese disciplines represent opposing poles of the sword arts spectrum — iaido's solitary, meditative <span class="vocab-link" onclick="showPopup('kata', 'a pre-arranged sequence of movements used to train techniques and principles')">kata</span> practice versus kendo's combative, competitive energy. Their coexistence within Japanese <em>budō</em> culture reflects a deliberate philosophical position: that martial training must cultivate both the capacity for decisive action and the capacity for stillness and self-reflection</li>
+                                            <li><strong>Eskrima's pedagogical inversion:</strong> Filipino martial arts' weapons-first approach challenges the assumption — embedded in most other traditions — that empty-hand skills precede and underpin weapons training. This inversion reflects a pragmatic combat philosophy shaped by the historical reality of blade culture in the Philippine archipelago, and has proven extraordinarily influential on contemporary combatives training</li>
+                                            <li><strong>The <span class="vocab-link" onclick="showPopup('martial lineage', 'the tradition of passing down fighting knowledge from teacher to student across generations')">martial lineage</span> problem across traditions:</strong> The question of authenticity and continuity haunts all historical martial arts. Japanese traditions claim unbroken transmission but have been extensively modified by 19th and 20th-century systematisation; HEMA reconstructs from manuscripts without living lineage; Filipino arts claim continuous practice but face similar modernisation pressures. Each tradition negotiates the tension between historical fidelity and contemporary relevance in distinctive ways</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1559181567-c3190ca9d222?w=800" alt="Martial Arts" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - The Rising Popularity -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Rising Global Popularity</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Sword fighting sports are becoming more popular all over the world. There are several reasons for this:</p>
+                                        <ul>
+                                            <li><strong>Movies and television:</strong> Films and TV shows featuring sword fights — such as <em>Game of Thrones</em>, martial arts movies, and historical dramas — have inspired millions of people to try these arts for themselves</li>
+                                            <li><strong>Online videos:</strong> YouTube channels dedicated to HEMA, kendo, and fencing have millions of subscribers. Watching exciting sword fights online makes people want to participate</li>
+                                            <li><strong>Video games:</strong> Popular games featuring sword fighting have introduced young people to the history and styles of different fighting traditions</li>
+                                            <li><strong>Mexico and Latin America:</strong> The number of sword fighting clubs in Mexico has grown rapidly. Cities like Mexico City, Guadalajara, and Monterrey now have active HEMA, kendo, and bohurt communities. The sport appeals to people interested in history, fitness, and cultural heritage</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Sword fighting sports have experienced remarkable growth in the 21st century, driven by a convergence of cultural, technological, and social factors:</p>
+                                        <ul>
+                                            <li><strong>Media and popular culture:</strong> The global success of fantasy and historical fiction — from <em>Game of Thrones</em> to the <em>Witcher</em> franchise — has generated unprecedented public interest in historical combat. HEMA practitioners and fencing coaches have benefited directly from this cultural moment, with club enrolments typically spiking after major releases</li>
+                                            <li><strong>Digital communities:</strong> YouTube channels such as Scholagladiatoria, Skallagrim, and various kendo federations have built audiences of millions, normalising sword sports as accessible, serious athletic disciplines. Social media communities have also been crucial in connecting practitioners globally and creating supportive networks for beginners</li>
+                                            <li><strong>The alternative combat sports market:</strong> As traditional martial arts like karate have faced declining interest among younger demographics, sword arts have benefited from their novelty, visual drama, and strong historical and philosophical content</li>
+                                            <li><strong>Latin America:</strong> Mexico, in particular, has seen explosive growth in all major sword disciplines. The Mexican HEMA community has grown from a handful of clubs in 2010 to over 80 active groups by 2024. Kendo has deep roots through Japanese-Mexican diaspora communities, while bohurt has attracted a new generation of enthusiasts drawn to the sport's physical demands and medieval aesthetics</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The contemporary revival of sword fighting sports constitutes a significant cultural phenomenon whose dimensions exceed the merely recreational — it reflects deeper currents of nostalgia, embodied identity-seeking, and resistance to the dematerialisation of modern life:</p>
+                                        <ul>
+                                            <li><strong>The embodiment thesis:</strong> Sociologists of sport have noted that sword arts attract practitioners who seek a form of physical engagement that is simultaneously intellectually demanding, historically rooted, and physically transformative. Unlike gym-based fitness, sword training offers a narrative framework — a tradition, a lineage, a set of values — that positions the practitioner within a meaningful historical continuum. This appeal to <em>embodied history</em> resonates particularly strongly in a cultural moment characterised by digital abstraction and the erosion of manual craft traditions</li>
+                                            <li><strong>Popular culture as recruitment pipeline:</strong> The relationship between sword arts and fantasy media is more complex than simple inspiration. The HEMA community has both benefited from and actively shaped popular cultural representations of historical combat — HEMA practitioners serve as fight choreographers and historical consultants for major productions, creating a feedback loop between scholarship, sport, and entertainment</li>
+                                            <li><strong>The Mexican case as cultural hybridisation:</strong> The growth of sword arts in Mexico illustrates a broader pattern of cultural hybridisation — the adoption and adaptation of traditions from distant historical and geographical contexts into local identities. Mexican HEMA practitioners often articulate their practice in terms of universal human heritage rather than European cultural property, while kendo communities navigate the complex dynamics of Japanese cultural diplomacy and diaspora identity. The result is a vibrant, syncretic sword arts culture that is distinctly Mexican in character while drawing on global traditions</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800" alt="Sword Fighting Community" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Remember these important points from the lesson:</p>
+                                        <ul>
+                                            <li><strong>Sport fencing</strong> is one of the oldest Olympic sports, using three different weapons: the foil, épée, and <span class="vocab-link" onclick="showPopup('sabre', 'a fencing weapon where both cuts and thrusts can score points')">sabre</span></li>
+                                            <li><strong>HEMA</strong> (Historical European Martial Arts) uses ancient manuscripts to reconstruct medieval European sword fighting techniques</li>
+                                            <li><strong>Bohurt</strong> is full-contact armored combat where fighters wear real plate armor and fight in large team battles</li>
+                                            <li><strong>Kendo</strong> is the Japanese "way of the sword," practiced with a bamboo <span class="vocab-link" onclick="showPopup('shinai', 'a practice sword made of bamboo used in kendo')">shinai</span> and focused on both sport and personal development</li>
+                                            <li><strong>Sword fighting sports are growing</strong> around the world, including in Mexico, driven by popular culture, online communities, and the appeal of history and tradition</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Essential takeaways from this lesson:</p>
+                                        <ul>
+                                            <li><strong>Sword fighting spans multiple traditions:</strong> Olympic fencing, HEMA, bohurt, and kendo each represent distinct approaches to the sword — shaped by different historical origins, cultural values, and competitive formats</li>
+                                            <li><strong>Equipment reflects philosophy:</strong> The choice of training weapon in each tradition — from the <span class="vocab-link" onclick="showPopup('shinai', 'a practice sword made of bamboo used in kendo')">shinai</span> to the HEMA steel simulator to the Olympic foil — encodes the values and priorities of each discipline</li>
+                                            <li><strong>Global diversity is rich:</strong> Beyond the major disciplines, traditions such as iaido, eskrima, and Chinese sword arts demonstrate the universality of humanity's relationship with the sword across cultures</li>
+                                            <li><strong>The revival is real and significant:</strong> Participation in sword arts is growing rapidly worldwide, driven by media, online communities, and a hunger for historically grounded physical practice</li>
+                                            <li><strong>Mexico and Latin America</strong> are important and growing centres of sword arts culture, with active communities in HEMA, kendo, and bohurt — demonstrating that these traditions belong to anyone who chooses to embrace them</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Salient conclusions from this lesson:</p>
+                                        <ul>
+                                            <li><strong>The sword as cultural signifier:</strong> Across all traditions examined, the sword functions as far more than a weapon — it is a vehicle for philosophical values, historical identity, and personal transformation. The persistence of sword arts in modernity reflects an enduring human need to engage with the past through physical practice</li>
+                                            <li><strong>The authenticity problem:</strong> Every sword fighting tradition navigates the tension between historical fidelity and contemporary relevance differently. HEMA's manuscript-based reconstruction, kendo's <span class="vocab-link" onclick="showPopup('martial lineage', 'the tradition of passing down fighting knowledge from teacher to student across generations')">martial lineage</span>, and bohurt's emphasis on physical immersion represent fundamentally different epistemologies of martial knowledge</li>
+                                            <li><strong>The <span class="vocab-link" onclick="showPopup('codification', 'the process of formally recording and organising a set of rules or techniques')">codification</span> legacy:</strong> The systematic recording of sword fighting techniques — whether in medieval European fechtbücher or modern FIE rulebooks — has been the decisive factor in the survival and revival of these traditions, underlining the profound relationship between written knowledge and embodied practice</li>
+                                            <li><strong>Globalisation and hybridisation:</strong> The worldwide spread of sword arts — and their particular vitality in Latin America — demonstrates that martial traditions are not culturally fixed properties but dynamic practices that acquire new meanings and identities as they travel across cultural borders</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800" alt="Sword Arts" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Blade</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The long metal part of a sword used for cutting or thrusting</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Guard</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A defensive position held to protect against an opponent's attack</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Parry</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To block or deflect an opponent's attack with your weapon</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Lunge</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A long forward thrust used to reach and strike an opponent</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Duel</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A formal combat between two people, historically fought with swords or pistols</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Armor</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Protective metal or padded clothing worn during combat</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Tournament</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A competition where fighters or athletes compete against each other over several rounds</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stance</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The position in which a fighter stands when ready to fight or defend</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Épée</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The heaviest Olympic fencing sword, where the entire body is the valid target</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Foil</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A light fencing sword where only the torso counts as a valid target</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sabre</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A fencing weapon where both cutting and thrusting actions can score points</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Piste</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The long narrow strip on which fencing bouts take place</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Riposte</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An offensive action made immediately after successfully blocking an opponent's attack</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Bout</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A single match or competition period in fencing or other combat sports</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sparring</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Practice fighting with a partner to develop and test techniques in a safe environment</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Footwork</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The movement of the feet used to control distance, balance, and positioning during combat</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">HEMA</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Historical European Martial Arts — a movement dedicated to reconstructing and practising medieval and Renaissance European fighting systems from historical manuscripts</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Bohurt</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A full-contact armored combat sport derived from medieval tournament fighting, in which competitors wear steel plate armor and fight with blunted steel weapons</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Iaido</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A Japanese martial art focused on the smooth, controlled drawing and cutting of the sword, emphasising meditative precision over combative application</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Kata</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A pre-arranged sequence of movements used in martial arts to train techniques, principles, and mental discipline through repetition</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Shinai</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A practice sword made of four bamboo staves used in kendo, designed to allow full-force strikes while minimising the risk of serious injury</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Codification</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of formally recording and organising a set of rules, techniques, or principles into a systematic body of knowledge</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Longsword</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A large European sword with a long blade designed to be used with two hands, the most widely studied weapon in the HEMA community</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Martial Lineage</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The tradition of passing down fighting knowledge from teacher to student across generations, providing a living chain of transmission for a martial art</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>Sword fighting arts have experienced a remarkable global revival in recent decades. Choose two of the combat disciplines discussed in this lesson — such as Olympic fencing, HEMA, bohurt, or kendo — and compare their approaches to the sword. Discuss the history, equipment, and cultural appeal of each discipline. Why do you think people today are drawn to these ancient fighting arts? Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - The Art of the Sword - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Blade", definition: "The long metal part of a sword used for cutting or thrusting", sentences: ["The fencer's ___ was made of flexible spring steel.", "He raised his ___ to block the incoming strike.", "A sharp ___ requires careful handling and respect."] },
+                { term: "Guard", definition: "A defensive position held to protect against an opponent's attack", sentences: ["The instructor corrected her ___ before the sparring session.", "He dropped his ___ for a moment, and his opponent scored.", "Maintaining a strong ___ is one of the first lessons in fencing."] },
+                { term: "Parry", definition: "To block or deflect an opponent's attack with your weapon", sentences: ["She used a quick ___ to stop the blade from hitting her arm.", "Learning to ___ correctly takes months of practice.", "He attempted to ___ but was too slow and was hit."] },
+                { term: "Lunge", definition: "A long forward thrust used to reach and strike an opponent", sentences: ["She made a fast ___ and scored a point on his chest.", "The ___ is one of the most important attacking techniques in fencing.", "A powerful ___ can cover almost two meters of distance."] },
+                { term: "Duel", definition: "A formal combat between two people, historically fought with swords or pistols", sentences: ["In the 18th century, gentlemen settled disputes with a sword ___.", "The ___ scene in the film was choreographed by a HEMA expert.", "A ___ requires both fighters to follow strict rules of honour."] },
+                { term: "Armor", definition: "Protective metal or padded clothing worn during combat", sentences: ["The bohurt fighter wore full plate ___ weighing 40 kilograms.", "Without proper ___, full-contact sword fighting would be too dangerous.", "Medieval knights spent years learning to fight effectively in ___."] },
+                { term: "Tournament", definition: "A competition where fighters or athletes compete against each other over several rounds", sentences: ["She won her first HEMA ___ after only two years of training.", "The Battle of the Nations is the world's largest bohurt ___.", "The regional kendo ___ attracted over 200 competitors."] },
+                { term: "Stance", definition: "The position in which a fighter stands when ready to fight or defend", sentences: ["The kendo instructor corrected his ___ before teaching him to attack.", "A good ___ gives you balance and the ability to move quickly.", "Each sword fighting style has its own preferred fighting ___."] }
+            ],
+            B2: [
+                { term: "Épée", definition: "The heaviest Olympic fencing sword, where the entire body is the valid target", sentences: ["The ___ is the heaviest of the three Olympic fencing weapons.", "In ___ fencing, a simultaneous hit means both athletes score a point.", "She switched from foil to ___ because she preferred the whole-body target."] },
+                { term: "Foil", definition: "A light fencing sword where only the torso counts as a valid target", sentences: ["Most beginners in Olympic fencing start with the ___.", "The ___ follows right of way rules, meaning only one fencer can score at a time.", "She trained for years with the ___ before competing internationally."] },
+                { term: "Sabre", definition: "A fencing weapon where both cutting and thrusting actions can score points", sentences: ["The ___ is the fastest and most aggressive of the three Olympic weapons.", "A ___ fencer targets the entire upper body, including the arms and head.", "He chose the ___ because his quick reflexes suited its explosive style."] },
+                { term: "Piste", definition: "The long narrow strip on which fencing bouts take place", sentences: ["Fencers must stay within the boundaries of the ___ during a bout.", "The ___ is 14 meters long and 1.5 to 2 meters wide.", "Stepping off the back of the ___ gives a point to the opposing fencer."] },
+                { term: "Riposte", definition: "An offensive action made immediately after successfully blocking an opponent's attack", sentences: ["She parried his attack and launched a fast ___ to score the point.", "A well-timed ___ is one of the most satisfying actions in fencing.", "The ___ must come immediately after the parry to retain right of way."] },
+                { term: "Bout", definition: "A single match or competition period in fencing or other combat sports", sentences: ["Each ___ in Olympic fencing lasts up to three periods of three minutes.", "He won his first competitive ___ by a score of 15 to 9.", "A preliminary ___ at a major tournament can be over in under two minutes."] },
+                { term: "Sparring", definition: "Practice fighting with a partner to develop and test techniques in a safe environment", sentences: ["Regular ___ with more experienced fighters is the best way to improve.", "HEMA practitioners wear protective gear for all ___ sessions.", "She learned more from one hour of ___ than from a week of solo drills."] },
+                { term: "Footwork", definition: "The movement of the feet used to control distance, balance, and positioning during combat", sentences: ["Good ___ is considered the foundation of all sword fighting arts.", "The coach spent three months working on her ___ before teaching her attacks.", "His superior ___ allowed him to control the distance throughout the bout."] }
+            ],
+            C1: [
+                { term: "HEMA", definition: "Historical European Martial Arts — reconstructing medieval and Renaissance European fighting systems from manuscripts", sentences: ["Practitioners of ___ use original fechtbücher to reconstruct lost fighting techniques.", "The ___ community has grown from a handful of clubs to thousands worldwide in two decades.", "___ tournaments now attract competitors from over 50 countries."] },
+                { term: "Bohurt", definition: "A full-contact armored combat sport derived from medieval tournament fighting", sentences: ["In ___, competitors wear full plate armor and fight with blunted steel weapons.", "___ athletes must combine the strength of a weightlifter with the endurance of a distance runner.", "The annual Battle of the Nations is the premier ___ championship event."] },
+                { term: "Iaido", definition: "A Japanese martial art focused on the smooth controlled drawing and cutting of the sword", sentences: ["___ practitioners perform solo kata against imaginary opponents.", "Unlike kendo, ___ prioritises meditative precision over competitive fighting.", "___ is often described as the art of drawing the sword, not the art of using it."] },
+                { term: "Kata", definition: "A pre-arranged sequence of movements used to train techniques, principles, and mental discipline", sentences: ["Students practice ___ to internalize the mechanics of each technique through repetition.", "Kendo ___ are performed with wooden bokken rather than the bamboo shinai.", "In HEMA, practitioners debate whether ___ training is historically authentic."] },
+                { term: "Shinai", definition: "A practice sword made of four bamboo staves used in kendo", sentences: ["The ___ is designed to allow full-force strikes safely during kendo training.", "A standard adult ___ is approximately 120 centimetres in length.", "The development of the ___ in the 18th century enabled kendo to become a contact sport."] },
+                { term: "Codification", definition: "The process of formally recording and organising a set of rules or techniques into systematic knowledge", sentences: ["The ___ of European sword fighting in fechtbücher is more extensive than most people realise.", "The ___ of kendo rules during the Meiji era transformed it from a military art into a modern sport.", "Without the ___ of its techniques, HEMA would have nothing to reconstruct."] },
+                { term: "Longsword", definition: "A large European sword designed to be used with two hands, the most studied weapon in HEMA", sentences: ["The ___ is the most popular weapon in the HEMA community.", "Techniques for the ___ are described in detail in Fiore dei Liberi's 1410 manuscript.", "A typical HEMA ___ simulator weighs between 1.2 and 1.6 kilograms."] },
+                { term: "Martial Lineage", definition: "The tradition of passing down fighting knowledge from teacher to student across generations", sentences: ["Kendo's unbroken ___ distinguishes it from HEMA, which must reconstruct lost techniques.", "The concept of ___ is central to the cultural authority of Japanese martial arts.", "Some HEMA practitioners argue their ___ runs through the manuscripts, not through people."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
