@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Euro Disney: Lost in Translation - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Euro Disney: Lost in Translation</h1>
+        <p class="game-subtitle">Cultural Missteps &amp; International Expansion</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>Euro Disney: Lost in Translation</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">Euro Disney: Lost in Translation</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Cultural Missteps &amp; International Expansion</p>
+                                    <p style="font-size: 1.1rem; opacity: 0.6; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase;">Ought to Have · Should Have · Needn't Have · Cultural Vocabulary</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <!-- Replace the YouTube video ID below with your preferred documentary about the Euro Disney / Disneyland Paris opening and cultural failures -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/VIDEO_ID_HERE?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - Disney Goes to Paris -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Disney Goes to Paris</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>In April 1992, Disney opened a new theme park near Paris, France. It was called Euro Disneyland. Disney already had very successful parks in the United States — Disneyland in California and Disney World in Florida. Disney thought its Paris park would be just as popular.</p>
+                                        <p>Disney expected 11 million visitors in the first year. But the reality was very different. Many fewer people came, and those who did visit spent less money than expected. The park lost hundreds of millions of dollars. Disney had made some very serious <span class="vocab-link" onclick="showPopup('assumptions', 'things you believe are true without having enough proof')">assumptions</span> about European visitors.</p>
+                                        <p>The biggest problem was that Disney did not understand French and European <span class="vocab-link" onclick="showPopup('local customs', 'the traditional ways that people in a specific place behave and live')">local customs</span>. It tried to copy its American parks without thinking about what European visitors actually wanted.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Euro Disneyland opened in April 1992 in Marne-la-Vallée, 32 kilometres east of Paris. Disney had projected 11 million visitors in the first year, based on the extraordinary success of its Florida and California parks. In reality, <span class="vocab-link" onclick="showPopup('attendance figures', 'the number of visitors to a place over a period of time')">attendance figures</span> fell far short. The park lost approximately $900 million in its first year of operation.</p>
+                                        <p>Disney had conducted extensive demographic research and identified Europe as a market with sufficient population and purchasing power to support a large theme park. What it had failed to account for were the profound cultural differences between American and European consumers — differences in dining habits, leisure patterns, attitudes toward alcohol, and expectations about the role of entertainment in daily life.</p>
+                                        <p>The <span class="vocab-link" onclick="showPopup('revenue shortfall', 'when actual income is significantly less than expected or projected')">revenue shortfall</span> was not simply a financial problem — it was the visible consequence of a failure of cultural intelligence at every level of the planning process.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The opening of Euro Disneyland in 1992 represents one of the most extensively studied cases of failed international expansion in business history. Disney's strategic planning was grounded in the assumption that consumer behaviour at its Florida and California parks could be transplanted to a European market with minimal adaptation. This <span class="vocab-link" onclick="showPopup('ethnocentrism', 'evaluating other cultures based on the standards and assumptions of one\'s own culture')">ethnocentrism</span> — sometimes characterized as American cultural imperialism — failed to account for the profound differences in leisure patterns, dining culture, attitudes toward work-life boundaries, and consumer expectations that distinguished European from American visitors.</p>
+                                        <p>Disney's pre-opening research was extensive in demographic and economic terms: the company had identified that Europe contained a population and per-capita income base sufficient to support a major theme park. What it lacked was <span class="vocab-link" onclick="showPopup('cultural due diligence', 'thorough research into the cultural context of a market before entering it, as a financial and strategic discipline')">cultural due diligence</span> — the structured investigation of how cultural values, social rituals, and consumer psychology would shape actual visitor behaviour in ways that invalidated the American baseline assumptions.</p>
+                                        <p>The financial consequences were immediate and severe: a loss of approximately $900 million in the first year, a debt restructuring in 1994, and a reputational crisis that generated sustained negative press coverage, including the famous description of the park by French intellectual Ariane Mnouchkine as "a cultural Chernobyl."</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800" alt="International business meeting" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Cultural Missteps -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Cultural Missteps</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Disney made several important mistakes because it did not understand European culture. Here are the main ones:</p>
+                                        <ul>
+                                            <li><strong>The alcohol ban:</strong> Disney did not allow wine or beer in the park. In France, drinking wine with a meal is completely normal. French visitors felt insulted.</li>
+                                            <li><strong>Too many hotels:</strong> Disney built 5,200 hotel rooms. But most European visitors preferred to come for just one day — they did not want to stay overnight.</li>
+                                            <li><strong>Meal timing:</strong> French people eat lunch together at noon. Disney's restaurants were not ready for 50,000 people all wanting to eat at the same time.</li>
+                                            <li><strong>Employee rules:</strong> Disney's strict rules about employee appearance — hair, makeup, and clothing — went against French ideas about personal <span class="vocab-link" onclick="showPopup('adapt', 'to change something to suit a different situation, environment, or culture')">adapting</span> to a new country.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Disney's <span class="vocab-link" onclick="showPopup('cultural insensitivity', 'a failure to recognize or respect the values, traditions, and practices of another culture')">cultural insensitivity</span> manifested in several interconnected ways:</p>
+                                        <ul>
+                                            <li><strong>The alcohol ban:</strong> Disney initially prohibited wine and beer — a policy that worked in the US but was profoundly offensive to French cultural sensibilities. France has one of the world's strongest wine cultures; its absence from mealtimes was seen as an act of cultural disrespect.</li>
+                                            <li><strong>Hotel overcapacity:</strong> Disney built 5,200 hotel rooms, projecting multi-day stays consistent with US visitor patterns. European visitors preferred single-day excursions, leaving hotels largely empty.</li>
+                                            <li><strong>Meal scheduling failure:</strong> Disney's restaurants were designed for continuous American-style snacking throughout the day. French visitors concentrated their meals at noon in a shared ritual, overwhelming restaurant capacity entirely.</li>
+                                            <li><strong>Employee dress codes:</strong> Strict grooming standards — covering hairstyles, jewelry, and personal presentation — violated French <span class="vocab-link" onclick="showPopup('labor relations', 'the relationship between a company and its employees, shaped by law, culture, and union activity')">labor relations</span> law and were subsequently challenged in French courts.</li>
+                                            <li><strong>Language policy:</strong> English-first signage and entertainment left many French visitors feeling the park did not respect their national identity.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Disney's cultural missteps at Euro Disneyland were the product of systematic <span class="vocab-link" onclick="showPopup('ethnocentrism', 'evaluating other cultures based on the standards and assumptions of one\'s own culture')">ethnocentrism</span> — the application of US-centric frameworks to a fundamentally different cultural context. The alcohol prohibition, perhaps the most widely cited example, illustrates the distinction between cultural adaptation and cultural imposition: Disney's no-alcohol policy reflected an American understanding of family entertainment that was entirely foreign to a French audience for whom wine is an inseparable accompaniment to mealtimes.</p>
+                                        <p>More structurally damaging were the assumptions embedded in the park's physical design. The number of hotel rooms assumed multi-day visit patterns consistent with US parks; the restaurant infrastructure assumed dispersed, continuous dining. Both projections proved incorrect, with consequences that were both operational and financial: fixed costs had been calibrated to an attendance and per-visitor spend profile that European visitors consistently failed to deliver.</p>
+                                        <p>The employment practices dispute — particularly the "Disney Look" codebook governing employee grooming — additionally illustrates the consequences of ignoring <span class="vocab-link" onclick="showPopup('institutional isomorphism', 'the pressure on multinational companies to adapt their organizational practices to the legal and cultural environment of the host country')">institutional isomorphism</span>: the imperative for multinational organisations to adapt their internal practices to the legal and cultural norms of the host country, rather than exporting the domestic operating model unchanged.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800" alt="French restaurant dining" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - The Alcohol Policy & Dining Habits -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Wine, Dining &amp; Assumptions</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>One of Disney's biggest mistakes was banning wine and beer from the park. In America, this was not a problem. But in France, wine is a normal part of everyday meals — it is part of the culture. Many French visitors felt that Disney was telling them their culture was wrong. The French press called Euro Disney "a cultural Chernobyl."</p>
+                                        <p>Disney also did not understand French <span class="vocab-link" onclick="showPopup('local customs', 'the traditional ways that people in a specific place behave and live')">local customs</span> around eating. French people typically eat a proper sit-down lunch at noon. Disney's restaurants were not big enough for everyone to eat at the same time. Visitors had to wait more than two hours for lunch.</p>
+                                        <p>Disney <strong>ought to have</strong> researched French dining habits before designing the restaurants. The company <strong>should have</strong> allowed wine from the beginning. It <strong>needn't have</strong> copied American rules — France is not America.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The alcohol ban illustrates Disney's failure to perform adequate <span class="vocab-link" onclick="showPopup('market research', 'the process of gathering information about consumers, cultural practices, and market conditions before entering a new market')">market research</span>. In the US, a no-alcohol theme park aligns with cultural norms around family entertainment. In France, wine is not a special-occasion drink — it is a daily accompaniment to meals whose absence is perceived as abnormal, even disrespectful. The decision provoked immediate public backlash and sustained negative press coverage.</p>
+                                        <p>The dining infrastructure failure was equally revealing. Disney projected a consumption pattern based on American visitor behaviour — dispersed meals and snacks throughout the day. French visitors, however, ate lunch as a shared, structured ritual at noon. When tens of thousands of visitors simultaneously demanded table service at midday, restaurants were overwhelmed, queues stretched for hours, and the experience directly contradicted the park's core promise of enjoyment.</p>
+                                        <p>Disney <strong>ought to have</strong> conducted proper cultural research before finalizing the restaurant design. Management <strong>should have</strong> consulted French cultural advisors at the planning stage. The company <strong>needn't have</strong> imposed the alcohol ban at all — it served no purpose in a French cultural context and caused significant reputational damage.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The alcohol policy and dining infrastructure failures at Euro Disneyland are instructive case studies in the gap between stated cultural awareness and operational reality. Disney's pre-opening planning process did involve European consultants, yet consistently failed to translate cultural input into design decisions — a pattern that reflects what Hofstede's cultural dimensions theory would characterize as the collision of high power-distance, rule-bound American corporate culture with the French cultural preference for individual autonomy and established social rituals.</p>
+                                        <p>The dining crisis demonstrates the financial consequences of culturally misinformed assumptions with particular clarity. Fixed infrastructure — kitchen capacity, seating, staffing ratios — was sized for a dispersed-demand model. The actual demand curve, concentrated in a single midday window consistent with French meal norms, exceeded capacity by a factor that rendered the experience operationally unmanageable. The cost of retrofitting this infrastructure post-opening substantially exceeded what accurate <span class="vocab-link" onclick="showPopup('cultural due diligence', 'thorough research into the cultural context of a market before entering it, as a financial and strategic discipline')">cultural due diligence</span> would have cost at the planning stage — a textbook illustration of why cultural research is a hard financial discipline rather than a soft competency.</p>
+                                        <p>The press characterization of the park as "a cultural Chernobyl" was not merely colourful criticism — it captured a genuine perception among French intellectuals and the general public that Disney was engaged in <span class="vocab-link" onclick="showPopup('cultural imperialism', 'the imposition of one culture\'s values, practices, and commercial products on another culture')">cultural imperialism</span>: the replacement of French cultural norms with American commercial values on French soil.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800" alt="French wine and dining" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Modals of Advice -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Modals of Advice: Talking About the Past</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>We use special modal verbs to give advice about the past — to say what was the right or wrong thing to do.</p>
+                                        <ul>
+                                            <li><strong>"ought to have"</strong> → strong advice: the right thing was not done<br><em>"Disney ought to have researched French dining habits."</em></li>
+                                            <li><strong>"should have"</strong> → a good expectation that wasn't followed<br><em>"They should have allowed wine in the park."</em></li>
+                                            <li><strong>"needn't have"</strong> → the action was not necessary<br><em>"They needn't have banned wine — it only caused problems."</em></li>
+                                            <li><strong>"could have"</strong> → a different possible action (no judgment)<br><em>"Disney could have hired more French managers."</em></li>
+                                        </ul>
+                                        <p>Practice: "Disney _____ consulted local experts before opening." Which modal do you prefer and why?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Modals of advice are essential in business post-mortems, performance reviews, and case study analysis. Each carries a different meaning:</p>
+                                        <ul>
+                                            <li><strong>"ought to have"</strong> = strong moral or professional obligation not met. Slightly more formal and emphatic than "should have."<br><em>"Disney ought to have conducted cultural due diligence before finalizing the park's design."</em></li>
+                                            <li><strong>"should have"</strong> = a reasonable expectation or good practice that was not followed.<br><em>"The company should have consulted French cultural advisors at the planning stage."</em></li>
+                                            <li><strong>"needn't have"</strong> = an action was taken unnecessarily — it was done, but wasn't required.<br><em>"Disney needn't have enforced American grooming standards — French labor law prohibited them anyway."</em></li>
+                                            <li><strong>"could have"</strong> = a possible alternative action that was not taken (neutral, no judgment).<br><em>"Disney could have introduced a more flexible alcohol policy from the start."</em></li>
+                                        </ul>
+                                        <p>In performance reviews and strategic analysis, the choice between "ought to have" and "could have" signals how strongly you are assigning <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for decisions and actions and be prepared to explain them')">accountability</span> for a missed standard.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The modal perfect constructions used in retrospective professional analysis each encode distinct epistemic and deontic values with significant implications in corporate and legal discourse.</p>
+                                        <ul>
+                                            <li><strong>"ought to have"</strong> encodes strong deontic obligation — it implies an external standard (professional, ethical, or cultural) against which the action is measured and found deficient. Its use in business analysis signals a clear accountability claim: a duty existed and was not discharged.<br><em>"Disney ought to have engaged in systematic cultural due diligence."</em></li>
+                                            <li><strong>"should have"</strong> similarly encodes deontic modality but carries slightly weaker obligation — it may reflect best practice rather than binding duty. The difference is pragmatically significant in contract disputes and post-incident reviews.</li>
+                                            <li><strong>"needn't have"</strong> is unique in the modal perfect system: it asserts that an action taken was unnecessary. Unlike the others, it does not assign blame but identifies inefficiency or a misunderstanding of requirements.<br><em>"Disney needn't have enforced American grooming norms — they achieved nothing and generated legal costs."</em></li>
+                                            <li><strong>"could have"</strong> encodes epistemic possibility: the action was feasible, but no claim is made about whether it was required. It is analytically neutral — preferred in exploratory analysis before accountability is formally assigned.</li>
+                                        </ul>
+                                        <p>Legal counsel routinely negotiates the modal constructions used in corporate post-incident statements with great precision: "we ought to have" is functionally an admission of <span class="vocab-link" onclick="showPopup('liability', 'legal responsibility for harm, loss, or failure to meet a required standard')">liability</span>; "we could have" is an observation. This distinction shapes how organisations communicate during and after crises.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800" alt="Business analysis and planning" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Management & Labor Relations -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Management &amp; Labor Relations</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Disney also had serious problems with its employees in France. Disney has a strict "Disney Look" — rules about how employees must wear their hair, use makeup, and dress. In France, people believe strongly in personal freedom and workers have strong legal rights. Many French employees refused to follow these rules.</p>
+                                        <p>Disney also tried to use American management ideas in France. American managers expected employees to be very enthusiastic and follow company rules without question. French workers were not used to this style. There were many arguments between employees and management. Some employees took Disney to court.</p>
+                                        <p>These problems cost the company a lot of money and made the <span class="vocab-link" onclick="showPopup('reputation', 'the opinion that people have about how trustworthy or good a person or company is')">reputation</span> of the park even worse. Disney ought to have learned about French employment law before writing its contracts.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Disney's employment practices in France generated significant <span class="vocab-link" onclick="showPopup('labor relations', 'the relationship between a company and its employees, shaped by law, culture, and union activity')">labor relations</span> problems. The company's contracts specified a "Disney Look" — detailed prescriptions governing employees' hairstyles, jewelry, nail color, and personal presentation — which French labor courts subsequently ruled to be incompatible with French law protecting personal autonomy.</p>
+                                        <p>Disney had also imported an American approach to workplace culture: high enthusiasm, close adherence to corporate standards, limited employee autonomy. French professional norms and French unions — among the most active in Europe — were poorly suited to this model. Disney's predominantly American management team was ill-equipped to navigate the industrial relations environment they encountered.</p>
+                                        <p>The result was a cascade of labor disputes, legal challenges, and high employee turnover that increased operational costs and reduced service quality — directly affecting visitor satisfaction at a time when attendance was already below projections. Disney's management <strong>ought to have</strong> studied French employment law before drafting contracts. They <strong>should have</strong> hired senior European managers with direct experience of French <span class="vocab-link" onclick="showPopup('brand identity', 'the image, values, and personality that a company projects to its customers and the public')">brand identity</span> challenges from the start.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Disney's labor relations difficulties at Euro Disneyland illustrate the consequences of applying a unilateral organizational culture to a legally and socially distinct workforce environment. The company's employment practices — particularly the "Disney Look" — were grounded in the US employment-at-will doctrine, under which such provisions are routinely enforceable. French labor law, shaped by a fundamentally different conception of the employment relationship, provides substantially stronger protections for personal autonomy and constrains the degree to which employers may regulate employee appearance.</p>
+                                        <p>The resulting legal challenges compelled Disney to modify its employment standards, but the reputational damage among potential employees and the operational disruption caused by high turnover were not so easily reversed. The episode reflects a failure of <span class="vocab-link" onclick="showPopup('institutional isomorphism', 'the pressure on multinational companies to adapt their organizational practices to the legal and cultural environment of the host country')">institutional isomorphism</span> — the pressure on multinational firms to adapt their organizational practices to the institutional environment of the host country, encompassing labor law, union structures, professional culture, and social norms.</p>
+                                        <p>More broadly, the labor relations crisis compounded the cultural credibility problem: a company already perceived as indifferent to French cultural values was now also perceived as hostile to French workers' rights. The two narratives reinforced each other in the French press, amplifying the reputational damage well beyond what either issue alone would have produced.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800" alt="Workplace discussion" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - The Recovery -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Road to Recovery</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>After several very difficult years, Disney began to change. The company hired new managers with more experience in Europe and started to <span class="vocab-link" onclick="showPopup('adapt', 'to change something to suit a different situation, environment, or culture')">adapt</span> the park to European tastes. The key changes included:</p>
+                                        <ul>
+                                            <li><strong>Wine and beer were allowed</strong> in the park from 1993 — less than one year after opening.</li>
+                                            <li>The park was <strong>renamed "Disneyland Paris"</strong> in 1994 — a name that felt more European and less corporate.</li>
+                                            <li><strong>Better food</strong> was introduced, including proper French meals at restaurants with enough seating.</li>
+                                            <li><strong>Prices were lowered</strong> to attract more European day visitors.</li>
+                                            <li>More <strong>European entertainment</strong> was added to the shows and attractions.</li>
+                                        </ul>
+                                        <p>These changes worked. Today, Disneyland Paris is the most visited tourist attraction in Europe, with more than 15 million visitors each year.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Disney's recovery strategy was essentially a systematic reversal of its initial cultural missteps. The most significant early change was lifting the alcohol ban in 1993 — which had immediate positive effects on visitor satisfaction and food service <span class="vocab-link" onclick="showPopup('revenue', 'the total income a company earns from its business activities over a period of time')">revenue</span>. The park was rebranded from "Euro Disneyland" to "Disneyland Paris" in 1994, a change that better reflected the park's European identity and reduced the perception of American cultural imposition.</p>
+                                        <p>Menu reform was equally important: the park introduced proper table-service restaurant capacity, extended meal hours, and adapted menus to include French and European cuisine. Pricing was restructured to reflect European day-visitor patterns. The entertainment programme was diversified to include more European cultural references.</p>
+                                        <p>These adaptations took several years and required multiple financial restructurings to produce stability. But the long-term outcome validated the investment: Disneyland Paris is today the most-visited tourist attraction in Europe, with over 15 million annual visitors. The recovery demonstrated that <span class="vocab-link" onclick="showPopup('localization', 'the process of adapting a product or service to meet the expectations and preferences of a specific local market')">localization</span>, though belated, is never impossible — provided the organization is willing to genuinely revise its assumptions.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The recovery trajectory of Disneyland Paris is instructive precisely because it demonstrates the reversibility of cultural missteps — provided that the organization is willing to fundamentally revise its operating assumptions rather than making incremental adjustments within an unchanged strategic framework.</p>
+                                        <p>Disney's initial response to underperformance was defensive: the company attributed disappointing attendance to external factors — recession, bad weather, European skepticism toward theme parks — rather than to the structural cultural misalignments identified by critics. This attribution error delayed the adaptive response and extended the financial distress. It was only after a financial crisis that came close to bankruptcy in 1994 that management made the decisive strategic shift toward genuine <span class="vocab-link" onclick="showPopup('localization strategy', 'a deliberate plan to adapt products, services, and communications to meet the cultural expectations of a specific market')">localization strategy</span>.</p>
+                                        <p>The eventual success of Disneyland Paris validates the core argument of cross-cultural management theory: that market entry success in culturally distant markets requires not the export of a successful domestic formula, but its contextual reconstruction. The park's contemporary position as Europe's most visited tourist attraction is not despite its European identity — it is because of it. The case therefore offers a more nuanced lesson than simple failure: it demonstrates that <span class="vocab-link" onclick="showPopup('market penetration', 'the degree to which a product or service is adopted and recognized within a target market')">market penetration</span> through authentic cultural adaptation is achievable even after a damaging start, given sufficient will and structural change.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800" alt="Business growth and recovery" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Lessons in International Expansion -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Lessons in International Expansion</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The story of Disneyland Paris teaches us important lessons for any company that wants to <span class="vocab-link" onclick="showPopup('expansion', 'the process of growing a business into new areas, regions, or countries')">expand</span> into a new country:</p>
+                                        <ul>
+                                            <li><strong>Research the local culture</strong> before you open. Find out what people eat, drink, and enjoy.</li>
+                                            <li><strong>Don't copy your home market.</strong> What works in one country will not always work in another.</li>
+                                            <li><strong>Hire local managers</strong> who understand the culture and the laws.</li>
+                                            <li><strong>Be ready to change</strong> quickly when something is not working.</li>
+                                            <li><strong>Respect the local culture</strong> — don't try to replace it with your own.</li>
+                                        </ul>
+                                        <p>These lessons apply to any international business — not just theme parks. Disney ought to have followed these principles from the beginning. Instead, it spent years and hundreds of millions of dollars learning them the hard way.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The Disneyland Paris case provides a practical framework for international <span class="vocab-link" onclick="showPopup('expansion', 'the process of growing a business into new areas, regions, or countries')">expansion</span>:</p>
+                                        <ul>
+                                            <li><strong>Cultural due diligence:</strong> Market research must go beyond demographics and purchasing power to include cultural practices, social rituals, and consumer psychology. Disney had the data on Europe's wealth — what it lacked was cultural intelligence.</li>
+                                            <li><strong>Localization, not just translation:</strong> The difference between a successful global brand and a failed one is not language — it is the willingness to adapt the core product to local expectations while preserving <span class="vocab-link" onclick="showPopup('brand identity', 'the image, values, and personality that a company projects to its customers and the public')">brand identity</span>.</li>
+                                            <li><strong>Hire locally at senior levels:</strong> Disney's management team was predominantly American. Experienced European executives at a senior level would have provided the cultural intelligence the company lacked.</li>
+                                            <li><strong>Plan for agile revision:</strong> No international expansion goes perfectly. Building revision mechanisms into the operational plan — rather than defending initial decisions — is essential.</li>
+                                            <li><strong>Respect the host culture:</strong> The most damaging reputational consequence of Euro Disneyland's early years was the perception that Disney did not respect French culture. The recovery was possible only when that perception changed.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The Disneyland Paris case has become the paradigmatic example in international business strategy of the consequences of <span class="vocab-link" onclick="showPopup('ethnocentrism', 'evaluating other cultures based on the standards and assumptions of one\'s own culture')">ethnocentrism</span> in global expansion. Several theoretical frameworks illuminate different dimensions of the failure:</p>
+                                        <ul>
+                                            <li><strong>Hofstede's Cultural Dimensions:</strong> France and the US differ significantly on individualism (particularly in the workplace context), uncertainty avoidance, and power distance. Disney's assumption that uniformized entertainment and employment practices would transfer without friction ignored these structural differences.</li>
+                                            <li><strong>Uppsala Model of Internationalization:</strong> The Uppsala model predicts that firms expand internationally through incremental learning and adaptation. Disney's approach bypassed this process, attempting large-scale deployment without the accumulated market knowledge the model identifies as a prerequisite for success.</li>
+                                            <li><strong>Institutional Theory:</strong> French institutions — labor law, union structures, culinary culture, the state's role in cultural policy — created an operating environment fundamentally different from the US. Ignoring these institutional constraints produced predictable and costly conflicts.</li>
+                                        </ul>
+                                        <p>The broader lesson is that brand strength in a home market does not confer insight into foreign consumer psychology. The assumption that it does — what might be called "brand imperialism" — is one of the most reliably costly mistakes in international <span class="vocab-link" onclick="showPopup('market penetration', 'the degree to which a product or service is adopted and recognized within a target market')">market penetration</span> strategy.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800" alt="International teamwork" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <ul>
+                                            <li><strong>The failure:</strong> Euro Disneyland opened in 1992 near Paris and lost hundreds of millions of dollars. Disney had made wrong <span class="vocab-link" onclick="showPopup('assumptions', 'things you believe are true without having enough proof')">assumptions</span> about European visitors.</li>
+                                            <li><strong>The mistakes:</strong> Disney banned wine, built too many hotels, didn't prepare for French dining habits, and tried to apply American employee rules in France.</li>
+                                            <li><strong>Language focus:</strong> "Ought to have" = the right thing was not done (strong). "Should have" = a good expectation was not followed. "Needn't have" = an action was not necessary. "Could have" = a possible action (no judgment).</li>
+                                            <li><strong>The recovery:</strong> After allowing wine, renaming the park, improving food, and lowering prices, Disneyland Paris became the most visited park in Europe.</li>
+                                            <li><strong>The lesson:</strong> Before expanding to a new country, you must research and respect the local culture.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <ul>
+                                            <li><strong>Core failure:</strong> Disney's failure was caused by cultural assumptions — projecting American consumer behaviour onto European visitors without adequate <span class="vocab-link" onclick="showPopup('market research', 'the process of gathering information about consumers, cultural practices, and market conditions before entering a new market')">market research</span>.</li>
+                                            <li><strong>Key missteps:</strong> Alcohol ban, hotel overcapacity, meal scheduling failure, language policy, and labor relations conflicts — all products of insufficient cultural intelligence.</li>
+                                            <li><strong>Language focus:</strong> "Ought to have" = strong obligation not met; "should have" = reasonable expectation not followed; "needn't have" = unnecessary action taken; "could have" = neutral alternative. The choice signals how much accountability is being assigned.</li>
+                                            <li><strong>The recovery:</strong> Systematic cultural adaptation — lifting the alcohol ban, rebranding, menu reform, pricing revision — reversed the failure over several years. The park now attracts over 15 million visitors annually.</li>
+                                            <li><strong>The lesson:</strong> <span class="vocab-link" onclick="showPopup('localization', 'the process of adapting a product or service to meet the expectations and preferences of a specific local market')">Localization</span> is a financial discipline, not a soft skill. The cost of getting it wrong at Euro Disneyland far exceeded the cost of getting it right would have been.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <ul>
+                                            <li><strong>Systemic ethnocentrism:</strong> Disney's failure illustrates the consequences of <span class="vocab-link" onclick="showPopup('ethnocentrism', 'evaluating other cultures based on the standards and assumptions of one\'s own culture')">ethnocentrism</span> in international expansion — the assumption that a culturally specific product can be deployed without contextual reconstruction.</li>
+                                            <li><strong>Theoretical frameworks:</strong> Hofstede's Cultural Dimensions, the Uppsala Model, and Institutional Theory each illuminate different dimensions of the failure and provide analytical tools for avoiding similar mistakes in future expansions.</li>
+                                            <li><strong>Modal advice constructions:</strong> "Ought to have" encodes strong deontic obligation; "should have" encodes moderate deontic expectation; "needn't have" identifies unnecessary action; "could have" encodes neutral epistemic possibility. These distinctions carry significant implications for accountability attribution in professional and legal contexts.</li>
+                                            <li><strong>Recovery through genuine adaptation:</strong> The park's eventual success demonstrates that recovery is achievable through genuine strategic adaptation — but only after management abandoned its attribution of failure to external factors and accepted the structural critique of its cultural approach.</li>
+                                            <li><strong>Conceptual legacy:</strong> Market entry success in culturally distant markets requires contextual reconstruction of the product offer, not export of the domestic formula. Brand strength at home does not confer cultural intelligence abroad.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800" alt="Business professional" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cultural Misstep</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A mistake caused by not understanding or respecting another culture's customs and values</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Expansion</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of growing a business into new areas, regions, or countries</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Adapt</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To change something to suit a different situation, environment, or culture</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Assumption</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Something you believe is true without having enough proof or evidence</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Local Customs</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The traditional ways that people in a specific place behave, eat, celebrate, and live</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Revenue</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The total income a company earns from its business activities over a period of time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Reputation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The opinion that people have about how trustworthy, reliable, or good a person or company is</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Consumer</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person who buys and uses products or services</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cultural Insensitivity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A failure to recognize or respect the values, traditions, and practices of another culture</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Market Research</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of gathering information about consumers, cultural practices, and market conditions before entering a new market</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Localization</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of adapting a product or service to meet the expectations and preferences of a specific local market</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Labor Relations</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The relationship between a company and its employees, shaped by law, contracts, culture, and union activity</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Attendance Figures</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The number of visitors to a place, event, or attraction over a given period of time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Revenue Shortfall</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A situation in which a company's actual income is significantly lower than what was projected or expected</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand Identity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The image, values, and personality that a company projects to its customers and to the public</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accountability</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The obligation to accept responsibility for decisions and actions and be prepared to explain them to others</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ethnocentrism</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Evaluating other cultures based on the standards and assumptions of one's own culture, often leading to poor strategic decisions in international markets</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cultural Due Diligence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Thorough research into the cultural context of a market before entering it — treated as a financial and strategic discipline rather than a soft skill</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Localization Strategy</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A deliberate plan to adapt products, services, and communications to meet the cultural expectations of a specific market while preserving core brand values</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Market Penetration</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The degree to which a product or service is adopted, recognized, and used within a target market</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Institutional Isomorphism</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The pressure on multinational companies to adapt their organizational practices to the legal and cultural environment of the host country</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cultural Imperialism</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The imposition of one culture's values, practices, and commercial products on another culture, often through economic or media dominance</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Deontic Modality</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Language expressing obligation, duty, or moral expectation — as in "ought to have" — which implies a standard against which past actions are judged</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Liability</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Legal responsibility for harm, loss, or failure to meet a required professional or contractual standard</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>It is April 1993 — one year after Euro Disneyland opened. Attendance is far below projections and the press is calling the park "a cultural Chernobyl." Imagine you are a newly appointed European VP at Disney, tasked with writing an internal strategic memo to the CEO recommending urgent changes. Write approximately 200–250 words. Your memo should: (1) identify at least two specific cultural missteps that ought to have been avoided; (2) recommend concrete actions the company should take immediately; and (3) use at least three modals of advice ("ought to have," "should have," "needn't have," or "could have") with clear reference to the lesson topic. Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your strategic memo here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Euro Disney: Lost in Translation - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Cultural Misstep", definition: "A mistake caused by not understanding or respecting another culture's customs and values", sentences: ["Banning wine was a serious ___ that offended French visitors immediately.", "The company made a costly ___ by not researching local dining habits before opening.", "A ___ in international business can damage a brand's reputation far more than a financial mistake."] },
+                { term: "Expansion", definition: "The process of growing a business into new areas, regions, or countries", sentences: ["Disney planned the ___ of its brand into Europe with Euro Disneyland.", "International ___ requires careful research into local markets and cultural practices.", "The company's European ___ in 1992 did not go as planned."] },
+                { term: "Adapt", definition: "To change something to suit a different situation, environment, or culture", sentences: ["Disney had to ___ its menu to include more French and European food options.", "Successful companies ___ their products to suit the preferences of local customers.", "It took several years for Disney to fully ___ to the expectations of the French market."] },
+                { term: "Assumption", definition: "Something you believe is true without having enough proof or evidence", sentences: ["Disney made the wrong ___ that Europeans would behave like American park visitors.", "A dangerous ___ in business is that success in one country guarantees success in another.", "The hotel overcapacity was based on an incorrect ___ about how long visitors would stay."] },
+                { term: "Local Customs", definition: "The traditional ways that people in a specific place behave, eat, celebrate, and live", sentences: ["Disney did not respect French ___ around wine and shared mealtimes.", "Understanding ___ is essential before entering any new international market.", "The wine ban showed that Disney had not properly researched ___ in France."] },
+                { term: "Revenue", definition: "The total income a company earns from its business activities over a period of time", sentences: ["The park's ___ in its first year was much lower than expected.", "Disney lost hundreds of millions in ___ because attendance fell far short of projections.", "By adapting to French culture, the park was gradually able to increase its ___."] },
+                { term: "Reputation", definition: "The opinion that people have about how trustworthy, reliable, or good a person or company is", sentences: ["Disney's ___ in France was damaged by the perception that it didn't respect French culture.", "The French press described Euro Disney as 'a cultural Chernobyl,' seriously harming its ___.", "It took many years for Disneyland Paris to rebuild its ___ with French consumers."] },
+                { term: "Consumer", definition: "A person who buys and uses products or services", sentences: ["French and American ___ have very different expectations and habits.", "Disney failed to research what its European ___ actually wanted from a theme park.", "A ___ survey before opening would have revealed the importance of wine to French diners."] }
+            ],
+            B2: [
+                { term: "Cultural Insensitivity", definition: "A failure to recognize or respect the values, traditions, and practices of another culture", sentences: ["Disney's initial alcohol ban was widely seen as an act of ___ toward French culture.", "___ in international business can damage a brand's reputation far more than financial mistakes.", "The press accused Disney of ___ when it tried to apply American entertainment values to France."] },
+                { term: "Market Research", definition: "The process of gathering information about consumers, cultural practices, and market conditions before entering a new market", sentences: ["Thorough ___ before the opening would have revealed the importance of wine to French diners.", "Disney's ___ focused on demographics and purchasing power but largely ignored cultural practices.", "Effective ___ goes beyond statistics to include cultural habits, social rituals, and daily routines."] },
+                { term: "Localization", definition: "The process of adapting a product or service to meet the expectations and preferences of a specific local market", sentences: ["The ___ of Disney's menu to include French cuisine was an important step in the recovery.", "___ is the process of adapting a product to suit the expectations of a specific market.", "Disney's initial refusal to pursue proper ___ was at the heart of its cultural failures."] },
+                { term: "Labor Relations", definition: "The relationship between a company and its employees, shaped by law, contracts, culture, and union activity", sentences: ["Disney's ___ in France were complicated by strict grooming policies that violated French law.", "Poor ___ led to high staff turnover and reduced service quality at Euro Disneyland.", "French ___ are governed by laws that provide much stronger worker protections than US law."] },
+                { term: "Attendance Figures", definition: "The number of visitors to a place, event, or attraction over a given period of time", sentences: ["Disney had projected 11 million visitors, but actual ___ fell far short of this target.", "Poor ___ in the first year forced Disney to cut prices and fundamentally change its strategy.", "Today's ___ of over 15 million per year show how successfully the park has recovered."] },
+                { term: "Revenue Shortfall", definition: "A situation in which a company's actual income is significantly lower than what was projected or expected", sentences: ["A massive ___ of hundreds of millions of dollars in the first year shocked Disney's management.", "The ___ was caused by lower attendance and lower per-visitor spending than projected.", "Disney had to restructure its debt after the serious ___ of its first operating year."] },
+                { term: "Brand Identity", definition: "The image, values, and personality that a company projects to its customers and to the public", sentences: ["Disney's strong ___ as a family entertainment company did not automatically translate into European success.", "The rebranding to 'Disneyland Paris' was a deliberate effort to align the park's ___ with European expectations.", "A global ___ must be flexible enough to adapt to different cultural contexts without losing its core values."] },
+                { term: "Accountability", definition: "The obligation to accept responsibility for decisions and actions and be prepared to explain them to others", sentences: ["Effective crisis management requires clear ___ — someone must own the problem and fix it.", "Disney's early management avoided ___ by blaming external factors like recession and bad weather.", "Taking ___ for the cultural missteps was the first step toward a genuine recovery strategy."] }
+            ],
+            C1: [
+                { term: "Ethnocentrism", definition: "Evaluating other cultures based on the standards and assumptions of one's own culture, often leading to poor strategic decisions in international markets", sentences: ["Disney's early management approach exhibited classic ___ — judging the French market entirely by American standards.", "___ in international business leads companies to assume that domestic success can be replicated without cultural adaptation.", "Academic critics described Disney's approach to the French market as institutional ___, imposing American norms without genuine consultation."] },
+                { term: "Cultural Due Diligence", definition: "Thorough research into the cultural context of a market before entering it — treated as a financial and strategic discipline rather than a soft skill", sentences: ["Adequate ___ would have identified the French dining culture problem before the park ever opened.", "___ is not a soft skill but a hard financial discipline — the cost of neglecting it at Euro Disneyland ran to hundreds of millions.", "Disney's planning process included European consultants but failed to translate their input into genuine ___."] },
+                { term: "Localization Strategy", definition: "A deliberate plan to adapt products, services, and communications to meet the cultural expectations of a specific market while preserving core brand values", sentences: ["Disney's absence of a coherent ___ was the fundamental strategic error of the Euro Disneyland project.", "The park's recovery was only possible once management implemented a genuine ___ that addressed cultural preferences at the product level.", "A successful ___ preserves core brand values while adapting the product offer to meet local expectations."] },
+                { term: "Market Penetration", definition: "The degree to which a product or service is adopted, recognized, and used within a target market", sentences: ["Euro Disneyland's initial ___ was far below projections, with attendance running at roughly 60% of expected levels.", "Genuine ___ in the French market required not just physical access but cultural legitimacy.", "The park's eventual ___ as Europe's most visited tourist destination validated the long-term investment in cultural adaptation."] },
+                { term: "Institutional Isomorphism", definition: "The pressure on multinational companies to adapt their organizational practices to the legal and cultural environment of the host country", sentences: ["___ theory predicts that multinational companies must adapt their organizational practices to the institutional environment of the host country.", "Disney's failure to achieve ___ with French labor law and cultural norms produced significant legal and reputational costs.", "The concept of ___ helps explain why practices that are effective in one national context often fail when transferred unchanged."] },
+                { term: "Cultural Imperialism", definition: "The imposition of one culture's values, practices, and commercial products on another culture, often through economic or media dominance", sentences: ["French intellectuals accused Disney of ___ — replacing French cultural values with American commercial entertainment.", "___ describes the process by which powerful cultures impose their values on others through economic or cultural dominance.", "The controversy over Euro Disneyland intensified French debates about ___ in the context of American media and entertainment expansion."] },
+                { term: "Deontic Modality", definition: "Language expressing obligation, duty, or moral expectation — as in 'ought to have' — which implies a standard against which past actions are judged", sentences: ["The statement 'Disney ought to have conducted cultural research' uses ___ to assign responsibility by implying a professional standard was not met.", "Legal counsel reviews post-incident communications for ___ markers, as 'ought to have' may constitute an admission of duty and breach.", "Understanding ___ helps analysts distinguish between statements of obligation and statements of mere possibility."] },
+                { term: "Liability", definition: "Legal responsibility for harm, loss, or failure to meet a required professional or contractual standard", sentences: ["Disney faced questions of ___ after its grooming policies were found to violate French employment law.", "The distinction between 'ought to have' and 'could have' in corporate statements has direct implications for ___ exposure.", "Proactively addressing cultural missteps reduced Disney's long-term ___ to employee legal challenges."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
