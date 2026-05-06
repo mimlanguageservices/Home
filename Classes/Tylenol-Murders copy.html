@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>The Tylenol Murders - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">The Tylenol Murders</h1>
+        <p class="game-subtitle">Product Recalls &amp; Public Relations</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>The Tylenol Murders</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">The Tylenol Murders</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Product Recalls &amp; Public Relations</p>
+                                    <p style="font-size: 1.1rem; opacity: 0.6; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase;">Apologizing · Should Have vs. Could Have · Crisis Vocabulary</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <!-- Replace the YouTube video ID below with your preferred documentary about the 1982 Tylenol crisis -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/U_7CGl6VWaQ?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What Happened? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What Happened?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>In September 1982, seven people in Chicago, USA, died after taking Tylenol capsules. Someone had opened the bottles and added a deadly poison called cyanide. The police found the bottles in stores — the killer had bought the medicine, put poison inside, and returned the bottles to the shelves.</p>
+                                        <p>People were very scared. Stores stopped selling Tylenol immediately. The news spread across the whole country. The company that made Tylenol was Johnson &amp; Johnson, one of the biggest companies in the world. Suddenly, it faced a very serious <span class="vocab-link" onclick="showPopup('crisis', 'an urgent and dangerous situation that needs immediate action')">crisis</span>.</p>
+                                        <p>Nobody knew which bottles were safe and which were dangerous. The public lost <span class="vocab-link" onclick="showPopup('trust', 'the belief that someone or something is safe and honest')">trust</span> in the product very quickly. Johnson &amp; Johnson had to make some very difficult decisions.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>In the autumn of 1982, seven people in the Chicago metropolitan area died after taking Extra-Strength Tylenol capsules that had been laced with potassium cyanide. The <span class="vocab-link" onclick="showPopup('contamination', 'making a substance dangerous or impure by introducing a harmful foreign element')">contamination</span> appeared to have occurred after the products left the factory — bottles had been purchased from retail stores, poisoned, and returned to shelves.</p>
+                                        <p>The case caused nationwide panic. Within days, stores across the United States removed Tylenol from their shelves. The FBI, the FDA, and Chicago police launched a major investigation. Tylenol held approximately 37% of the US over-the-counter painkiller market at the time — making this not just a public health emergency, but a massive corporate <span class="vocab-link" onclick="showPopup('crisis', 'an urgent and dangerous situation that needs immediate action')">crisis</span>.</p>
+                                        <p>Despite one of the largest criminal investigations in US history, the perpetrator was never identified or prosecuted. Johnson &amp; Johnson faced a situation that was entirely outside its control — but the public would judge the company by how it chose to respond.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The 1982 Tylenol poisonings represented an entirely new category of corporate crisis — one in which a company became a victim of criminal sabotage rather than an internal failure. The realisation that retail products could be <span class="vocab-link" onclick="showPopup('tampered with', 'interfered with or altered without permission, especially to cause harm')">tampered with</span> after leaving the factory challenged fundamental assumptions about consumer safety and forced a rapid reassessment of product packaging, regulatory oversight, and crisis communication strategy.</p>
+                                        <p>Seven people died in the Chicago area before the connection between the deaths and the product was established. The scale of the public response — spontaneous withdrawal of the product by retailers nationwide, before any regulatory directive — illustrated both the power of media in shaping consumer behaviour and the extreme fragility of brand trust when consumer safety is implicated.</p>
+                                        <p>The perpetrator was never prosecuted, raising profound and unresolved questions about <span class="vocab-link" onclick="showPopup('corporate liability', 'the legal responsibility a company bears for harm caused in connection with its products')">corporate liability</span> in cases of criminal third-party interference — questions that have acquired new relevance in the era of e-commerce and home delivery.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800" alt="Medicine bottles" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Johnson & Johnson's Response -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Johnson &amp; Johnson's Response</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Johnson &amp; Johnson made a very brave decision. They <span class="vocab-link" onclick="showPopup('recalled', 'officially asked customers and stores to return a product because it may be dangerous')">recalled</span> ALL Tylenol products from stores across the entire United States — not just in Chicago. This was 31 million bottles of medicine.</p>
+                                        <p>The CEO of Johnson &amp; Johnson, James Burke, appeared on television to <span class="vocab-link" onclick="showPopup('apologize', 'to say that you are sorry and take responsibility for a problem')">apologize</span> to the public. He said the company was putting the safety of customers first. He worked closely with the police and the media to warn people about the danger.</p>
+                                        <p>The recall cost the company $100 million. Many people thought it was the right decision. Johnson &amp; Johnson showed that it cared more about people than about money. This is why many people still <span class="vocab-link" onclick="showPopup('trust', 'the belief that someone or something is safe and honest')">trust</span> the company today.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Johnson &amp; Johnson's response is widely considered a landmark in corporate crisis management. CEO James Burke immediately prioritized public safety over profit, authorizing a nationwide <span class="vocab-link" onclick="showPopup('recall', 'the official process of taking a product back from stores and customers because it is dangerous')">recall</span> of approximately 31 million bottles of Tylenol at an estimated cost of $100 million — far exceeding what regulators initially requested.</p>
+                                        <p>Burke gave extensive television and press interviews, communicating openly and with evident sincerity throughout the crisis. He stated clearly: "We consider it our responsibility to you, our customer, to act in your best interest." The company cooperated fully with the FBI, FDA, and Chicago police, sharing all relevant information without restriction.</p>
+                                        <p>Critically, J&amp;J's response was guided by the company's published "Credo" — a statement of corporate values that placed customer welfare as the company's first <span class="vocab-link" onclick="showPopup('responsibility', 'the duty to deal with something and be accountable for your actions')">responsibility</span>, ahead of shareholders and profit. This alignment between stated values and crisis action made J&amp;J's communications appear authentic rather than merely strategic.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>J&amp;J's response under CEO James Burke is the canonical example of what crisis communication theorists call an "accommodative" response strategy — one that accepts responsibility, prioritises victim welfare, and demonstrates transparency, even at significant financial cost. Burke's decision to pursue a nationwide <span class="vocab-link" onclick="showPopup('recall', 'the official process of taking a product back from stores and customers because it is dangerous')">recall</span> went substantially beyond what the FDA initially required, a decision that was simultaneously an ethical choice and a calculated reputational investment.</p>
+                                        <p>The enabling factor was J&amp;J's Credo, drafted by Robert Wood Johnson II in 1943, which established a clear hierarchy of <span class="vocab-link" onclick="showPopup('responsibility', 'the duty to deal with something and be accountable for your actions')">responsibility</span>: customers first, employees second, communities third, and shareholders last. When the crisis struck, this pre-existing framework removed the ambiguity that paralyses many organisations in moments of emergency — Burke and his team knew immediately which value should take precedence.</p>
+                                        <p>The authenticity premium in J&amp;J's communications was decisive. Research in crisis communication consistently demonstrates that audiences distinguish between genuine contrition and strategic damage control, and respond punitively to the latter. J&amp;J's Credo provided the institutional proof that its stated commitment to customer welfare was not merely expedient.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800" alt="Corporate boardroom" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - The Product Recall -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Product Recall</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>A <span class="vocab-link" onclick="showPopup('recall', 'the official process of taking a product back from stores and customers because it is dangerous')">recall</span> is when a company asks stores and customers to return a product because it might be dangerous. Johnson &amp; Johnson recalled all Tylenol products in the United States. Stores took the bottles off their shelves. Customers were told not to take any Tylenol.</p>
+                                        <p>After the recall, Johnson &amp; Johnson worked hard to make Tylenol safe again. They introduced new <span class="vocab-link" onclick="showPopup('tamper-proof', 'designed so that it is obvious if someone has opened or changed the packaging without permission')">tamper-proof</span> packaging — three different seals that show if anyone has opened the bottle. Today, all medicine in the US has this kind of packaging because of what happened in 1982.</p>
+                                        <p>Johnson &amp; Johnson offered to replace all recalled bottles for free. Within just a few months, Tylenol was back in stores with the new packaging. Within one year, Tylenol recovered its position as the best-selling painkiller in the United States.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The nationwide <span class="vocab-link" onclick="showPopup('recall', 'the official process of taking a product back from stores and customers because it is dangerous')">recall</span> of 31 million Tylenol bottles was unprecedented in speed and scale. J&amp;J worked with retailers, distributors, and regulatory bodies to remove all products from shelves within days. The company offered free replacements to consumers and established a hotline for public inquiries.</p>
+                                        <p>Following the crisis, J&amp;J worked with the FDA and the US Congress to develop federal tamper-resistant packaging regulations, which became law in 1983. The triple-seal packaging system — a foil seal under the cap, a shrink-wrap outer seal, and a sealed inner bottle — was developed in direct response to the Tylenol crisis and became the mandatory industry standard for all over-the-counter medications.</p>
+                                        <p>The Federal Anti-Tampering Act of 1983 also made product <span class="vocab-link" onclick="showPopup('tampering', 'interfering with a product in a way that makes it dangerous, without the manufacturer\'s knowledge')">tampering</span> a federal crime, punishable by up to life imprisonment if the tampering resulted in death. These regulatory changes — driven by J&amp;J's proactive engagement with lawmakers — represent one of the most significant lasting legacies of the crisis.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The Tylenol recall established several important regulatory and legal precedents. The Federal Anti-Tampering Act of 1983 created a new category of federal crime and significantly expanded the scope of <span class="vocab-link" onclick="showPopup('corporate liability', 'the legal responsibility a company bears for harm caused in connection with its products')">corporate liability</span> protections for victimised manufacturers. The FDA's tamper-evident packaging regulations fundamentally changed the economics of consumer product manufacturing, creating substantial compliance costs that simultaneously raised barriers to market entry and increased consumer confidence.</p>
+                                        <p>J&amp;J's voluntary recall beyond the minimum legally required scope was subsequently cited in product liability litigation as evidence of the company's good faith — demonstrating that proactive ethical action and legal protection can be strategically aligned. This insight has shaped corporate legal strategy in product safety crises ever since.</p>
+                                        <p>The recall also illustrated the concept of <span class="vocab-link" onclick="showPopup('due diligence', 'the careful research and protective measures a company takes to avoid harm and meet its obligations')">due diligence</span> in action: J&amp;J's immediate, comprehensive response made it difficult for plaintiffs to argue that the company had been negligent in its response, even though the sabotage itself was entirely external to the company's operations.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800" alt="Empty store shelves" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - The Language of Apology -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Language of Apology</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>When a company has a crisis, it needs to apologize clearly and quickly. Here are some useful phrases:</p>
+                                        <ul>
+                                            <li><strong>"We are deeply sorry for..."</strong> — a strong, sincere apology</li>
+                                            <li><strong>"We apologize to everyone affected by..."</strong> — shows you understand who is hurt</li>
+                                            <li><strong>"We take full responsibility for..."</strong> — you accept the problem is yours to fix</li>
+                                            <li><strong>"We are committed to making this right."</strong> — you promise to take action</li>
+                                            <li><strong>"We understand your concern."</strong> — you show empathy</li>
+                                        </ul>
+                                        <p>A good <span class="vocab-link" onclick="showPopup('apology', 'an expression of regret and acceptance of responsibility for a wrong or mistake')">apology</span> must be sincere, quick, and followed by action. Johnson &amp; Johnson's CEO did not just say sorry — he showed what the company was doing to protect people.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Effective corporate apologies share four key features. They are <strong>specific</strong> (they name what went wrong), <strong>personal</strong> (they use "I" or "we" rather than passive voice), <strong>empathetic</strong> (they acknowledge the impact on those affected), and <strong>actionable</strong> (they describe concrete steps being taken).</p>
+                                        <p>Compare these two responses:</p>
+                                        <ul>
+                                            <li><strong>Weak:</strong> "Mistakes were made and we regret any inconvenience." — passive voice hides <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for your actions and explain them to others')">accountability</span>; "inconvenience" minimises real harm.</li>
+                                            <li><strong>Strong:</strong> "We are deeply sorry. We take full responsibility for acting immediately to protect our customers. Here is exactly what we are doing..." — active voice, specific, followed by action.</li>
+                                        </ul>
+                                        <p>CEO James Burke's public communications combined personal accountability with a clear description of remedial action. The key is that the <span class="vocab-link" onclick="showPopup('apology', 'an expression of regret and acceptance of responsibility for a wrong or mistake')">apology</span> was never the final statement — it was always the beginning of a concrete response plan.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The rhetoric of corporate apology is a rich area of discourse analysis. Effective apologies in crisis situations typically combine multiple speech acts: an acknowledgment of harm (a form of self-condemnation), an expression of remorse, an acceptance of <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for your actions and explain them to others')">accountability</span>, and a commitment to future action. The sequencing and emphasis of these elements profoundly affects how audiences receive and evaluate the communication.</p>
+                                        <p>In J&amp;J's case, the decision to lead with consumer welfare rather than legal defensibility was linguistically significant. A legally cautious response would have deployed hedging language ("we are investigating whether..."), conditional structures ("to the extent that..."), and passive constructions ("it has been determined that..."). Burke's communications, by contrast, used direct active structures and first-person pronouns that signalled genuine ownership of the response.</p>
+                                        <p>Research in crisis communication confirms that audiences are highly sensitive to what scholars call the "sincerity cue" — the linguistic and contextual signals that distinguish genuine contrition from strategic image management. J&amp;J's pre-existing Credo provided the institutional context that made its <span class="vocab-link" onclick="showPopup('apology', 'an expression of regret and acceptance of responsibility for a wrong or mistake')">apology</span> credible: the words aligned with a documented organisational identity, rather than appearing as an improvised response to an emergency.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=800" alt="Person speaking at a podium" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Should Have vs. Could Have -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>"Should Have" vs. "Could Have"</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>We use <strong>"should have"</strong> to talk about the right or best action in the past — something that was a good idea, whether it happened or not.</p>
+                                        <ul>
+                                            <li>"J&amp;J <strong>should have</strong> recalled all products." ✓ (They did — and it was the right decision.)</li>
+                                            <li>"The killer <strong>should not have</strong> tampered with the bottles." ✗ (Wrong action in the past.)</li>
+                                        </ul>
+                                        <p>We use <strong>"could have"</strong> to talk about a past possibility — something that was possible, but may or may not have happened.</p>
+                                        <ul>
+                                            <li>"J&amp;J <strong>could have</strong> only recalled products in Chicago." (This was possible, but they chose not to.)</li>
+                                            <li>"The crisis <strong>could have</strong> destroyed the company." (It was possible, but it didn't happen.)</li>
+                                        </ul>
+                                        <p>Practice: "The company _____ responded faster." (should have / could have — which one carries a judgment?)</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Modal perfect constructions are essential in business post-mortems and crisis analysis. Understanding the difference helps you give precise feedback and avoid assigning blame unfairly.</p>
+                                        <ul>
+                                            <li><strong>"Should have"</strong> = the morally correct or professionally expected action in hindsight. It carries a judgment: this was the right thing to do.</li>
+                                            <li><strong>"Could have"</strong> = a possible action that was not taken, without a moral judgment. It describes what was within the range of options.</li>
+                                            <li><strong>"Would have"</strong> = a conditional result: what would have happened if a different choice had been made.</li>
+                                        </ul>
+                                        <p>Examples from the Tylenol crisis:</p>
+                                        <ul>
+                                            <li>"J&amp;J <strong>should have</strong> introduced tamper-proof packaging years earlier." (Judgment: this was the right action and it wasn't taken.)</li>
+                                            <li>"J&amp;J <strong>could have</strong> limited the recall to Chicago." (Neutral: this option existed, but they chose differently.)</li>
+                                            <li>"Without the recall, consumer trust <strong>would have</strong> been destroyed permanently." (Conditional outcome.)</li>
+                                        </ul>
+                                        <p>In business meetings, choosing between "should have" and "could have" signals how much <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for your actions and explain them to others')">accountability</span> you are assigning to a person or company.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The modal perfect constructions "should have," "could have," and "would have" function as markers of epistemic and deontic modality with significant implications in professional and legal discourse.</p>
+                                        <ul>
+                                            <li><strong>"Should have"</strong> encodes <em>deontic modality</em> — an obligation, norm, or moral expectation that was or was not fulfilled. Its use implies that a standard existed against which the action can be measured. In post-crisis analysis, "should have" assigns responsibility by referencing that standard.</li>
+                                            <li><strong>"Could have"</strong> encodes <em>epistemic possibility</em> — it asserts that an action was within the realm of feasibility. Crucially, it carries no normative evaluation: it does not say whether the action would have been right or wrong, only that it was possible.</li>
+                                            <li><strong>"Would have"</strong> constructs a counterfactual: it projects an alternative causal chain from a hypothetical premise. It is analytically powerful but dependent on assumptions about causation that are often contestable.</li>
+                                        </ul>
+                                        <p>The legal implications of these distinctions are significant. "We <strong>should have</strong> acted sooner" is effectively an admission of duty and breach. "We <strong>could have</strong> acted sooner" states only that earlier action was possible — an analytically neutral claim. Legal counsel routinely negotiates the modal constructions used in corporate public statements with great precision, understanding that these choices can determine <span class="vocab-link" onclick="showPopup('liability', 'legal responsibility for something that causes harm or loss')">liability</span> exposure in subsequent litigation.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800" alt="Business analysis" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Crisis Communication -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Crisis Communication</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>When a company has a crisis, how it communicates with the public is very important. Johnson &amp; Johnson followed five important steps:</p>
+                                        <ul>
+                                            <li><strong>1. Tell the truth quickly.</strong> J&amp;J was honest with the media and the public from the beginning.</li>
+                                            <li><strong>2. Apologize sincerely.</strong> CEO James Burke appeared on national television to apologize.</li>
+                                            <li><strong>3. Take action.</strong> J&amp;J recalled all products and introduced new packaging.</li>
+                                            <li><strong>4. Keep communicating.</strong> J&amp;J held regular <span class="vocab-link" onclick="showPopup('press conference', 'a meeting where a company or person speaks to journalists to give official information')">press conferences</span> to update the public.</li>
+                                            <li><strong>5. Put people first.</strong> J&amp;J always said that customer safety was more important than profit.</li>
+                                        </ul>
+                                        <p>Because of these actions, Tylenol recovered its <span class="vocab-link" onclick="showPopup('reputation', 'the opinion people have about how good or trustworthy a person or company is')">reputation</span>. Within one year, it was the number-one painkiller in the US again.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Effective crisis communication follows a set of established principles that J&amp;J demonstrated in textbook fashion:</p>
+                                        <ul>
+                                            <li><strong>Speed:</strong> The first 24 hours are critical. Delays allow speculation and negative narratives to fill the information vacuum. J&amp;J communicated immediately.</li>
+                                            <li><strong>Transparency:</strong> Share all known facts, even if incomplete. Acknowledge uncertainty rather than waiting to confirm details. J&amp;J shared information openly with regulators, media, and the public.</li>
+                                            <li><strong>Consistency:</strong> All spokespersons must communicate the same message. Conflicting statements destroy credibility. CEO Burke was the single clear voice of the company throughout the crisis.</li>
+                                            <li><strong>Empathy:</strong> Lead with concern for those affected, not with legal disclaimers or financial figures. Burke's public statements consistently foregrounded the human cost of the crisis.</li>
+                                            <li><strong>Action:</strong> Words must be supported by visible, concrete steps. The recall provided undeniable evidence that J&amp;J's stated commitment to customer <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for your actions and explain them to others')">accountability</span> was genuine.</li>
+                                        </ul>
+                                        <p>J&amp;J recovered 70% of its pre-crisis market share within a year — remarkable evidence of the power of effective crisis communication.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Crisis communication theory offers several frameworks for analysing J&amp;J's response. William Benoit's "Image Restoration Theory" classifies crisis responses along a spectrum from denial to mortification (full acceptance of blame and commitment to corrective action). J&amp;J's response occupied the mortification pole — the most accommodative position available — at a time when the company could legitimately have adopted a victim-stance denial (since the tampering was external and criminal).</p>
+                                        <p>Timothy Coombs' Situational Crisis Communication Theory (SCCT) similarly predicts that companies facing crises of low <span class="vocab-link" onclick="showPopup('liability', 'legal responsibility for something that causes harm or loss')">liability</span> (such as product tampering by a third party) do not need to adopt maximally accommodative strategies to protect their reputation. J&amp;J went further than the theory would predict as necessary — and, in doing so, transformed a crisis into a brand equity-building moment. The case is now cited as evidence that SCCT's predictions can be exceeded when organisational values are clearly articulated and authentically enacted.</p>
+                                        <p>The <span class="vocab-link" onclick="showPopup('transparency', 'being open and honest about decisions and actions, especially in a professional or public context')">transparency</span> of J&amp;J's communications was reinforced by the structural decision to make CEO Burke the primary spokesperson — a choice that signalled the crisis was being handled at the highest organisational level, and that the company's leader was personally accountable for the response.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800" alt="Newspaper headlines" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - The Legacy -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Legacy of the Tylenol Crisis</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The Tylenol crisis of 1982 changed many things. Here are the most important:</p>
+                                        <ul>
+                                            <li><strong>Tamper-proof packaging:</strong> Because of Tylenol, all medicines today have special seals to show if someone has opened them. This law still protects us today.</li>
+                                            <li><strong>Crisis communication:</strong> Johnson &amp; Johnson's response became a model for other companies. Business schools still teach this case today.</li>
+                                            <li><strong>New laws:</strong> The US government made it a serious crime to <span class="vocab-link" onclick="showPopup('tamper with', 'to interfere with a product in a dangerous or illegal way')">tamper with</span> products. This is called the Federal Anti-Tampering Act.</li>
+                                            <li><strong>Brand recovery:</strong> Tylenol came back. Within one year, it was the best-selling painkiller in the US again — proof that doing the right thing protects your <span class="vocab-link" onclick="showPopup('reputation', 'the opinion people have about how good or trustworthy a person or company is')">reputation</span>.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The lasting impact of the 1982 Tylenol crisis extends across several domains:</p>
+                                        <ul>
+                                            <li><strong>Packaging regulation:</strong> The tamper-evident packaging standards developed after the crisis became mandatory for all over-the-counter medications in the US — a regulatory change that has prevented countless subsequent poisoning incidents.</li>
+                                            <li><strong>Crisis PR standards:</strong> J&amp;J's response became the textbook model for corporate crisis management, studied in business schools worldwide. Its core lesson — that prioritising consumer welfare over short-term profit is the most strategically effective response to a product safety crisis — remains the dominant paradigm in crisis communication.</li>
+                                            <li><strong>Legal precedent:</strong> The Federal Anti-Tampering Act (1983) made product <span class="vocab-link" onclick="showPopup('tampering', 'interfering with a product in a way that makes it dangerous, without the manufacturer\'s knowledge')">tampering</span> a federal crime and significantly clarified the <span class="vocab-link" onclick="showPopup('liability', 'legal responsibility for something that causes harm or loss')">liability</span> landscape for manufacturers facing third-party sabotage.</li>
+                                            <li><strong>Brand recovery:</strong> Tylenol's return to market dominance within one year — against all initial predictions — demonstrated empirically that authentic crisis response can actually strengthen brand equity rather than merely limiting its erosion.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The enduring significance of the Tylenol crisis extends well beyond its immediate regulatory and commercial consequences. It fundamentally altered the discourse around corporate responsibility by demonstrating that ethical action and commercial success are not inherently in conflict — that, in situations of significant reputational risk, they may in fact be deeply aligned.</p>
+                                        <p>The crisis also exposed the vulnerability of supply chain integrity in a post-manufacturing environment, anticipating the product safety concerns that have become increasingly urgent with the globalisation of supply chains and the growth of e-commerce. The question of what constitutes adequate <span class="vocab-link" onclick="showPopup('due diligence', 'the careful research and protective measures a company takes to avoid harm and meet its obligations')">due diligence</span> in preventing post-sale product interference remains legally and practically unresolved.</p>
+                                        <p>Perhaps the deepest legacy is conceptual: the Tylenol case established that a company's crisis response is not separate from its brand identity — it is one of the most revealing expressions of that identity. The alignment between J&amp;J's stated values (the Credo) and its actual behaviour under pressure validated the Credo as an authentic institutional document rather than corporate window-dressing, generating a level of <span class="vocab-link" onclick="showPopup('trust', 'the belief that someone or something is safe and honest')">trust</span> that no marketing campaign could have produced.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1576670159805-381ef52a7f90?w=800" alt="Pharmacy interior" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <ul>
+                                            <li><strong>The crisis:</strong> Seven people died in 1982 after someone put poison in Tylenol bottles in Chicago stores.</li>
+                                            <li><strong>The response:</strong> Johnson &amp; Johnson recalled 31 million bottles and apologized to the public. The CEO appeared on television to explain what the company was doing.</li>
+                                            <li><strong>The cost:</strong> The recall cost $100 million — but it saved the company's <span class="vocab-link" onclick="showPopup('reputation', 'the opinion people have about how good or trustworthy a person or company is')">reputation</span>.</li>
+                                            <li><strong>The legacy:</strong> All medicines now have tamper-proof packaging because of this event. Product tampering became a federal crime in 1983.</li>
+                                            <li><strong>Language focus:</strong> "Should have" = the right action in the past (judgment). "Could have" = a possible action in the past (no judgment). A good apology is sincere, specific, and followed by action.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <ul>
+                                            <li><strong>Crisis communication model:</strong> J&amp;J's response — speed, transparency, empathy, and action — established the modern standard for corporate crisis management.</li>
+                                            <li><strong>Leadership matters:</strong> CEO James Burke's decision to prioritise public safety over short-term profit is credited with saving the Tylenol brand. Within one year, the product regained its market-leading position.</li>
+                                            <li><strong>Apology language:</strong> Effective corporate apologies are specific, personal, empathetic, and actionable. Passive voice and hedging language signal a lack of genuine <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for your actions and explain them to others')">accountability</span>.</li>
+                                            <li><strong>Modal perfects:</strong> "Should have" encodes a moral judgment about the right course of action; "could have" describes what was possible without making that judgment. The choice matters in business and legal contexts.</li>
+                                            <li><strong>Lasting change:</strong> The crisis produced mandatory tamper-evident packaging laws and the Federal Anti-Tampering Act of 1983 — both of which still protect consumers today.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <ul>
+                                            <li><strong>Accommodative crisis response:</strong> J&amp;J's strategy — accepting responsibility and prioritising victim welfare beyond what was legally required — is the definitive example of accommodative crisis response (SCCT), and demonstrates that this strategy produces superior long-term reputational outcomes.</li>
+                                            <li><strong>Institutional values as enabling factor:</strong> J&amp;J's pre-existing Credo provided the organisational framework that enabled decisive and consistent action. Crisis communication is most effective when it reflects authentic institutional values, not improvised strategy.</li>
+                                            <li><strong>Modal perfect constructions:</strong> "Should have" encodes deontic modality (obligation/norm); "could have" encodes epistemic possibility (feasibility without evaluation). These distinctions carry significant legal and rhetorical implications in corporate communication.</li>
+                                            <li><strong>Unresolved questions:</strong> The perpetrator was never prosecuted. The case raises enduring questions about <span class="vocab-link" onclick="showPopup('corporate liability', 'the legal responsibility a company bears for harm caused in connection with its products')">corporate liability</span> in cases of criminal third-party interference — questions that have acquired renewed urgency in the era of e-commerce and global supply chains.</li>
+                                            <li><strong>Conceptual legacy:</strong> The Tylenol case demonstrated that crisis response is not separate from brand identity — it is one of its most authentic expressions. Companies with genuine, documented values are structurally better equipped to manage crises credibly.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800" alt="Business professional" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Recall</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To officially ask customers and stores to return a product because it may be dangerous</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Crisis</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An urgent and dangerous situation that needs immediate action</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Tamper</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To interfere with or change something without permission, especially in a harmful way</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Apologize</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To say that you are sorry and take responsibility for something that caused harm</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Trust</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The belief that someone or something is safe, reliable, and honest</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Reputation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The opinion that people have about how good or trustworthy a person or company is</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Responsibility</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The duty to deal with something and be accountable for your decisions and actions</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Contaminate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To make something dangerous or impure by adding a harmful substance to it</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Liability</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Legal responsibility for something that causes harm or financial loss</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Transparency</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Being open and honest about decisions and actions, especially in a professional or public context</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accountability</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The obligation to accept responsibility for your actions and be prepared to explain them to others</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stakeholder</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Any person or group that has an interest in or is affected by a company's actions and decisions</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Press Conference</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A meeting where a company or public figure speaks to journalists to give official information</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Precedent</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An action or decision that is used as an example or standard for similar situations in the future</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Contamination</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of making something dangerous or impure by introducing a harmful foreign substance</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Protocol</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An official set of rules and procedures for how to behave or act in a particular situation</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Crisis Management</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of handling an emergency or serious threat in a structured and effective way to limit damage</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Corporate Liability</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The legal responsibility a company bears for harm caused in connection with its products, services, or operations</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Due Diligence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The careful investigation and protective measures a company takes to meet its obligations and avoid foreseeable harm</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand Equity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The commercial value and consumer trust associated with a brand name, built through positive reputation over time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Deontic Modality</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Language expressing obligation, duty, or moral expectation — as in "should have" — which implies a standard against which actions are judged</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Preemptive Action</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Action taken to prevent a problem or threat before it fully develops, going beyond the minimum required response</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accommodative Response</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A crisis communication strategy in which an organisation accepts full responsibility and prioritises the welfare of those affected, rather than defending its image</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Whistleblower</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person who reports illegal or unethical activity within an organisation or industry to the authorities or the public</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>In 1982, Johnson &amp; Johnson faced one of the worst product safety crises in corporate history. Imagine you are the company's communications director the morning after the deaths are reported. Write an official public statement of approximately 200–250 words addressed to the American public. Your statement should: (1) apologize sincerely and specifically; (2) explain what the company is doing immediately; and (3) use at least two examples of "should have" or "could have" to reflect on what the situation demands. Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your public statement here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - The Tylenol Murders - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Recall", definition: "To officially ask customers and stores to return a product because it may be dangerous", sentences: ["Johnson & Johnson decided to ___ all Tylenol products from stores across the United States.", "The government ordered a ___ of the medicine after several people became sick.", "A product ___ is expensive, but it can save a company's reputation."] },
+                { term: "Crisis", definition: "An urgent and dangerous situation that needs immediate action", sentences: ["The company faced a serious ___ when people started dying after taking its medicine.", "A good leader stays calm and acts quickly during a ___.", "The Tylenol murders created a national ___ in the United States."] },
+                { term: "Tamper", definition: "To interfere with or change something without permission, especially in a harmful way", sentences: ["Someone had ___ with the bottles by adding cyanide to the capsules.", "The new packaging makes it easy to see if anyone has ___ with the medicine.", "It is illegal to ___ with food or medicine products."] },
+                { term: "Apologize", definition: "To say that you are sorry and take responsibility for something that caused harm", sentences: ["The CEO appeared on television to ___ to the public for the danger caused.", "It is important to ___ quickly and sincerely when something goes wrong.", "A company should ___ and then explain what it is doing to fix the problem."] },
+                { term: "Trust", definition: "The belief that someone or something is safe, reliable, and honest", sentences: ["The poisonings destroyed public ___ in Tylenol almost overnight.", "Johnson & Johnson worked hard to rebuild ___ after recalling all its products.", "Customers need to ___ that the products they buy are safe."] },
+                { term: "Reputation", definition: "The opinion that people have about how good or trustworthy a person or company is", sentences: ["The Tylenol crisis threatened to destroy Johnson & Johnson's ___ permanently.", "By acting quickly and honestly, J&J was able to protect its ___.", "A company's ___ takes years to build and can be lost in a single day."] },
+                { term: "Responsibility", definition: "The duty to deal with something and be accountable for your decisions and actions", sentences: ["CEO James Burke said it was the company's ___ to protect its customers.", "Taking ___ means admitting the problem and fixing it, not making excuses.", "Johnson & Johnson accepted ___ for recalling every single bottle."] },
+                { term: "Contaminate", definition: "To make something dangerous or impure by adding a harmful substance to it", sentences: ["The killer had ___ the capsules with a deadly poison called cyanide.", "The factory had to stop production after the water supply was ___.", "Investigators worked to find out exactly how and when the medicine had been ___."] }
+            ],
+            B2: [
+                { term: "Liability", definition: "Legal responsibility for something that causes harm or financial loss", sentences: ["The company's lawyers assessed its ___ before deciding how to respond to the crisis.", "By recalling all products voluntarily, J&J limited its legal ___ significantly.", "Product ___ lawsuits can cost companies hundreds of millions of dollars."] },
+                { term: "Transparency", definition: "Being open and honest about decisions and actions, especially in a professional or public context", sentences: ["J&J's ___ with the media throughout the crisis helped it rebuild consumer confidence.", "A lack of ___ during a crisis almost always makes the situation worse.", "CEO Burke's ___ — sharing all information with regulators and journalists — was central to the company's recovery."] },
+                { term: "Accountability", definition: "The obligation to accept responsibility for your actions and be prepared to explain them to others", sentences: ["James Burke demonstrated ___ by personally leading J&J's public communications.", "Weak apologies use passive voice to avoid ___: 'mistakes were made' instead of 'we made mistakes.'", "Consumers expect ___ from companies when their products cause harm."] },
+                { term: "Stakeholder", definition: "Any person or group that has an interest in or is affected by a company's actions and decisions", sentences: ["Every ___ — from customers and employees to shareholders and regulators — was affected by the Tylenol crisis.", "Effective crisis communication must address the concerns of all key ___.", "J&J communicated consistently with every ___ group throughout the recall process."] },
+                { term: "Press Conference", definition: "A meeting where a company or public figure speaks to journalists to give official information", sentences: ["CEO James Burke held multiple ___ to keep the public informed about the recall.", "The company's first ___ after the deaths established the tone for its entire crisis response.", "At the ___, Burke answered all questions directly and without legal hedging."] },
+                { term: "Precedent", definition: "An action or decision that is used as an example or standard for similar situations in the future", sentences: ["J&J's nationwide recall set a ___ for how companies should handle product safety crises.", "The Federal Anti-Tampering Act of 1983 established a legal ___ for prosecuting product interference.", "Business schools have taught the Tylenol case as the defining ___ in crisis communication for over 40 years."] },
+                { term: "Contamination", definition: "The process of making something dangerous or impure by introducing a harmful foreign substance", sentences: ["The ___ of the capsules with cyanide appeared to have occurred after the products left the factory.", "Investigators focused on determining the source and extent of the ___ before advising the public.", "The scale of the ___ — spread across multiple retail locations — made a total recall the only responsible option."] },
+                { term: "Protocol", definition: "An official set of rules and procedures for how to behave or act in a particular situation", sentences: ["J&J followed a clear communication ___ that kept all public statements consistent.", "Many companies now have crisis management ___ in place specifically because of the Tylenol case.", "Without an established ___, crisis responses become slow, inconsistent, and damaging."] }
+            ],
+            C1: [
+                { term: "Crisis Management", definition: "The process of handling an emergency or serious threat in a structured and effective way to limit damage", sentences: ["J&J's ___ response is still cited as the gold standard in business schools worldwide.", "Effective ___ requires pre-established values, clear leadership, and a commitment to transparency.", "The Tylenol case demonstrated that ___ done well can actually strengthen rather than merely protect a brand."] },
+                { term: "Corporate Liability", definition: "The legal responsibility a company bears for harm caused in connection with its products, services, or operations", sentences: ["J&J faced questions about ___ despite being a victim of criminal sabotage rather than internal negligence.", "The Federal Anti-Tampering Act significantly clarified the ___ landscape for manufacturers facing third-party interference.", "Proactively exceeding the minimum recall requirements strengthened J&J's legal position regarding ___."] },
+                { term: "Due Diligence", definition: "The careful investigation and protective measures a company takes to meet its obligations and avoid foreseeable harm", sentences: ["J&J's ___ in cooperating with regulators and law enforcement helped establish its good faith throughout the crisis.", "Critics argued that greater ___ in post-sale monitoring might have identified the tampering sooner.", "The concept of ___ was significantly expanded in consumer product law following the 1982 crisis."] },
+                { term: "Brand Equity", definition: "The commercial value and consumer trust associated with a brand name, built through positive reputation over time", sentences: ["The Tylenol murders threatened to permanently destroy the substantial ___ that J&J had built over decades.", "Remarkably, J&J's accommodative crisis response ultimately enhanced rather than merely preserved its ___.", "The recovery of Tylenol's market share within one year was unprecedented evidence of the resilience of genuine ___."] },
+                { term: "Deontic Modality", definition: "Language expressing obligation, duty, or moral expectation — as in 'should have' — which implies a standard against which actions are judged", sentences: ["The use of ___ in post-crisis analysis — 'the company should have acted sooner' — assigns responsibility by referencing a standard of expected conduct.", "Legal counsel carefully reviews statements for ___ markers before public release, as they can constitute admissions of duty and breach.", "Understanding ___ helps analysts distinguish between statements of obligation and statements of mere possibility."] },
+                { term: "Preemptive Action", definition: "Action taken to prevent a problem or threat before it fully develops, going beyond the minimum required response", sentences: ["J&J's national recall — far exceeding what the FDA initially requested — was a ___ that went substantially beyond legal obligation.", "The introduction of triple-seal tamper-evident packaging was a ___ that permanently changed the consumer product industry.", "In crisis situations, ___ signals genuine commitment to consumer welfare rather than minimal compliance."] },
+                { term: "Accommodative Response", definition: "A crisis communication strategy in which an organisation accepts full responsibility and prioritises the welfare of those affected, rather than defending its image", sentences: ["J&J's fully ___ to the Tylenol crisis — accepting responsibility and prioritising victims — is the canonical example in crisis communication theory.", "Situational Crisis Communication Theory predicts that an ___ produces superior long-term reputational outcomes compared to defensive strategies.", "The authenticity of J&J's ___ was reinforced by the pre-existing Credo, which demonstrated that its stated values were genuinely embedded in the organisation."] },
+                { term: "Whistleblower", definition: "A person who reports illegal or unethical activity within an organisation or industry to the authorities or the public", sentences: ["No ___ ever came forward with information that helped identify the Tylenol poisoner.", "The case raised questions about whether stronger ___ protections in the retail sector might enable earlier detection of product tampering.", "Unlike many corporate crises, the Tylenol murders involved no internal ___ because the criminal act originated entirely outside the company."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
