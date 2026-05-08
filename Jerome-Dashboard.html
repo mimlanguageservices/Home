@@ -206,6 +206,60 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
 
+        .kanban-col {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 200px;
+        }
+
+        .kanban-col-header {
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            text-align: center;
+            padding: 14px 16px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .kanban-cards {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .kanban-card {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: #2d3748;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.6);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.13);
+        }
+
+        .kanban-empty {
+            color: #a0aec0;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
         .student-picture {
             width: 60px;
             height: 60px;
@@ -375,13 +429,23 @@
             </div>
 
             <div class="section" id="kanban">
-                <h2>Canva</h2>
-                <div style="height: calc(100vh - 250px); width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;">
-                    <p style="color: #555; font-size: 16px;">Canva doesn't support embedding — open it directly in a new tab.</p>
-                    <a href="https://canva.link/msdamyn97ydfarh" target="_blank" rel="noopener noreferrer"
-                        style="display: inline-block; padding: 14px 28px; background: #7d2ae8; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.15);">
-                        Open in Canva
-                    </a>
+                <h2>Kanban</h2>
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                    <button onclick="loadKanbanData()" style="padding: 8px 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500;">&#8635; Refresh</button>
+                </div>
+                <div id="kanban-board" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; flex: 1; overflow-y: auto;">
+                    <div class="kanban-col" id="col-todo">
+                        <div class="kanban-col-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">To Do</div>
+                        <div class="kanban-cards" id="cards-todo"></div>
+                    </div>
+                    <div class="kanban-col" id="col-doing">
+                        <div class="kanban-col-header" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">Doing</div>
+                        <div class="kanban-cards" id="cards-doing"></div>
+                    </div>
+                    <div class="kanban-col" id="col-done">
+                        <div class="kanban-col-header" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">Done</div>
+                        <div class="kanban-cards" id="cards-done"></div>
+                    </div>
                 </div>
             </div>
 
@@ -571,13 +635,54 @@
             }
         }
 
+        const KANBAN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1To7aB0Tb8o_egl5-yquAoHyH343JU5q9A02OhpEecpk/export?format=csv';
+
+        async function loadKanbanData() {
+            ['todo','doing','done'].forEach(id => {
+                document.getElementById('cards-' + id).innerHTML = '<div class="kanban-empty">Loading...</div>';
+            });
+            try {
+                const res = await fetch(KANBAN_SHEET_URL);
+                const text = await res.text();
+                const rows = text.trim().split('\n').slice(1); // skip header row if any
+                const cols = { todo: [], doing: [], done: [] };
+
+                rows.forEach(row => {
+                    // Handle quoted CSV fields
+                    const cells = row.match(/(".*?"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g) || row.split(',');
+                    const clean = cells.map(c => c ? c.replace(/^"|"$/g, '').trim() : '');
+                    if (clean[0]) cols.todo.push(clean[0]);
+                    if (clean[1]) cols.doing.push(clean[1]);
+                    if (clean[2]) cols.done.push(clean[2]);
+                });
+
+                const render = (id, items) => {
+                    const el = document.getElementById('cards-' + id);
+                    el.innerHTML = items.length
+                        ? items.map(t => `<div class="kanban-card">${t}</div>`).join('')
+                        : '<div class="kanban-empty">Nothing here yet</div>';
+                };
+
+                render('todo', cols.todo);
+                render('doing', cols.doing);
+                render('done', cols.done);
+            } catch (e) {
+                ['todo','doing','done'].forEach(id => {
+                    document.getElementById('cards-' + id).innerHTML = '<div class="kanban-empty">Error loading data</div>';
+                });
+            }
+        }
+
         // Add click handlers to navigation
         document.addEventListener('DOMContentLoaded', () => {
             // Set up navigation handlers
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.onclick = (e) => {
                     const sectionId = e.target.getAttribute('data-section');
-                    if (sectionId) showSection(sectionId, e.target);
+                    if (sectionId) {
+                        showSection(sectionId, e.target);
+                        if (sectionId === 'kanban') loadKanbanData();
+                    }
                 };
             });
 
