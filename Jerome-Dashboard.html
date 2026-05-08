@@ -215,6 +215,12 @@
             flex-direction: column;
             overflow: hidden;
             min-height: 200px;
+            transition: background 0.2s;
+        }
+
+        .kanban-col.drag-over {
+            background: rgba(102, 126, 234, 0.12);
+            border: 2px dashed #667eea;
         }
 
         .kanban-col-header {
@@ -228,7 +234,7 @@
         }
 
         .kanban-cards {
-            padding: 12px;
+            padding: 12px 12px 4px;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -239,17 +245,48 @@
         .kanban-card {
             background: rgba(255, 255, 255, 0.92);
             border-radius: 10px;
-            padding: 12px 16px;
+            padding: 10px 14px;
             font-size: 0.95rem;
             color: #2d3748;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             border: 1px solid rgba(255,255,255,0.6);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
         }
 
         .kanban-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 14px rgba(0,0,0,0.13);
+        }
+
+        .kanban-card.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+        }
+
+        .kanban-card-text {
+            flex: 1;
+        }
+
+        .kanban-delete-btn {
+            background: none;
+            border: none;
+            color: #cbd5e0;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: color 0.15s;
+            flex-shrink: 0;
+        }
+
+        .kanban-delete-btn:hover {
+            color: #e53e3e;
         }
 
         .kanban-empty {
@@ -258,6 +295,60 @@
             text-align: center;
             padding: 20px;
             font-style: italic;
+        }
+
+        .kanban-add-row {
+            display: flex;
+            gap: 8px;
+            padding: 8px 12px 12px;
+        }
+
+        .kanban-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(102,126,234,0.3);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            background: rgba(255,255,255,0.8);
+            color: #2d3748;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .kanban-input:focus {
+            border-color: #667eea;
+        }
+
+        .kanban-add-btn {
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .kanban-add-btn:hover {
+            opacity: 0.85;
+        }
+
+        .kanban-toolbar-btn {
+            padding: 8px 16px;
+            border: 1px solid currentColor;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 500;
+            font-family: inherit;
+            transition: opacity 0.2s;
+        }
+
+        .kanban-toolbar-btn:hover {
+            opacity: 0.75;
         }
 
         .student-picture {
@@ -430,21 +521,34 @@
 
             <div class="section" id="kanban">
                 <h2>Kanban</h2>
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
-                    <button onclick="loadKanbanData()" style="padding: 8px 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 500;">&#8635; Refresh</button>
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 16px; gap: 10px;">
+                    <button onclick="importFromSheet()" class="kanban-toolbar-btn" style="background: rgba(102,126,234,0.15); color: #4c51bf;">&#8659; Import from Sheet</button>
+                    <button onclick="clearKanban()" class="kanban-toolbar-btn" style="background: rgba(245,87,108,0.12); color: #c53030;">&#128465; Clear All</button>
                 </div>
-                <div id="kanban-board" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; flex: 1; overflow-y: auto;">
-                    <div class="kanban-col" id="col-todo">
+                <div id="kanban-board" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; flex: 1; min-height: 0;">
+                    <div class="kanban-col" id="col-todo" ondragover="onDragOver(event)" ondrop="onDrop(event,'todo')" ondragleave="onDragLeave(event)">
                         <div class="kanban-col-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">To Do</div>
                         <div class="kanban-cards" id="cards-todo"></div>
+                        <div class="kanban-add-row">
+                            <input class="kanban-input" id="input-todo" type="text" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask('todo')">
+                            <button class="kanban-add-btn" onclick="addTask('todo')">+</button>
+                        </div>
                     </div>
-                    <div class="kanban-col" id="col-doing">
+                    <div class="kanban-col" id="col-doing" ondragover="onDragOver(event)" ondrop="onDrop(event,'doing')" ondragleave="onDragLeave(event)">
                         <div class="kanban-col-header" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">Doing</div>
                         <div class="kanban-cards" id="cards-doing"></div>
+                        <div class="kanban-add-row">
+                            <input class="kanban-input" id="input-doing" type="text" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask('doing')">
+                            <button class="kanban-add-btn" onclick="addTask('doing')">+</button>
+                        </div>
                     </div>
-                    <div class="kanban-col" id="col-done">
+                    <div class="kanban-col" id="col-done" ondragover="onDragOver(event)" ondrop="onDrop(event,'done')" ondragleave="onDragLeave(event)">
                         <div class="kanban-col-header" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">Done</div>
                         <div class="kanban-cards" id="cards-done"></div>
+                        <div class="kanban-add-row">
+                            <input class="kanban-input" id="input-done" type="text" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask('done')">
+                            <button class="kanban-add-btn" onclick="addTask('done')">+</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -636,41 +740,122 @@
         }
 
         const KANBAN_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1To7aB0Tb8o_egl5-yquAoHyH343JU5q9A02OhpEecpk/export?format=csv';
+        const KANBAN_STORAGE_KEY = 'jerome_kanban_v1';
+        let kanbanData = { todo: [], doing: [], done: [] };
+        let dragSrcCol = null;
+        let dragSrcIndex = null;
 
-        async function loadKanbanData() {
+        function saveKanban() {
+            localStorage.setItem(KANBAN_STORAGE_KEY, JSON.stringify(kanbanData));
+        }
+
+        function renderKanban() {
+            ['todo', 'doing', 'done'].forEach(col => {
+                const el = document.getElementById('cards-' + col);
+                if (!kanbanData[col].length) {
+                    el.innerHTML = '<div class="kanban-empty">Nothing here yet</div>';
+                    return;
+                }
+                el.innerHTML = kanbanData[col].map((task, i) => `
+                    <div class="kanban-card" draggable="true"
+                         ondragstart="onDragStart(event,'${col}',${i})"
+                         ondragend="onDragEnd(event)">
+                        <span class="kanban-card-text">${task}</span>
+                        <button class="kanban-delete-btn" onclick="deleteTask('${col}',${i})" title="Delete">&#10005;</button>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function addTask(col) {
+            const input = document.getElementById('input-' + col);
+            const text = input.value.trim();
+            if (!text) return;
+            kanbanData[col].push(text);
+            input.value = '';
+            saveKanban();
+            renderKanban();
+        }
+
+        function deleteTask(col, index) {
+            kanbanData[col].splice(index, 1);
+            saveKanban();
+            renderKanban();
+        }
+
+        function clearKanban() {
+            if (!confirm('Clear all tasks from the Kanban board?')) return;
+            kanbanData = { todo: [], doing: [], done: [] };
+            saveKanban();
+            renderKanban();
+        }
+
+        function onDragStart(event, col, index) {
+            dragSrcCol = col;
+            dragSrcIndex = index;
+            event.dataTransfer.effectAllowed = 'move';
+            event.currentTarget.classList.add('dragging');
+        }
+
+        function onDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+            document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
+        }
+
+        function onDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function onDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function onDrop(event, destCol) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            if (dragSrcCol === null || dragSrcIndex === null) return;
+            const task = kanbanData[dragSrcCol].splice(dragSrcIndex, 1)[0];
+            kanbanData[destCol].push(task);
+            dragSrcCol = null;
+            dragSrcIndex = null;
+            saveKanban();
+            renderKanban();
+        }
+
+        function initKanban() {
+            const saved = localStorage.getItem(KANBAN_STORAGE_KEY);
+            if (saved) {
+                try { kanbanData = JSON.parse(saved); } catch(e) {}
+            }
+            renderKanban();
+        }
+
+        async function importFromSheet() {
             ['todo','doing','done'].forEach(id => {
-                document.getElementById('cards-' + id).innerHTML = '<div class="kanban-empty">Loading...</div>';
+                document.getElementById('cards-' + id).innerHTML = '<div class="kanban-empty">Importing...</div>';
             });
             try {
                 const res = await fetch(KANBAN_SHEET_URL);
                 const text = await res.text();
-                const rows = text.trim().split('\n').slice(1); // skip header row if any
-                const cols = { todo: [], doing: [], done: [] };
-
+                const rows = text.trim().split('\n');
+                const imported = { todo: [], doing: [], done: [] };
                 rows.forEach(row => {
-                    // Handle quoted CSV fields
-                    const cells = row.match(/(".*?"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g) || row.split(',');
+                    const cells = row.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
                     const clean = cells.map(c => c ? c.replace(/^"|"$/g, '').trim() : '');
-                    if (clean[0]) cols.todo.push(clean[0]);
-                    if (clean[1]) cols.doing.push(clean[1]);
-                    if (clean[2]) cols.done.push(clean[2]);
+                    if (clean[0]) imported.todo.push(clean[0]);
+                    if (clean[1]) imported.doing.push(clean[1]);
+                    if (clean[2]) imported.done.push(clean[2]);
                 });
-
-                const render = (id, items) => {
-                    const el = document.getElementById('cards-' + id);
-                    el.innerHTML = items.length
-                        ? items.map(t => `<div class="kanban-card">${t}</div>`).join('')
-                        : '<div class="kanban-empty">Nothing here yet</div>';
-                };
-
-                render('todo', cols.todo);
-                render('doing', cols.doing);
-                render('done', cols.done);
-            } catch (e) {
-                ['todo','doing','done'].forEach(id => {
-                    document.getElementById('cards-' + id).innerHTML = '<div class="kanban-empty">Error loading data</div>';
-                });
+                if (confirm(`Import ${imported.todo.length + imported.doing.length + imported.done.length} tasks from Google Sheet? This will replace the current board.`)) {
+                    kanbanData = imported;
+                    saveKanban();
+                }
+            } catch(e) {
+                alert('Could not reach Google Sheet. Make sure it is publicly shared.');
             }
+            renderKanban();
         }
 
         // Add click handlers to navigation
@@ -681,7 +866,7 @@
                     const sectionId = e.target.getAttribute('data-section');
                     if (sectionId) {
                         showSection(sectionId, e.target);
-                        if (sectionId === 'kanban') loadKanbanData();
+                        if (sectionId === 'kanban') initKanban();
                     }
                 };
             });
