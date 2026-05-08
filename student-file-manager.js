@@ -35,7 +35,8 @@ class StudentFileManager {
             CLASS_IDENTIFIER: 13,   // Column N (Class identifier like C1, C2, etc.)
             LEARNING_OBJECTIVE: 14, // Column O (Learning Objectives)
             VOCABULARY_URL: 15,     // Column P (Vocabulary URL for tab with Google Sheets clipping)
-            WRITING_ASSIGNMENT: 17  // Column R (Writing Assignment Google Doc URL)
+            WRITING_ASSIGNMENT: 17, // Column R (Writing Assignment Google Doc URL)
+            SIXTY_MIN_BOOKING: 18   // Column S (Checkbox: TRUE = 60-min booking link override)
         };
 
         this.existingFiles = new Set();
@@ -141,6 +142,7 @@ class StudentFileManager {
                 vocabularyUrl: rawVocabUrl,
                 finishedActivities: columns[this.columnMap.FINISHED_ACTIVITIES] || '',
                 writingAssignmentUrl: columns[this.columnMap.WRITING_ASSIGNMENT] || '',
+                sixtyMinBooking: (columns[this.columnMap.SIXTY_MIN_BOOKING] || '').trim().toUpperCase() === 'TRUE',
                 fileName: this.generateFileName(studentName.trim())
             };
 
@@ -208,17 +210,15 @@ class StudentFileManager {
         const whatsappLink = student.phone ?
             `https://wa.me/${student.phone.replace(/[^0-9]/g, '')}` : '';
 
-        // Generate class link icon based on the class link
+        // Generate class link icon URL based on the class link
         let classLinkIcon = '';
         if (student.classLink) {
-            if (student.classLink.includes('teams')) {
-                classLinkIcon = '🎥'; // Teams
-            } else if (student.classLink.includes('zoom')) {
-                classLinkIcon = '📹'; // Zoom
-            } else if (student.classLink.includes('meet')) {
-                classLinkIcon = '💻'; // Google Meet
-            } else {
-                classLinkIcon = '🔗'; // Generic link
+            if (student.classLink.includes('teams.live.com') || student.classLink.includes('teams.microsoft.com')) {
+                classLinkIcon = 'https://upload.wikimedia.org/wikipedia/commons/5/50/Microsoft_Teams.png';
+            } else if (student.classLink.includes('preply.com')) {
+                classLinkIcon = 'https://static.wixstatic.com/media/593d03_f48567670bfd4fe0a3c540e957d102c9~mv2.png';
+            } else if (student.classLink.includes('meet.google.com')) {
+                classLinkIcon = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Meet_icon_%282020%29.svg/960px-Google_Meet_icon_%282020%29.svg.png?_=20221213135236';
             }
         }
 
@@ -230,6 +230,19 @@ class StudentFileManager {
 
         // Process vocabulary URL to hide Google Sheets UI
         const processedVocabularyUrl = this.processVocabularyUrl(student.vocabularyUrl);
+
+        const isLinked = (student.level || '').trim().toLowerCase() === 'linked';
+        let tidycalEmbed, bookingUrl;
+        if (student.sixtyMinBooking) {
+            bookingUrl = 'https://tidycal.com/m7kn081/60-minutes-jerome-meadows-1xo2lgn';
+            tidycalEmbed = `<iframe src="${bookingUrl}" style="width:100%;height:100%;border:none;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);" title="Book a Lesson"></iframe>`;
+        } else if (isLinked) {
+            bookingUrl = 'https://tidycal.com/m7kn081/linked-jerome-meadows';
+            tidycalEmbed = `<iframe src="${bookingUrl}" style="width:100%;height:100%;border:none;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.15);" title="Book a Lesson"></iframe>`;
+        } else {
+            bookingUrl = 'https://tidycal.com/m7kn081';
+            tidycalEmbed = `<div class="tidycal-embed" data-path="m7kn081"></div><script src="https://asset-tidycal.b-cdn.net/js/embed.js" async><\/script>`;
+        }
 
         const placeholders = {
             '{{STUDENT_NAME}}': student.name,
@@ -249,11 +262,14 @@ class StudentFileManager {
             '{{LEVEL}}': student.level,
             '{{LEARNING_OBJECTIVES}}': student.learningObjective,
             '{{VOCABULARY_URL}}': processedVocabularyUrl,
+            '{{FLASHCARD_SHEET_URL}}': student.vocabularyUrl || '',
             '{{FINISHED_ACTIVITIES}}': student.finishedActivities,
             '{{FINISHED_ACTIVITIES_HTML}}': finishedActivitiesHtml,
             '{{NATIONALITY}}': student.nationality || '',
             '{{LOCATION}}': student.location || '',
-            '{{WRITING_ASSIGNMENT_URL}}': student.writingAssignmentUrl || ''
+            '{{WRITING_ASSIGNMENT_URL}}': student.writingAssignmentUrl || '',
+            '{{TIDYCAL_EMBED}}': tidycalEmbed,
+            '{{BOOKING_URL}}': bookingUrl
         };
 
         return placeholders;
