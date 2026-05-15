@@ -21,11 +21,11 @@
         .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
         @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
-        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
-        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
-        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-card.a2-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b1-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.b2-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
         .level-icon { font-size: 3rem; margin-bottom: 15px; }
-        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .a2-card .level-icon { color: #4ade80; } .b1-card .level-icon { color: #60a5fa; } .b2-card .level-icon { color: #f472b6; }
         .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
         .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
         .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
@@ -45,9 +45,9 @@
         .header-title { display: flex; flex-direction: column; }
         .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
         .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
-        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
-        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
-        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge.a2 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b1 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.b2 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
         .current-level-badge:hover { transform: scale(1.05); }
         .header-right { display: flex; align-items: center; gap: 15px; }
         .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
@@ -217,20 +217,20 @@
         <div class="level-select-container">
             <p class="select-prompt">Select Your Level</p>
             <div class="level-cards">
-                <div class="level-card b1-card" onclick="startGame('B1')">
+                <div class="level-card a2-card" onclick="startGame('A2')">
                     <div class="level-icon">&#9733;</div>
+                    <div class="level-name">A2</div>
+                    <div class="level-desc">Elementary</div>
+                </div>
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;&#9733;</div>
                     <div class="level-name">B1</div>
                     <div class="level-desc">Intermediate</div>
                 </div>
                 <div class="level-card b2-card" onclick="startGame('B2')">
-                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
                     <div class="level-name">B2</div>
                     <div class="level-desc">Upper-Intermediate</div>
-                </div>
-                <div class="level-card c1-card" onclick="startGame('C1')">
-                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
-                    <div class="level-name">C1</div>
-                    <div class="level-desc">Advanced</div>
                 </div>
             </div>
         </div>
@@ -244,8 +244,8 @@
                 <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
                 <div class="header-title">
                     <h1>Passport Bros</h1>
-                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
-                        <span>Level: </span><span id="currentLevelText">B2</span>
+                    <div class="current-level-badge b1" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B1</span>
                         <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
                     </div>
                 </div>
@@ -293,17 +293,17 @@
                             <div class="discussion-slide slide-horizontal">
                                 <div class="slide-text-section-left">
                                     <h3>What Are Passport Bros?</h3>
-                                    <div class="difficulty-content difficulty-B1">
+                                    <div class="difficulty-content difficulty-A2">
                                         <p>"<span class="vocab-link" onclick="showPopup('passport bros', 'men who travel abroad to find romantic partners, often because they are unhappy with dating in their home country')">Passport Bros</span>" is a term used to describe men — often from the United States, Canada, the United Kingdom, or Australia — who travel to other countries to meet and date women.</p>
                                         <p>These men are often unhappy with dating in their home country. They feel it is difficult to find a partner who meets their expectations, so they decide to look <span class="vocab-link" onclick="showPopup('abroad', 'in or to a foreign country')">abroad</span>. Popular destinations include Latin America, Southeast Asia, Eastern Europe, and West Africa.</p>
                                         <p>The trend became very popular on social media, where men share videos and advice about finding love in other countries. Some find genuine relationships and start families abroad. Others are looking for short-term connections.</p>
                                     </div>
-                                    <div class="difficulty-content difficulty-B2">
+                                    <div class="difficulty-content difficulty-B1">
                                         <p>"<span class="vocab-link" onclick="showPopup('passport bros', 'men who travel abroad to find romantic partners, often citing dissatisfaction with Western dating culture')">Passport Bros</span>" refers to a social movement — primarily among Western men — of travelling to developing countries to seek romantic relationships. The movement gained mainstream visibility through social media content creators who documented finding what they described as more <span class="vocab-link" onclick="showPopup('traditional values', 'beliefs and customs about family and gender roles passed down through generations')">traditional</span>, appreciative partners overseas.</p>
                                         <p>Proponents argue that Western <span class="vocab-link" onclick="showPopup('dating market', 'the social environment in which people seek romantic partners, viewed through the lens of supply and demand')">dating market</span> dynamics have made domestic relationships increasingly difficult for ordinary men. Critics contend that the movement reflects exploitative attitudes and an unwillingness to adapt to gender equality.</p>
                                         <p>The debate sits at the intersection of economics, culture, and gender politics — making it a rich topic for discussion and analysis.</p>
                                     </div>
-                                    <div class="difficulty-content difficulty-C1">
+                                    <div class="difficulty-content difficulty-B2">
                                         <p>The "<span class="vocab-link" onclick="showPopup('passport bros', 'men who travel abroad to find romantic partners, often citing dissatisfaction with Western dating culture')">Passport Bros</span>" phenomenon represents a contemporary iteration of cross-cultural romantic migration, distinctively shaped by social media amplification and disillusionment with post-feminist Western dating norms. The movement is internally heterogeneous: it encompasses men seeking culturally compatible long-term partnerships, economic opportunists exploiting income disparities, and ideologically motivated actors rejecting Western gender <span class="vocab-link" onclick="showPopup('hegemony', 'the dominance of one group\'s cultural, ideological, or social values over others')">hegemony</span> entirely.</p>
                                         <p>What unites them is a perception that the domestic <span class="vocab-link" onclick="showPopup('dating market', 'the social environment in which people seek romantic partners, viewed through the lens of supply and demand')">dating market</span> systematically disadvantages ordinary men — a perception that itself reflects deeper tensions in post-industrial Western gender relations.</p>
                                         <p>Neither simple condemnation nor simple endorsement adequately captures the movement's complexity. It sits at the intersection of mate market theory, post-feminist backlash, economic globalisation, and cross-cultural power dynamics.</p>
@@ -318,7 +318,7 @@
                             <div class="discussion-slide slide-horizontal">
                                 <div class="slide-text-section-left">
                                     <h3>The Western Dating Market</h3>
-                                    <div class="difficulty-content difficulty-B1">
+                                    <div class="difficulty-content difficulty-A2">
                                         <p>Many Passport Bros say that dating in Western countries is difficult because of three main things: <strong>age</strong>, <strong>appearance</strong>, and <strong>money</strong>.</p>
                                         <ul>
                                             <li><strong>Age:</strong> Some men feel they are too old to attract the partners they want in Western countries. Women often prefer partners of a similar age or slightly older, which can make things competitive.</li>
@@ -327,7 +327,7 @@
                                         </ul>
                                         <p>Of course, not everyone agrees with this view. Many people think these ideas are unfair to women.</p>
                                     </div>
-                                    <div class="difficulty-content difficulty-B2">
+                                    <div class="difficulty-content difficulty-B1">
                                         <p>The Passport Bros movement is partly driven by what members describe as an unfavourable <span class="vocab-link" onclick="showPopup('dating market', 'the social environment in which people seek romantic partners, viewed through the lens of supply and demand')">dating market</span> dynamic. This manifests in three interconnected areas:</p>
                                         <ul>
                                             <li><strong>Age:</strong> Many Western women exhibit <span class="vocab-link" onclick="showPopup('hypergamy', 'the tendency to seek a romantic partner of equal or higher social or economic status')">hypergamous</span> tendencies — preferring partners who are older, taller, or more successful. As men enter their late 30s and 40s, the pool of available partners narrows considerably.</li>
@@ -336,7 +336,7 @@
                                         </ul>
                                         <p>Critics argue these perceptions reflect a refusal to accept women's right to have preferences, rather than a genuine structural problem.</p>
                                     </div>
-                                    <div class="difficulty-content difficulty-C1">
+                                    <div class="difficulty-content difficulty-B2">
                                         <p>The Western dating market can be partially understood through mate market theory and assortative mating research. Digital intermediation through dating applications has produced a "winner-takes-most" structure, concentrating romantic opportunity among a narrow male elite while rendering the majority of men statistically marginal.</p>
                                         <p>This dynamic is exacerbated by structural factors. First, <span class="vocab-link" onclick="showPopup('hypergamy', 'the socially patterned tendency to partner upward in status, creating asymmetric mating markets')">hypergamy</span> — the well-documented preference for partners of equal or higher <span class="vocab-link" onclick="showPopup('socioeconomic status', 'a person\'s position in society based on income, education, and occupation')">socioeconomic status</span> — becomes increasingly problematic as women's educational attainment outpaces men's across Western nations. As more women enter the professional class, the pool of men who meet or exceed their status aspirations contracts.</p>
                                         <p>Second, shifting norms around relationship reciprocity have introduced new ambiguities. The social contract historically underpinning male resource provision in exchange for partnership has dissolved without clear replacement, generating diffuse resentment among men who feel the terms have changed unilaterally.</p>
@@ -351,7 +351,7 @@
                             <div class="discussion-slide slide-horizontal">
                                 <div class="slide-text-section-left">
                                     <h3>Grammar: Cause &amp; Effect + Hedging Opinions</h3>
-                                    <div class="difficulty-content difficulty-B1">
+                                    <div class="difficulty-content difficulty-A2">
                                         <p>When we discuss social topics, we need two types of language: <strong>cause &amp; effect</strong> (explaining WHY things happen) and <strong>hedging</strong> (expressing opinions carefully).</p>
                                         <div class="grammar-box">
                                             <div class="formula">Cause &amp; Effect: because / so / this leads to</div>
@@ -367,7 +367,7 @@
                                             <div class="example">"I think this <strong>might</strong> cause problems for society."</div>
                                         </div>
                                     </div>
-                                    <div class="difficulty-content difficulty-B2">
+                                    <div class="difficulty-content difficulty-B1">
                                         <p>Discussing sensitive social topics requires both precise <strong>cause &amp; effect</strong> language and careful <strong>modal hedging</strong>.</p>
                                         <div class="grammar-box">
                                             <div class="formula">Formal connectors: owing to / consequently / as a result of / this has led to</div>
@@ -379,7 +379,7 @@
                                         </div>
                                         <p>Notice: "Women are materialistic" (strong claim) vs. "Women <strong>tend to</strong> prioritise financial stability" (hedged observation) — the second is more accurate and less offensive.</p>
                                     </div>
-                                    <div class="difficulty-content difficulty-C1">
+                                    <div class="difficulty-content difficulty-B2">
                                         <p><strong>Nominalisation</strong> converts verbs and adjectives into nouns, creating analytical distance and academic register:</p>
                                         <div class="grammar-box">
                                             <div class="formula">verb/adjective → noun phrase</div>
@@ -404,7 +404,7 @@
                             <div class="discussion-slide slide-horizontal">
                                 <div class="slide-text-section-left">
                                     <h3>What Passport Bros Find Abroad</h3>
-                                    <div class="difficulty-content difficulty-B1">
+                                    <div class="difficulty-content difficulty-A2">
                                         <p>Passport Bros often travel to countries where they feel they have better <span class="vocab-link" onclick="showPopup('opportunity', 'a set of circumstances that makes it possible to do or achieve something')">opportunities</span>. They often describe finding women who are:</p>
                                         <ul>
                                             <li><strong>Younger:</strong> In many countries, a larger age difference between partners is more accepted. A 40-year-old man dating a woman in her late 20s may be entirely normal.</li>
@@ -413,7 +413,7 @@
                                         </ul>
                                         <p>Popular destinations include Colombia, Brazil, Mexico, Thailand, the Philippines, Ukraine, and Nigeria. Some Passport Bros find genuine love abroad. Others are looking for short-term relationships. The motivations and outcomes vary greatly between individuals.</p>
                                     </div>
-                                    <div class="difficulty-content difficulty-B2">
+                                    <div class="difficulty-content difficulty-B1">
                                         <p>The appeal of overseas dating centres on three interrelated factors:</p>
                                         <ul>
                                             <li><strong>Age dynamics:</strong> In many developing countries, a ten-to-twenty-year age gap carries less social stigma. A 40-year-old Western man may find partners in their late 20s entirely normalised in countries such as Colombia, the Philippines, or Thailand — a dating reality that would attract significant criticism at home.</li>
@@ -421,7 +421,7 @@
                                             <li><strong>Economic relativity:</strong> A modest Western income represents significant privilege in developing economies. This creates both genuine opportunity — a man of ordinary means becomes a high-status provider — and serious risk, as economic need can <span class="vocab-link" onclick="showPopup('resentment', 'anger or bitterness felt toward someone you believe has treated you unfairly')">distort</span> the genuine nature of a relationship.</li>
                                         </ul>
                                     </div>
-                                    <div class="difficulty-content difficulty-C1">
+                                    <div class="difficulty-content difficulty-B2">
                                         <p>The appeal of overseas romantic migration operates simultaneously at economic, cultural, and psychological registers.</p>
                                         <p>Economically, the exercise of purchasing power parity <span class="vocab-link" onclick="showPopup('disparity', 'a significant difference or inequality between two or more groups or situations')">disparity</span> arbitrage in romantic markets reflects a broader globalisation dynamic: Western men leverage income differentials to access partner demographics otherwise statistically unavailable domestically. A man earning a median Western salary becomes a high-status provider in many developing economies — effectively reclassifying his position in the local mate market.</p>
                                         <p>Culturally, the attraction to ostensibly "<span class="vocab-link" onclick="showPopup('traditional values', 'beliefs and customs about family and gender roles passed down through generations')">traditional</span>" women reflects a specific ideological orientation — a preference for pre-feminist gender complementarity. Whether this represents genuine cultural compatibility or projection of fantasy onto women from different cultural contexts is a matter of considerable debate. The critical question is whether the relationship is built on authentic mutual understanding or on the <span class="vocab-link" onclick="showPopup('commodification', 'the process of treating relationships or people as having market value that can be exchanged')">commodification</span> of cultural difference.</p>
@@ -436,7 +436,7 @@
                             <div class="discussion-slide slide-horizontal">
                                 <div class="slide-text-section-left">
                                     <h3>The Impact on Western Women</h3>
-                                    <div class="difficulty-content difficulty-B1">
+                                    <div class="difficulty-content difficulty-A2">
                                         <p>When men leave their home country to find partners abroad, this can affect the women who stay behind:</p>
                                         <ul>
                                             <li><strong>Fewer options:</strong> If many men choose to date abroad, women may find it harder to find a partner at home — especially those looking for men of a similar age or income level.</li>
@@ -445,7 +445,7 @@
                                         </ul>
                                         <p>It is important to remember that having high <span class="vocab-link" onclick="showPopup('standards', 'the qualities or conditions someone expects or requires in a partner')">standards</span> is not the same as being unreasonable — and that women's right to choose their partners is just as important as men's.</p>
                                     </div>
-                                    <div class="difficulty-content difficulty-B2">
+                                    <div class="difficulty-content difficulty-B1">
                                         <p>The movement has tangible implications for women remaining in Western dating markets.</p>
                                         <ul>
                                             <li><strong>Reduced availability:</strong> If men with stable incomes and commitment-oriented attitudes exit the domestic market, the supply of such partners decreases. This effect is not distributed equally — it falls most heavily on women in their late 20s to late 30s, the years when partnership formation is most common.</li>
@@ -453,7 +453,7 @@
                                             <li><strong>Class dynamics:</strong> The movement disproportionately draws men who feel overlooked by women with high <span class="vocab-link" onclick="showPopup('socioeconomic status', 'a person\'s position in society based on income, education, and occupation')">socioeconomic</span> expectations. As these men leave, the domestic pool becomes more stratified.</li>
                                         </ul>
                                     </div>
-                                    <div class="difficulty-content difficulty-C1">
+                                    <div class="difficulty-content difficulty-B2">
                                         <p>The implications for Western women resist simple characterisation as purely victim or purely agent.</p>
                                         <p>At the level of mate market <span class="vocab-link" onclick="showPopup('disparity', 'a significant difference or inequality between two or more groups or situations')">dynamics</span>, the emigration — even partial or symbolic — of a cohort of men who perceive themselves as undervalued introduces supply-side pressure into domestic partnership markets. The true scale is difficult to measure, and much of the impact may be psychological rather than strictly numerical.</p>
                                         <p>More significantly, the discursive effects are measurable. The movement has normalised a vocabulary of female inadequacy that frames women's exercise of romantic <span class="vocab-link" onclick="showPopup('agency', 'the capacity of individuals to act independently and make their own free choices')">agency</span> as pathological. This discourse does not merely reflect existing attitudes — it actively constructs and amplifies them.</p>
@@ -469,7 +469,7 @@
                             <div class="discussion-slide slide-horizontal">
                                 <div class="slide-text-section-left">
                                     <h3>Tensions in Host Countries</h3>
-                                    <div class="difficulty-content difficulty-B1">
+                                    <div class="difficulty-content difficulty-A2">
                                         <p>When large numbers of Western men visit countries to find romantic partners, this can also cause problems <em>in those countries</em>:</p>
                                         <ul>
                                             <li><strong>Local resentment:</strong> Local men may feel that Western visitors are taking the most desirable women because of their money, not because they are better partners. This creates jealousy and conflict.</li>
@@ -478,7 +478,7 @@
                                             <li><strong>Cultural change:</strong> The arrival of many Western men can shift local social <span class="vocab-link" onclick="showPopup('standards', 'the qualities or conditions someone expects or requires in a partner')">standards</span>, which some communities find threatening to their way of life.</li>
                                         </ul>
                                     </div>
-                                    <div class="difficulty-content difficulty-B2">
+                                    <div class="difficulty-content difficulty-B1">
                                         <p>The presence of large numbers of Passport Bros in popular destinations generates significant local tensions.</p>
                                         <ul>
                                             <li><strong>Economic asymmetry:</strong> When substantial income <span class="vocab-link" onclick="showPopup('disparity', 'a significant difference or inequality between two or more groups or situations')">disparities</span> exist, relationships carry inherent power imbalances. Economic need can replace genuine emotional connection — a fact that some Passport Bros frame as mutual benefit while critics characterise as <span class="vocab-link" onclick="showPopup('exploitation', 'the act of treating someone unfairly or selfishly for your own advantage')">exploitation</span>.</li>
@@ -487,7 +487,7 @@
                                             <li><strong>Cultural friction:</strong> When a destination becomes known as a Passport Bros hotspot, local <span class="vocab-link" onclick="showPopup('lifestyle', 'the way a person lives, including their habits, priorities, and values')">lifestyle</span> norms can shift, women who date foreign men may be stigmatised, and complex individuals may be reduced to national stereotypes.</li>
                                         </ul>
                                     </div>
-                                    <div class="difficulty-content difficulty-C1">
+                                    <div class="difficulty-content difficulty-B2">
                                         <p>The impact of the Passport Bros phenomenon on destination countries represents a microcosm of tensions generated by globalisation's asymmetric distribution of economic power.</p>
                                         <p>The neo-colonial critique has intellectual merit: the pattern of economically privileged men from historically dominant nations forming romantic relationships with women from economically marginalised communities echoes, at the individual level, the structural dynamics of colonial extraction. The critical question is whether this analogy illuminates genuine harm or moralises the free choices of consenting adults.</p>
                                         <p>The <span class="vocab-link" onclick="showPopup('commodification', 'the process of treating relationships or people as having market value that can be exchanged')">commodification</span> concern is empirically grounded. In established destination countries, concentrated romantic migration can distort local marriage markets and create gendered stratification based on perceived Western desirability. The deepest tension is philosophical: between liberal commitment to individual freedom of association and the communitarian recognition that individual choices, in aggregate, produce social structures that communities — exercising their <span class="vocab-link" onclick="showPopup('cultural sovereignty', 'the right of a community to protect and maintain its own cultural identity and practices')">cultural sovereignty</span> — have legitimate interests in shaping.</p>
@@ -502,7 +502,7 @@
                             <div class="discussion-slide slide-horizontal">
                                 <div class="slide-text-section-left">
                                     <h3>Key Takeaways &amp; Discussion</h3>
-                                    <div class="difficulty-content difficulty-B1">
+                                    <div class="difficulty-content difficulty-A2">
                                         <p>Let's review what we learned today:</p>
                                         <ul>
                                             <li><strong>Passport Bros</strong> are men who travel <span class="vocab-link" onclick="showPopup('abroad', 'in or to a foreign country')">abroad</span> to find romantic partners</li>
@@ -517,7 +517,7 @@
                                             <li>Is it possible to have a happy relationship when there is a big difference in income?</li>
                                         </ul>
                                     </div>
-                                    <div class="difficulty-content difficulty-B2">
+                                    <div class="difficulty-content difficulty-B1">
                                         <p>Core conclusions:</p>
                                         <ul>
                                             <li>The Passport Bros movement reflects genuine frustrations with modern Western dating, but also expresses attitudes toward women that many find deeply problematic</li>
@@ -532,7 +532,7 @@
                                             <li>How has social media changed expectations in modern relationships?</li>
                                         </ul>
                                     </div>
-                                    <div class="difficulty-content difficulty-C1">
+                                    <div class="difficulty-content difficulty-B2">
                                         <p>Salient conclusions:</p>
                                         <ul>
                                             <li>The Passport Bros phenomenon sits at the intersection of mate market theory, post-feminist backlash, economic <span class="vocab-link" onclick="showPopup('globalisation', 'the process by which economies, cultures, and populations become increasingly interconnected')">globalisation</span>, and cross-cultural power dynamics</li>
@@ -598,7 +598,7 @@
                 <div class="section" id="vocabulary">
                     <h2>Vocabulary Flashcards</h2>
                     <div class="reading-container">
-                        <div class="vocab-page active" id="vocab-page-B1">
+                        <div class="vocab-page active" id="vocab-page-A2">
                             <div class="vocab-grid">
                                 <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Passport Bros</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Men who travel abroad to find romantic partners, often because they are unhappy with dating in their home country</div></div></div></div>
                                 <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Dating Market</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The social environment in which people look for romantic partners, viewed in terms of supply and demand</div></div></div></div>
@@ -610,7 +610,7 @@
                                 <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Resentment</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Anger or bitterness felt toward someone or something you believe has treated you unfairly</div></div></div></div>
                             </div>
                         </div>
-                        <div class="vocab-page" id="vocab-page-B2">
+                        <div class="vocab-page" id="vocab-page-B1">
                             <div class="vocab-grid">
                                 <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hypergamy</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The social tendency to seek a romantic partner of equal or higher social or economic status</div></div></div></div>
                                 <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Socioeconomic Status</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person's position in society based on their income, education, and occupation</div></div></div></div>
@@ -622,7 +622,7 @@
                                 <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Migration</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The movement of people from one place or country to another, often to settle or find opportunity</div></div></div></div>
                             </div>
                         </div>
-                        <div class="vocab-page" id="vocab-page-C1">
+                        <div class="vocab-page" id="vocab-page-B2">
                             <div class="vocab-grid">
                                 <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Commodification</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of treating relationships, people, or attributes as products with economic market value</div></div></div></div>
                                 <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hegemony</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The dominance of one group's cultural, ideological, or social values over others</div></div></div></div>
@@ -684,7 +684,7 @@
     <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
 
     <script>
-        let currentDifficulty = 'B2';
+        let currentDifficulty = 'B1';
         let currentSlide = 1;
         const totalSlides = 10;
 
@@ -794,7 +794,7 @@
         function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
 
         const vocabularyByLevel = {
-            B1: [
+            A2: [
                 { term: "Passport Bros", definition: "Men who travel abroad to find romantic partners, often because they are unhappy with dating in their home country", sentences: ["___ use social media to share their experiences of finding love overseas.", "The ___ movement started primarily in the United States.", "Some people support ___, while others think they are running away from their problems."] },
                 { term: "Dating Market", definition: "The social environment in which people look for romantic partners, viewed in terms of supply and demand", sentences: ["Many men say the ___ in Western countries is unfair to them.", "Social media has changed the ___ by giving people more choices.", "The ___ works differently in different countries and cultures."] },
                 { term: "Standards", definition: "The qualities or conditions someone expects or requires in a romantic partner", sentences: ["Some men feel that women's ___ have become too high.", "Having ___ in a relationship is normal and healthy.", "The debate is about whether people's ___ are realistic or not."] },
@@ -804,7 +804,7 @@
                 { term: "Lifestyle", definition: "The way a person lives, including their habits, priorities, and values", sentences: ["A shared ___ is important for a successful relationship.", "Moving abroad can mean adopting a completely different ___.", "Some men prefer a quieter ___ that they feel is easier to find in other countries."] },
                 { term: "Resentment", definition: "Anger or bitterness felt toward someone or something you believe has treated you unfairly", sentences: ["Some local men feel ___ toward Western visitors in their dating scene.", "___ can build up when people feel the system is unfair.", "The debate around Passport Bros has created ___ on both sides."] }
             ],
-            B2: [
+            B1: [
                 { term: "Hypergamy", definition: "The social tendency to seek a romantic partner of equal or higher social or economic status", sentences: ["___ is one reason some men feel disadvantaged in Western dating markets.", "Researchers have documented ___ as a consistent pattern in partner selection.", "___ becomes more challenging for men when women's earnings rise."] },
                 { term: "Socioeconomic Status", definition: "A person's position in society based on their income, education, and occupation", sentences: ["A man's ___ plays a major role in his attractiveness in some dating markets.", "The gap in ___ between Western men and local women can distort relationships.", "As women's ___ has improved, their expectations of partners have often risen too."] },
                 { term: "Disparity", definition: "A significant difference or inequality between two or more groups or situations", sentences: ["The income ___ between Western visitors and local populations creates power imbalances.", "There is a clear ___ in how men and women experience modern dating.", "Economic ___ makes it difficult to know whether a relationship is built on genuine love."] },
@@ -814,7 +814,7 @@
                 { term: "Cultural Friction", definition: "Tension or conflict arising from the clash of different cultural values and expectations", sentences: ["___ often arises when Western men misunderstand the values of their host country.", "The presence of many Passport Bros in one destination can cause serious ___.", "___ in relationships can be managed through communication and mutual respect."] },
                 { term: "Migration", definition: "The movement of people from one place or country to another, often to find opportunity", sentences: ["Romantic ___ is not a new phenomenon — people have always crossed borders for love.", "The Passport Bros trend represents a form of voluntary ___ motivated by relationship goals.", "Economic ___ and romantic ___ are often linked when income disparities are large."] }
             ],
-            C1: [
+            B2: [
                 { term: "Commodification", definition: "The process of treating relationships, people, or attributes as products with economic market value", sentences: ["Critics argue that the Passport Bros movement involves the ___ of female companionship.", "The ___ of attraction through dating apps has intensified competition among men.", "___ of relationships reduces complex human connections to transactions."] },
                 { term: "Hegemony", definition: "The dominance of one group's cultural, ideological, or social values over others", sentences: ["The movement can be read as a rejection of feminist ___ over Western dating norms.", "Western cultural ___ shapes how men in developing countries are perceived by comparison.", "Some argue that Passport Bros perpetuate Western economic ___ in romantic contexts."] },
                 { term: "Cultural Sovereignty", definition: "The right of a community to protect and maintain its own cultural identity and practices", sentences: ["Destination communities have legitimate interests in preserving their ___ against external influence.", "The arrival of large numbers of foreign men can threaten local ___.", "___ raises questions about whether communities can regulate who enters their romantic markets."] },
@@ -837,7 +837,7 @@
             userQuizAnswers = {};
             quizScore = 0;
             quizQuestions = [];
-            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B1;
             const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
             for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
                 const v = shuffled[i];
