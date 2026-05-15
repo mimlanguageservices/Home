@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>The Butterfly Effect - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(10, 20, 10, 0.85) 0%, rgba(20, 40, 20, 0.85) 50%, rgba(10, 30, 10, 0.85) 100%), url('https://upload.wikimedia.org/wikipedia/commons/0/0f/Papilio_Machaon_JPG1a.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 234, 126, 0.8), 0 0 60px rgba(75, 162, 118, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 234, 126, 0.8), 0 0 60px rgba(75, 162, 118, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 234, 126, 1), 0 0 100px rgba(75, 162, 118, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .grammar-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; padding: 18px 22px; margin: 12px 0; }
+        .grammar-box .formula { font-size: 1.1rem; font-weight: 600; color: #4c51bf; font-family: monospace; }
+        .grammar-box .example { font-size: 1rem; color: #4a5568; margin-top: 8px; font-style: italic; }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">The Butterfly Effect</h1>
+        <p class="game-subtitle">Chaos, Coincidence &amp; the Past Perfect</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>The Butterfly Effect</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title Image -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(10, 25, 10, 0.88) 0%, rgba(20, 50, 20, 0.88) 100%), url('https://upload.wikimedia.org/wikipedia/commons/0/0f/Papilio_Machaon_JPG1a.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(74, 222, 128, 0.8);">The Butterfly Effect</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Chaos, Coincidence &amp; the Past Perfect</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/pEjZd-AvPco?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What is the Butterfly Effect? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What Is the Butterfly Effect?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The <span class="vocab-link" onclick="showPopup('butterfly effect', 'the idea that a very small action can lead to very large changes later')">butterfly effect</span> is a simple but powerful idea: a very small action can cause very big changes. Imagine a butterfly flapping its wings in Brazil — this tiny movement of air might, over time, help cause a tornado in Texas.</p>
+                                        <p>Of course, this doesn't mean one butterfly really causes a tornado. The idea is that small things can have big <span class="vocab-link" onclick="showPopup('consequence', 'a result or effect of an action or event')">consequences</span> — especially in a complicated world where everything is connected.</p>
+                                        <p>We can use this idea to think about history. Sometimes, one small moment was the <span class="vocab-link" onclick="showPopup('turning point', 'a moment when everything changes')">turning point</span> for everything that happened next.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The <span class="vocab-link" onclick="showPopup('butterfly effect', 'the idea that a very small action can lead to very large changes later')">butterfly effect</span> is a concept from chaos theory suggesting that a tiny change in initial conditions can produce dramatically different outcomes over time. The metaphor — a butterfly flapping its wings in Brazil setting off a <span class="vocab-link" onclick="showPopup('cascade', 'a series of events where each one triggers the next')">cascade</span> of atmospheric changes that ultimately produces a tornado in Texas — captures the profound <span class="vocab-link" onclick="showPopup('sensitive dependence', 'the property of a system where small changes in starting conditions lead to very different outcomes')">sensitive dependence</span> of complex systems.</p>
+                                        <p>In practical terms, this means that predicting the long-term behaviour of complex systems — weather, economies, human history — is fundamentally limited, regardless of how much data we have. The world is not just complicated; it is genuinely chaotic in the mathematical sense.</p>
+                                        <p>When we apply this to history, we begin to see how <span class="vocab-link" onclick="showPopup('contingency', 'the possibility that things could have happened differently')">contingency</span> — the idea that things could easily have gone another way — shapes everything around us.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The butterfly effect is the popular articulation of sensitive dependence on initial conditions — a cornerstone of chaos theory — which holds that infinitesimally small perturbations in a dynamical system can, over time, produce radically divergent outcomes. The metaphor, while technically imprecise, effectively communicates a profound epistemological constraint: the long-range behaviour of complex systems is, in principle, unpredictable.</p>
+                                        <p>This has far-reaching implications for <span class="vocab-link" onclick="showPopup('determinism', 'the philosophical idea that all events are caused by prior events and are therefore inevitable')">determinism</span> — the classical philosophical position that a sufficiently complete knowledge of present conditions would allow perfect prediction of future states. Chaos theory demonstrates that determinism and predictability are not equivalent: a system can be perfectly deterministic yet remain computationally irreducible in its long-range behaviour.</p>
+                                        <p>Applied to historiography, this perspective challenges teleological readings of history and foregrounds <span class="vocab-link" onclick="showPopup('contingency', 'the possibility that things could have happened differently')">contingency</span> — the recognition that historical outcomes are not inevitable but the product of chance confluences of circumstance.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Papilio_Machaon_JPG1a.jpg" alt="Butterfly" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Edward Lorenz & Chaos Theory -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Edward Lorenz &amp; Chaos Theory</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The butterfly effect was discovered by accident. In 1961, an American scientist called Edward Lorenz was using a computer to predict the weather. He entered a number — 0.506 instead of 0.506127 — a tiny difference. But the result was completely different!</p>
+                                        <p>Lorenz realised that even a very small change in starting conditions can lead to a totally different <span class="vocab-link" onclick="showPopup('outcome', 'the final result of a process or situation')">outcome</span>. This became known as <strong>Chaos Theory</strong>.</p>
+                                        <p>In 1972, he gave a famous talk called: <em>"Does the flap of a butterfly's wings in Brazil set off a tornado in Texas?"</em> The name <strong>"butterfly effect"</strong> came from this title.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The butterfly effect was identified — largely by accident — by American meteorologist Edward Lorenz in 1961. While running weather simulations on an early computer, Lorenz re-entered a value as 0.506 rather than the full 0.506127. The resulting forecast diverged dramatically from the original run, revealing that even tiny differences in <span class="vocab-link" onclick="showPopup('initial conditions', 'the starting state of a system before it begins to evolve')">initial conditions</span> could produce wildly different outcomes.</p>
+                                        <p>Lorenz published his findings in 1963 and formalised the concept as <em>sensitive dependence on initial conditions</em>. In 1972, his talk — <em>"Does the Flap of a Butterfly's Wings in Brazil Set Off a Tornado in Texas?"</em> — gave the phenomenon its memorable name and introduced chaos theory to a wider audience.</p>
+                                        <p>The implications extended far beyond meteorology: any sufficiently complex system — from economies to ecosystems — exhibits this same <span class="vocab-link" onclick="showPopup('sensitive dependence', 'the property of a system where small changes in starting conditions lead to very different outcomes')">sensitive dependence</span>, making long-range prediction fundamentally impossible.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The mathematical foundations of chaos theory were laid in the early 20th century — most notably by Henri Poincaré's work on the three-body problem — but it was Edward Lorenz's serendipitous 1961 discovery that catalysed the field's modern development. Running a Royal McBee LGP-30 computer to model atmospheric convection, Lorenz truncated a decimal input from 0.506127 to 0.506. The resulting forecast divergence — exponentially amplifying over simulated time — demonstrated that deterministic equations could generate aperiodic, unpredictable behaviour.</p>
+                                        <p>Lorenz's 1963 paper, <em>Deterministic Nonperiodic Flow</em>, introduced the concept of what would later be called a "strange attractor" — a fractal geometric structure in phase space that characterises chaotic systems. His 1972 talk crystallised these insights into the butterfly metaphor, which proved extraordinarily effective at communicating the concept of <span class="vocab-link" onclick="showPopup('sensitive dependence', 'the property of a system where small changes in starting conditions lead to very different outcomes')">sensitive dependence</span> to non-specialist audiences.</p>
+                                        <p>The broader implications — for <span class="vocab-link" onclick="showPopup('epistemology', 'the branch of philosophy concerned with the nature and limits of knowledge')">epistemology</span>, for the limits of scientific prediction, and for our understanding of determinism — continue to reverberate across disciplines from physics to economics to philosophy.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Lorenz_attractor_yb.svg" alt="Mathematics Chaos" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Grammar: Past Perfect -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Grammar: The Past Perfect</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>We use the <strong>Past Perfect</strong> to talk about something that happened <em>before</em> another event in the past. It uses <strong>had + past participle</strong>.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">Subject + had + past participle</div>
+                                            <div class="example">"By the time the war started, he <strong>had already left</strong> the city."</div>
+                                        </div>
+                                        <p>We also use it in <strong>Third Conditional</strong> sentences to imagine how the past could have been different:</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">If + had + pp... would have + pp</div>
+                                            <div class="example">"If I <strong>hadn't gone</strong> to that party, I <strong>wouldn't have met</strong> my boyfriend."</div>
+                                        </div>
+                                        <p>These sentences let us think about how one small moment changed everything — just like the butterfly effect!</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The <strong>Past Perfect</strong> (had + past participle) establishes a sequence of past events — it marks an action as completed before another past moment.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">had + past participle</div>
+                                            <div class="example">"The archduke <strong>had already changed</strong> his route when the assassin stepped forward."</div>
+                                        </div>
+                                        <p>In <strong>Third Conditional</strong> structures, the Past Perfect allows us to speculate about alternative past outcomes:</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">If + Past Perfect → would have + pp</div>
+                                            <div class="example">"If Fleming <strong>hadn't left</strong> his petri dish uncovered, he <strong>would never have discovered</strong> penicillin."</div>
+                                        </div>
+                                        <p>This structure is the grammatical home of the butterfly effect — it lets us trace the <span class="vocab-link" onclick="showPopup('counterfactual', 'a statement about what would have happened if the past had been different')">counterfactual</span> chain: what <em>would</em> have happened if one small thing <em>had</em> been different?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The <strong>Past Perfect</strong> encodes temporal anteriority — it situates an event as having been completed prior to another past reference point, establishing a narrative timeline that the Simple Past alone cannot achieve.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">had + past participle (anteriority marker)</div>
+                                            <div class="example">"The driver <strong>had taken</strong> a wrong turn before the assassination became possible."</div>
+                                        </div>
+                                        <p>In the <strong>Third Conditional</strong>, the Past Perfect functions as the protasis of an irrealis conditional — a grammatical structure for <span class="vocab-link" onclick="showPopup('counterfactual', 'a statement about what would have happened if the past had been different')">counterfactual</span> reasoning about unrealised past possibilities:</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">If + Past Perfect (protasis) → would have + pp (apodosis)</div>
+                                            <div class="example">"If Rosa Parks <strong>had given up</strong> her seat, the Montgomery Bus Boycott <strong>might never have begun</strong>."</div>
+                                        </div>
+                                        <p>This structure underpins <span class="vocab-link" onclick="showPopup('counterfactual history', 'a form of historical analysis asking what would have happened if key events had been different')">counterfactual historical analysis</span> — the systematic enquiry into how different initial conditions might have produced divergent historical trajectories. It is, in essence, the grammatical expression of the butterfly effect.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Woman_writing_on_a_notebook_with_a_pen.jpg" alt="Writing and Grammar" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Franz Ferdinand 1914 -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>A Wrong Turn &amp; World War I (1914)</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>On 28 June 1914, Archduke Franz Ferdinand of Austria was shot in Sarajevo. This single event <span class="vocab-link" onclick="showPopup('trigger', 'something small that starts a much larger chain of events')">triggered</span> World War I — a war that killed 20 million people.</p>
+                                        <p>But here is the amazing part: the assassination almost didn't happen. The first attempt failed — a bomb missed the archduke's car. The assassin Gavrilo Princip gave up and went to a nearby shop. Then, by <span class="vocab-link" onclick="showPopup('coincidence', 'when two things happen at the same time by chance, without being planned')">coincidence</span>, the archduke's driver took a wrong turn — and stopped right in front of the shop where Princip was standing.</p>
+                                        <p><strong>Think about it:</strong> If the driver <strong>hadn't taken</strong> that wrong turn, Princip <strong>would never have had</strong> another chance to shoot. World War I might never have started.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The assassination of Archduke Franz Ferdinand on 28 June 1914 is perhaps history's most consequential butterfly effect. The plot had already failed that morning — a bomb rolled under the wrong car. Gavrilo Princip, believing the mission over, stopped at Schiller's Delicatessen. Then the archduke's driver, unaware of a route change, made a wrong turn onto Franz Josef Street and stalled the engine — directly in front of Princip.</p>
+                                        <p>The <span class="vocab-link" onclick="showPopup('cascade', 'a series of events where each one triggers the next')">cascade</span> that followed — Austrian ultimatum, Serbian refusal, Russian mobilisation, German declaration of war — led to a conflict claiming 20 million lives, the collapse of four empires, and the conditions that produced World War II.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">Third Conditional — try it:</div>
+                                            <div class="example">"If the driver <strong>hadn't taken</strong> a wrong turn, Princip <strong>would never have fired</strong> the fatal shot."</div>
+                                        </div>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The regicide of 28 June 1914 represents a paradigmatic case of historical contingency amplified through systemic fragility. The assassination itself was the product of multiple chance confluences: the initial bomb attack had failed, Princip had abandoned the mission, and the encounter in Franz Josef Street resulted entirely from a navigational error by the archduke's driver, Franz Urban, who had not received the revised route instructions.</p>
+                                        <p>The <span class="vocab-link" onclick="showPopup('cascade', 'a series of events where each one triggers the next')">cascade</span> that followed — shaped by entangling alliances, imperial rivalries, and the cult of offensive warfare — illustrates how brittle the pre-war system had become. The assassination was less a cause than a detonator for pre-existing tensions that had reached critical mass. Yet <span class="vocab-link" onclick="showPopup('counterfactual history', 'a form of historical analysis asking what would have happened if key events had been different')">counterfactual analysis</span> suggests that without this specific trigger, war may have been deferred — and a deferred war might have been a different war entirely.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">Counterfactual construction:</div>
+                                            <div class="example">"Had the driver <strong>received</strong> the correct route, the encounter <strong>would never have occurred</strong> — and the 20th century might have unfolded very differently."</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Franz_Ferdinand_at_Sarajevo_Station.jpg" alt="Historical Archive" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Fleming & Penicillin 1928 -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>A Dirty Petri Dish &amp; Penicillin (1928)</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>In 1928, a Scottish scientist called Alexander Fleming went on holiday. Before he left, he was careless — he forgot to cover one of his petri dishes (a small glass container used in laboratories).</p>
+                                        <p>When he came back, he noticed something strange: a mould had grown on the dish, and it had killed all the bacteria around it. This was the discovery of penicillin — the world's first antibiotic.</p>
+                                        <p>Penicillin has saved more than 200 million lives. But this incredible discovery happened only because Fleming left one dish uncovered by <span class="vocab-link" onclick="showPopup('coincidence', 'when two things happen at the same time by chance, without being planned')">coincidence</span>.</p>
+                                        <p><strong>If Fleming <strong>hadn't left</strong> his dish uncovered, he <strong>would never have discovered</strong> penicillin.</strong></p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>In September 1928, Alexander Fleming returned from a two-week holiday to find that a contaminating mould — <em>Penicillium notatum</em> — had destroyed a bacterial culture he had left uncovered. Rather than discarding the dish, Fleming recognised the significance of the clear zone around the mould and identified an antibacterial substance he named <strong>penicillin</strong>.</p>
+                                        <p>The discovery required an extraordinary convergence of accidents: an unusually cold summer that slowed bacterial growth (allowing the mould time to act), Fleming's characteristically untidy laboratory habits, and a <span class="vocab-link" onclick="showPopup('coincidence', 'when two things happen at the same time by chance, without being planned')">coincidence</span> of timing that placed the contaminating spore at exactly the right moment.</p>
+                                        <p>Penicillin transformed medicine, making previously fatal infections survivable. It is estimated to have saved over 200 million lives — all from a single forgotten petri dish.</p>
+                                        <div class="grammar-box">
+                                            <div class="example">"If Fleming <strong>hadn't forgotten</strong> to cover his dish, penicillin <strong>might have remained undiscovered</strong> for decades."</div>
+                                        </div>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Fleming's 1928 discovery exemplifies what the philosopher of science Horace Walpole termed <span class="vocab-link" onclick="showPopup('serendipitous', 'happening by fortunate accident or chance')">serendipity</span> — the capacity to recognise the significance of an unexpected observation. The contamination of Fleming's staphylococcal culture by <em>Penicillium notatum</em> was itself the product of multiple contingencies: the specific mould strain's provenance (possibly from a neighbouring mycology lab), the unseasonably cold summer of 1928 that delayed bacterial re-growth after contamination, and Fleming's well-documented tendency toward laboratory disorder.</p>
+                                        <p>Yet the discovery's full medical significance was only realised over a decade later by Howard Florey and Ernst Boris Chain, who developed penicillin into a clinically viable drug in 1940-41. The transformation of an accidental observation into a medical revolution required not just serendipity but sustained scientific investment — a reminder that the butterfly's wing-flap is necessary but not sufficient; the atmospheric conditions must also be receptive.</p>
+                                        <p>The <span class="vocab-link" onclick="showPopup('counterfactual history', 'a form of historical analysis asking what would have happened if key events had been different')">counterfactual</span> implications are staggering: without penicillin, the mortality rate of World War II — already catastrophic — would have been dramatically higher, and the entire trajectory of post-war medicine would have diverged profoundly.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/Professor_Alexander_Fleming_at_work_in_his_laboratory_at_St_Mary%27s_Hospital%2C_London%2C_during_the_Second_World_War._D17801.jpg" alt="Medical Laboratory" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Rosa Parks 1955 -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>One Seat &amp; the Civil Rights Movement (1955)</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>On 1 December 1955, in Montgomery, Alabama, a Black seamstress named Rosa Parks was sitting on a bus. When the driver told her to give her seat to a white passenger, she said <strong>no</strong>.</p>
+                                        <p>Rosa Parks was arrested. But her small act of <span class="vocab-link" onclick="showPopup('ripple effect', 'when one action creates a series of further actions, like ripples in water')">ripple effect</span>d across the whole country. The Black community of Montgomery started a boycott of the buses — they refused to ride them for 381 days. The boycott brought a young minister named Martin Luther King Jr. to national attention.</p>
+                                        <p>Her refusal to move was a <span class="vocab-link" onclick="showPopup('turning point', 'a moment when everything changes')">turning point</span> for the entire Civil Rights Movement in the United States.</p>
+                                        <p><strong>If Rosa Parks <strong>had given up</strong> her seat, the boycott <strong>might never have started</strong>.</strong></p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Rosa Parks' refusal to relinquish her seat on a Montgomery city bus on 1 December 1955 is one of history's most significant acts of individual resistance. Parks was not the first person to refuse — Claudette Colvin had done so nine months earlier — but the timing, the person, and the community's readiness converged to transform this single act into the catalyst for the Montgomery Bus Boycott.</p>
+                                        <p>The 381-day boycott, sustained at enormous personal cost by the Black community of Montgomery, proved that economic pressure could be an effective tool against <span class="vocab-link" onclick="showPopup('cascade', 'a series of events where each one triggers the next')">cascading</span> injustice. It launched Martin Luther King Jr. as a national figure and established non-violent civil disobedience as the movement's defining strategy.</p>
+                                        <p>The <span class="vocab-link" onclick="showPopup('ripple effect', 'when one action creates a series of further actions, like ripples in water')">ripple effect</span> extended through the Civil Rights Act of 1964 and the Voting Rights Act of 1965 — reshaping American democracy.</p>
+                                        <div class="grammar-box">
+                                            <div class="example">"If Parks <strong>hadn't refused</strong> to move, the boycott <strong>might never have been organised</strong> in the same way."</div>
+                                        </div>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Rosa Parks' act of resistance on 1 December 1955 is a compelling illustration of how individual contingency intersects with structural readiness to produce historical transformation. Parks herself was not acting spontaneously — she was a trained activist, secretary of the Montgomery chapter of the NAACP, and had attended the Highlander Folk School. Her refusal was a conscious act of defiance, not an impulsive gesture of fatigue.</p>
+                                        <p>Yet the specific timing — occurring when the community, legal infrastructure, and organisational capacity were primed for sustained resistance — was genuinely contingent. The <span class="vocab-link" onclick="showPopup('paradigm shift', 'a fundamental change in the way something is understood or done')">paradigm shift</span> that followed — from legal challenge to mass direct action — was not inevitable; it required this particular spark at this particular moment in a receptive social environment.</p>
+                                        <p>The episode illustrates a crucial nuance in butterfly-effect thinking: the individual action is rarely sufficient on its own. Its transformative power derives from the systemic conditions that amplify it — just as a butterfly's wing-flap only produces a tornado in an atmosphere already primed for turbulence. <span class="vocab-link" onclick="showPopup('counterfactual history', 'a form of historical analysis asking what would have happened if key events had been different')">Counterfactual analysis</span> must account for both the triggering event and the conditions that allowed it to cascade.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Rosa_Parks_being_fingerprinted_by_Deputy_Sheriff_D.H._Lackey_after_being_arrested_on_February_22%2C_1956%2C_during_the_Montgomery_bus_boycott.jpg" alt="Civil Rights" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Post-It Notes & WWW -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Happy Accidents: Post-It Notes &amp; the Internet</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Not all butterfly effects are about war or politics. Some of the most important inventions in history happened by accident!</p>
+                                        <ul>
+                                            <li><strong>Post-It Notes (1968):</strong> A scientist at 3M called Spencer Silver was trying to make a very strong glue. He made a mistake — the glue was very weak. Years later, a colleague used this "useless" glue to keep his bookmark in place. The Post-It Note was born! If Silver <strong>hadn't made</strong> that mistake, we <strong>wouldn't have</strong> Post-It Notes today.</li>
+                                            <li><strong>The World Wide Web (1989):</strong> Tim Berners-Lee was a scientist at CERN in Switzerland. He wanted a simple system to share information with his colleagues. He never planned to change the world. But his small idea became the internet as we know it. If he <strong>hadn't created</strong> that simple system, our world today <strong>would be</strong> completely different.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The butterfly effect operates as powerfully in innovation as in history. Many transformative technologies began as accidents or solutions to unrelated problems:</p>
+                                        <ul>
+                                            <li><strong>Post-It Notes:</strong> Spencer Silver's 1968 attempt to create a strong adhesive at 3M produced instead a <span class="vocab-link" onclick="showPopup('outcome', 'the final result of a process or situation')">outcome</span> — a pressure-sensitive, repositionable adhesive with low bonding strength. The application lay dormant for six years until Art Fry, frustrated by bookmarks falling from his hymn book, recognised the potential. A failed experiment became a product used in virtually every office on earth.</li>
+                                            <li><strong>The World Wide Web:</strong> Tim Berners-Lee proposed his hypertext information system in March 1989 as a purely internal tool for managing documentation at CERN. His supervisor famously annotated the proposal "vague but exciting." If CERN <strong>had rejected</strong> the proposal outright, or if Berners-Lee <strong>hadn't insisted</strong> on an open, non-proprietary architecture, the web <strong>would have developed</strong> very differently — if at all.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The history of technological innovation is replete with examples of what scholars have termed "exaptation" — the appropriation of an adaptation for a purpose entirely different from its original function. This represents a form of technological butterfly effect, where a small, apparently inconsequential development cascades into transformative impact:</p>
+                                        <ul>
+                                            <li><strong>Post-It Notes:</strong> Silver's low-tack adhesive languished as a scientific curiosity because it solved no identified problem — a reminder that innovation ecosystems require not just <span class="vocab-link" onclick="showPopup('serendipitous', 'happening by fortunate accident or chance')">serendipitous</span> discovery but organisational receptivity to unexpected solutions. The six-year gap between invention and application illustrates the contingent nature of innovation diffusion.</li>
+                                            <li><strong>The World Wide Web:</strong> Berners-Lee's critical architectural decision — to make HTTP and HTML open, royalty-free standards rather than proprietary protocols — was a non-obvious choice with civilisation-altering consequences. A proprietary web would have produced a radically different information architecture, almost certainly more fragmented, more commercialised from the outset, and less democratically accessible. The <span class="vocab-link" onclick="showPopup('contingency', 'the possibility that things could have happened differently')">contingency</span> here was not merely technical but ethical — a value-laden decision whose implications could not have been fully foreseen.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Tim_Berners-Lee_Office_at_CERN.jpg" alt="Technology and Innovation" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways & Discussion -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways &amp; Discussion</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Let's review what we learned today:</p>
+                                        <ul>
+                                            <li>The <strong>butterfly effect</strong> means that a small action can have a very big <span class="vocab-link" onclick="showPopup('consequence', 'a result or effect of an action or event')">consequence</span></li>
+                                            <li>Edward Lorenz discovered this idea in 1961 by accident, while using a computer</li>
+                                            <li>We use the <strong>Past Perfect + Third Conditional</strong> to talk about how the past could have been different</li>
+                                            <li>Famous examples: Franz Ferdinand's assassination, Fleming's penicillin, Rosa Parks, Post-It Notes, the internet</li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>Can you think of a moment in your own life that was a <span class="vocab-link" onclick="showPopup('turning point', 'a moment when everything changes')">turning point</span>?</li>
+                                            <li>If you <strong>hadn't made</strong> one important decision, how <strong>would</strong> your life <strong>be different</strong> today?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Core conclusions from today's lesson:</p>
+                                        <ul>
+                                            <li>The butterfly effect demonstrates that complex systems exhibit <span class="vocab-link" onclick="showPopup('sensitive dependence', 'the property of a system where small changes in starting conditions lead to very different outcomes')">sensitive dependence</span> — small changes in initial conditions can produce dramatically different outcomes</li>
+                                            <li>The <strong>Third Conditional</strong> gives us a grammatical framework for <span class="vocab-link" onclick="showPopup('counterfactual', 'a statement about what would have happened if the past had been different')">counterfactual</span> thinking — imagining how history might have unfolded differently</li>
+                                            <li>History is not inevitable — it is shaped by <span class="vocab-link" onclick="showPopup('contingency', 'the possibility that things could have happened differently')">contingency</span>, coincidence, and chance</li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>Which example from the lesson do you find most surprising? Why?</li>
+                                            <li>Can you think of a moment from your own life where a small <span class="vocab-link" onclick="showPopup('coincidence', 'when two things happen at the same time by chance, without being planned')">coincidence</span> led to a big change?</li>
+                                            <li>Do you think the butterfly effect makes life seem more exciting or more frightening?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Salient conclusions:</p>
+                                        <ul>
+                                            <li>Chaos theory — and its popular expression in the butterfly effect — challenges both scientific <span class="vocab-link" onclick="showPopup('determinism', 'the philosophical idea that all events are caused by prior events and are therefore inevitable')">determinism</span> and teleological readings of history, foregrounding the role of contingency in shaping outcomes</li>
+                                            <li>The Third Conditional is the grammatical infrastructure of <span class="vocab-link" onclick="showPopup('counterfactual history', 'a form of historical analysis asking what would have happened if key events had been different')">counterfactual historical analysis</span> — enabling systematic interrogation of the roads not taken</li>
+                                            <li>Historical butterfly effects typically involve not just a triggering event but a receptive system — one primed for transformation by pre-existing structural tensions</li>
+                                            <li>The <span class="vocab-link" onclick="showPopup('epistemology', 'the branch of philosophy concerned with the nature and limits of knowledge')">epistemological</span> implications are profound: if history is genuinely contingent, then confident retrospective narratives of inevitability are distortions rather than explanations</li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>Does the butterfly effect undermine the possibility of meaningful historical explanation, or does it enrich it?</li>
+                                            <li>Is there a tension between the butterfly effect's emphasis on contingency and our psychological need for narrative causality?</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Ripple_effect_on_water.jpg" alt="Ripple Effect Water" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(10, 25, 10, 0.95) 0%, rgba(20, 50, 20, 0.95) 50%, rgba(10, 40, 10, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Butterfly Effect</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The idea that a very small action can lead to very large changes later</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Coincidence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">When two things happen at the same time by chance, without being planned</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Consequence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A result or effect of an action or event</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Turning Point</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A moment when everything changes</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Trigger</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Something small that starts a much larger chain of events</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ripple Effect</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">When one action creates a series of further actions, like ripples in water</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cascade</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A series of events where each one triggers the next</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Outcome</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The final result of a process or situation</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Chaos Theory</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The scientific study of systems where small changes in starting conditions produce very different outcomes</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Counterfactual</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A statement about what would have happened if the past had been different</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Contingency</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The possibility that things could have happened differently; dependence on chance</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hindsight</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Understanding of a situation only after it has happened</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sensitive Dependence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The property of a system where small changes in starting conditions lead to very different outcomes</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Conditional</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A grammatical structure using "if" to describe a condition and its result</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Initial Conditions</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The starting state of a system before it begins to evolve</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Serendipitous</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Happening by fortunate accident or chance</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Determinism</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The philosophical idea that all events are caused by prior events and are therefore inevitable</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Counterfactual History</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A form of historical analysis asking what would have happened if key events had been different</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Teleological</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Explaining events by the purpose or end-goal they serve, as if history moves toward a predetermined outcome</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Historiography</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The study of how history is written and interpreted, and how historical methods develop over time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Epistemology</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The branch of philosophy concerned with the nature and limits of knowledge</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Paradigm Shift</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A fundamental change in the way something is understood or done</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Contingent</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Dependent on circumstances that might or might not occur; not inevitable</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Serendipity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The occurrence of fortunate discoveries by chance; the capacity to recognise the significance of an unexpected event</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task: Your Own Butterfly Effect</h3>
+                            <p>Think about your own life. Can you identify a small moment — a coincidence, a decision, an accident — that changed everything? Write about it using the Past Perfect and Third Conditional. For example: <em>"If I hadn't missed that bus, I would never have met my best friend."</em></p>
+                            <p style="margin-top: 12px;">Try to write at least <strong>three</strong> "butterfly effect" sentences from your own life. Then write a short paragraph explaining one of them in more detail.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="If I hadn't... I would never have..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - The Butterfly Effect - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Butterfly Effect", definition: "The idea that a very small action can lead to very large changes later", sentences: ["The ___ tells us that small actions can have big consequences.", "Edward Lorenz discovered the ___ while working on weather prediction.", "The ___ explains why one wrong turn changed the course of history."] },
+                { term: "Coincidence", definition: "When two things happen at the same time by chance, without being planned", sentences: ["By ___, Princip was standing outside the shop when the car stopped.", "It was a ___ that Fleming left his petri dish uncovered.", "What seemed like a ___ turned out to change everything."] },
+                { term: "Consequence", definition: "A result or effect of an action or event", sentences: ["The ___ of the wrong turn was the start of World War I.", "Every action has a ___.", "She didn't realise the ___ of her small decision."] },
+                { term: "Turning Point", definition: "A moment when everything changes", sentences: ["Rosa Parks' refusal was a ___ for the Civil Rights Movement.", "That small mistake became a ___ in his career.", "The discovery of penicillin was a ___ for medicine."] },
+                { term: "Trigger", definition: "Something small that starts a much larger chain of events", sentences: ["The assassination was the ___ for World War I.", "A small argument can ___ a much bigger conflict.", "One forgotten petri dish was the ___ for a medical revolution."] },
+                { term: "Ripple Effect", definition: "When one action creates a series of further actions, like ripples in water", sentences: ["Rosa Parks' act of courage had a ___ across the country.", "The ___ of the invention spread around the world.", "One small decision can have a ___ on many people's lives."] },
+                { term: "Cascade", definition: "A series of events where each one triggers the next", sentences: ["The assassination caused a ___ of events leading to war.", "A single mistake can ___ into a much bigger problem.", "The discovery created a ___ of new scientific research."] },
+                { term: "Outcome", definition: "The final result of a process or situation", sentences: ["The ___ of the boycott was a change in the law.", "If the driver had taken a different road, the ___ would have been completely different.", "Nobody could predict the ___ of such a small accident."] }
+            ],
+            B2: [
+                { term: "Chaos Theory", definition: "The scientific study of systems where small changes in starting conditions produce very different outcomes", sentences: ["___ shows that predicting complex systems is fundamentally limited.", "Lorenz developed ___ after noticing tiny differences led to huge changes.", "___ applies to weather, economics, and even human history."] },
+                { term: "Counterfactual", definition: "A statement about what would have happened if the past had been different", sentences: ["'If Fleming hadn't left the dish uncovered' is a ___ sentence.", "Historians use ___ thinking to understand the importance of key events.", "Writing a ___ requires the Past Perfect tense."] },
+                { term: "Contingency", definition: "The possibility that things could have happened differently; dependence on chance", sentences: ["The ___ of history means nothing was inevitable.", "Historical ___ reminds us that small moments shape everything.", "The war was not inevitable — it depended on historical ___."] },
+                { term: "Hindsight", definition: "Understanding of a situation only after it has happened", sentences: ["With ___, we can see how important that wrong turn was.", "It is easy to see the significance of events in ___.", "In ___, Fleming's mistake was the most important in medical history."] },
+                { term: "Sensitive Dependence", definition: "The property of a system where small changes in starting conditions lead to very different outcomes", sentences: ["___ is the key principle of chaos theory.", "Weather systems exhibit ___, making forecasting impossible beyond two weeks.", "___ on initial conditions explains why small events matter so much."] },
+                { term: "Conditional", definition: "A grammatical structure using 'if' to describe a condition and its result", sentences: ["The Third ___ uses the Past Perfect to talk about the past.", "A ___ sentence can express a butterfly effect.", "Use the Third ___ when the situation is impossible to change now."] },
+                { term: "Initial Conditions", definition: "The starting state of a system before it begins to evolve", sentences: ["Lorenz found that tiny changes in ___ produced completely different weather forecasts.", "___ in history — like a driver's wrong turn — can change everything.", "Chaos theory shows that ___ are impossible to measure with perfect accuracy."] },
+                { term: "Serendipitous", definition: "Happening by fortunate accident or chance", sentences: ["Fleming's discovery of penicillin was entirely ___.", "It was ___ that Princip happened to be standing outside that shop.", "Many great inventions began with a ___ accident."] }
+            ],
+            C1: [
+                { term: "Determinism", definition: "The philosophical idea that all events are caused by prior events and are therefore inevitable", sentences: ["Chaos theory challenges classical ___ by showing that prediction is impossible.", "___ would suggest that World War I was inevitable — but was it?", "The butterfly effect undermines strict ___ by emphasising contingency."] },
+                { term: "Counterfactual History", definition: "A form of historical analysis asking what would have happened if key events had been different", sentences: ["___ explores what might have happened if Princip had not taken that second shot.", "The Third Conditional is the grammatical tool of ___.", "Some historians dismiss ___ as speculation; others see it as essential analysis."] },
+                { term: "Teleological", definition: "Explaining events by the purpose or end-goal they serve, as if history moves toward a predetermined outcome", sentences: ["A ___ reading of history assumes events were always going to unfold as they did.", "Chaos theory challenges ___ narratives by foregrounding contingency.", "The butterfly effect makes ___ explanations of history difficult to sustain."] },
+                { term: "Historiography", definition: "The study of how history is written and interpreted, and how historical methods develop over time", sentences: ["___ examines whether historians have ignored the role of chance.", "The butterfly effect has influenced ___ by drawing attention to contingency.", "Modern ___ increasingly recognises the importance of small, overlooked events."] },
+                { term: "Epistemology", definition: "The branch of philosophy concerned with the nature and limits of knowledge", sentences: ["Chaos theory has profound ___ implications for scientific prediction.", "The butterfly effect raises ___ questions about what we can ever truly know.", "Lorenz's discovery transformed the ___ of meteorology."] },
+                { term: "Paradigm Shift", definition: "A fundamental change in the way something is understood or done", sentences: ["Lorenz's findings represented a ___ in how scientists understood prediction.", "The Civil Rights Movement brought about a ___ in American social attitudes.", "The invention of the World Wide Web caused a ___ in how humans communicate."] },
+                { term: "Contingent", definition: "Dependent on circumstances that might or might not occur; not inevitable", sentences: ["History is ___ — it could easily have unfolded very differently.", "The assassination was ___ on a series of unlikely accidents.", "All historical outcomes are ___ on conditions that were themselves unpredictable."] },
+                { term: "Serendipity", definition: "The occurrence of fortunate discoveries by chance; the capacity to recognise unexpected significance", sentences: ["Fleming's discovery exemplifies ___ — the ability to see value in an accident.", "___ played a crucial role in the history of scientific innovation.", "Without ___, penicillin might not have been discovered for decades."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
