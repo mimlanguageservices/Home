@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Passport Bros - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(5, 15, 40, 0.88) 0%, rgba(10, 25, 60, 0.88) 50%, rgba(5, 20, 50, 0.88) 100%), url('https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 164, 234, 0.9), 0 0 60px rgba(75, 118, 162, 0.6); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 164, 234, 0.9), 0 0 60px rgba(75, 118, 162, 0.6); } 50% { text-shadow: 0 0 50px rgba(102, 164, 234, 1), 0 0 100px rgba(75, 118, 162, 0.9); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.a2-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b1-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.b2-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .a2-card .level-icon { color: #4ade80; } .b1-card .level-icon { color: #60a5fa; } .b2-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.a2 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b1 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.b2 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .grammar-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; padding: 18px 22px; margin: 12px 0; }
+        .grammar-box .formula { font-size: 1.1rem; font-weight: 600; color: #4c51bf; font-family: monospace; }
+        .grammar-box .example { font-size: 1rem; color: #4a5568; margin-top: 8px; font-style: italic; }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Passport Bros</h1>
+        <p class="game-subtitle">Dating, Migration &amp; the Global Marketplace</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card a2-card" onclick="startGame('A2')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">A2</div>
+                    <div class="level-desc">Elementary</div>
+                </div>
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>Passport Bros</h1>
+                    <div class="current-level-badge b1" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B1</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(5, 15, 40, 0.92) 0%, rgba(10, 25, 60, 0.92) 50%, rgba(5, 20, 50, 0.92) 100%), url('https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 164, 234, 0.9);">Passport Bros</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Dating, Migration &amp; the Global Marketplace</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <!-- Replace YOUTUBE_VIDEO_ID below with the actual YouTube video ID for your chosen video -->
+                                    <iframe src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What Are Passport Bros? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What Are Passport Bros?</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>"<span class="vocab-link" onclick="showPopup('passport bros', 'men who travel abroad to find romantic partners, often because they are unhappy with dating in their home country')">Passport Bros</span>" is a term used to describe men — often from the United States, Canada, the United Kingdom, or Australia — who travel to other countries to meet and date women.</p>
+                                        <p>These men are often unhappy with dating in their home country. They feel it is difficult to find a partner who meets their expectations, so they decide to look <span class="vocab-link" onclick="showPopup('abroad', 'in or to a foreign country')">abroad</span>. Popular destinations include Latin America, Southeast Asia, Eastern Europe, and West Africa.</p>
+                                        <p>The trend became very popular on social media, where men share videos and advice about finding love in other countries. Some find genuine relationships and start families abroad. Others are looking for short-term connections.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>"<span class="vocab-link" onclick="showPopup('passport bros', 'men who travel abroad to find romantic partners, often citing dissatisfaction with Western dating culture')">Passport Bros</span>" refers to a social movement — primarily among Western men — of travelling to developing countries to seek romantic relationships. The movement gained mainstream visibility through social media content creators who documented finding what they described as more <span class="vocab-link" onclick="showPopup('traditional values', 'beliefs and customs about family and gender roles passed down through generations')">traditional</span>, appreciative partners overseas.</p>
+                                        <p>Proponents argue that Western <span class="vocab-link" onclick="showPopup('dating market', 'the social environment in which people seek romantic partners, viewed through the lens of supply and demand')">dating market</span> dynamics have made domestic relationships increasingly difficult for ordinary men. Critics contend that the movement reflects exploitative attitudes and an unwillingness to adapt to gender equality.</p>
+                                        <p>The debate sits at the intersection of economics, culture, and gender politics — making it a rich topic for discussion and analysis.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The "<span class="vocab-link" onclick="showPopup('passport bros', 'men who travel abroad to find romantic partners, often citing dissatisfaction with Western dating culture')">Passport Bros</span>" phenomenon represents a contemporary iteration of cross-cultural romantic migration, distinctively shaped by social media amplification and disillusionment with post-feminist Western dating norms. The movement is internally heterogeneous: it encompasses men seeking culturally compatible long-term partnerships, economic opportunists exploiting income disparities, and ideologically motivated actors rejecting Western gender <span class="vocab-link" onclick="showPopup('hegemony', 'the dominance of one group\'s cultural, ideological, or social values over others')">hegemony</span> entirely.</p>
+                                        <p>What unites them is a perception that the domestic <span class="vocab-link" onclick="showPopup('dating market', 'the social environment in which people seek romantic partners, viewed through the lens of supply and demand')">dating market</span> systematically disadvantages ordinary men — a perception that itself reflects deeper tensions in post-industrial Western gender relations.</p>
+                                        <p>Neither simple condemnation nor simple endorsement adequately captures the movement's complexity. It sits at the intersection of mate market theory, post-feminist backlash, economic globalisation, and cross-cultural power dynamics.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg" alt="Earth from Space" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - The Western Dating Market -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Western Dating Market</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>Many Passport Bros say that dating in Western countries is difficult because of three main things: <strong>age</strong>, <strong>appearance</strong>, and <strong>money</strong>.</p>
+                                        <ul>
+                                            <li><strong>Age:</strong> Some men feel they are too old to attract the partners they want in Western countries. Women often prefer partners of a similar age or slightly older, which can make things competitive.</li>
+                                            <li><strong>Appearance:</strong> Dating apps show people many options at once. This can make people feel that only the most attractive individuals get attention. Men who consider themselves "average" may feel ignored.</li>
+                                            <li><strong>Money:</strong> Some men feel that women in Western countries have very high financial <span class="vocab-link" onclick="showPopup('standards', 'the qualities or conditions someone expects or requires in a partner')">standards</span>. They look for a man who earns a lot and has a successful career.</li>
+                                        </ul>
+                                        <p>Of course, not everyone agrees with this view. Many people think these ideas are unfair to women.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The Passport Bros movement is partly driven by what members describe as an unfavourable <span class="vocab-link" onclick="showPopup('dating market', 'the social environment in which people seek romantic partners, viewed through the lens of supply and demand')">dating market</span> dynamic. This manifests in three interconnected areas:</p>
+                                        <ul>
+                                            <li><strong>Age:</strong> Many Western women exhibit <span class="vocab-link" onclick="showPopup('hypergamy', 'the tendency to seek a romantic partner of equal or higher social or economic status')">hypergamous</span> tendencies — preferring partners who are older, taller, or more successful. As men enter their late 30s and 40s, the pool of available partners narrows considerably.</li>
+                                            <li><strong>Appearance:</strong> Dating apps filter candidates visually, meaning a small percentage of men receive the majority of female attention. Studies suggest the top 20% of male profiles attract around 80% of likes.</li>
+                                            <li><strong>Finance:</strong> A paradox exists: as women achieve greater economic independence, their minimum financial expectations of male partners have often <em>increased</em>, not decreased — a documented pattern in sociological research on partner preferences.</li>
+                                        </ul>
+                                        <p>Critics argue these perceptions reflect a refusal to accept women's right to have preferences, rather than a genuine structural problem.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The Western dating market can be partially understood through mate market theory and assortative mating research. Digital intermediation through dating applications has produced a "winner-takes-most" structure, concentrating romantic opportunity among a narrow male elite while rendering the majority of men statistically marginal.</p>
+                                        <p>This dynamic is exacerbated by structural factors. First, <span class="vocab-link" onclick="showPopup('hypergamy', 'the socially patterned tendency to partner upward in status, creating asymmetric mating markets')">hypergamy</span> — the well-documented preference for partners of equal or higher <span class="vocab-link" onclick="showPopup('socioeconomic status', 'a person\'s position in society based on income, education, and occupation')">socioeconomic status</span> — becomes increasingly problematic as women's educational attainment outpaces men's across Western nations. As more women enter the professional class, the pool of men who meet or exceed their status aspirations contracts.</p>
+                                        <p>Second, shifting norms around relationship reciprocity have introduced new ambiguities. The social contract historically underpinning male resource provision in exchange for partnership has dissolved without clear replacement, generating diffuse resentment among men who feel the terms have changed unilaterally.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Ripple_effect_on_water.jpg" alt="Social Dynamics" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Grammar: Cause & Effect + Modal Hedging -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Grammar: Cause &amp; Effect + Hedging Opinions</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>When we discuss social topics, we need two types of language: <strong>cause &amp; effect</strong> (explaining WHY things happen) and <strong>hedging</strong> (expressing opinions carefully).</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">Cause &amp; Effect: because / so / this leads to</div>
+                                            <div class="example">"Many men travel abroad <strong>because</strong> they feel frustrated at home."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">Cause &amp; Effect: as a result / therefore</div>
+                                            <div class="example">"Dating apps show many options. <strong>As a result</strong>, expectations have risen."</div>
+                                        </div>
+                                        <p>We use <strong>modal verbs</strong> to give opinions without sounding too strong:</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">I think this might / could / may...</div>
+                                            <div class="example">"I think this <strong>might</strong> cause problems for society."</div>
+                                        </div>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Discussing sensitive social topics requires both precise <strong>cause &amp; effect</strong> language and careful <strong>modal hedging</strong>.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">Formal connectors: owing to / consequently / as a result of / this has led to</div>
+                                            <div class="example">"<strong>Owing to</strong> the rise of dating apps, competition has intensified, <strong>which has consequently led</strong> some men to seek relationships abroad."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">Hedging: It could be argued that... / The evidence suggests... / This might reflect...</div>
+                                            <div class="example">"<strong>It could be argued that</strong> Western dating culture has become increasingly challenging for men of average income."</div>
+                                        </div>
+                                        <p>Notice: "Women are materialistic" (strong claim) vs. "Women <strong>tend to</strong> prioritise financial stability" (hedged observation) — the second is more accurate and less offensive.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><strong>Nominalisation</strong> converts verbs and adjectives into nouns, creating analytical distance and academic register:</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">verb/adjective → noun phrase</div>
+                                            <div class="example">"Men feel frustrated" → "<strong>Male frustration</strong> with domestic dating markets"<br>"Women earn more" → "<strong>The expansion of female economic participation</strong>"</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">Epistemic modality: assertion → observation → attribution</div>
+                                            <div class="example">"X is the case" → "X <strong>appears</strong> to be the case" → "X <strong>has been suggested</strong> by..."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">Concession + counter-argument structure</div>
+                                            <div class="example">"<strong>While it cannot be denied that</strong> income disparities play a role, <strong>it should also be noted that</strong> individual agency remains significant."</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Woman_writing_on_a_notebook_with_a_pen.jpg" alt="Writing and Grammar" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - What Passport Bros Find Abroad -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What Passport Bros Find Abroad</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>Passport Bros often travel to countries where they feel they have better <span class="vocab-link" onclick="showPopup('opportunity', 'a set of circumstances that makes it possible to do or achieve something')">opportunities</span>. They often describe finding women who are:</p>
+                                        <ul>
+                                            <li><strong>Younger:</strong> In many countries, a larger age difference between partners is more accepted. A 40-year-old man dating a woman in her late 20s may be entirely normal.</li>
+                                            <li><strong>Traditional:</strong> Some women in Latin America, Southeast Asia, or Eastern Europe place a high value on family life and may have different expectations about relationships and gender roles.</li>
+                                            <li><strong>More accessible:</strong> In countries with lower average incomes, a Western man's salary can make him appear to be a high-value partner.</li>
+                                        </ul>
+                                        <p>Popular destinations include Colombia, Brazil, Mexico, Thailand, the Philippines, Ukraine, and Nigeria. Some Passport Bros find genuine love abroad. Others are looking for short-term relationships. The motivations and outcomes vary greatly between individuals.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The appeal of overseas dating centres on three interrelated factors:</p>
+                                        <ul>
+                                            <li><strong>Age dynamics:</strong> In many developing countries, a ten-to-twenty-year age gap carries less social stigma. A 40-year-old Western man may find partners in their late 20s entirely normalised in countries such as Colombia, the Philippines, or Thailand — a dating reality that would attract significant criticism at home.</li>
+                                            <li><strong>Traditional values:</strong> Many Passport Bros report seeking women who prioritise family, home life, and relationship stability — characteristics they associate with non-Western backgrounds and contrast with what they perceive as the <span class="vocab-link" onclick="showPopup('lifestyle', 'the way a person lives, including their habits, priorities, and values')">lifestyle</span> individualism of modern Western women.</li>
+                                            <li><strong>Economic relativity:</strong> A modest Western income represents significant privilege in developing economies. This creates both genuine opportunity — a man of ordinary means becomes a high-status provider — and serious risk, as economic need can <span class="vocab-link" onclick="showPopup('resentment', 'anger or bitterness felt toward someone you believe has treated you unfairly')">distort</span> the genuine nature of a relationship.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The appeal of overseas romantic migration operates simultaneously at economic, cultural, and psychological registers.</p>
+                                        <p>Economically, the exercise of purchasing power parity <span class="vocab-link" onclick="showPopup('disparity', 'a significant difference or inequality between two or more groups or situations')">disparity</span> arbitrage in romantic markets reflects a broader globalisation dynamic: Western men leverage income differentials to access partner demographics otherwise statistically unavailable domestically. A man earning a median Western salary becomes a high-status provider in many developing economies — effectively reclassifying his position in the local mate market.</p>
+                                        <p>Culturally, the attraction to ostensibly "<span class="vocab-link" onclick="showPopup('traditional values', 'beliefs and customs about family and gender roles passed down through generations')">traditional</span>" women reflects a specific ideological orientation — a preference for pre-feminist gender complementarity. Whether this represents genuine cultural compatibility or projection of fantasy onto women from different cultural contexts is a matter of considerable debate. The critical question is whether the relationship is built on authentic mutual understanding or on the <span class="vocab-link" onclick="showPopup('commodification', 'the process of treating relationships or people as having market value that can be exchanged')">commodification</span> of cultural difference.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Tim_Berners-Lee_Office_at_CERN.jpg" alt="Global Connection" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Impact on Western Women -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Impact on Western Women</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>When men leave their home country to find partners abroad, this can affect the women who stay behind:</p>
+                                        <ul>
+                                            <li><strong>Fewer options:</strong> If many men choose to date abroad, women may find it harder to find a partner at home — especially those looking for men of a similar age or income level.</li>
+                                            <li><strong>Hurtful language:</strong> The Passport Bros movement often describes Western women as "too difficult," "too demanding," or "not worth dating." Many women find this deeply offensive and unfair.</li>
+                                            <li><strong>Social debate:</strong> The movement has started a big conversation about modern relationships. Some people think it shows something is broken in dating culture. Others think it is simply men blaming women for their own failures in relationships.</li>
+                                        </ul>
+                                        <p>It is important to remember that having high <span class="vocab-link" onclick="showPopup('standards', 'the qualities or conditions someone expects or requires in a partner')">standards</span> is not the same as being unreasonable — and that women's right to choose their partners is just as important as men's.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The movement has tangible implications for women remaining in Western dating markets.</p>
+                                        <ul>
+                                            <li><strong>Reduced availability:</strong> If men with stable incomes and commitment-oriented attitudes exit the domestic market, the supply of such partners decreases. This effect is not distributed equally — it falls most heavily on women in their late 20s to late 30s, the years when partnership formation is most common.</li>
+                                            <li><strong>Rhetorical harm:</strong> The <span class="vocab-link" onclick="showPopup('resentment', 'anger or bitterness felt toward someone you believe has treated you unfairly')">discourse</span> surrounding the movement — characterising Western women as too demanding or insufficiently feminine — causes documented psychological harm. Women report internalising these narratives, creating anxiety about their own desirability.</li>
+                                            <li><strong>Class dynamics:</strong> The movement disproportionately draws men who feel overlooked by women with high <span class="vocab-link" onclick="showPopup('socioeconomic status', 'a person\'s position in society based on income, education, and occupation')">socioeconomic</span> expectations. As these men leave, the domestic pool becomes more stratified.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The implications for Western women resist simple characterisation as purely victim or purely agent.</p>
+                                        <p>At the level of mate market <span class="vocab-link" onclick="showPopup('disparity', 'a significant difference or inequality between two or more groups or situations')">dynamics</span>, the emigration — even partial or symbolic — of a cohort of men who perceive themselves as undervalued introduces supply-side pressure into domestic partnership markets. The true scale is difficult to measure, and much of the impact may be psychological rather than strictly numerical.</p>
+                                        <p>More significantly, the discursive effects are measurable. The movement has normalised a vocabulary of female inadequacy that frames women's exercise of romantic <span class="vocab-link" onclick="showPopup('agency', 'the capacity of individuals to act independently and make their own free choices')">agency</span> as pathological. This discourse does not merely reflect existing attitudes — it actively constructs and amplifies them.</p>
+                                        <p>The relationship between Passport Bros and misogyny is contested. Feminist critics argue it constitutes a form of gendered backlash against women's expanded autonomy. Defenders counter that identifying genuine market dynamics is not inherently misogynistic, and that women's freedom to choose necessarily entails men's freedom to respond — including by looking elsewhere.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Rosa_Parks_being_fingerprinted_by_Deputy_Sheriff_D.H._Lackey_after_being_arrested_on_February_22%2C_1956%2C_during_the_Montgomery_bus_boycott.jpg" alt="Women and Social Change" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Tensions in Host Countries -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Tensions in Host Countries</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>When large numbers of Western men visit countries to find romantic partners, this can also cause problems <em>in those countries</em>:</p>
+                                        <ul>
+                                            <li><strong>Local resentment:</strong> Local men may feel that Western visitors are taking the most desirable women because of their money, not because they are better partners. This creates jealousy and conflict.</li>
+                                            <li><strong>Exploitation:</strong> Not all Passport Bros have good intentions. Women from very poor backgrounds may feel economic pressure to stay in unequal relationships.</li>
+                                            <li><strong>Short-term visitors:</strong> Some men visit for short periods, have relationships, and then leave. Local women who hoped for a stable future can be left hurt and disappointed.</li>
+                                            <li><strong>Cultural change:</strong> The arrival of many Western men can shift local social <span class="vocab-link" onclick="showPopup('standards', 'the qualities or conditions someone expects or requires in a partner')">standards</span>, which some communities find threatening to their way of life.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The presence of large numbers of Passport Bros in popular destinations generates significant local tensions.</p>
+                                        <ul>
+                                            <li><strong>Economic asymmetry:</strong> When substantial income <span class="vocab-link" onclick="showPopup('disparity', 'a significant difference or inequality between two or more groups or situations')">disparities</span> exist, relationships carry inherent power imbalances. Economic need can replace genuine emotional connection — a fact that some Passport Bros frame as mutual benefit while critics characterise as <span class="vocab-link" onclick="showPopup('exploitation', 'the act of treating someone unfairly or selfishly for your own advantage')">exploitation</span>.</li>
+                                            <li><strong>Local male resentment:</strong> Men in destination countries often resent foreign competition backed by significant economic advantage. Movements opposing the practice have emerged in Colombia, Nigeria, Thailand, and the Philippines.</li>
+                                            <li><strong>Neo-colonial framing:</strong> Some academics characterise the movement as wealthy Western men exercising economic and racial privilege to access women in economically marginalised communities — an echo of historical patterns of colonial exploitation.</li>
+                                            <li><strong>Cultural friction:</strong> When a destination becomes known as a Passport Bros hotspot, local <span class="vocab-link" onclick="showPopup('lifestyle', 'the way a person lives, including their habits, priorities, and values')">lifestyle</span> norms can shift, women who date foreign men may be stigmatised, and complex individuals may be reduced to national stereotypes.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The impact of the Passport Bros phenomenon on destination countries represents a microcosm of tensions generated by globalisation's asymmetric distribution of economic power.</p>
+                                        <p>The neo-colonial critique has intellectual merit: the pattern of economically privileged men from historically dominant nations forming romantic relationships with women from economically marginalised communities echoes, at the individual level, the structural dynamics of colonial extraction. The critical question is whether this analogy illuminates genuine harm or moralises the free choices of consenting adults.</p>
+                                        <p>The <span class="vocab-link" onclick="showPopup('commodification', 'the process of treating relationships or people as having market value that can be exchanged')">commodification</span> concern is empirically grounded. In established destination countries, concentrated romantic migration can distort local marriage markets and create gendered stratification based on perceived Western desirability. The deepest tension is philosophical: between liberal commitment to individual freedom of association and the communitarian recognition that individual choices, in aggregate, produce social structures that communities — exercising their <span class="vocab-link" onclick="showPopup('cultural sovereignty', 'the right of a community to protect and maintain its own cultural identity and practices')">cultural sovereignty</span> — have legitimate interests in shaping.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Lorenz_attractor_yb.svg" alt="Complex Social Systems" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Key Takeaways & Discussion -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways &amp; Discussion</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>Let's review what we learned today:</p>
+                                        <ul>
+                                            <li><strong>Passport Bros</strong> are men who travel <span class="vocab-link" onclick="showPopup('abroad', 'in or to a foreign country')">abroad</span> to find romantic partners</li>
+                                            <li>They often feel the <span class="vocab-link" onclick="showPopup('dating market', 'the social environment in which people seek romantic partners')">dating market</span> at home is unfair because of age, appearance, and money</li>
+                                            <li>This affects women in Western countries, who have fewer <span class="vocab-link" onclick="showPopup('opportunity', 'a set of circumstances that makes it possible to do or achieve something')">opportunities</span> to find partners</li>
+                                            <li>It also creates problems in the countries that Passport Bros visit</li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>Do you think it is normal to travel abroad to find a partner? Why or why not?</li>
+                                            <li>Are men's and women's <span class="vocab-link" onclick="showPopup('standards', 'the qualities or conditions someone expects or requires in a partner')">standards</span> in relationships different in your country compared to Western countries?</li>
+                                            <li>Is it possible to have a happy relationship when there is a big difference in income?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Core conclusions:</p>
+                                        <ul>
+                                            <li>The Passport Bros movement reflects genuine frustrations with modern Western dating, but also expresses attitudes toward women that many find deeply problematic</li>
+                                            <li>Economic <span class="vocab-link" onclick="showPopup('disparity', 'a significant difference or inequality between two or more groups or situations')">disparities</span> between Western men and women in developing countries create complex power dynamics</li>
+                                            <li>The movement produces tangible effects on both Western women and women in destination countries</li>
+                                            <li>Language choices matter: the difference between describing a trend and blaming a group requires careful use of <span class="vocab-link" onclick="showPopup('agency', 'the capacity of individuals to act independently and make their own free choices')">hedging</span></li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>Is the Passport Bros movement a response to a genuine social problem, or a refusal to accept accountability?</li>
+                                            <li>What responsibilities does someone in a cross-cultural, cross-income relationship have to ensure it is truly equal?</li>
+                                            <li>How has social media changed expectations in modern relationships?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Salient conclusions:</p>
+                                        <ul>
+                                            <li>The Passport Bros phenomenon sits at the intersection of mate market theory, post-feminist backlash, economic <span class="vocab-link" onclick="showPopup('globalisation', 'the process by which economies, cultures, and populations become increasingly interconnected')">globalisation</span>, and cross-cultural power dynamics</li>
+                                            <li>Neither simple condemnation nor endorsement adequately captures its complexity — rigorous analysis requires holding multiple frameworks simultaneously</li>
+                                            <li>The grammar of social commentary — nominalisation, epistemic modality, concessive structures — is essential for engaging with controversial topics without misrepresenting them</li>
+                                            <li>Individual romantic choices, in aggregate, produce social structures with implications that cannot be resolved by reference to individual <span class="vocab-link" onclick="showPopup('agency', 'the capacity of individuals to act independently and make their own free choices')">agency</span> alone</li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>To what extent is the movement a symptom of structural failures in Western gender relations versus a manifestation of individual attitudes?</li>
+                                            <li>Can relationships formed within significant economic <span class="vocab-link" onclick="showPopup('disparity', 'a significant difference or inequality between two or more groups or situations')">asymmetry</span> be genuinely equitable? What conditions would need to be met?</li>
+                                            <li>Does individual freedom of romantic association override community concerns about its aggregate social effects?</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Ripple_effect_on_water.jpg" alt="Ripple Effect" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(5, 15, 40, 0.95) 0%, rgba(10, 25, 60, 0.95) 50%, rgba(5, 20, 50, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-A2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Passport Bros</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Men who travel abroad to find romantic partners, often because they are unhappy with dating in their home country</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Dating Market</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The social environment in which people look for romantic partners, viewed in terms of supply and demand</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Standards</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The qualities or conditions someone expects or requires in a romantic partner</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Abroad</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">In or to a foreign country</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Traditional Values</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Beliefs and customs about family, relationships, and gender roles that have been passed down through generations</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Opportunity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A set of circumstances that makes it possible to do or achieve something desirable</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Lifestyle</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The way a person lives, including their habits, priorities, and values</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Resentment</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Anger or bitterness felt toward someone or something you believe has treated you unfairly</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hypergamy</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The social tendency to seek a romantic partner of equal or higher social or economic status</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Socioeconomic Status</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person's position in society based on their income, education, and occupation</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Disparity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A significant difference or inequality between two or more groups or situations</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Exploitation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The act of treating someone unfairly or selfishly for your own advantage</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Agency</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The ability of an individual to act independently and make their own free choices</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Demographic</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A section of the population defined by shared characteristics such as age, gender, or income</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cultural Friction</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Tension or conflict arising from the clash of different cultural values and expectations</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Migration</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The movement of people from one place or country to another, often to settle or find opportunity</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Commodification</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of treating relationships, people, or attributes as products with economic market value</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hegemony</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The dominance of one group's cultural, ideological, or social values over others</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cultural Sovereignty</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The right of a community to protect and maintain its own cultural identity and practices</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Globalisation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process by which economies, cultures, and populations become increasingly interconnected and interdependent</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Asymmetric Power Dynamic</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A relationship in which one party holds significantly greater social, economic, or cultural power than the other</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Nominalisation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Converting verbs or adjectives into nouns to create a more formal, analytical register in speech or writing</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Epistemic Modality</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Language that expresses the speaker's degree of certainty or commitment to a claim (e.g., might, appears to, has been suggested)</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Intersectionality</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The way multiple aspects of identity — race, gender, class, nationality — overlap to create unique social experiences</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task: Cross-Cultural Relationships &amp; Social Change</h3>
+                            <p>Consider the following statement: <em>"The Passport Bros movement is a natural response to changes in modern dating culture, not a rejection of women."</em></p>
+                            <p style="margin-top: 12px;">Do you agree or disagree? Write a response using cause &amp; effect connectors and modal verbs to hedge your opinions. For example: <em>"It could be argued that... Owing to... This might suggest..."</em></p>
+                            <p style="margin-top: 12px;">Try to present <strong>at least two perspectives</strong> — one supporting and one opposing the statement — before giving your own conclusion. Aim for 150–250 words.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="It could be argued that... Owing to... This might suggest..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B1';
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Passport Bros - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            A2: [
+                { term: "Passport Bros", definition: "Men who travel abroad to find romantic partners, often because they are unhappy with dating in their home country", sentences: ["___ use social media to share their experiences of finding love overseas.", "The ___ movement started primarily in the United States.", "Some people support ___, while others think they are running away from their problems."] },
+                { term: "Dating Market", definition: "The social environment in which people look for romantic partners, viewed in terms of supply and demand", sentences: ["Many men say the ___ in Western countries is unfair to them.", "Social media has changed the ___ by giving people more choices.", "The ___ works differently in different countries and cultures."] },
+                { term: "Standards", definition: "The qualities or conditions someone expects or requires in a romantic partner", sentences: ["Some men feel that women's ___ have become too high.", "Having ___ in a relationship is normal and healthy.", "The debate is about whether people's ___ are realistic or not."] },
+                { term: "Abroad", definition: "In or to a foreign country", sentences: ["Many Passport Bros travel ___ to find a partner.", "She met her husband while studying ___.", "Living ___ can change your perspective on relationships and culture."] },
+                { term: "Traditional Values", definition: "Beliefs and customs about family, relationships, and gender roles passed down through generations", sentences: ["Some men seek partners with ___ who prioritise family life.", "___ about marriage are different in every culture.", "It is important to respect your partner's ___ even if they differ from your own."] },
+                { term: "Opportunity", definition: "A set of circumstances that makes it possible to do or achieve something desirable", sentences: ["Some men feel they have more ___ to find a partner abroad.", "Dating apps have created new ___ for meeting people.", "Economic inequality creates unequal ___ in the dating market."] },
+                { term: "Lifestyle", definition: "The way a person lives, including their habits, priorities, and values", sentences: ["A shared ___ is important for a successful relationship.", "Moving abroad can mean adopting a completely different ___.", "Some men prefer a quieter ___ that they feel is easier to find in other countries."] },
+                { term: "Resentment", definition: "Anger or bitterness felt toward someone or something you believe has treated you unfairly", sentences: ["Some local men feel ___ toward Western visitors in their dating scene.", "___ can build up when people feel the system is unfair.", "The debate around Passport Bros has created ___ on both sides."] }
+            ],
+            B1: [
+                { term: "Hypergamy", definition: "The social tendency to seek a romantic partner of equal or higher social or economic status", sentences: ["___ is one reason some men feel disadvantaged in Western dating markets.", "Researchers have documented ___ as a consistent pattern in partner selection.", "___ becomes more challenging for men when women's earnings rise."] },
+                { term: "Socioeconomic Status", definition: "A person's position in society based on their income, education, and occupation", sentences: ["A man's ___ plays a major role in his attractiveness in some dating markets.", "The gap in ___ between Western men and local women can distort relationships.", "As women's ___ has improved, their expectations of partners have often risen too."] },
+                { term: "Disparity", definition: "A significant difference or inequality between two or more groups or situations", sentences: ["The income ___ between Western visitors and local populations creates power imbalances.", "There is a clear ___ in how men and women experience modern dating.", "Economic ___ makes it difficult to know whether a relationship is built on genuine love."] },
+                { term: "Exploitation", definition: "The act of treating someone unfairly or selfishly for your own advantage", sentences: ["Critics argue that some Passport Bros engage in ___ of economically vulnerable women.", "The line between mutual benefit and ___ can be difficult to define.", "___ becomes more likely when there is a large difference in wealth between partners."] },
+                { term: "Agency", definition: "The ability of an individual to act independently and make their own free choices", sentences: ["Women in developing countries have ___ and make their own choices about who to date.", "Economic need can limit a person's ___ in romantic decisions.", "Defenders of the movement argue that all parties have full ___ in these relationships."] },
+                { term: "Demographic", definition: "A section of the population defined by shared characteristics such as age, gender, or income", sentences: ["The Passport Bros movement primarily affects a specific ___ of single men.", "Women in their 30s are one ___ particularly affected by men choosing to date abroad.", "Dating app data reveals large differences in how different ___ groups experience the market."] },
+                { term: "Cultural Friction", definition: "Tension or conflict arising from the clash of different cultural values and expectations", sentences: ["___ often arises when Western men misunderstand the values of their host country.", "The presence of many Passport Bros in one destination can cause serious ___.", "___ in relationships can be managed through communication and mutual respect."] },
+                { term: "Migration", definition: "The movement of people from one place or country to another, often to find opportunity", sentences: ["Romantic ___ is not a new phenomenon — people have always crossed borders for love.", "The Passport Bros trend represents a form of voluntary ___ motivated by relationship goals.", "Economic ___ and romantic ___ are often linked when income disparities are large."] }
+            ],
+            B2: [
+                { term: "Commodification", definition: "The process of treating relationships, people, or attributes as products with economic market value", sentences: ["Critics argue that the Passport Bros movement involves the ___ of female companionship.", "The ___ of attraction through dating apps has intensified competition among men.", "___ of relationships reduces complex human connections to transactions."] },
+                { term: "Hegemony", definition: "The dominance of one group's cultural, ideological, or social values over others", sentences: ["The movement can be read as a rejection of feminist ___ over Western dating norms.", "Western cultural ___ shapes how men in developing countries are perceived by comparison.", "Some argue that Passport Bros perpetuate Western economic ___ in romantic contexts."] },
+                { term: "Cultural Sovereignty", definition: "The right of a community to protect and maintain its own cultural identity and practices", sentences: ["Destination communities have legitimate interests in preserving their ___ against external influence.", "The arrival of large numbers of foreign men can threaten local ___.", "___ raises questions about whether communities can regulate who enters their romantic markets."] },
+                { term: "Globalisation", definition: "The process by which economies, cultures, and populations become increasingly interconnected and interdependent", sentences: ["The Passport Bros movement would not exist without the ___ of transport and social media.", "___ enables income disparity arbitrage in romantic as well as economic markets.", "The relationship challenges created by ___ require new frameworks for thinking about consent and equity."] },
+                { term: "Asymmetric Power Dynamic", definition: "A relationship in which one party holds significantly greater social, economic, or cultural power than the other", sentences: ["Cross-income relationships necessarily involve an ___ that must be actively managed.", "An ___ does not automatically invalidate a relationship, but it requires honest acknowledgement.", "Critics argue that Passport Bros relationships are defined by a structural ___ that undermines genuine equality."] },
+                { term: "Nominalisation", definition: "Converting verbs or adjectives into nouns to create a more formal, analytical register", sentences: ["Using ___ — 'male frustration' rather than 'men are frustrated' — creates analytical distance.", "___ is a key feature of academic and journalistic writing about social trends.", "Practise ___ to elevate your writing when discussing sensitive social topics."] },
+                { term: "Epistemic Modality", definition: "Language that expresses the speaker's degree of certainty or commitment to a claim", sentences: ["___ allows us to discuss controversial claims without asserting them as established facts.", "Words like 'might,' 'appears to,' and 'has been suggested' are examples of ___.", "Skilled writers deploy ___ to signal where claims are contested or uncertain."] },
+                { term: "Intersectionality", definition: "The way multiple aspects of identity — race, gender, class, nationality — overlap to create unique social experiences", sentences: ["An ___ analysis reveals that Passport Bros dynamics affect women of different backgrounds very differently.", "___ is essential for understanding why the movement's effects are not uniformly distributed.", "Without ___, analyses of the movement risk oversimplifying the experiences of those involved."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B1;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
