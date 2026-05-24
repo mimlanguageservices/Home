@@ -278,6 +278,64 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ── Music player ── */
+        .music-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(30, 30, 46, 0.97);
+            backdrop-filter: blur(12px);
+            z-index: 500;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+        }
+        .music-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            user-select: none;
+            color: #e2e8f0;
+            transition: background 0.2s;
+        }
+        .music-toggle:hover { background: rgba(255,255,255,0.05); }
+        .music-toggle-icon { color: #a78bfa; flex-shrink: 0; }
+        .music-toggle-label {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .music-toggle-sub {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 1px;
+        }
+        .music-chevron { flex-shrink: 0; color: #94a3b8; transition: transform 0.25s; }
+        .music-bar.open .music-chevron { transform: rotate(180deg); }
+        .music-panel {
+            display: none;
+            padding: 0 12px 12px;
+        }
+        .music-bar.open .music-panel { display: block; }
+        .music-panel iframe {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            border: none;
+            display: block;
+        }
+        .music-no-track {
+            color: #64748b;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* Push content up so player bar doesn't overlap */
+        body { padding-bottom: 54px; }
+
         /* ── Mobile dropdown bar (hidden on desktop) ── */
         .mobile-nav-bar {
             display: none;
@@ -341,9 +399,9 @@
             }
 
             /* Lock to viewport — no scrolling */
-            body { overflow: hidden; height: 100vh; }
+            body { overflow: hidden; height: 100vh; padding-bottom: 0; }
             .header { display: none; }
-            .container { flex-direction: column; height: calc(100vh - 58px); }
+            .container { flex-direction: column; height: calc(100vh - 58px - 54px); }
             .navigation { display: none; }
             .content { height: 100%; overflow: hidden; }
 
@@ -404,7 +462,7 @@
         }
 
         @media (max-width: 480px) {
-            .container { height: calc(100vh - 54px); }
+            .container { height: calc(100vh - 54px - 54px); }
             .slide-info h3 { font-size: 1rem; }
             .stat-box { padding: 7px 9px; }
         }
@@ -481,6 +539,26 @@
         </div>
     </div>
 
+    <!-- Music player bar -->
+    <div class="music-bar" id="musicBar">
+        <div class="music-toggle" onclick="toggleMusic()">
+            <svg class="music-toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+            </svg>
+            <div class="music-toggle-label">
+                <div id="musicTabName">Music</div>
+                <div class="music-toggle-sub" id="musicTabSub">Select a workout to load playlist</div>
+            </div>
+            <svg class="music-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="6 9 12 15 18 9"/>
+            </svg>
+        </div>
+        <div class="music-panel" id="musicPanel">
+            <div class="music-no-track" id="musicNoTrack">No playlist added for this workout yet.</div>
+            <iframe id="musicFrame" style="display:none" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+
     <script>
         const SHEET_ID = '1fK8pkodvit67qvqDyPG_FYiAYSeTRQ8z748EquHNsdc';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
@@ -532,9 +610,58 @@
                     sets:     cellVal(row.c[3]),
                     reps:     cellVal(row.c[4]),
                     focus:    row.c[5]?.v ?? '',
-                    image:    row.c[6]?.v ?? ''
+                    image:    row.c[6]?.v ?? '',
+                    music:    row.c[7]?.v ?? ''
                 }))
                 .filter(r => r.tab && r.exercise);
+        }
+
+        // Convert any YouTube URL to an embed URL
+        function toEmbedUrl(url) {
+            if (!url) return null;
+            url = String(url).trim();
+            const listMatch = url.match(/[?&]list=([^&]+)/);
+            const vidMatch  = url.match(/(?:v=|youtu\.be\/)([^?&]+)/);
+            if (listMatch && vidMatch) return `https://www.youtube.com/embed/${vidMatch[1]}?list=${listMatch[1]}&autoplay=1`;
+            if (listMatch)            return `https://www.youtube.com/embed/videoseries?list=${listMatch[1]}&autoplay=1`;
+            if (vidMatch)             return `https://www.youtube.com/embed/${vidMatch[1]}?autoplay=1`;
+            return null;
+        }
+
+        // Tab labels for the player bar
+        const TAB_LABELS = {
+            push:  { name: 'Push Day',   sub: 'Chest, Shoulders, Triceps' },
+            pull:  { name: 'Pull Day',   sub: 'Back, Rear Delts, Biceps' },
+            legs:  { name: 'Leg Day',    sub: 'Quad Focused + Calves' },
+            upper: { name: 'Upper Body', sub: 'General Hypertrophy' },
+            lower: { name: 'Lower Body', sub: 'Posterior Chain Focused' },
+        };
+
+        // Music URL per tab, populated after data loads
+        const tabMusic = { push: null, pull: null, legs: null, upper: null, lower: null };
+
+        function setMusicForTab(tabId) {
+            const url    = tabMusic[tabId];
+            const labels = TAB_LABELS[tabId] || { name: 'Music', sub: '' };
+            document.getElementById('musicTabName').textContent = labels.name;
+            document.getElementById('musicTabSub').textContent  = labels.sub;
+
+            const frame   = document.getElementById('musicFrame');
+            const noTrack = document.getElementById('musicNoTrack');
+            const embedUrl = toEmbedUrl(url);
+            if (embedUrl) {
+                frame.src = embedUrl;
+                frame.style.display = 'block';
+                noTrack.style.display = 'none';
+            } else {
+                frame.src = '';
+                frame.style.display = 'none';
+                noTrack.style.display = 'block';
+            }
+        }
+
+        function toggleMusic() {
+            document.getElementById('musicBar').classList.toggle('open');
         }
 
         function buildSlideshow(sectionId, exercises) {
@@ -697,6 +824,7 @@
             document.getElementById(sectionId).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             navItem.classList.add('active');
+            setMusicForTab(sectionId);
         }
 
         // Mobile dropdown
@@ -719,6 +847,9 @@
             // Update trigger label
             document.getElementById('mobileNavLabel').innerHTML =
                 `${title}<small>${subtitle}</small>`;
+
+            // Update music player
+            setMusicForTab(sectionId);
 
             // Close dropdown
             document.getElementById('mobileNavDropdown').classList.remove('open');
@@ -758,12 +889,17 @@
                 return;
             }
 
-            // Group by tab
+            // Group by tab; grab first music URL found per tab
             const groups = { push: [], pull: [], legs: [], upper: [], lower: [] };
             rows.forEach(row => {
                 const id = resolveTabId(row.tab);
-                if (id) groups[id].push(row);
+                if (!id) return;
+                groups[id].push(row);
+                if (!tabMusic[id] && row.music) tabMusic[id] = row.music;
             });
+
+            // Set music for the initially active tab (Push)
+            setMusicForTab('push');
 
             // Render each tab
             Object.entries(groups).forEach(([id, exercises]) => {
