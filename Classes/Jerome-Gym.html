@@ -340,30 +340,73 @@
                 text-align: left;
             }
 
-            /* Hide desktop sidebar on mobile */
-            body { overflow-y: auto; height: auto; }
+            /* Lock to viewport — no scrolling */
+            body { overflow: hidden; height: 100vh; }
             .header { display: none; }
-            .container { flex-direction: column; height: auto; }
+            .container { flex-direction: column; height: calc(100vh - 58px); }
             .navigation { display: none; }
-            .content { height: auto; overflow: visible; }
-            .section { padding: 20px 15px; height: auto; overflow: visible; }
-            .section.active { min-height: 80vh; }
-            .slideshow-section { padding: 0 !important; min-height: 90vh; }
-            .slideshow-container { padding: 20px 15px; height: auto; min-height: 85vh; }
-            .slide-content-wrapper { height: auto; min-height: 75vh; max-width: 100%; }
-            .gym-slide { flex-direction: column; height: auto; min-height: 70vh; padding: 24px 18px; }
-            .slide-info { max-width: 100%; padding-right: 0; }
-            .slide-info h3 { font-size: 1.4rem; }
-            .slide-image { width: 100%; max-width: 100%; height: 220px; margin-top: 20px; }
-            .slide-arrow.prev { left: -18px; }
-            .slide-arrow.next { right: -18px; }
-            .slide-arrow { width: 38px; height: 38px; }
-            .stat-value { font-size: 1.15rem; }
+            .content { height: 100%; overflow: hidden; }
+
+            /* Sections fill remaining height */
+            .section { padding: 0; height: 100%; overflow: hidden; }
+            .section.active { display: flex; flex-direction: column; }
+
+            /* Slideshow fills the full section */
+            .slideshow-section { padding: 0 !important; }
+            .slideshow-container {
+                padding: 10px 14px 36px;
+                height: 100%;
+                justify-content: flex-start;
+            }
+            .slide-counter { top: 10px; right: 14px; font-size: 0.8rem; }
+            .slide-content-wrapper {
+                height: calc(100% - 30px);
+                max-width: 100%;
+                margin-top: 6px;
+            }
+            .gym-slide {
+                flex-direction: column;
+                height: 100%;
+                padding: 14px 14px 10px;
+                gap: 10px;
+                overflow: hidden;
+            }
+            .slide-info {
+                max-width: 100%;
+                padding-right: 0;
+                flex: 0 0 auto;
+            }
+            .slide-info h3 { font-size: 1.1rem; margin-bottom: 4px; }
+            .slide-focus { font-size: 0.85rem; margin-bottom: 10px; }
+            .stat-row { gap: 8px; }
+            .stat-box { padding: 8px 10px; border-radius: 10px; }
+            .stat-label { font-size: 0.68rem; margin-bottom: 3px; }
+            .stat-value { font-size: 1rem; }
+
+            /* Image fills remaining space */
+            .slide-image {
+                width: 100%;
+                max-width: 100%;
+                flex: 1 1 0;
+                min-height: 0;
+                margin-top: 0;
+                border-radius: 12px;
+            }
+
+            /* Arrows tucked in at sides */
+            .slide-arrow { width: 34px; height: 34px; }
+            .slide-arrow.prev { left: -14px; }
+            .slide-arrow.next { right: -14px; }
+
+            /* Dots */
+            .slide-indicators { bottom: 10px; gap: 7px; }
+            .indicator-dot { width: 8px; height: 8px; }
         }
 
         @media (max-width: 480px) {
-            .slide-info h3 { font-size: 1.2rem; }
-            .stat-box { padding: 10px 12px; }
+            .container { height: calc(100vh - 54px); }
+            .slide-info h3 { font-size: 1rem; }
+            .stat-box { padding: 7px 9px; }
         }
     </style>
 </head>
@@ -568,6 +611,7 @@
             next.onclick = () => changeSlide(sectionId, 1);
             wrapper.appendChild(next);
 
+            addSwipe(wrapper, sectionId);
             container.appendChild(wrapper);
 
             // Dot indicators
@@ -630,6 +674,23 @@
             if (e.key === 'ArrowLeft')  changeSlide(activeSection.id, -1);
             if (e.key === 'ArrowRight') changeSlide(activeSection.id,  1);
         });
+
+        // Swipe support — attached to each slideshow wrapper
+        function addSwipe(el, sectionId) {
+            let startX = 0, startY = 0;
+            el.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }, { passive: true });
+            el.addEventListener('touchend', e => {
+                const dx = e.changedTouches[0].clientX - startX;
+                const dy = e.changedTouches[0].clientY - startY;
+                // Only trigger if horizontal swipe is dominant and long enough
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                    changeSlide(sectionId, dx < 0 ? 1 : -1);
+                }
+            }, { passive: true });
+        }
 
         function showSection(sectionId, navItem) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
