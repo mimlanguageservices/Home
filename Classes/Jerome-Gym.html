@@ -389,6 +389,22 @@
             return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
+        // Safely read a cell — handles Google's Date(year,month,day) values
+        // that appear when a column has a date format applied in Sheets.
+        function cellVal(cell) {
+            if (!cell || cell.v === null || cell.v === undefined) return null;
+            const v = cell.v;
+            if (typeof v === 'string' && v.startsWith('Date(')) {
+                // Prefer the formatted value if it looks like a plain number
+                const f = String(cell.f ?? '').trim();
+                if (/^\d+(\.\d+)?$/.test(f)) return f;
+                // Otherwise extract the day component as a fallback
+                const parts = v.match(/Date\(\d+,\d+,(\d+)\)/);
+                return parts ? parts[1] : v;
+            }
+            return v;
+        }
+
         // Parse Google Visualization JSON wrapper
         function parseGviz(text) {
             const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
@@ -398,9 +414,9 @@
                 .map(row => ({
                     tab:      row.c[0]?.v ?? '',
                     exercise: row.c[1]?.v ?? '',
-                    weight:   row.c[2]?.v ?? null,
-                    sets:     row.c[3]?.v ?? null,
-                    reps:     row.c[4]?.v ?? null,
+                    weight:   cellVal(row.c[2]),
+                    sets:     cellVal(row.c[3]),
+                    reps:     cellVal(row.c[4]),
                     focus:    row.c[5]?.v ?? '',
                     image:    row.c[6]?.v ?? ''
                 }))
