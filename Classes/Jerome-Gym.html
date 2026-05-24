@@ -637,15 +637,20 @@
             lower: { name: 'Lower Body', sub: 'Posterior Chain Focused' },
         };
 
-        // Music URL per tab, populated after data loads
-        const tabMusic = { push: null, pull: null, legs: null, upper: null, lower: null };
+        // Active slide music is read directly from data-music on each .gym-slide element
 
         function setMusicForTab(tabId) {
-            const url    = tabMusic[tabId];
             const labels = TAB_LABELS[tabId] || { name: 'Music', sub: '' };
             document.getElementById('musicTabName').textContent = labels.name;
             document.getElementById('musicTabSub').textContent  = labels.sub;
 
+            // Read music URL from the currently active slide in this tab
+            const activeSlide = document.querySelector(`#${tabId} .gym-slide.active`);
+            const url = activeSlide?.dataset.music || null;
+            applyMusicUrl(url);
+        }
+
+        function applyMusicUrl(url) {
             const frame   = document.getElementById('musicFrame');
             const noTrack = document.getElementById('musicNoTrack');
             const embedUrl = toEmbedUrl(url);
@@ -696,6 +701,7 @@
             exercises.forEach((ex, i) => {
                 const slide = document.createElement('div');
                 slide.className = 'gym-slide' + (i === 0 ? ' active' : '');
+                if (ex.music) slide.dataset.music = ex.music;
 
                 const hasImg = ex.image && ex.image.startsWith('http');
 
@@ -775,6 +781,7 @@
             slides[cur - 1].classList.add('active');
             dots[cur - 1].classList.add('active');
             if (counter) counter.textContent = `${cur} / ${slides.length}`;
+            applyMusicUrl(slides[cur - 1].dataset.music || null);
         }
 
         function goToSlide(sectionId, num) {
@@ -792,6 +799,7 @@
             slides[num - 1].classList.add('active');
             dots[num - 1].classList.add('active');
             if (counter) counter.textContent = `${num} / ${slides.length}`;
+            applyMusicUrl(slides[num - 1].dataset.music || null);
         }
 
         // Keyboard navigation on the active tab
@@ -889,13 +897,11 @@
                 return;
             }
 
-            // Group by tab; grab first music URL found per tab
+            // Group by tab
             const groups = { push: [], pull: [], legs: [], upper: [], lower: [] };
             rows.forEach(row => {
                 const id = resolveTabId(row.tab);
-                if (!id) return;
-                groups[id].push(row);
-                if (!tabMusic[id] && row.music) tabMusic[id] = row.music;
+                if (id) groups[id].push(row);
             });
 
             // Set music for the initially active tab (Push)
