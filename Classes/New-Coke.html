@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>New Coke: A Marketing Failure - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1554866585-cd94860890b7?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); }
+        .level-card.a2-card:hover { border-color: #fbbf24; box-shadow: 0 20px 60px rgba(251, 191, 36, 0.4), 0 0 40px rgba(251, 191, 36, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .a2-card .level-icon { color: #fbbf24; } .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.a2 { background: rgba(251, 191, 36, 0.2); color: #92400e; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">New Coke: A Marketing Failure</h1>
+        <p class="game-subtitle">Market Research &amp; Brand Loyalty</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card a2-card" onclick="startGame('A2')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">A2</div>
+                    <div class="level-desc">Elementary</div>
+                </div>
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>New Coke: A Marketing Failure</h1>
+                    <div class="current-level-badge b1" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B1</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1554866585-cd94860890b7?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">New Coke: A Marketing Failure</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Market Research &amp; Brand Loyalty</p>
+                                    <p style="font-size: 1.1rem; opacity: 0.6; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase;">Comparative Adjectives · Consumer Behavior · Market Vocabulary</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <!-- Replace the YouTube video ID below with your preferred documentary about the 1985 New Coke story -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/dF7KLsE6RfI?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What Happened? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What Happened?</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>In 1985, Coca-Cola changed its recipe. The company made a new, sweeter drink. They called it "New Coke." But people were very angry. They did not like the new <span class="vocab-link" onclick="showPopup('taste', 'how food or drink feels or smells in your mouth')">taste</span>. Many people wrote letters to the company. They wanted the old Coke back.</p>
+                                        <p>After 79 days, Coca-Cola brought back the original recipe. They called it "Coca-Cola <span class="vocab-link" onclick="showPopup('classic', 'something traditional that has been popular for a long time')">Classic</span>." People were very happy. Today, we still remember New Coke as one of the biggest mistakes in business history.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>In April 1985, the Coca-Cola Company made one of the most surprising decisions in business history. After 99 years, it changed its famous recipe. The new formula was sweeter and was designed to compete directly with Pepsi. Coca-Cola called it "New Coke." The company believed that <span class="vocab-link" onclick="showPopup('consumers', 'people who buy and use products or services')">consumers</span> wanted a sweeter drink.</p>
+                                        <p>However, the public reaction was extremely negative. Thousands of people called the company's hotline every day to complain. People organized protests and demanded the return of the original formula. Just 79 days later, Coca-Cola reversed its decision and relaunched the original recipe as "Coca-Cola Classic" — one of the most dramatic U-turns in corporate history.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The launch of New Coke in April 1985 represents one of the most studied cases of corporate misjudgment in modern business history. Coca-Cola's decision to reformulate its 99-year-old flagship product was driven by declining <span class="vocab-link" onclick="showPopup('market share', 'the percentage of total sales in a market held by one company')">market share</span> and the competitive threat of the Pepsi Challenge — a marketing campaign in which blind taste tests consistently showed consumers preferred Pepsi's sweeter flavor profile.</p>
+                                        <p>What the research failed to measure was the emotional and cultural significance of the brand itself. The backlash was swift and overwhelming: within days, Coca-Cola's consumer hotline was receiving 8,000 calls a day — compared to 400 on a typical day — with callers expressing outrage, grief, and a deep sense of personal betrayal. Just 79 days after launch, on July 10, 1985, Coca-Cola announced the return of the original formula as "Coca-Cola Classic."</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1581636625402-29b2a704ef13?w=800" alt="Soft drink cans" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Why Did Coca-Cola Change? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Why Did Coca-Cola Change?</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>In the 1980s, Pepsi ran a famous advertising <span class="vocab-link" onclick="showPopup('campaign', 'a series of planned activities to achieve a business goal')">campaign</span> called "The Pepsi Challenge." People tried both drinks without knowing which was which. More people said Pepsi tasted better! Coca-Cola was worried.</p>
+                                        <p>Coca-Cola did a <span class="vocab-link" onclick="showPopup('survey', 'a set of questions to find out what people think')">survey</span> with 200,000 people. In the tests, the new, sweeter recipe was more <span class="vocab-link" onclick="showPopup('popular', 'liked by many people')">popular</span>. So the company decided to change. But they made one big mistake: people don't just drink Coke for the taste.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>In the early 1980s, Coca-Cola was losing <span class="vocab-link" onclick="showPopup('market share', 'the percentage of total sales in a market held by one company')">market share</span> to Pepsi. The "Pepsi Challenge" campaign invited <span class="vocab-link" onclick="showPopup('consumers', 'people who buy and use products or services')">consumers</span> to taste both drinks in a blind test — and consistently showed that people preferred Pepsi's sweeter flavor. This was a serious problem for a company that had been the world's best-selling soft drink for decades.</p>
+                                        <p>To respond, Coca-Cola conducted massive <span class="vocab-link" onclick="showPopup('market research', 'the process of collecting information to understand what customers want')">market research</span> — the largest in the company's history — testing a new, sweeter formula with 200,000 consumers. In these taste tests, the new formula performed better than both the original Coke and Pepsi. The company felt confident. However, <span class="vocab-link" onclick="showPopup('market research', 'the process of collecting information to understand what customers want')">market research</span> can measure what people say they prefer in a test — but it cannot always predict how people will feel when their favorite product actually disappears.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Coca-Cola's decision to reformulate was a direct response to a sustained competitive threat. Between 1975 and 1983, Coca-Cola's share of the US soft drink market declined from approximately 24.3% to 21.8%, while Pepsi's grew. The Pepsi Challenge taste tests were not only damaging Coca-Cola's commercial position but were visibly undermining its <span class="vocab-link" onclick="showPopup('brand equity', 'the commercial value of a brand based on customer loyalty and recognition')">brand equity</span>.</p>
+                                        <p>Coca-Cola's own <span class="vocab-link" onclick="showPopup('market research', 'the process of collecting information to understand what customers want')">market research</span>, involving 200,000 taste tests and extensive <span class="vocab-link" onclick="showPopup('focus group', 'a small selected group used to give opinions on a product before its launch')">focus group</span> sessions, appeared statistically compelling. What it did not — and perhaps could not — measure was the symbolic role of the original formula in consumers' sense of identity and cultural heritage. Market research is fundamentally better at measuring rational preference between known options than at predicting emotional responses to the removal of something people take for granted.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800" alt="Market research and testing" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Consumer Reaction -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Consumer Reaction</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>People in America were very upset when New Coke arrived. Many people loved the old Coca-Cola. They did not want a new, different drink. Some people went to stores to buy as many bottles of the old Coke as possible. More than 40,000 people wrote letters to the company.</p>
+                                        <p>Some people said Coca-Cola was like an old friend that had changed. The company received thousands of phone calls every day. People said the new taste was less good than the old one. They also said that Coca-Cola was more important than just a drink. It was a part of their life.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The public reaction to New Coke was much stronger than Coca-Cola expected. Within days of the launch, the company's hotline was receiving thousands of angry calls. People compared their feelings to the death of an old friend. Some <span class="vocab-link" onclick="showPopup('consumers', 'people who buy and use products or services')">consumers</span> stockpiled bottles of the original formula before it disappeared from stores.</p>
+                                        <p>Consumer groups organized <span class="vocab-link" onclick="showPopup('campaign', 'a series of planned activities to achieve a business goal')">campaigns</span> demanding the return of "the real thing." There was even a group called the "Old Cola Drinkers of America" with more than 100,000 members. This reaction revealed something important: for many consumers, Coca-Cola was more than just a soft drink — it was part of their identity and memories. This strong attachment to a brand is called <span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">brand loyalty</span> — and New Coke had seriously underestimated it.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The consumer response to New Coke was not merely negative — it was extraordinary in its emotional intensity. Research into the backlash revealed that consumers were not expressing a simple taste preference: they were expressing a sense of loss and betrayal. Psychiatrists and sociologists described responses more typical of personal bereavement than product dissatisfaction.</p>
+                                        <p>This paradox — that people often do not recognize the value of something until it is taken away — is a fundamental insight in <span class="vocab-link" onclick="showPopup('consumer behavior', 'the patterns and decisions people make when buying products or services')">consumer behavior</span>. <span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">Brand loyalty</span> is not simply a rational preference: it is an emotional bond incorporating memory, identity, habit, and cultural association. Coca-Cola had not accounted for the fact that its customers were not simply buying a flavor — they were buying a symbol of continuity, familiarity, and American identity. This is the gap between stated preferences (what people say in tests) and revealed preferences (what people actually do in the market).</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800" alt="People reacting" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Comparative Adjectives -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Comparative Adjectives</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>We use comparative adjectives to compare two things. For short adjectives, add <strong>-er</strong>:</p>
+                                        <ul>
+                                            <li>sweet → <strong>sweeter</strong>: "New Coke was <strong>sweeter</strong> than the original."</li>
+                                            <li>old → <strong>older</strong>: "The original recipe was <strong>older</strong> than New Coke."</li>
+                                            <li>big → <strong>bigger</strong>: "Pepsi's market share became <strong>bigger</strong>."</li>
+                                        </ul>
+                                        <p>For long adjectives, use <strong>more</strong> or <strong>less</strong>:</p>
+                                        <ul>
+                                            <li>"New Coke was <strong>more popular</strong> in taste tests."</li>
+                                            <li>"The original was <strong>more familiar</strong> to customers."</li>
+                                            <li>"New Coke was <strong>less popular</strong> in real stores."</li>
+                                        </ul>
+                                        <p>Irregular: good → <strong>better</strong>, bad → <strong>worse</strong>. "Pepsi performed <strong>better</strong> than Coke in blind tests."</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Comparative adjectives are very useful in business when you analyze products, markets, and results.</p>
+                                        <ul>
+                                            <li>"New Coke was <strong>sweeter than</strong> the original formula." (product comparison)</li>
+                                            <li>"Pepsi's market share grew <strong>faster than</strong> Coca-Cola's in the early 1980s." (performance comparison)</li>
+                                            <li>"Consumer reaction was <strong>stronger than</strong> the company expected." (result comparison)</li>
+                                        </ul>
+                                        <p>Using <strong>as...as</strong> for equal comparisons:</p>
+                                        <ul>
+                                            <li>"New Coke was not <strong>as popular as</strong> the original formula in real sales."</li>
+                                            <li>"The recovery was nearly <strong>as fast as</strong> the crisis itself."</li>
+                                        </ul>
+                                        <p>Using <strong>less</strong> for negative comparisons:</p>
+                                        <ul>
+                                            <li>"Customer <span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">loyalty</span> was <strong>less flexible</strong> than researchers assumed."</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>In B2+ business English, qualifying your comparatives transforms description into analysis. The choice of modifier signals how confident you are:</p>
+                                        <ul>
+                                            <li><strong>Considerably / far / significantly</strong> (large difference): "Consumer loyalty proved <strong>far stronger than</strong> market research predicted."</li>
+                                            <li><strong>Slightly / marginally / somewhat</strong> (small difference): "New Coke appeared <strong>slightly more popular</strong> in controlled taste tests."</li>
+                                        </ul>
+                                        <p>Double comparatives show change over time:</p>
+                                        <ul>
+                                            <li>"<strong>The longer</strong> New Coke remained on the market, <strong>the more</strong> negative the reaction became."</li>
+                                            <li>"<strong>The more</strong> consumers protested, <strong>the stronger</strong> Coca-Cola's original brand became."</li>
+                                        </ul>
+                                        <p>In business presentations, "considerably stronger," "marginally sweeter," and "far more loyal" are far more precise — and more persuasive — than unqualified comparatives. This precision is a key marker of upper-intermediate business English.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800" alt="Business analysis charts" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Coca-Cola Classic Returns -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Coca-Cola Classic Returns</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>After 79 days, Coca-Cola made an important decision. The company brought back the original recipe. They called it "Coca-Cola <span class="vocab-link" onclick="showPopup('classic', 'something traditional that has been popular for a long time')">Classic</span>." People were very happy. Many television news programs covered the story. Some people said it was the best news they had heard all year!</p>
+                                        <p>New Coke stayed in stores for a while, but not many people bought it. Eventually, New Coke disappeared. "Coca-Cola Classic" became one of the most recognizable names in the world. The story shows that companies must listen to their customers — even big, powerful companies.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>On July 10, 1985 — just 79 days after the <span class="vocab-link" onclick="showPopup('launch', 'to introduce a new product to the public for the first time')">launch</span> of New Coke — Coca-Cola made an extraordinary decision. The company announced the return of the original formula as "Coca-Cola Classic." The announcement was broadcast on live television and was treated like major national news. <span class="vocab-link" onclick="showPopup('consumers', 'people who buy and use products or services')">Consumers</span> celebrated openly.</p>
+                                        <p>For many people, it felt like a victory — proof that ordinary customers could force a global corporation to change its mind. Some marketing analysts pointed out that the whole episode had generated enormous free publicity for Coca-Cola, completely overshadowing Pepsi's <span class="vocab-link" onclick="showPopup('campaign', 'a series of planned activities to achieve a business goal')">campaigns</span>. Whether by accident or design, New Coke had reminded millions of consumers exactly how much they loved the original formula.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The return of Coca-Cola Classic on July 10, 1985 was managed as a major media event. Company executives made personal television appearances to announce the reversal, framing it as a response to the voice of the American consumer — an act of humility and customer service rather than a corporate failure.</p>
+                                        <p>The "Classic" designation itself was a strategic masterstroke. By adding that single word, Coca-Cola implicitly <span class="vocab-link" onclick="showPopup('repositioning', 'changing the way a product is perceived by consumers without necessarily changing the product itself')">repositioned</span> the original formula from "old Coke" into a premium heritage product. The product had not changed — but its meaning had been elevated. A counter-narrative also emerged: some analysts suggested, controversially, that the entire episode had been a calculated strategy to reinvigorate <span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">brand loyalty</span>. Coca-Cola denied this, but whatever the intent, by the end of 1985, Coca-Cola Classic held a larger <span class="vocab-link" onclick="showPopup('market share', 'the percentage of total sales in a market held by one company')">market share</span> than Coke had held before the New Coke launch.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800" alt="Celebration and success" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Consumer Behavior -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Understanding Consumer Behavior</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>The story of New Coke teaches us some important lessons about business:</p>
+                                        <ul>
+                                            <li>Customers do not always like <span class="vocab-link" onclick="showPopup('change', 'to make something different from before')">change</span>.</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('brand', 'a name or design that helps people recognize a product')">brand</span> is more than just a product — it is also feelings and memories.</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('survey', 'a set of questions to find out what people think')">survey</span> is useful, but it does not tell you everything.</li>
+                                            <li>Companies should listen to their customers carefully.</li>
+                                            <li>Even the biggest companies in the world can make mistakes.</li>
+                                        </ul>
+                                        <p>Useful phrases for talking about business lessons:</p>
+                                        <ul>
+                                            <li>"The company <strong>should have</strong> listened to customers more carefully."</li>
+                                            <li>"In my opinion, the best decision was..."</li>
+                                            <li>"This was a mistake because..."</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The New Coke story reveals an important difference between what <span class="vocab-link" onclick="showPopup('consumers', 'people who buy and use products or services')">consumers</span> say they prefer and what they actually buy.</p>
+                                        <ul>
+                                            <li><strong>Rational vs. emotional decisions:</strong> In a blind taste test, consumers make a rational choice based on flavor alone. In real life, they make an emotional choice based on memory, identity, and <span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">brand loyalty</span>.</li>
+                                            <li><strong>The limits of <span class="vocab-link" onclick="showPopup('market research', 'the process of collecting information to understand what customers want')">market research</span>:</strong> Surveys and taste tests can measure immediate reactions, but they cannot always predict the emotional impact of removing a familiar product.</li>
+                                            <li><strong>The value of <span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">brand loyalty</span>:</strong> Customers who have used the same product for years develop a strong emotional bond with it. Changing that product can feel like a personal betrayal of their loyalty.</li>
+                                            <li><strong>Listening to <span class="vocab-link" onclick="showPopup('feedback', 'opinions that people give about a product or service')">feedback</span>:</strong> When customers react strongly, companies must respond quickly. Coca-Cola's relatively fast reversal — just 79 days — helped limit the long-term damage.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The New Coke case provides a masterclass in the limitations of rational, data-driven decision-making in marketing. It illustrates the fundamental distinction between <strong>stated preferences</strong> (what people say they prefer when asked) and <strong>revealed preferences</strong> (what people actually choose under real market conditions).</p>
+                                        <ul>
+                                            <li><strong>Brand identity as a psychological construct:</strong> <span class="vocab-link" onclick="showPopup('consumers', 'people who buy and use products or services')">Consumers</span> develop relationships with brands that involve memory, identity, and social meaning. These cannot be captured in a taste test — or in any study of <span class="vocab-link" onclick="showPopup('demographics', 'statistical data about a population group such as age, income, or location')">demographics</span> alone.</li>
+                                            <li><strong>Ecological validity:</strong> Coca-Cola's <span class="vocab-link" onclick="showPopup('focus group', 'a small selected group used to give opinions on a product before its launch')">focus group</span> and survey conditions measured a type of preference (flavor in isolation) that is not the primary driver of real-world <span class="vocab-link" onclick="showPopup('consumer behavior', 'the patterns and decisions people make when buying products or services')">consumer behavior</span>. Laboratory conditions do not always replicate real-world contexts.</li>
+                                            <li><strong>Switching costs and inertia:</strong> Even when consumers theoretically prefer a competitor's product, the psychological costs of switching — adjusting habits, confronting the unfamiliar — produce strong resistance to change. <span class="vocab-link" onclick="showPopup('nostalgia', 'a sentimental feeling of affection for something from the past')">Nostalgia</span> amplifies this effect significantly.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800" alt="Shopping and consumer decisions" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - The Legacy -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Legacy of New Coke</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>New Coke is now very famous. It is one of the biggest marketing mistakes in history. But some good things came from it:</p>
+                                        <ul>
+                                            <li>Coca-Cola learned that customers love the original <span class="vocab-link" onclick="showPopup('recipe', 'a list of instructions for making a food or drink')">recipe</span> very much.</li>
+                                            <li>"Coca-Cola <span class="vocab-link" onclick="showPopup('classic', 'something traditional that has been popular for a long time')">Classic</span>" became even more <span class="vocab-link" onclick="showPopup('popular', 'liked by many people')">popular</span> than before.</li>
+                                            <li>Companies around the world learned an important lesson: be careful when you change something that people love.</li>
+                                            <li>New Coke is now studied in business schools all over the world.</li>
+                                        </ul>
+                                        <p>Today, Coca-Cola is the most popular soft drink in the world. The story shows that big companies can make mistakes — and learn from them.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The New Coke episode had a lasting impact on business and marketing:</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">Brand loyalty</span>:</strong> The crisis showed how important emotional connections are between customers and products. This made Coca-Cola — and other companies — much more careful about changing products that people love.</li>
+                                            <li><strong>The limits of <span class="vocab-link" onclick="showPopup('market research', 'the process of collecting information to understand what customers want')">market research</span>:</strong> The case is now a warning in business schools: research can tell you a lot, but it cannot always predict how consumers will react in real life.</li>
+                                            <li><strong>A positive outcome:</strong> Paradoxically, the crisis helped Coca-Cola. The return of "Coca-Cola Classic" generated enormous positive publicity. By the end of 1985, Coca-Cola's <span class="vocab-link" onclick="showPopup('market share', 'the percentage of total sales in a market held by one company')">market share</span> was higher than before the New Coke launch.</li>
+                                            <li><strong>Lessons for all companies:</strong> The story is studied in every marketing course as the definitive example of why companies must understand the emotional power of brands — not just their functional performance.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The New Coke case has acquired almost mythological status in marketing education, but its most important legacy is conceptual. It demonstrated, with extraordinary clarity, that <span class="vocab-link" onclick="showPopup('brand equity', 'the commercial value of a brand based on customer loyalty and recognition')">brand equity</span> is not stored in a product's functional attributes — it is stored in the minds, memories, and identities of consumers.</p>
+                                        <p>This insight reshaped how major companies approach brand management. Heritage brands — products with decades of cultural association — cannot be treated as simple commercial propositions subject to optimization through standard research. The emotional architecture of a brand is a strategic asset that is simultaneously highly valuable and highly fragile.</p>
+                                        <p>The case also established an important precedent in corporate crisis recovery. Coca-Cola's rapid, media-managed reversal — framing it as proof that it "listened to its customers" — demonstrated that the manner in which a company acknowledges a mistake can itself become a reputational asset. By presenting the reversal as an act of customer-centrism, Coca-Cola transformed a humiliating failure into a demonstration of <span class="vocab-link" onclick="showPopup('competitive advantage', 'a feature or quality that makes one company better than its rivals in the market')">competitive advantage</span>: a company that listens is more trustworthy than one that does not.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800" alt="Business professional" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <ul>
+                                            <li><strong>The story:</strong> In 1985, Coca-Cola changed its <span class="vocab-link" onclick="showPopup('recipe', 'a list of instructions for making a food or drink')">recipe</span>. The new drink was sweeter than the original. People were angry.</li>
+                                            <li><strong>The result:</strong> After 79 days, Coca-Cola brought back the original. They called it "Coca-Cola <span class="vocab-link" onclick="showPopup('classic', 'something traditional that has been popular for a long time')">Classic</span>."</li>
+                                            <li><strong>The lesson:</strong> A <span class="vocab-link" onclick="showPopup('brand', 'a name or design that helps people recognize a product')">brand</span> is not just a taste. It is also feelings, memories, and loyalty.</li>
+                                            <li><strong>Grammar:</strong> We use comparative adjectives to compare things: <em>sweeter, more popular, less loyal, better, worse.</em></li>
+                                            <li><strong>Key question:</strong> "Is New Coke <strong>better than</strong> the original?" — What do you think?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <ul>
+                                            <li><strong>The failure:</strong> The New Coke launch in 1985 showed that <span class="vocab-link" onclick="showPopup('market research', 'the process of collecting information to understand what customers want')">market research</span> cannot always predict <span class="vocab-link" onclick="showPopup('consumer behavior', 'the patterns and decisions people make when buying products or services')">consumer behavior</span>.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">Brand loyalty</span>:</strong> A strong emotional connection between customers and a brand is often more powerful than a rational taste preference.</li>
+                                            <li><strong>Comparative adjectives in business:</strong> "The original was <strong>more popular than</strong> New Coke. The consumer reaction was <strong>stronger than</strong> expected. Coca-Cola Classic was <strong>sweeter than</strong> the original? No — it was the same recipe!"</li>
+                                            <li><strong>Key question:</strong> Are you changing something functional — or something emotional?</li>
+                                            <li><strong>The recovery:</strong> By the end of 1985, Coca-Cola's <span class="vocab-link" onclick="showPopup('market share', 'the percentage of total sales in a market held by one company')">market share</span> was <strong>higher than</strong> before the New Coke launch — proof that listening to customers pays off.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <ul>
+                                            <li><strong>Stated vs. revealed preferences:</strong> Consumers said they preferred New Coke's flavor in tests, but revealed their true preference by demanding the original back. <span class="vocab-link" onclick="showPopup('market research', 'the process of collecting information to understand what customers want')">Market research</span> must account for this gap.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('brand equity', 'the commercial value of a brand based on customer loyalty and recognition')">Brand equity</span> as emotional capital:</strong> Coca-Cola's brand value resided in emotional and cultural associations — factors that functional taste tests cannot measure.</li>
+                                            <li><strong>Qualified comparatives:</strong> "Considerably stronger," "marginally sweeter," "far more loyal" — these modifiers transform description into precise business analysis, a key feature of B2+ English.</li>
+                                            <li><strong>Ecological validity:</strong> Research conducted in artificial conditions (blind tests) does not always predict behavior in natural market conditions. This is a structural limitation of <span class="vocab-link" onclick="showPopup('consumer behavior', 'the patterns and decisions people make when buying products or services')">consumer behavior</span> research.</li>
+                                            <li><strong>Crisis as opportunity:</strong> Coca-Cola's reversal, framed as customer-listening, ultimately strengthened <span class="vocab-link" onclick="showPopup('brand loyalty', 'the tendency of customers to keep buying the same brand because they feel emotionally connected to it')">brand loyalty</span> and increased <span class="vocab-link" onclick="showPopup('market share', 'the percentage of total sales in a market held by one company')">market share</span> beyond pre-crisis levels.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800" alt="Business meeting" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-A2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Taste</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">How food or drink feels or smells in your mouth</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A name or design that helps people recognize a product</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Recipe</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A list of instructions for making a food or drink</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Change</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To make something different from before</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Popular</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Liked or enjoyed by many people</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Survey</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A set of questions used to find out what people think or prefer</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Launch</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To introduce a new product to the public for the first time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Classic</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Something traditional that has been popular for a long time</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Market Research</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of collecting information to understand what customers want</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand Loyalty</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The tendency of customers to keep buying the same brand because they feel emotionally connected to it</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Consumer</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person who buys and uses products or services</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Competition</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The situation when companies try to sell more than each other in the same market</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Campaign</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A series of planned activities designed to achieve a business or marketing goal</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Feedback</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Opinions that people give about a product or service, used to improve it</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Strategy</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A plan designed to achieve a long-term business goal</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Market Share</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The percentage of total sales in a market held by one company</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand Equity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The commercial value of a brand based on customer loyalty and recognition, built over time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Consumer Behavior</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The patterns and decisions people make when buying products or services</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Focus Group</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A small selected group of people used to give opinions on a product before it is launched to the wider market</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Demographics</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Statistical data about a population group, such as age, income, location, or gender</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Competitive Advantage</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A feature or quality that makes one company better than its rivals in the market</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Nostalgia</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A sentimental feeling of affection or longing for something from the past</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Repositioning</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Changing how a product is perceived by consumers without necessarily changing the product itself</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stated vs. Revealed Preferences</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The gap between what people say they prefer in a survey and what they actually choose in the real market</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>In 1985, Coca-Cola faced a massive backlash when it changed its famous recipe. Imagine you are a marketing consultant hired by Coca-Cola one month after the launch of New Coke. Write a memo of approximately 200–250 words to the company's CEO advising whether to keep New Coke or return to the original formula. Your memo should: (1) use at least three comparative adjectives to compare the two products; (2) analyse what the consumer reaction tells us about brand loyalty; and (3) give a clear recommendation with reasons. Use vocabulary from today's lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your marketing memo here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B1';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - New Coke: A Marketing Failure - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            A2: [
+                { term: "Taste", definition: "How food or drink feels or smells in your mouth", sentences: ["People liked the ___ of the original Coca-Cola more than New Coke.", "The ___ of Pepsi is sweeter than original Coca-Cola.", "Can you tell the difference in ___ between the two drinks?"] },
+                { term: "Brand", definition: "A name or design that helps people recognize a product", sentences: ["Coca-Cola is one of the most famous ___ names in the world.", "A strong ___ makes customers feel a personal connection to a product.", "The ___ name 'Classic' helped people remember the original recipe."] },
+                { term: "Recipe", definition: "A list of instructions for making a food or drink", sentences: ["Coca-Cola changed its secret ___ in 1985.", "The new ___ was sweeter than the original.", "Many customers wanted the company to use the original ___ again."] },
+                { term: "Popular", definition: "Liked or enjoyed by many people", sentences: ["New Coke was more ___ in taste tests than in real sales.", "Coca-Cola Classic became very ___ after the company brought it back.", "The original recipe was more ___ with older customers."] },
+                { term: "Survey", definition: "A set of questions used to find out what people think or prefer", sentences: ["Coca-Cola used a ___ with 200,000 people to test the new formula.", "The results of the ___ showed that people preferred the sweeter taste.", "Companies often use a ___ to find out what customers want."] },
+                { term: "Launch", definition: "To introduce a new product to the public for the first time", sentences: ["The ___ of New Coke was on April 23, 1985.", "Coca-Cola prepared carefully for the ___ of its new formula.", "After the ___, the company received thousands of angry phone calls."] },
+                { term: "Classic", definition: "Something traditional that has been popular for a long time", sentences: ["When Coca-Cola brought back the original, they called it 'Coca-Cola ___'.", "The original Coke recipe is now considered a ___ drink.", "A ___ product is one that people have loved for many years."] },
+                { term: "Change", definition: "To make something different from before", sentences: ["The ___ to a sweeter formula was a very big mistake.", "Coca-Cola decided to ___ its recipe because of competition from Pepsi.", "Many customers did not want any ___ to their favorite drink."] }
+            ],
+            B1: [
+                { term: "Market Research", definition: "The process of collecting information to understand what customers want", sentences: ["Coca-Cola used extensive ___ to test its new formula before launching it.", "The results of their ___ showed that people preferred the sweeter taste.", "Good ___ helps companies understand what customers want — but it has its limits."] },
+                { term: "Brand Loyalty", definition: "The tendency of customers to keep buying the same brand because they feel emotionally connected to it", sentences: ["The huge negative reaction to New Coke showed the power of ___ among Coca-Cola's customers.", "Companies invest heavily in building ___ because loyal customers are less likely to switch to a competitor.", "The concept of ___ helps explain why changing a famous recipe can be so dangerous."] },
+                { term: "Consumer", definition: "A person who buys and uses products or services", sentences: ["Each ___ who called Coca-Cola's hotline expressed anger and disappointment.", "A ___ does not just buy a product — they also buy a feeling and a memory.", "Coca-Cola's biggest ___ groups were very resistant to change."] },
+                { term: "Competition", definition: "The situation when companies try to sell more than each other in the same market", sentences: ["The main reason for the recipe change was growing ___ from Pepsi.", "In any ___, understanding what customers really want is more important than just matching a competitor.", "The ___ between Coca-Cola and Pepsi is one of the most famous business rivalries in history."] },
+                { term: "Campaign", definition: "A series of planned activities designed to achieve a business or marketing goal", sentences: ["The 'Pepsi Challenge' ___ successfully showed that people preferred Pepsi's sweeter taste in blind tests.", "Coca-Cola launched a major marketing ___ when it introduced New Coke.", "A good advertising ___ communicates the benefits of a product in a simple, memorable way."] },
+                { term: "Feedback", definition: "Opinions that people give about a product or service, used to improve it", sentences: ["The company received overwhelmingly negative ___ from customers after launching New Coke.", "Listening to customer ___ is one of the most important skills in business.", "The ___ from focus groups should have warned the company that some customers would be upset."] },
+                { term: "Strategy", definition: "A plan designed to achieve a long-term business goal", sentences: ["Coca-Cola's ___ was to beat Pepsi by creating a sweeter formula.", "A good ___ considers not just what customers say they want, but also what they feel.", "After the failure of New Coke, the company changed its ___ and brought back the original formula."] },
+                { term: "Market Share", definition: "The percentage of total sales in a market held by one company", sentences: ["Coca-Cola was losing ___ to Pepsi throughout the early 1980s.", "After the return of Coca-Cola Classic, the company's ___ actually increased beyond pre-New Coke levels.", "A company's ___ is one of the most important measures of its competitive position."] }
+            ],
+            B2: [
+                { term: "Brand Equity", definition: "The commercial value of a brand based on customer loyalty and recognition, built over time", sentences: ["The New Coke failure showed that Coca-Cola's most valuable asset was not its recipe, but its ___.", "Strong ___ means that customers are willing to pay more for a product simply because of the brand name.", "Coca-Cola ultimately increased its ___ by demonstrating that it listened to its customers."] },
+                { term: "Consumer Behavior", definition: "The patterns and decisions people make when buying products or services", sentences: ["The massive negative response to New Coke became a landmark study in ___.", "Understanding ___ requires more than measuring taste preferences — it requires understanding emotions and identity.", "The gap between what consumers say in surveys and how they actually act is a central problem in ___ research."] },
+                { term: "Focus Group", definition: "A small selected group of people used to give opinions on a product before it is launched", sentences: ["A ___ of Coca-Cola drinkers should have revealed the emotional significance of the original formula.", "Companies use a ___ to get detailed feedback on a product before launching it to the wider market.", "The results from the ___ were more positive than the real-world consumer reaction would later suggest."] },
+                { term: "Demographics", definition: "Statistical data about a population group, such as age, income, location, or gender", sentences: ["Coca-Cola's research analyzed consumer preferences across different ___, including age groups and regions.", "Understanding your target ___ is essential when planning a product launch.", "The ___ most loyal to the original formula were older customers who had drunk Coca-Cola for decades."] },
+                { term: "Competitive Advantage", definition: "A feature or quality that makes one company better than its rivals in the market", sentences: ["The original Coca-Cola recipe was itself a major ___ — a secret formula that no competitor could copy.", "Changing a ___ without understanding why customers value it is one of the most dangerous decisions a company can make.", "Coca-Cola believed that a sweeter formula would give it a ___ over Pepsi."] },
+                { term: "Nostalgia", definition: "A sentimental feeling of affection or longing for something from the past", sentences: ["Much of the backlash against New Coke was driven by ___ — consumers' emotional attachment to childhood memories of the original.", "Marketers increasingly use ___ as a strategy to create emotional connections between consumers and products.", "The concept of ___ helps explain why removing a familiar product can provoke a much stronger reaction than simply launching a new one."] },
+                { term: "Repositioning", definition: "Changing how a product is perceived by consumers without necessarily changing the product itself", sentences: ["The addition of the word 'Classic' was a subtle act of ___ — transforming the original formula from 'old Coke' into a premium heritage product.", "___ a product means changing how it is perceived by consumers, not necessarily changing the product itself.", "Coca-Cola's ___ of its original formula as 'Classic' is one of the most successful examples of brand recovery in marketing history."] },
+                { term: "Market Research", definition: "The process of collecting information to understand what customers want and how they behave", sentences: ["Despite involving 200,000 participants, Coca-Cola's ___ completely failed to predict the real-world consumer reaction.", "The New Coke case revealed a fundamental limitation of ___: it can measure stated preferences but not emotional attachment.", "Effective ___ must go beyond taste tests and surveys to explore the psychological and cultural meaning consumers attach to brands."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B1;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
