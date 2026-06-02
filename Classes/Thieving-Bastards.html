@@ -2,2429 +2,878 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Thieving Bastards - MIM Language Services</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-left {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header h1 {
-            color: #2d3748;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: -0.5px;
-        }
-
-        .header-image {
-            width: 120px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: cover;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .header .website {
-            text-align: center;
-            margin-top: 8px;
-        }
-
-        .header .website a {
-            color: #4c51bf;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .header .website a:hover {
-            color: #553c9a;
-        }
-
-        .container {
-            display: flex;
-            height: calc(100vh - 120px);
-        }
-
-        .navigation {
-            width: 280px;
-            background: rgba(45, 55, 72, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 30px 20px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-item {
-            padding: 16px 24px;
-            margin: 8px 0;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: #e2e8f0;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            font-weight: 500;
-            font-size: 1.1rem;
-            backdrop-filter: blur(5px);
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border-color: transparent;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-
-        .section {
-            display: none;
-            flex: 1;
-            padding: 40px;
-            overflow: hidden;
-            height: 100%;
-        }
-
-        .section.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .section h2 {
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-size: 2rem;
-            font-weight: 700;
-            text-align: center;
-            letter-spacing: -0.5px;
-        }
-
-        /* Discussion Slideshow Styles */
-        #discussion {
-            padding: 0;
-            background: white;
-        }
-
-        .slideshow-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            padding: 40px 100px;
-        }
-
-        .slide-content-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 1400px;
-            height: 85%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .discussion-slide {
-            display: none;
-            width: 100%;
-            height: 100%;
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .discussion-slide.active {
-            display: flex;
-            flex-direction: column;
-            animation: slideIn 0.5s ease-in-out;
-        }
-
-        /* Image-only slide (Slide 1) */
-        .slide-image-only {
-            padding: 0;
-        }
-
-        /* Horizontal layout slides (Slides 2-5) */
-        .slide-horizontal {
-            flex-direction: row !important;
-            gap: 30px;
-        }
-
-        .slide-text-section-left {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-right: 20px;
-            max-width: 50%;
-        }
-
-        .slide-text-section-left h3 {
-            font-size: 1.6rem;
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .slide-text-section-left p {
-            font-size: 1.05rem;
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 12px;
-        }
-
-        .slide-text-section-left ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .slide-text-section-left li {
-            font-size: 1rem;
-            color: #4a5568;
-            line-height: 1.6;
-            margin-bottom: 8px;
-            padding-left: 22px;
-            position: relative;
-        }
-
-        .slide-text-section-left li:before {
-            content: "•";
-            color: #667eea;
-            font-weight: bold;
-            position: absolute;
-            left: 8px;
-        }
-
-        .slide-image-section-right {
-            width: 45%;
-            max-width: 50%;
-            height: 100%;
-            position: relative;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 16px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .slide-image-section-right img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 14px;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Navigation Arrows - Outside the white box */
-        .slide-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #8B7EC8;
-            color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .slide-arrow:hover {
-            background: #7366B0;
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .slide-arrow.prev {
-            left: -60px;
-        }
-
-        .slide-arrow.next {
-            right: -60px;
-        }
-
-        /* Slide Indicators */
-        .slide-indicators {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 12px;
-        }
-
-        .indicator-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #D1D5DB;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .indicator-dot.active {
-            background: #667eea;
-            transform: scale(1.3);
-        }
-
-        .indicator-dot:hover {
-            background: #9CA3AF;
-        }
-
-        /* Reading Section */
-        .reading-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 80px);
-        }
-
-        .reading-nav {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .reading-subnav {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 30px;
-        }
-
-        .reading-level {
-            flex: 1;
-            position: relative;
-            height: 100%;
-            min-height: 500px;
-        }
-
-        .page-btn {
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            color: #4c51bf;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .page-btn.active, .page-btn:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border-color: transparent;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .reading-page {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 30px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            scrollbar-width: auto;
-            scrollbar-color: #c1c1c1 #f1f1f1;
-        }
-
-        .reading-page.active {
-            display: block !important;
-        }
-
-        /* Force scrollbar to always be visible */
-        .reading-page {
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .reading-page * {
-            box-sizing: border-box;
-        }
-
-        /* Simplified scrollbar styling for reading pages */
-        .reading-page::-webkit-scrollbar {
-            width: 14px;
-        }
-
-        .reading-page::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 7px;
-        }
-
-        .reading-page::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 7px;
-        }
-
-        .reading-page::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        .reading-page p {
-            color: #2d3748;
-            line-height: 1.8;
-            margin-bottom: 25px;
-            font-size: 1.15rem;
-            font-weight: 400;
-        }
-
-        .reading-page h3 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            margin-top: 35px;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
-        .vocab-link {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            position: relative;
-            font-size: 1.15rem;
-        }
-
-        .vocab-link:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .popup-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 35px;
-            max-width: 450px;
-            margin: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        .popup-word {
-            color: #2d3748;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .popup-definition {
-            color: #4a5568;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            text-align: center;
-        }
-
-        .popup-close {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 1.1rem;
-            margin-top: 20px;
-            display: block;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .popup-close:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        /* Vocabulary Section */
-        .vocab-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 120px);
-        }
-
-        .vocab-nav {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .vocab-page {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .vocab-page.active {
-            display: block;
-        }
-
-        .vocab-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            height: auto;
-            padding: 20px 0;
-        }
-
-        .flashcard {
-            background: transparent;
-            width: 100%;
-            height: 220px;
-            perspective: 1000px;
-            cursor: pointer;
-        }
-
-        .flashcard-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-
-        .flashcard.flipped .flashcard-inner {
-            transform: rotateY(180deg);
-        }
-
-        .flashcard-front, .flashcard-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            padding: 25px;
-            backdrop-filter: blur(10px);
-        }
-
-        .flashcard-front {
-            background: rgba(255, 255, 255, 0.9);
-            color: #2d3748;
-        }
-
-        .flashcard-back {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            transform: rotateY(180deg);
-        }
-
-        .flashcard-term {
-            font-weight: 700;
-            font-size: 2rem;
-            text-align: center;
-        }
-
-        .flashcard-definition {
-            font-weight: 500;
-            line-height: 1.5;
-            text-align: center;
-            font-size: 1.5rem;
-        }
-
-        .flashcard-hint {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 1.1rem;
-            color: #a0aec0;
-            opacity: 0.8;
-        }
-
-        .flashcard:hover .flashcard-inner {
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Quiz Styles */
-        .quiz-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            height: calc(100vh - 100px);
-            overflow-y: auto;
-        }
-
-        .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 1000px;
-            margin-bottom: 30px;
-            padding: 0 20px;
-        }
-
-        .question-counter {
-            color: #4a5568;
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
-
-        .quiz-nav {
-            display: flex;
-            gap: 15px;
-        }
-
-        .quiz-content {
-            width: 100%;
-            max-width: 1000px;
-            position: relative;
-            min-height: 400px;
-        }
-
-        .quiz-question {
-            display: none;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 40px;
-            margin: 0 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .quiz-question.active {
-            display: block;
-        }
-
-        .quiz-question h3 {
-            color: #2d3748;
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .multiple-choice {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .choice {
-            background: rgba(255, 255, 255, 0.8);
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            border-radius: 15px;
-            padding: 25px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            font-weight: 500;
-            color: #2d3748;
-        }
-
-        .choice:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-
-        .choice.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border-color: transparent;
-        }
-
-        .choice.correct {
-            background: rgba(72, 187, 120, 0.2);
-            border-color: #48bb78;
-        }
-
-        .choice.incorrect {
-            background: rgba(245, 101, 101, 0.2);
-            border-color: #f56565;
-        }
-
-        .quiz-input {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            padding: 20px 25px;
-            font-size: 1.4rem;
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            border-radius: 25px;
-            text-align: center;
-            font-family: inherit;
-            background: rgba(255, 255, 255, 0.8);
-            display: block;
-            transition: all 0.3s ease;
-        }
-
-        .quiz-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
-        }
-
-        .check-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border: none;
-            padding: 18px 35px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 25px auto;
-            display: block;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .check-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .check-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .nav-btn {
-            padding: 12px 25px;
-            background: rgba(45, 55, 72, 0.9);
-            color: #ffffff;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn:hover {
-            background: rgba(102, 126, 234, 0.9);
-            transform: translateY(-2px);
-        }
-
-        .nav-btn:disabled {
-            background: rgba(160, 174, 192, 0.5);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .feedback {
-            padding: 20px;
-            border-radius: 12px;
-            margin: 25px 0;
-            font-weight: 500;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        .feedback.correct {
-            background: rgba(72, 187, 120, 0.1);
-            color: #2f855a;
-            border: 1px solid rgba(72, 187, 120, 0.3);
-        }
-
-        .feedback.incorrect {
-            background: rgba(245, 101, 101, 0.1);
-            color: #c53030;
-            border: 1px solid rgba(245, 101, 101, 0.3);
-        }
-
-        .results-summary {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 50px;
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .results-summary h3 {
-            color: #2d3748;
-            font-size: 2.2rem;
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
-
-        .score {
-            font-size: 4rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 25px 0;
-        }
-
-        /* Video Section */
-        .video-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 120px);
-            padding: 15px;
-            justify-content: center;
-        }
-
-        /* Video Discussions Section */
-        .video-discussions-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 120px);
-            padding: 30px;
-            overflow-y: auto;
-        }
-
-        /* Writing Section */
-        .writing-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 100px);
-            padding: 10px;
-            overflow: hidden;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .writing-content {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 95%;
-            width: 95%;
-            margin: 0 auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            max-height: calc(100vh - 140px);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .writing-objective {
-            color: #4a5568;
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        .writing-question {
-            color: #2d3748;
-            font-size: 1.8rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .writing-form .form-group {
-            margin-bottom: 20px;
-        }
-
-        .writing-form .form-group label {
-            display: block;
-            color: #2d3748;
-            font-weight: 500;
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
-
-        .writing-form .form-group input {
-            width: 100%;
-            padding: 15px 20px;
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            border-radius: 15px;
-            font-size: 1rem;
-            font-family: inherit;
-            background: rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        .writing-form .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
-            background: rgba(255, 255, 255, 1);
-        }
-
-        .writing-form .button-container {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            justify-content: center;
-        }
-
-        .writing-form .check-button {
-            flex: 1;
-            max-width: 150px;
-        }
-
-        .tips-box {
-            background: rgba(102, 126, 234, 0.1);
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 25px 0;
-        }
-
-        .tips-box h4 {
-            color: #2d3748;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .vocab-category {
-            margin-bottom: 12px;
-            line-height: 1.6;
-        }
-
-        .vocab-category strong {
-            color: #2d3748;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .vocab-items {
-            color: #4a5568;
-            font-style: italic;
-        }
-
-        /* Mobile Responsive Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(15, 10, 30, 0.90) 0%, rgba(40, 20, 60, 0.90) 50%, rgba(20, 10, 35, 0.90) 100%), url('https://images.unsplash.com/photo-1560508801-e1d85f32f8ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(192, 132, 252, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(192, 132, 252, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(192, 132, 252, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #c084fc; box-shadow: 0 20px 60px rgba(192, 132, 252, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #c084fc; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(192, 132, 252, 0.2); color: #6b21a8; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 10px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; display: inline; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .grammar-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; padding: 18px 22px; margin: 12px 0; }
+        .grammar-box .formula { font-size: 1.1rem; font-weight: 600; color: #4c51bf; font-family: monospace; }
+        .grammar-box .example { font-size: 1rem; color: #4a5568; margin-top: 8px; font-style: italic; }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.4rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; white-space: nowrap; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(102, 126, 234, 0.15); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; font-family: inherit; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; overflow-y: auto; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80 !important; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4) !important; }
+        .quiz-card:hover { border-color: #c084fc !important; box-shadow: 0 20px 60px rgba(192, 132, 252, 0.4) !important; }
+        .writing-card:hover { border-color: #f472b6 !important; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4) !important; }
         @media (max-width: 768px) {
-            body {
-                overflow-y: auto;
-                height: auto;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            }
-
-            .header {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px 15px;
-                background: rgba(255, 255, 255, 0.95);
-            }
-
-            .header h1 {
-                font-size: 2rem;
-                margin-bottom: 15px;
-            }
-
-            .header .website a {
-                font-size: 1rem;
-            }
-
-            .header-image {
-                width: 80px;
-                height: 60px;
-                margin-top: 15px;
-            }
-
-            .container {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .navigation {
-                width: 100%;
-                padding: 20px 15px;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                justify-content: center;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-                background: rgba(45, 55, 72, 0.95);
-            }
-
-            .nav-item {
-                flex: 1;
-                min-width: 120px;
-                margin: 5px;
-                font-size: 0.95rem;
-                padding: 12px 16px;
-                border-radius: 20px;
-            }
-
-            .content {
-                height: auto;
-                overflow: visible;
-                background: rgba(255, 255, 255, 0.95);
-            }
-
-            .section {
-                padding: 25px 15px;
-                height: auto;
-                overflow: visible;
-            }
-
-            .section h2 {
-                font-size: 1.7rem;
-                text-align: center;
-                margin-bottom: 15px;
-            }
-
-            .discussion-grid {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                height: auto;
-            }
-
-            .discussion-header {
-                order: -1;
-                padding: 20px;
-            }
-
-            .actual-image {
-                width: 250px;
-                height: 150px;
-                margin: 0 auto 15px;
-                border-radius: 12px;
-            }
-
-            .discussion-question {
-                padding: 20px;
-                border-radius: 12px;
-            }
-
-            .discussion-question h3 {
-                font-size: 1.3rem;
-            }
-
-            /* Mobile styles for slideshow */
-            .slideshow-container {
-                padding: 20px 15px;
-                height: auto;
-                min-height: 100vh;
-            }
-
-            .slide-content-wrapper {
-                height: auto;
-                min-height: 80vh;
-                max-width: 100%;
-                padding: 0;
-            }
-
-            .discussion-slide {
-                padding: 20px 15px;
-                height: auto;
-                min-height: 80vh;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            }
-
-            .slide-horizontal {
-                flex-direction: column !important;
-                gap: 20px;
-            }
-
-            .slide-text-section-left {
-                max-width: 100%;
-                padding-right: 0;
-                margin-bottom: 20px;
-            }
-
-            .slide-text-section-left h3 {
-                font-size: 1.4rem;
-                margin-bottom: 15px;
-                text-align: center;
-            }
-
-            .slide-text-section-left p {
-                font-size: 1rem;
-                line-height: 1.6;
-                margin-bottom: 15px;
-                text-align: center;
-            }
-
-            .slide-text-section-left ul {
-                margin-top: 15px;
-            }
-
-            .slide-text-section-left li {
-                font-size: 0.95rem;
-                margin-bottom: 10px;
-                padding-left: 25px;
-            }
-
-            .slide-image-section-right {
-                width: 100%;
-                max-width: 100%;
-                height: 250px;
-                margin-top: 20px;
-                border-radius: 12px;
-            }
-
-            .slide-image-section-right img {
-                border-radius: 10px;
-            }
-
-            .slide-arrow {
-                width: 40px;
-                height: 40px;
-            }
-
-            .slide-arrow.prev {
-                left: -20px;
-            }
-
-            .slide-arrow.next {
-                right: -20px;
-            }
-
-            .slide-indicators {
-                bottom: 20px;
-            }
-
-            .indicator-dot {
-                width: 10px;
-                height: 10px;
-            }
-
-            .reading-nav, .reading-subnav {
-                flex-wrap: wrap;
-                gap: 8px;
-                margin-bottom: 20px;
-            }
-
-            .page-btn {
-                font-size: 1rem;
-                padding: 10px 18px;
-                border-radius: 20px;
-            }
-
-            .reading-page {
-                padding: 25px 18px;
-            }
-
-            .reading-page p {
-                font-size: 1.05rem;
-                margin-bottom: 20px;
-            }
-
-            .reading-page h3 {
-                font-size: 1.5rem;
-                margin-top: 25px;
-            }
-
-            .video-container {
-                padding: 20px 10px;
-                height: auto;
-            }
-
-            .video-discussions-container {
-                padding: 20px 15px;
-                height: auto;
-            }
-
-            .quiz-container {
-                height: auto;
-            }
-
-            .quiz-header {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .quiz-nav {
-                justify-content: center;
-            }
-
-            .nav-btn {
-                font-size: 1rem;
-                padding: 10px 20px;
-                border-radius: 20px;
-            }
-
-            .quiz-question {
-                padding: 30px 20px;
-                margin: 0 10px;
-                border-radius: 16px;
-            }
-
-            .quiz-question h3 {
-                font-size: 1.6rem;
-                margin-bottom: 25px;
-            }
-
-            .multiple-choice {
-                grid-template-columns: 1fr;
-                gap: 15px;
-                max-width: 100%;
-            }
-
-            .choice {
-                font-size: 1.1rem;
-                padding: 20px;
-                border-radius: 12px;
-            }
-
-            .quiz-input {
-                font-size: 1.3rem;
-                max-width: 100%;
-                padding: 15px 20px;
-                border-radius: 20px;
-            }
-
-            .check-button {
-                font-size: 1.3rem;
-                padding: 15px 30px;
-                margin: 20px auto;
-                border-radius: 20px;
-            }
-
-            .feedback {
-                font-size: 1rem;
-                margin: 20px 10px;
-                border-radius: 10px;
-            }
-
-            .results-summary {
-                padding: 30px 20px;
-                margin: 0 10px;
-                border-radius: 16px;
-            }
-
-            .results-summary h3 {
-                font-size: 1.8rem;
-            }
-
-            .score {
-                font-size: 3rem;
-            }
-
-            .vocab-container {
-                height: auto;
-            }
-
-            .vocab-nav {
-                gap: 8px;
-            }
-
-            .vocab-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                height: auto;
-            }
-
-            .flashcard {
-                height: 200px;
-            }
-
-            .flashcard-front, .flashcard-back {
-                border-radius: 16px;
-            }
-
-            .flashcard-term {
-                font-size: 1.7rem;
-            }
-
-            .flashcard-definition {
-                font-size: 1.3rem;
-            }
-
-            .flashcard-hint {
-                font-size: 1rem;
-            }
-
-            .popup-content {
-                margin: 15px;
-                padding: 30px 25px;
-                max-width: 90%;
-                border-radius: 16px;
-            }
-
-            .popup-word {
-                font-size: 1.6rem;
-            }
-
-            .popup-definition {
-                font-size: 1.1rem;
-            }
-
-            .popup-close {
-                border-radius: 20px;
-            }
-
-            .vocab-link {
-                font-size: 1rem;
-                padding: 3px 8px;
-                display: inline-block;
-                margin: 1px;
-                border-radius: 5px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.6rem;
-            }
-
-            .nav-item {
-                font-size: 0.85rem;
-                padding: 10px 12px;
-                min-width: 100px;
-            }
-
-            .section {
-                padding: 20px 12px;
-            }
-
-            .section h2 {
-                font-size: 1.4rem;
-                margin-bottom: 10px;
-            }
-
-            .quiz-question h3 {
-                font-size: 1.4rem;
-            }
-
-            .flashcard {
-                height: 180px;
-            }
-
-            .flashcard-term {
-                font-size: 1.5rem;
-            }
-
-            .flashcard-definition {
-                font-size: 1.2rem;
-            }
-
-            .reading-page {
-                padding: 20px 15px;
-            }
-
-            .discussion-question {
-                padding: 18px;
-            }
-
-            .actual-image {
-                width: 200px;
-                height: 120px;
-            }
-
-            .quiz-input {
-                font-size: 1.2rem;
-                padding: 12px 16px;
-            }
-
-            .check-button {
-                font-size: 1.2rem;
-                padding: 12px 25px;
-            }
-
-            /* Writing form mobile styles */
-            .writing-content {
-                padding: 30px 20px;
-                margin: 0 10px;
-            }
-
-            .writing-question {
-                font-size: 1.5rem;
-            }
-
-            .writing-form .button-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .writing-form .check-button {
-                max-width: none;
-            }
-
-            .tips-box {
-                padding: 15px;
-                margin: 20px 0;
-            }
-
-            .tips-box h4 {
-                font-size: 1.1rem;
-            }
-        }
-
-        @media (hover: none) and (pointer: coarse) {
-            .nav-item,
-            .choice,
-            .flashcard,
-            .vocab-link,
-            .check-button,
-            .page-btn {
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .vocab-link {
-                min-height: 32px;
-                line-height: 1.2;
-            }
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
         }
     </style>
 </head>
 <body>
-    <!-- Audio elements for sound effects -->
-    <audio id="flipSound" preload="auto">
-        <source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="correctSound" preload="auto">
-        <source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
 
-    <div class="header">
-        <div class="header-left">
-            <h1>Thieving Bastards</h1>
-            <div class="website">
-                <a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a>
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Thieving Bastards</h1>
+        <p class="game-subtitle">Crime, Vocabulary &amp; Rob vs Steal</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
             </div>
         </div>
-        <a href="https://www.mimlanguageservices.com/" target="_blank">
-            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image">
-        </a>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
     </div>
 
-    <div class="container">
-        <div class="navigation">
-            <div class="nav-item active" onclick="showSection('discussion', this)">Discussion</div>
-            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
-            <div class="nav-item" onclick="showSection('video', this)">Video</div>
-            <div class="nav-item" onclick="showSection('video-discussions', this)">Video Discussions</div>
-            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
-            <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
-            <div class="nav-item" onclick="openWritingForm(this)">Writing</div>
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>Thieving Bastards</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
         </div>
 
-        <div class="content">
-            <!-- Discussion Section with Slideshow -->
-            <div class="section active" id="discussion">
-                <div class="slideshow-container">
-
-                    <div class="slide-content-wrapper">
-                        <!-- Navigation Arrows - Outside the white box -->
-                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                <polyline points="15 18 9 12 15 6"></polyline>
-                            </svg>
-                        </button>
-                        <button class="slide-arrow next" onclick="changeSlide(1)">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </button>
-
-                        <!-- Slide 1 - Image Only -->
-                        <div class="discussion-slide active slide-image-only">
-                            <img src="https://images.unsplash.com/photo-1560508801-e1d85f32f8ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80" alt="Thief in Mask" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
-                        </div>
-
-                        <!-- Slide 2 -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Types of Thieves</h3>
-                                <p>Have you ever been robbed or had something stolen from you? Different thieves have different specializations and methods of operation.</p>
-                                <ul>
-                                    <li><span class="vocab-link" onclick="showPopup('pickpocket', 'a thief who steals from peoples pockets or bags in crowded places')">Pickpockets</span> operate in crowded areas like subways and markets</li>
-                                    <li><span class="vocab-link" onclick="showPopup('mugger', 'a thief who attacks and robs people using force or threats')">Muggers</span> use force or threats to rob people on the street</li>
-                                    <li><span class="vocab-link" onclick="showPopup('burglar', 'a thief who breaks into buildings to steal things')">Burglars</span> break into homes and businesses to steal valuables</li>
-                                    <li><span class="vocab-link" onclick="showPopup('shoplifter', 'a person who steals items from stores')">Shoplifters</span> steal merchandise from retail stores</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1509099652299-30938b0aeb63?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Pickpocket in crowd" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 3 -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Sophisticated Criminals</h3>
-                                <p>What do you think motivates people to become thieves? Some criminals operate with more sophistication and planning than simple street crime.</p>
-                                <ul>
-                                    <li><span class="vocab-link" onclick="showPopup('con artist', 'a person who tricks others into giving them money or valuables')">Con artists</span> use deception and manipulation to trick victims</li>
-                                    <li><span class="vocab-link" onclick="showPopup('cat burglar', 'a skilled thief who enters buildings by climbing')">Cat burglars</span> are skilled climbers who enter from high places</li>
-                                    <li><span class="vocab-link" onclick="showPopup('safecracker', 'a thief who specializes in opening safes')">Safecrackers</span> specialize in opening locked safes and vaults</li>
-                                    <li><span class="vocab-link" onclick="showPopup('fence', 'a person who buys and sells stolen goods')">Fences</span> buy stolen goods and resell them for profit</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Safe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 4 -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Tools and Methods</h3>
-                                <p>How do you protect your home from burglars? What security measures do you think are most effective?</p>
-                                <ul>
-                                    <li><span class="vocab-link" onclick="showPopup('lockpicks', 'tools used to open locks without a key')">Lockpicks</span> allow thieves to open locked doors silently</li>
-                                    <li><span class="vocab-link" onclick="showPopup('crowbar', 'a metal bar used to force open doors and windows')">Crowbars</span> are used to pry open doors and windows</li>
-                                    <li><span class="vocab-link" onclick="showPopup('getaway car', 'a vehicle used to escape after committing a crime')">Getaway cars</span> help thieves escape quickly after a robbery</li>
-                                    <li><span class="vocab-link" onclick="showPopup('accomplice', 'a person who helps another commit a crime')">Accomplices</span> work together to plan and execute crimes</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Lock and security" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-
-                        <!-- Slide 5 -->
-                        <div class="discussion-slide slide-horizontal">
-                            <div class="slide-text-section-left">
-                                <h3>Famous Heists and Their Impact</h3>
-                                <p>Can you name any famous robberies from history or movies? What makes a heist memorable or notorious?</p>
-                                <ul>
-                                    <li><span class="vocab-link" onclick="showPopup('heist', 'a carefully planned robbery, especially of money or valuables')">Heists</span> involve careful planning and coordination</li>
-                                    <li><span class="vocab-link" onclick="showPopup('loot', 'stolen money or goods')">Loot</span> is the stolen money or valuables from a crime</li>
-                                    <li>Famous heists like the Great Train Robbery fascinate the public</li>
-                                    <li>Banks, museums, and jewelry stores are common targets</li>
-                                </ul>
-                            </div>
-                            <div class="slide-image-section-right">
-                                <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Bank vault" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide Indicators -->
-                    <div class="slide-indicators">
-                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
-                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
-                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
-                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
-                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
-                    </div>
-                </div>
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
             </div>
 
-            <!-- Reading Section -->
-            <div class="section" id="reading">
-                <h2>Reading: The Evolution of Theft</h2>
-                <div class="reading-container">
-                    <div class="reading-nav">
-                        <button class="page-btn active" onclick="showPage(1)">Page 1</button>
-                        <button class="page-btn" onclick="showPage(2)">Page 2</button>
-                        <button class="page-btn" onclick="showPage(3)">Page 3</button>
-                    </div>
-                    <div class="reading-level">
-                        <div class="reading-page active" id="page1">
-                            <h3>The Art of Stealing Through the Ages</h3>
-                            <p>Throughout history, thieves have adapted their methods to match the times. In ancient Rome, <span class="vocab-link" onclick="showPopup('pickpockets', 'thieves who steal from peoples pockets or bags')">pickpockets</span> worked the crowded forums and bathhouses, while medieval <span class="vocab-link" onclick="showPopup('bandits', 'armed robbers who attack travelers')">bandits</span> ambushed travelers on lonely roads. The profession of thievery has always existed alongside civilization itself.</p>
+            <div class="content">
 
-                            <p>In the Victorian era, London became famous for its organized crime. <span class="vocab-link" onclick="showPopup('gangs', 'organized groups of criminals')">Gangs</span> of street urchins were trained as pickpockets by criminal masterminds. These young thieves would <span class="vocab-link" onclick="showPopup('rob', 'to steal from a person or place using force or threat')">rob</span> wealthy gentlemen in broad daylight, disappearing into the maze of narrow alleyways before anyone could catch them.</p>
+                <!-- LESSON / SLIDESHOW SECTION -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
 
-                            <p>The key distinction in theft vocabulary is understanding when to use "rob" versus "steal." You <span class="vocab-link" onclick="showPopup('rob', 'to take something from a person or place')">rob</span> a person or a place (rob a bank, rob someone), but you <span class="vocab-link" onclick="showPopup('steal', 'to take an object without permission')">steal</span> an object (steal money, steal a car). A <span class="vocab-link" onclick="showPopup('burglar', 'someone who breaks into buildings to steal')">burglar</span> might rob a house by stealing jewelry and electronics.</p>
-                        </div>
+                            <!-- Slide 1 - Title -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(15, 10, 30, 0.92) 0%, rgba(45, 20, 70, 0.92) 100%), url('https://images.unsplash.com/photo-1560508801-e1d85f32f8ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; padding: 0;">
+                                <div style="text-align: center; color: white; padding: 40px;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; font-weight: 700; text-shadow: 0 0 30px rgba(192, 132, 252, 0.8);">Thieving Bastards</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8; letter-spacing: 1px;">Crime, Vocabulary &amp; Rob vs Steal</p>
+                                </div>
+                            </div>
 
-                        <div class="reading-page" id="page2">
-                            <h3>Modern Thieves and Their Methods</h3>
-                            <p>Today's criminals have access to technology that Victorian thieves could never have imagined. However, the basic principles remain the same. A <span class="vocab-link" onclick="showPopup('mugger', 'a thief who attacks people on the street')">mugger</span> still relies on surprise and intimidation, while a <span class="vocab-link" onclick="showPopup('shoplifter', 'someone who steals from stores')">shoplifter</span> depends on distraction and concealment.</p>
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/jM8dCGIm6yc?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
 
-                            <p>Professional <span class="vocab-link" onclick="showPopup('burglars', 'thieves who break into buildings')">burglars</span> study their targets carefully. They observe routines, identify security weaknesses, and plan their crimes meticulously. Some use traditional <span class="vocab-link" onclick="showPopup('lockpicks', 'tools for opening locks without keys')">lockpicks</span>, while others prefer brute force with a <span class="vocab-link" onclick="showPopup('crowbar', 'a metal bar for forcing open doors')">crowbar</span>. The most skilled thieves can enter and exit a building without leaving any trace.</p>
-
-                            <p>Organized <span class="vocab-link" onclick="showPopup('heists', 'carefully planned major robberies')">heists</span> require teams of specialists. One person might be the <span class="vocab-link" onclick="showPopup('safecracker', 'an expert at opening safes')">safecracker</span>, another the lookout, and a third the <span class="vocab-link" onclick="showPopup('getaway driver', 'the person who drives the escape vehicle')">getaway driver</span>. Each <span class="vocab-link" onclick="showPopup('accomplice', 'a person who helps commit a crime')">accomplice</span> plays a crucial role in the operation's success.</p>
-                        </div>
-
-                        <div class="reading-page" id="page3">
-                            <h3>The Criminal Economy</h3>
-                            <p>Stealing valuables is only half the challenge. Thieves must then convert their <span class="vocab-link" onclick="showPopup('loot', 'stolen goods or money')">loot</span> into cash without getting caught. This is where the <span class="vocab-link" onclick="showPopup('fence', 'a dealer in stolen goods')">fence</span> becomes essential. These middlemen purchase stolen items at a fraction of their value and resell them through various channels.</p>
-
-                            <p>Some thieves specialize in particular types of crime. <span class="vocab-link" onclick="showPopup('cat burglars', 'thieves who enter by climbing')">Cat burglars</span> are athletic individuals who scale buildings to enter through upper-story windows. <span class="vocab-link" onclick="showPopup('con artists', 'criminals who use deception')">Con artists</span> prefer psychological manipulation over physical theft, tricking victims into voluntarily handing over their money or valuables.</p>
-
-                            <p>Despite advances in security technology—alarms, cameras, biometric locks—theft remains a persistent problem. The eternal game between those who <span class="vocab-link" onclick="showPopup('steal', 'to take without permission')">steal</span> and those who protect continues. Whether someone robs a convenience store or steals a priceless painting from a museum, the fundamental human motivations of greed, desperation, and opportunity remain unchanged across centuries.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Video Section -->
-            <div class="section" id="video">
-                <h2>Watch & Learn</h2>
-                <div class="video-container">
-                    <iframe width="100%" height="100%" style="border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);"
-                            src="https://www.youtube.com/embed/jM8dCGIm6yc"
-                            title="YouTube video player"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                    </iframe>
-                </div>
-            </div>
-
-            <!-- Video Discussions Section -->
-            <div class="section" id="video-discussions">
-                <h2>Video Discussion Questions</h2>
-                <div class="video-discussions-container">
-                    <div style="background: rgba(255, 255, 255, 0.9); border-radius: 20px; padding: 35px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
-                        <h3 style="color: #2d3748; font-size: 1.6rem; margin-bottom: 25px; text-align: center;">Discussion Questions</h3>
-
-                        <div style="margin-bottom: 30px; padding: 25px; background: rgba(102, 126, 234, 0.05); border-left: 4px solid #667eea; border-radius: 10px;">
-                            <h4 style="color: #2d3748; font-size: 1.3rem; margin-bottom: 15px;">Question 1: Types of Theft</h4>
-                            <p style="color: #4a5568; line-height: 1.8; font-size: 1.1rem;">According to the video, what are the most common types of theft in urban areas? Which type do you think would be most difficult to prevent?</p>
-                        </div>
-
-                        <div style="margin-bottom: 30px; padding: 25px; background: rgba(102, 126, 234, 0.05); border-left: 4px solid #667eea; border-radius: 10px;">
-                            <h4 style="color: #2d3748; font-size: 1.3rem; margin-bottom: 15px;">Question 2: Security Measures</h4>
-                            <p style="color: #4a5568; line-height: 1.8; font-size: 1.1rem;">What security measures were discussed in the video? Have you implemented any of these in your own home or workplace?</p>
-                        </div>
-
-                        <div style="margin-bottom: 30px; padding: 25px; background: rgba(102, 126, 234, 0.05); border-left: 4px solid #667eea; border-radius: 10px;">
-                            <h4 style="color: #2d3748; font-size: 1.3rem; margin-bottom: 15px;">Question 3: Psychology of Theft</h4>
-                            <p style="color: #4a5568; line-height: 1.8; font-size: 1.1rem;">The video mentioned various motivations for stealing. In your opinion, what drives most people to commit theft? Is it desperation, greed, or something else?</p>
-                        </div>
-
-                        <div style="margin-bottom: 30px; padding: 25px; background: rgba(102, 126, 234, 0.05); border-left: 4px solid #667eea; border-radius: 10px;">
-                            <h4 style="color: #2d3748; font-size: 1.3rem; margin-bottom: 15px;">Question 4: Personal Experience</h4>
-                            <p style="color: #4a5568; line-height: 1.8; font-size: 1.1rem;">Have you or someone you know ever been the victim of theft? How did it make you feel, and did it change your behavior regarding security?</p>
-                        </div>
-
-                        <div style="padding: 25px; background: rgba(102, 126, 234, 0.05); border-left: 4px solid #667eea; border-radius: 10px;">
-                            <h4 style="color: #2d3748; font-size: 1.3rem; margin-bottom: 15px;">Question 5: Modern Solutions</h4>
-                            <p style="color: #4a5568; line-height: 1.8; font-size: 1.1rem;">How has technology changed the way we protect ourselves from thieves? Do you think modern security systems are effective, or do thieves always find new ways to adapt?</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vocabulary Section -->
-            <div class="section" id="vocabulary">
-                <h2>Thief Vocabulary</h2>
-                <div class="vocab-container">
-                    <div class="vocab-nav">
-                        <button class="page-btn active" onclick="showVocabPage(1, this)">Types of Thieves</button>
-                        <button class="page-btn" onclick="showVocabPage(2, this)">Tools & Methods</button>
-                        <button class="page-btn" onclick="showVocabPage(3, this)">Rob vs Steal</button>
-                    </div>
-
-                    <div class="vocab-page active" id="vocab-page-1">
-                        <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Pickpocket</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
+                            <!-- Slide 3 - Types of Thieves -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Types of Thieves</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>There are many different types of thieves. Each one has a different way of stealing. Have you ever been robbed or had something stolen from you?</p>
+                                        <ul>
+                                            <li>A <span class="vocab-link" onclick="showPopup('pickpocket', 'A thief who steals from people\'s pockets or bags in crowded places')">pickpocket</span> works in crowded places like markets or public transport</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('mugger', 'A thief who attacks and robs people on the street using force or threats')">mugger</span> attacks people on the street and takes their phone or wallet</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('burglar', 'A thief who breaks into buildings to steal things, usually at night')">burglar</span> breaks into houses or shops, usually at night</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('shoplifter', 'A person who steals items from shops without paying')">shoplifter</span> steals things from shops without paying</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> Which type of thief do you think is most common in your city? Which is the most dangerous?</p>
                                     </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A thief who steals from people's pockets or bags in crowded places</div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The criminal world has a surprisingly rich vocabulary for different types of thieves. Each specialisation reflects distinct skills, risk tolerance, and target preference.</p>
+                                        <ul>
+                                            <li>A <span class="vocab-link" onclick="showPopup('con artist', 'A person who tricks others into giving them money or valuables through deception and psychological manipulation')">con artist</span> relies on psychological manipulation rather than force — the most cerebral of criminals</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('cat burglar', 'A skilled thief who enters buildings by climbing, typically targeting upper floors or rooftops')">cat burglar</span> combines athleticism and stealth to enter through high windows or skylights</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('safecracker', 'A thief who specialises in opening locked safes and vaults using technical skill')">safecracker</span> brings technical expertise — listening to tumblers, exploiting mechanical weaknesses</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('fence', 'A middleman who buys stolen goods from thieves and resells them for profit')">fence</span> is the criminal economy's merchant — converting stolen property into untraceable cash</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> What do you think motivates people to become professional criminals? Is it purely money, or are there other factors?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Criminal typologies reveal as much about society as they do about individual psychology. The specialisation of theft reflects the economic and social conditions of a given era.</p>
+                                        <ul>
+                                            <li><span class="vocab-link" onclick="showPopup('recidivist', 'A person who repeatedly commits crimes after being caught and punished — a habitual offender')">Recidivists</span> account for a disproportionate share of criminal activity — a small number of persistent offenders drive the majority of acquisitive crime</li>
+                                            <li>The distinction between <span class="vocab-link" onclick="showPopup('opportunistic crime', 'Theft committed spontaneously when an opportunity presents itself, without prior planning')">opportunistic</span> and <span class="vocab-link" onclick="showPopup('premeditated crime', 'A crime planned deliberately in advance — affects both the charge and the sentence')">premeditated</span> crime is central to criminal law, affecting both the charge and the sentence</li>
+                                            <li><span class="vocab-link" onclick="showPopup('white-collar crime', 'Non-violent crime committed by professionals for financial gain — fraud, embezzlement, money laundering')">White-collar criminals</span> — fraudsters, embezzlers, money launderers — often cause greater aggregate financial harm than street thieves, yet are prosecuted far less frequently</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> Is white-collar crime treated too leniently compared to street crime? What systemic factors might explain any disparity?</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1509099652299-30938b0aeb63?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Crowded street">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Rob vs Steal (Grammar) -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Grammar: Rob vs Steal</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Many English learners confuse <strong>rob</strong> and <strong>steal</strong>. They mean similar things, but we use them very differently.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">ROB = person or place (the victim)</div>
+                                            <div class="example">"They robbed the bank." &nbsp;/&nbsp; "He robbed me."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">STEAL = an object (the thing taken)</div>
+                                            <div class="example">"She stole my wallet." &nbsp;/&nbsp; "They stole the painting."</div>
+                                        </div>
+                                        <p>A quick test: if the next word is a person or a place, use <strong>rob</strong>. If it is a thing, use <strong>steal</strong>.</p>
+                                        <p><strong>Practice:</strong></p>
+                                        <ul>
+                                            <li>"Someone ___ my car." (stole)</li>
+                                            <li>"They ___ the jewellery shop." (robbed)</li>
+                                            <li>"He ___ £500 from his employer." (stole)</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The <strong>rob/steal</strong> distinction is one of the most commonly tested in English exams — and one of the most frequently confused by learners at all levels.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">ROB + [person/place] → focus on the victim</div>
+                                            <div class="example">"The gang robbed three banks in a single week." / "She was robbed at knifepoint."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">STEAL + [object] → focus on what was taken</div>
+                                            <div class="example">"They stole €2 million in diamonds." / "Someone stole her identity."</div>
+                                        </div>
+                                        <p>You can combine both: <em>"They <strong>robbed</strong> the museum and <strong>stole</strong> three Picassos."</em></p>
+                                        <p>Related legal terms: <span class="vocab-link" onclick="showPopup('robbery', 'The crime of stealing from a person or place using force or the threat of force — victim must be present')">robbery</span>, <span class="vocab-link" onclick="showPopup('burglary', 'The crime of illegally entering a building with intent to commit a crime, especially theft')">burglary</span>, <span class="vocab-link" onclick="showPopup('theft', 'The general legal term for taking someone\'s property without permission — no force required')">theft</span>.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The rob/steal distinction maps onto a fundamental legal distinction: <strong>robbery</strong> requires a victim who is present and subject to force or threat; <strong>theft</strong> (or <strong>larceny</strong>) does not require the victim's presence.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">ROBBERY: force/threat + victim present → "rob" a person or place</div>
+                                            <div class="example">"The cashier was robbed at gunpoint." (victim present, immediate threat)</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">THEFT / LARCENY: no force required → "steal" an object</div>
+                                            <div class="example">"The Mona Lisa was stolen from the Louvre in 1911." (no confrontation)</div>
+                                        </div>
+                                        <p><span class="vocab-link" onclick="showPopup('grand larceny', 'Theft of property above a certain value threshold, classified as a felony in most legal systems')">Grand larceny</span>, <span class="vocab-link" onclick="showPopup('embezzlement', 'Theft by a person entrusted with the money or property they steal — e.g. an employee stealing from their employer')">embezzlement</span>, and <span class="vocab-link" onclick="showPopup('extortion', 'Obtaining money or goods through threats, intimidation, or abuse of power — coercion rather than direct theft')">extortion</span> each occupy distinct positions in criminal law, reflecting the mode, scale, and relationship between offender and victim.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Lock and security">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Tools & Methods -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Tools &amp; Methods</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Different thieves use different tools. Here are some of the most common words for the things thieves use:</p>
+                                        <ul>
+                                            <li><span class="vocab-link" onclick="showPopup('lockpicks', 'Small metal tools used to open locks without a key')">Lockpicks</span> — small metal tools that open locks without a key, silently</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('crowbar', 'A heavy metal bar used to force open doors, windows, or safes')">crowbar</span> — a heavy metal bar used to force open doors or windows</li>
+                                            <li>A <span class="vocab-link" onclick="showPopup('getaway car', 'A vehicle waiting outside to help criminals escape quickly after a crime')">getaway car</span> — the car waiting outside to help thieves escape fast</li>
+                                            <li>An <span class="vocab-link" onclick="showPopup('accomplice', 'A person who helps another commit a crime — e.g. acting as a lookout')">accomplice</span> — someone who helps the thief, for example by keeping watch</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> What do you think is the most important thing for a thief — speed, careful planning, or the right tools?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Professional criminals treat their craft with the same attention to planning as any specialist. A well-executed burglary typically involves multiple stages:</p>
+                                        <ul>
+                                            <li><strong>Reconnaissance:</strong> observing the target for days or weeks — learning routines, identifying security gaps, planning entry and exit</li>
+                                            <li><strong>Tools:</strong> <span class="vocab-link" onclick="showPopup('lockpicks', 'Small metal tools used to open locks without a key')">lockpicks</span>, glass cutters, signal jammers (to disable wireless alarms), and electronic key cloners</li>
+                                            <li><strong>The team:</strong> a driver, a lookout, and the specialists who enter the building — each with a defined role</li>
+                                            <li><strong>The exit:</strong> a clean <span class="vocab-link" onclick="showPopup('getaway car', 'A vehicle waiting outside to help criminals escape quickly after a crime')">getaway</span>, pre-planned escape routes, and a <span class="vocab-link" onclick="showPopup('fence', 'A middleman who buys stolen goods from thieves and resells them for profit')">fence</span> already arranged</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> How has technology changed crime — both making it easier to commit and easier to detect and prosecute?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The arms race between criminal methodology and law enforcement capability is continuous and adaptive. Each advance in security technology is met with creative countermeasures.</p>
+                                        <ul>
+                                            <li><span class="vocab-link" onclick="showPopup('social engineering', 'Manipulating people psychologically to gain access to information, systems, or property — cheaper and often more effective than technical attacks')">Social engineering</span> has become the most cost-effective attack vector — it is cheaper to deceive a human than to defeat a modern electronic security system</li>
+                                            <li>Cybercrime blurs traditional legal boundaries: <span class="vocab-link" onclick="showPopup('ransomware', 'Malicious software that encrypts a victim\'s data and demands payment for the decryption key — a form of digital extortion')">ransomware</span> is extortion; account takeover is theft; identity fraud combines elements of both</li>
+                                            <li>Cryptocurrency has transformed the <span class="vocab-link" onclick="showPopup('money laundering', 'The process of making illegally obtained money appear legitimate by passing it through a series of financial transactions')">laundering</span> of criminal proceeds, posing novel challenges for financial intelligence agencies worldwide</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> Should cybercrime carry the same penalties as physical theft of equivalent value? What are the arguments for and against?</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Safe and vault">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Famous Heists -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Famous Heists in History</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Some robberies are so famous that everyone knows about them. Here are two of the most well-known:</p>
+                                        <ul>
+                                            <li><strong>The Great Train Robbery (1963):</strong> A gang of 17 people stopped a Royal Mail train in England and stole £2.6 million in cash. The <span class="vocab-link" onclick="showPopup('loot', 'Stolen money or goods')">loot</span> was never fully recovered. Most of their <span class="vocab-link" onclick="showPopup('accomplice', 'A person who helps another commit a crime')">accomplices</span> were eventually caught.</li>
+                                            <li><strong>The Mona Lisa (1911):</strong> A man stole the most famous painting in the world from the Louvre museum in Paris. He hid it under his coat and walked out! It was missing for two years before he was caught.</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> Why do you think some famous criminals become celebrities? Is there something exciting about a clever heist?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>History's most celebrated heists share a common quality: they expose the gap between institutional confidence in security systems and the ingenuity of those determined to defeat them.</p>
+                                        <ul>
+                                            <li><strong>The Antwerp Diamond Heist (2003):</strong> Thieves bypassed what was described as the world's most secure vault — 123 out of 160 safety deposit boxes were emptied over a weekend. Total losses exceeded $100 million. Most of the <span class="vocab-link" onclick="showPopup('loot', 'Stolen money or goods')">loot</span> was never recovered.</li>
+                                            <li><strong>Isabella Stewart Gardner Museum (1990):</strong> Two men dressed as police officers stole 13 works of art worth an estimated $500 million. It remains the largest property theft in US history — no arrests have ever been made.</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> Why do you think some stolen artworks are never sold? What happens to them?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>High-profile heists function as cultural texts — they expose contradictions in how societies assign value, protect property, and construct narratives of criminality. The romanticisation of the "gentleman thief" in popular culture reflects an ambivalence about the legitimacy of existing property arrangements.</p>
+                                        <ul>
+                                            <li>The <strong>Baker Street vault robbery (1971)</strong> exemplifies institutional failure and state concealment: tunnelling from a rented shop, thieves breached Lloyd's Bank over a bank holiday weekend — and the story was suppressed by a <em>D-notice</em> for decades, suggesting the stolen contents implicated public figures</li>
+                                            <li><span class="vocab-link" onclick="showPopup('racketeering', 'Running an organised criminal enterprise through sustained illegal activity — typically involving a division of labour and hierarchy of command')">Organised crime</span> heists are distinguished from opportunistic theft by their operational complexity, division of labour, and the sophisticated <span class="vocab-link" onclick="showPopup('money laundering', 'The process of making illegally obtained money appear legitimate')">laundering</span> infrastructure required to monetise the proceeds</li>
+                                        </ul>
+                                        <p><strong>Discussion:</strong> Should stolen cultural property — art, antiquities — be treated differently from stolen money under criminal law?</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Bank vault">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Key Takeaways & Discussion -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways &amp; Discussion</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Let's review what we learned today:</p>
+                                        <ul>
+                                            <li>There are many types of thieves: <span class="vocab-link" onclick="showPopup('pickpocket', 'A thief who steals from people\'s pockets in crowded places')">pickpockets</span>, <span class="vocab-link" onclick="showPopup('mugger', 'A thief who attacks people using force or threats')">muggers</span>, <span class="vocab-link" onclick="showPopup('burglar', 'A thief who breaks into buildings to steal')">burglars</span>, and <span class="vocab-link" onclick="showPopup('shoplifter', 'A person who steals from shops')">shoplifters</span></li>
+                                            <li>Use <strong>rob</strong> with a person or a place: "rob the bank", "rob someone"</li>
+                                            <li>Use <strong>steal</strong> with an object: "steal money", "steal a car"</li>
+                                            <li>Thieves use tools like <span class="vocab-link" onclick="showPopup('lockpicks', 'Small tools to open locks without a key')">lockpicks</span> and work with <span class="vocab-link" onclick="showPopup('accomplice', 'A person who helps commit a crime')">accomplices</span></li>
+                                        </ul>
+                                        <p><strong>Final discussion:</strong></p>
+                                        <ul>
+                                            <li>Have you or anyone you know ever been robbed? What happened?</li>
+                                            <li>What is the best way to protect yourself from thieves?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Core takeaways from today's lesson:</p>
+                                        <ul>
+                                            <li>Criminal vocabulary is richly specialised — each type of theft has its own term reflecting the method, target, and level of sophistication</li>
+                                            <li><strong>Rob</strong> targets a person or place; <strong>steal</strong> targets an object — a distinction mirrored in criminal law (robbery vs theft)</li>
+                                            <li>Famous heists reveal systemic vulnerabilities: the most elaborate security systems can be defeated by the most creative criminals</li>
+                                            <li>The criminal economy depends on a chain — thief → <span class="vocab-link" onclick="showPopup('fence', 'A dealer in stolen goods — the middleman who converts stolen property into cash')">fence</span> → buyer — disrupting any link disrupts the whole operation</li>
+                                        </ul>
+                                        <p><strong>Final discussion:</strong></p>
+                                        <ul>
+                                            <li>Is there a moral difference between stealing from a large corporation and stealing from an individual?</li>
+                                            <li>Do you think tougher sentences actually reduce crime?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Salient conclusions:</p>
+                                        <ul>
+                                            <li>Criminal typology reflects the socioeconomic conditions of its time — theft vocabulary is a window into how societies organise and protect value</li>
+                                            <li>The rob/steal distinction maps onto a fundamental legal distinction between robbery (aggravated, victim-present) and theft (non-confrontational larceny)</li>
+                                            <li><span class="vocab-link" onclick="showPopup('recidivist', 'A person who repeatedly commits crimes after being caught and punished')">Recidivism</span> data consistently challenge purely punitive approaches — rehabilitation, employment support, and housing stability show stronger long-term results for reducing reoffending</li>
+                                            <li>The romanticisation of heists in popular culture raises questions about the social construction of criminality and the legitimacy of property relations</li>
+                                        </ul>
+                                        <p><strong>Final discussion:</strong></p>
+                                        <ul>
+                                            <li>Is <span class="vocab-link" onclick="showPopup('white-collar crime', 'Non-violent crime committed by professionals for financial gain — fraud, embezzlement, tax evasion')">white-collar crime</span> treated proportionately to the harm it causes?</li>
+                                            <li>Does criminalising poverty through harsh sentencing for petty theft reflect a failure of social policy?</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1509099652299-30938b0aeb63?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Discussion">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Lesson Complete -->
+                            <div class="discussion-slide" style="padding: 0;">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(15, 10, 30, 0.97) 0%, rgba(45, 20, 70, 0.97) 50%, rgba(25, 10, 45, 0.97) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Mugger</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A thief who attacks and robs people using force or threats</div>
-                                    </div>
-                                </div>
-                            </div>
+                        </div><!-- end slide-content-wrapper -->
 
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Burglar</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A thief who breaks into buildings to steal things</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Shoplifter</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A person who steals items from stores</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Con Artist</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A person who tricks others into giving them money or valuables</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Cat Burglar</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A skilled thief who enters buildings by climbing</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="vocab-page" id="vocab-page-2">
-                        <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Lockpicks</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Tools used to open locks without a key</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Crowbar</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A metal bar used to force open doors and windows</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Getaway Car</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A vehicle used to escape after committing a crime</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Accomplice</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A person who helps another commit a crime</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Heist</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A carefully planned robbery, especially of money or valuables</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Loot</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">Stolen money or goods</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="vocab-page" id="vocab-page-3">
-                        <div class="vocab-grid">
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">ROB</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">To steal from a PERSON or PLACE (rob someone, rob a bank)</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">STEAL</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">To take an OBJECT without permission (steal money, steal a car)</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Fence</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A person who buys and sells stolen goods</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Safecracker</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A thief who specializes in opening safes</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Bandit</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">An armed robber who attacks travelers or isolated places</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flashcard" onclick="flipCard(this)">
-                                <div class="flashcard-inner">
-                                    <div class="flashcard-front">
-                                        <div class="flashcard-term">Thief</div>
-                                        <div class="flashcard-hint">Click to see definition</div>
-                                    </div>
-                                    <div class="flashcard-back">
-                                        <div class="flashcard-definition">A person who steals - general term for all types</div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Interactive Quiz Section -->
-            <div class="section" id="quiz">
-                <h2>Interactive Quiz</h2>
-                <div class="quiz-container">
-                    <div class="quiz-header">
-                        <div class="question-counter">
-                            Question <span id="currentQuestion">1</span> of <span id="totalQuestions">10</span>
+                <!-- VOCABULARY SECTION -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+
+                        <!-- B1 Vocabulary -->
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Pickpocket</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A thief who steals from people's pockets or bags in crowded places</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Mugger</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A thief who attacks and robs people on the street using force or threats</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Burglar</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A thief who breaks into buildings to steal things, usually at night</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Shoplifter</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person who steals items from shops without paying</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">ROB</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To steal from a PERSON or PLACE: "rob the bank", "rob someone"</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">STEAL</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To take an OBJECT without permission: "steal money", "steal a car"</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Loot</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Stolen money or goods</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Getaway Car</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A vehicle used to escape quickly after committing a crime</div></div></div></div>
+                            </div>
                         </div>
-                        <div class="quiz-nav">
-                            <button class="nav-btn" id="prevBtn" onclick="changeQuestion(-1)" disabled>Previous</button>
-                            <button class="nav-btn" id="nextBtn" onclick="changeQuestion(1)">Next</button>
+
+                        <!-- B2 Vocabulary -->
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Con Artist</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person who tricks others into giving them money or valuables through deception and psychological manipulation</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cat Burglar</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A skilled thief who enters buildings by climbing, typically targeting upper floors or rooftops</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Safecracker</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A thief who specialises in opening locked safes and vaults using technical skill</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Fence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A middleman who buys stolen goods from thieves and resells them for profit</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accomplice</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person who helps another commit a crime — can be prosecuted even without committing the act directly</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Heist</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A carefully planned robbery of a large amount of money or high-value goods</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Lockpicks</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Small metal tools used to open locks without a key — illegal to carry in many countries</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Bandit</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An armed robber who attacks travellers or isolated places — associated with historical outlaw gangs</div></div></div></div>
+                            </div>
                         </div>
+
+                        <!-- C1 Vocabulary -->
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Larceny</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The legal term for theft — taking someone's property without consent or force; does not require a victim to be present</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Embezzlement</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Stealing money or property entrusted to one's care — typically by an employee stealing from their employer</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Extortion</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Obtaining money or goods through threats, intimidation, or abuse of power — coercion rather than direct theft</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Contraband</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Goods that are illegal to possess, trade, or transport — definition varies by jurisdiction</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Felony</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A serious crime typically punishable by imprisonment of more than one year — the most severe category of criminal offence</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Recidivist</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person who repeatedly commits crimes after being caught and punished — a habitual reoffender</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Money Laundering</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of disguising illegally obtained money as legitimate income by passing it through a series of transactions</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Racketeering</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Running an organised criminal enterprise through a sustained pattern of illegal activity — the basis of RICO prosecutions</div></div></div></div>
+                            </div>
+                        </div>
+
                     </div>
+                </div>
 
-                    <div class="quiz-content">
-                        <!-- Question 1 -->
-                        <div class="quiz-question active" data-question="1">
-                            <h3>What do you call a thief who steals from people's pockets in crowded places?</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'pickpocket')">Pickpocket</div>
-                                <div class="choice" onclick="selectChoice(this, 'mugger')">Mugger</div>
-                                <div class="choice" onclick="selectChoice(this, 'burglar')">Burglar</div>
-                                <div class="choice" onclick="selectChoice(this, 'shoplifter')">Shoplifter</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('pickpocket', 1)">Check Answer</button>
-                            <div class="feedback" id="feedback1" style="display: none;"></div>
+                <!-- QUIZ SECTION -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
                         </div>
-
-                        <!-- Question 2 -->
-                        <div class="quiz-question" data-question="2">
-                            <h3>Which verb is correct? "Someone _____ the bank last night."</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'robbed')">robbed</div>
-                                <div class="choice" onclick="selectChoice(this, 'stole')">stole</div>
-                                <div class="choice" onclick="selectChoice(this, 'burgled')">burgled</div>
-                                <div class="choice" onclick="selectChoice(this, 'mugged')">mugged</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('robbed', 2)">Check Answer</button>
-                            <div class="feedback" id="feedback2" style="display: none;"></div>
-                        </div>
-
-                        <!-- Question 3 -->
-                        <div class="quiz-question" data-question="3">
-                            <h3>What tool is used to force open doors and windows?</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'lockpicks')">Lockpicks</div>
-                                <div class="choice" onclick="selectChoice(this, 'crowbar')">Crowbar</div>
-                                <div class="choice" onclick="selectChoice(this, 'screwdriver')">Screwdriver</div>
-                                <div class="choice" onclick="selectChoice(this, 'hammer')">Hammer</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('crowbar', 3)">Check Answer</button>
-                            <div class="feedback" id="feedback3" style="display: none;"></div>
-                        </div>
-
-                        <!-- Question 4 -->
-                        <div class="quiz-question" data-question="4">
-                            <h3>A person who buys and sells stolen goods is called a _____.</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'dealer')">Dealer</div>
-                                <div class="choice" onclick="selectChoice(this, 'fence')">Fence</div>
-                                <div class="choice" onclick="selectChoice(this, 'merchant')">Merchant</div>
-                                <div class="choice" onclick="selectChoice(this, 'broker')">Broker</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('fence', 4)">Check Answer</button>
-                            <div class="feedback" id="feedback4" style="display: none;"></div>
-                        </div>
-
-                        <!-- Question 5 -->
-                        <div class="quiz-question" data-question="5">
-                            <h3>Which is correct? "A thief _____ my wallet while I was on the bus."</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'robbed')">robbed</div>
-                                <div class="choice" onclick="selectChoice(this, 'stole')">stole</div>
-                                <div class="choice" onclick="selectChoice(this, 'burgled')">burgled</div>
-                                <div class="choice" onclick="selectChoice(this, 'mugged')">mugged</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('stole', 5)">Check Answer</button>
-                            <div class="feedback" id="feedback5" style="display: none;"></div>
-                        </div>
-
-                        <!-- Question 6 -->
-                        <div class="quiz-question" data-question="6">
-                            <h3>What do you call a carefully planned major robbery?</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'theft')">Theft</div>
-                                <div class="choice" onclick="selectChoice(this, 'heist')">Heist</div>
-                                <div class="choice" onclick="selectChoice(this, 'burglary')">Burglary</div>
-                                <div class="choice" onclick="selectChoice(this, 'mugging')">Mugging</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('heist', 6)">Check Answer</button>
-                            <div class="feedback" id="feedback6" style="display: none;"></div>
-                        </div>
-
-                        <!-- Question 7 -->
-                        <div class="quiz-question" data-question="7">
-                            <h3>A thief who uses deception and trickery rather than force is called a _____.</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'mugger')">Mugger</div>
-                                <div class="choice" onclick="selectChoice(this, 'burglar')">Burglar</div>
-                                <div class="choice" onclick="selectChoice(this, 'con artist')">Con artist</div>
-                                <div class="choice" onclick="selectChoice(this, 'pickpocket')">Pickpocket</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('con artist', 7)">Check Answer</button>
-                            <div class="feedback" id="feedback7" style="display: none;"></div>
-                        </div>
-
-                        <!-- Question 8 -->
-                        <div class="quiz-question" data-question="8">
-                            <h3>Which is correct? "They _____ me on the street and took my phone."</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'stole')">stole</div>
-                                <div class="choice" onclick="selectChoice(this, 'robbed')">robbed</div>
-                                <div class="choice" onclick="selectChoice(this, 'burgled')">burgled</div>
-                                <div class="choice" onclick="selectChoice(this, 'shoplifted')">shoplifted</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('robbed', 8)">Check Answer</button>
-                            <div class="feedback" id="feedback8" style="display: none;"></div>
-                        </div>
-
-                        <!-- Question 9 -->
-                        <div class="quiz-question" data-question="9">
-                            <h3>A thief who breaks into buildings to steal is called a _____.</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'mugger')">Mugger</div>
-                                <div class="choice" onclick="selectChoice(this, 'burglar')">Burglar</div>
-                                <div class="choice" onclick="selectChoice(this, 'pickpocket')">Pickpocket</div>
-                                <div class="choice" onclick="selectChoice(this, 'shoplifter')">Shoplifter</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('burglar', 9)">Check Answer</button>
-                            <div class="feedback" id="feedback9" style="display: none;"></div>
-                        </div>
-
-                        <!-- Question 10 -->
-                        <div class="quiz-question" data-question="10">
-                            <h3>Stolen money or goods are called _____.</h3>
-                            <div class="multiple-choice">
-                                <div class="choice" onclick="selectChoice(this, 'treasure')">Treasure</div>
-                                <div class="choice" onclick="selectChoice(this, 'loot')">Loot</div>
-                                <div class="choice" onclick="selectChoice(this, 'booty')">Booty</div>
-                                <div class="choice" onclick="selectChoice(this, 'goods')">Goods</div>
-                            </div>
-                            <button class="check-button" onclick="checkAnswer('loot', 10)">Check Answer</button>
-                            <div class="feedback" id="feedback10" style="display: none;"></div>
-                        </div>
-
-                        <!-- Results Screen -->
-                        <div class="quiz-question" id="results-screen" style="display: none;">
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
                             <div class="results-summary">
                                 <h3>Quiz Complete!</h3>
-                                <div class="score" id="final-score">0/10</div>
-                                <p style="color: #4a5568; font-size: 1.2rem; margin-bottom: 20px;">Great job completing the quiz!</p>
-                                <button class="check-button" onclick="restartQuiz()">Restart Quiz</button>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568; font-size: 1.1rem;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Writing Section -->
-            <div class="section" id="writing">
-                <div class="writing-container">
-                    <div class="writing-content">
-                        <h2 style="color: #2d3748; font-size: 2.2rem; margin-bottom: 20px; text-align: center;">Writing Exercise</h2>
-
-                        <p class="writing-objective">
-                            Write a short story or paragraph using the vocabulary you've learned about thieves and theft. Practice using "rob" and "steal" correctly!
-                        </p>
-
-                        <h3 class="writing-question">Describe a fictional heist or theft scenario.</h3>
-
-                        <div class="tips-box">
-                            <h4>Remember to use:</h4>
-                            <div class="vocab-category">
-                                <strong>Types of Thieves:</strong>
-                                <span class="vocab-items">pickpocket, mugger, burglar, shoplifter, con artist, cat burglar, safecracker</span>
-                            </div>
-                            <div class="vocab-category">
-                                <strong>Tools & Methods:</strong>
-                                <span class="vocab-items">lockpicks, crowbar, getaway car, accomplice</span>
-                            </div>
-                            <div class="vocab-category">
-                                <strong>Related Terms:</strong>
-                                <span class="vocab-items">heist, loot, fence</span>
-                            </div>
-                            <div class="vocab-category" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(102, 126, 234, 0.3);">
-                                <strong style="color: #d97706;">ROB = person/place:</strong>
-                                <span class="vocab-items">rob a bank, rob someone, rob a store</span>
-                            </div>
-                            <div class="vocab-category">
-                                <strong style="color: #059669;">STEAL = object:</strong>
-                                <span class="vocab-items">steal money, steal a car, steal jewelry</span>
-                            </div>
+                <!-- WRITING SECTION -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task: Plan the Perfect Heist</h3>
+                            <p>Imagine you are a screenwriter for a heist film. Describe your fictional robbery in detail — who are the criminals, what are they stealing, and what goes wrong?</p>
+                            <p style="margin-top: 12px;">Use as much vocabulary from the lesson as possible. Remember to use <strong>rob</strong> and <strong>steal</strong> correctly! Write at least <strong>100 words</strong>.</p>
                         </div>
-
-                        <form class="writing-form" onsubmit="submitWriting(event)">
-                            <div class="form-group">
-                                <label for="studentName">Your Name:</label>
-                                <input type="text" id="studentName" name="studentName" required placeholder="Enter your name">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="writingResponse">Your Story (minimum 100 words):</label>
-                                <textarea id="writingResponse" name="writingResponse" required
-                                    style="width: 100%; min-height: 250px; padding: 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 15px; font-size: 1.05rem; font-family: inherit; background: rgba(255, 255, 255, 0.8); line-height: 1.7; resize: vertical;"
-                                    placeholder="Write your story here... Try to include different types of thieves, their tools, and use 'rob' and 'steal' correctly!"></textarea>
-                            </div>
-
-                            <div class="button-container">
-                                <button type="submit" class="check-button">Submit Writing</button>
-                                <button type="reset" class="check-button" style="background: rgba(160, 174, 192, 0.7);">Clear</button>
-                            </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" placeholder="Enter your name" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" placeholder="teacher@example.com" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="The gang planned to rob the museum and steal three paintings worth..." required></textarea></div>
+                            <div style="display: flex; justify-content: center; margin-top: 10px;"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
                         </form>
-
-                        <div id="writingFeedback" style="display: none; margin-top: 25px; padding: 25px; border-radius: 15px; background: rgba(72, 187, 120, 0.1); border: 2px solid rgba(72, 187, 120, 0.3);">
-                            <h4 style="color: #2f855a; font-size: 1.4rem; margin-bottom: 15px; text-align: center;">Submission Received!</h4>
-                            <p style="color: #2d3748; font-size: 1.1rem; text-align: center;">Great work! Your teacher will review your writing.</p>
-                        </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
-    </div>
+            </div><!-- end content -->
+        </div><!-- end main-container -->
+    </div><!-- end app-container -->
 
-    <!-- Popup for vocabulary definitions -->
-    <div class="popup-overlay" id="popupOverlay" onclick="closePopup()">
+    <!-- Vocab popup (from slides) -->
+    <div id="vocabPopup" onclick="closePopup()">
         <div class="popup-content" onclick="event.stopPropagation()">
-            <div class="popup-word" id="popupWord"></div>
-            <div class="popup-definition" id="popupDefinition"></div>
+            <div class="popup-word" id="vocabPopupWord"></div>
+            <div class="popup-definition" id="vocabPopupDef"></div>
             <button class="popup-close" onclick="closePopup()">Close</button>
         </div>
     </div>
 
     <script>
-        // Navigation between sections
-        function showSection(sectionId, navItem) {
-            // Hide all sections
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => section.classList.remove('active'));
-
-            // Show selected section
-            document.getElementById(sectionId).classList.add('active');
-
-            // Update navigation
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            navItem.classList.add('active');
-        }
-
-        // Flashcard flip function
-        function flipCard(card) {
-            card.classList.toggle('flipped');
-
-            // Play sound effect
-            const flipSound = document.getElementById('flipSound');
-            if (flipSound) {
-                flipSound.currentTime = 0;
-                flipSound.play().catch(e => {
-                    console.log('Audio playback failed:', e);
-                });
-            }
-        }
-
-        // Discussion Slideshow
+        let currentDifficulty = 'B2';
         let currentSlide = 1;
+        const totalSlides = 8;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Thieving Bastards - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
 
         function changeSlide(direction) {
             const slides = document.querySelectorAll('.discussion-slide');
-            const indicators = document.querySelectorAll('.indicator-dot');
-
+            const dots = document.querySelectorAll('.indicator-dot');
             slides[currentSlide - 1].classList.remove('active');
-            indicators[currentSlide - 1].classList.remove('active');
-
+            dots[currentSlide - 1].classList.remove('active');
             currentSlide += direction;
-
-            if (currentSlide > slides.length) currentSlide = 1;
-            if (currentSlide < 1) currentSlide = slides.length;
-
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
             slides[currentSlide - 1].classList.add('active');
-            indicators[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
         }
 
-        function goToSlide(slideNumber) {
+        function goToSlide(slideNum) {
             const slides = document.querySelectorAll('.discussion-slide');
-            const indicators = document.querySelectorAll('.indicator-dot');
-
+            const dots = document.querySelectorAll('.indicator-dot');
             slides[currentSlide - 1].classList.remove('active');
-            indicators[currentSlide - 1].classList.remove('active');
-
-            currentSlide = slideNumber;
-
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
             slides[currentSlide - 1].classList.add('active');
-            indicators[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
         }
 
-        // Reading Pages
-        function showPage(pageNumber) {
-            const pages = document.querySelectorAll('.reading-page');
-            const buttons = document.querySelectorAll('.reading-nav .page-btn');
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
 
-            pages.forEach(page => page.classList.remove('active'));
-            buttons.forEach(btn => btn.classList.remove('active'));
-
-            document.getElementById('page' + pageNumber).classList.add('active');
-            buttons[pageNumber - 1].classList.add('active');
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(() => {}); }
         }
 
-        // Vocabulary Pages
-        function showVocabPage(pageNum, element) {
-            // Hide all vocab pages
-            const pages = document.querySelectorAll('.vocab-page');
-            pages.forEach(page => page.classList.remove('active'));
-
-            // Remove active class from all page buttons
-            const buttons = document.querySelectorAll('.vocab-nav .page-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-
-            // Show selected page
-            document.getElementById('vocab-page-' + pageNum).classList.add('active');
-
-            // Add active class to clicked button
-            element.classList.add('active');
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
         }
 
-        // Vocabulary Popup
         function showPopup(word, definition) {
-            document.getElementById('popupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
-            document.getElementById('popupDefinition').textContent = definition;
-            document.getElementById('popupOverlay').style.display = 'flex';
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
         }
 
-        function closePopup() {
-            document.getElementById('popupOverlay').style.display = 'none';
-        }
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
 
-        // Quiz Functionality
-        let currentQuestionIndex = 1;
-        let score = 0;
-        let answeredQuestions = new Set();
-        const totalQuestions = 10;
+        // ── QUIZ DATA ──────────────────────────────────────────────────────────
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Pickpocket", definition: "A thief who steals from people's pockets or bags in crowded places", sentences: ["A ___ works best in crowded places like markets and public transport.", "Watch out for a ___ on the metro — keep your bag in front of you.", "The tourist was robbed by a ___ who bumped into her deliberately."] },
+                { term: "Mugger", definition: "A thief who attacks and robs people using force or threats", sentences: ["A ___ attacked him outside the ATM and took his wallet.", "She was afraid of being mugged after dark — a ___ had robbed her neighbour last week.", "The ___ threatened him and demanded his phone."] },
+                { term: "Burglar", definition: "A thief who breaks into buildings to steal things", sentences: ["A ___ broke into the house while the family was on holiday.", "The ___ entered through a back window and stole the jewellery.", "Police caught the ___ trying to climb out with a bag of valuables."] },
+                { term: "Shoplifter", definition: "A person who steals items from shops without paying", sentences: ["The security camera caught the ___ hiding clothes under her coat.", "A professional ___ can steal hundreds of dollars of goods in one visit.", "The store called the police when they spotted the ___ on camera."] },
+                { term: "Loot", definition: "Stolen money or goods", sentences: ["The thieves divided the ___ between them after the robbery.", "Police recovered some of the ___ in a warehouse on the edge of town.", "The ___ from the museum heist was never found."] },
+                { term: "Getaway Car", definition: "A vehicle used to escape quickly after committing a crime", sentences: ["A stolen ___ was waiting outside the bank.", "The driver of the ___ was caught at a roadblock.", "They used a fast ___ to escape after robbing the jewellery store."] },
+                { term: "Accomplice", definition: "A person who helps another commit a crime", sentences: ["His ___ waited in the car while he robbed the shop.", "The police arrested both the thief and his ___.", "You can be punished as an ___ even if you didn't steal anything yourself."] },
+                { term: "Rob", definition: "To steal from a person or place", sentences: ["Three men tried to ___ the bank on Main Street.", "You can ___ a person or a place, but not an object.", "They used guns to ___ the security van."] }
+            ],
+            B2: [
+                { term: "Con Artist", definition: "A person who tricks others into giving them money using deception", sentences: ["A skilled ___ can trick victims into handing over their savings voluntarily.", "The ___ posed as a bank official and stole thousands.", "Unlike burglars, a ___ relies on psychological manipulation rather than force."] },
+                { term: "Cat Burglar", definition: "A skilled thief who enters buildings by climbing", sentences: ["A ___ scaled the five-storey building to enter through the penthouse window.", "The ___ left no trace — not even a fingerprint.", "In heist films, the ___ is always athletic, silent, and elegant."] },
+                { term: "Safecracker", definition: "A thief who specialises in opening locked safes and vaults", sentences: ["The ___ listened to the lock's mechanism for twenty minutes before it opened.", "They needed an expert ___ to access the vault.", "A ___ requires patience, skill, and highly specialised tools."] },
+                { term: "Fence", definition: "A middleman who buys stolen goods and resells them for profit", sentences: ["Without a ___, the thieves had no way to convert the stolen art into cash.", "The ___ sold the jewels to buyers in three different countries.", "Police arrested the ___ whose warehouse was packed with stolen electronics."] },
+                { term: "Accomplice", definition: "A person who helps another commit a crime", sentences: ["His ___ waited in the car while he robbed the shop.", "The prosecution had to prove she was a willing ___, not just a bystander.", "An ___ can be prosecuted even if they didn't commit the crime directly."] },
+                { term: "Heist", definition: "A carefully planned robbery of a large amount of money or valuables", sentences: ["The Antwerp diamond ___ of 2003 is considered one of the greatest in history.", "Planning a ___ requires detailed knowledge of the target's security system.", "The film depicted an elaborate ___ involving a team of highly trained specialists."] },
+                { term: "Lockpicks", definition: "Small tools used to open locks without a key", sentences: ["The burglar used ___ to open the door silently in under thirty seconds.", "Professional ___ are illegal to carry in many countries.", "He had learned to use ___ as a teenager from a locksmith who taught him the trade."] },
+                { term: "Bandit", definition: "An armed robber who attacks travellers or isolated places", sentences: ["In the 19th century, ___ gangs terrorised travellers on remote roads.", "The ___ ambushed the stagecoach and made off with the gold.", "Wild West outlaws like Jesse James were notorious ___."] }
+            ],
+            C1: [
+                { term: "Larceny", definition: "The legal term for theft — taking property without consent or force", sentences: ["Grand ___ refers to theft of property above a certain value threshold.", "Petty ___ — such as shoplifting — is typically treated as a misdemeanour.", "The charge was reduced from robbery to ___ because no force was used."] },
+                { term: "Embezzlement", definition: "Stealing money or property entrusted to one's care", sentences: ["The accountant was convicted of ___ after transferring company funds to a personal account.", "___ is particularly difficult to prosecute because it often leaves no physical evidence.", "Corporate ___ costs businesses billions of dollars each year globally."] },
+                { term: "Extortion", definition: "Obtaining money or goods through threats or intimidation", sentences: ["The gang was charged with ___ for threatening shop owners who refused to pay protection money.", "___ differs from robbery in that the threat may be future rather than immediate.", "Digital ___ — often called ransomware — has become a major cybercrime category."] },
+                { term: "Contraband", definition: "Goods that are illegal to possess, trade, or transport", sentences: ["Customs officers seized a large shipment of ___ at the port.", "The definition of ___ varies by jurisdiction — what is illegal in one country may be legal in another.", "Smuggling ___ across borders carries severe criminal penalties in most legal systems."] },
+                { term: "Felony", definition: "A serious crime typically punishable by imprisonment of more than one year", sentences: ["Armed robbery is classified as a ___ in virtually every legal system.", "A ___ conviction can result in a prison sentence of more than one year.", "Certain ___ convictions permanently strip individuals of their right to vote in some jurisdictions."] },
+                { term: "Recidivist", definition: "A person who repeatedly commits crimes after being caught and punished", sentences: ["The judge cited his status as a ___ when imposing a longer sentence.", "Criminal justice systems struggle with the ___ problem — repeat offenders who cycle endlessly through the system.", "Studies suggest that rehabilitation programmes significantly reduce ___ rates compared to purely punitive approaches."] },
+                { term: "Money Laundering", definition: "Disguising illegally obtained money as legitimate income", sentences: ["___ involves passing illegal funds through legitimate businesses to disguise their origin.", "The banker was convicted of ___ after moving cartel money through a chain of shell companies.", "Anti-___ legislation requires financial institutions to report suspicious transactions."] },
+                { term: "Racketeering", definition: "Running an organised criminal enterprise through sustained illegal activity", sentences: ["The RICO Act in the United States was specifically designed to prosecute ___.", "___ typically involves a sustained pattern of criminal activity rather than isolated offences.", "The indictment charged seventeen individuals with ___ and criminal conspiracy."] }
+            ]
+        };
 
-        function selectChoice(element, value) {
-            const choices = element.parentElement.querySelectorAll('.choice');
-            choices.forEach(choice => choice.classList.remove('selected'));
-            element.classList.add('selected');
-            element.dataset.value = value;
-        }
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
 
-        function checkAnswer(correctAnswer, questionNumber) {
-            const question = document.querySelector(`[data-question="${questionNumber}"]`);
-            const selected = question.querySelector('.choice.selected');
-            const feedback = document.getElementById('feedback' + questionNumber);
-            const checkButton = question.querySelector('.check-button');
-
-            if (!selected) {
-                alert('Please select an answer!');
-                return;
-            }
-
-            checkButton.disabled = true;
-            const choices = question.querySelectorAll('.choice');
-            choices.forEach(choice => {
-                choice.style.pointerEvents = 'none';
-                if (choice.textContent.trim().toLowerCase() === correctAnswer.toLowerCase()) {
-                    choice.classList.add('correct');
-                }
-            });
-
-            if (selected.textContent.trim().toLowerCase() === correctAnswer.toLowerCase()) {
-                feedback.textContent = '✓ Correct! Well done!';
-                feedback.className = 'feedback correct';
-                if (!answeredQuestions.has(questionNumber)) {
-                    score++;
-                    answeredQuestions.add(questionNumber);
-                }
-                playSound('correctSound');
-            } else {
-                selected.classList.add('incorrect');
-                feedback.textContent = '✗ Incorrect. The correct answer is: ' + correctAnswer;
-                feedback.className = 'feedback incorrect';
-                if (!answeredQuestions.has(questionNumber)) {
-                    answeredQuestions.add(questionNumber);
-                }
-            }
-
-            feedback.style.display = 'block';
-        }
-
-        function changeQuestion(direction) {
-            const questions = document.querySelectorAll('.quiz-question:not(#results-screen)');
-
-            if (currentQuestionIndex + direction < 1 || currentQuestionIndex + direction > totalQuestions) {
-                if (currentQuestionIndex === totalQuestions && direction === 1) {
-                    showResults();
-                }
-                return;
-            }
-
-            questions[currentQuestionIndex - 1].classList.remove('active');
-            currentQuestionIndex += direction;
-            questions[currentQuestionIndex - 1].classList.add('active');
-
-            document.getElementById('currentQuestion').textContent = currentQuestionIndex;
-
-            document.getElementById('prevBtn').disabled = currentQuestionIndex === 1;
-            document.getElementById('nextBtn').textContent = currentQuestionIndex === totalQuestions ? 'Finish' : 'Next';
-        }
-
-        function showResults() {
-            const questions = document.querySelectorAll('.quiz-question:not(#results-screen)');
-            questions.forEach(q => q.classList.remove('active'));
-
-            const resultsScreen = document.getElementById('results-screen');
-            resultsScreen.style.display = 'block';
-
-            document.getElementById('final-score').textContent = score + '/' + totalQuestions;
-
-            document.querySelector('.quiz-header').style.display = 'none';
-        }
-
-        function restartQuiz() {
-            currentQuestionIndex = 1;
-            score = 0;
-            answeredQuestions.clear();
-
-            document.querySelectorAll('.quiz-question').forEach(question => {
-                question.classList.remove('active');
-                const choices = question.querySelectorAll('.choice');
-                choices.forEach(choice => {
-                    choice.classList.remove('selected', 'correct', 'incorrect');
-                    choice.style.pointerEvents = 'auto';
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({
+                    question: `Complete: "${sentence}"`,
+                    correctAnswer: v.term.toLowerCase(),
+                    correctTerm: v.term,
+                    hint: v.term.toLowerCase().substring(0, 2) + '...'
                 });
-                const feedback = question.querySelector('.feedback');
-                if (feedback) feedback.style.display = 'none';
-                const checkButton = question.querySelector('.check-button');
-                if (checkButton) checkButton.disabled = false;
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display:none;"></div></div>`;
+                container.appendChild(div);
             });
-
-            document.querySelector('.quiz-question[data-question="1"]').classList.add('active');
-            document.getElementById('results-screen').style.display = 'none';
-            document.querySelector('.quiz-header').style.display = 'flex';
-
-            document.getElementById('currentQuestion').textContent = '1';
-            document.getElementById('prevBtn').disabled = true;
-            document.getElementById('nextBtn').textContent = 'Next';
         }
 
-        // Writing Form
-        function openWritingForm(navItem) {
-            showSection('writing', navItem);
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(() => {});
+            else document.getElementById('incorrectSound').play().catch(() => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. The answer is: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
         }
 
-        function submitWriting(event) {
-            event.preventDefault();
-
-            const name = document.getElementById('studentName').value;
-            const response = document.getElementById('writingResponse').value;
-
-            if (response.split(/\s+/).length < 100) {
-                alert('Please write at least 100 words.');
-                return;
-            }
-
-            console.log('Student:', name);
-            console.log('Response:', response);
-
-            document.getElementById('writingFeedback').style.display = 'block';
-            document.querySelector('.writing-form').reset();
-
-            setTimeout(() => {
-                document.getElementById('writingFeedback').style.display = 'none';
-            }, 5000);
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
         }
 
-        // Sound effects
-        function playSound(soundId) {
-            const sound = document.getElementById(soundId);
-            if (sound) {
-                sound.currentTime = 0;
-                sound.play().catch(e => console.log('Sound play failed:', e));
-            }
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
         }
 
-        // Initialize quiz counter
-        document.getElementById('totalQuestions').textContent = totalQuestions;
-        document.getElementById('currentQuestion').textContent = '1';
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
     </script>
 </body>
 </html>
