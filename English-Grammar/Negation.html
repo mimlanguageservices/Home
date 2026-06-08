@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>There is / There are vs Have</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            background: white;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 30px 80px;
+        }
+
+        .slide-content-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            height: 85%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 20px;
+            padding: 25px 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #8B7EC8;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide-arrow:hover {
+            background: #7366B0;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slide-arrow.prev {
+            left: -70px;
+        }
+
+        .slide-arrow.next {
+            right: -70px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #D1D5DB;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: #667eea;
+            transform: scale(1.3);
+        }
+
+        .indicator-dot:hover {
+            background: #9CA3AF;
+        }
+
+        .slide h2 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .explanation-box {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 0;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .explanation-box h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .explanation-box p {
+            color: #2d3748;
+            line-height: 1.5;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .rule-box {
+            background: #e3f2fd;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .rule-box h4 {
+            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .rule-box p {
+            font-size: 1rem;
+            color: #2d3748;
+            margin: 5px 0;
+        }
+
+        .yes-no {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #4299e1;
+            color: white;
+        }
+
+        .auxiliary {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #48bb78;
+            color: white;
+        }
+
+        .subject {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #9f7aea;
+            color: white;
+        }
+
+        .verb {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            background: #ed64a6;
+            color: white;
+        }
+
+        .example-box {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+
+        .example-box p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #2d3748;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .note-box strong {
+            color: #856404;
+            font-size: 1rem;
+        }
+
+        .note-box p {
+            color: #856404;
+            margin-top: 5px;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .exercise-container {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin-bottom: 10px;
+            backdrop-filter: none;
+            box-shadow: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .exercise-container h3 {
+            color: #764ba2;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 0;
+        }
+
+        .question-box p {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 18px;
+            margin: 8px 0;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .check-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 15px 5px 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .feedback {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-weight: 500;
+            font-size: 1.05rem;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+            display: block;
+        }
+
+        ul {
+            margin-left: 25px;
+            line-height: 1.6;
+        }
+
+        li {
+            margin: 6px 0;
+            font-size: 1.05rem;
+            color: #2d3748;
+        }
+
+        li strong {
+            color: #667eea;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        .explanation-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .explanation-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .explanation-box::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .explanation-box::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+
+        .formula-box {
+            background: #e6fffa;
+            border: 2px solid #319795;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .grid-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .grid-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .grid-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .reading-text {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            line-height: 1.9;
+            margin: 15px 0;
+            border: 2px solid #e2e8f0;
+        }
+
+        .reading-text p {
+            margin: 12px 0;
+        }
+
+        .highlight-question {
+            background: #bee3f8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .highlight-answer {
+            background: #c6f6d5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .example-sentence {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <h1>"There is/are" vs "Have"</h1>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">mimlanguageservices</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="ESL Logo" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('explanation', this)">Explanation</div>
+            <div class="nav-item" onclick="showSection('examples', this)">Examples</div>
+            <div class="nav-item" onclick="showSection('reading', this)">Reading</div>
+            <div class="nav-item" onclick="showSection('media', this)">Media</div>
+            <div class="nav-item" onclick="showSection('practice', this)">Practice</div>
+            <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+        </div>
+
+        <div class="content">
+            <!-- Explanation Section -->
+            <div class="section active" id="explanation">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="explanation">
+                            <h2>Welcome: "There is/are" vs "Have"!</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.2rem; text-align: center; margin: 15px 0;">
+                                    Both <span class="subject">THERE IS / ARE</span> and <span class="yes-no">HAVE / HAS</span> describe the world around us — but they are used very differently!
+                                </p>
+                                <div class="formula-box">
+                                    <span class="subject">THERE IS / ARE</span> = something exists &nbsp;|&nbsp; describing a place or situation<br><br>
+                                    <span class="yes-no">HAVE / HAS</span> = someone owns or possesses something
+                                </div>
+                                <div class="grid-examples" style="grid-template-columns: repeat(2, 1fr); margin: 10px 0;">
+                                    <div class="grid-card">
+                                        <strong style="color: #9f7aea;">Use "THERE IS / ARE" to:</strong><br><br>
+                                        • say something exists in a place<br>
+                                        • describe what is in a room, city, or building<br>
+                                        • introduce something for the first time<br>
+                                        • talk about quantity in a location
+                                    </div>
+                                    <div class="grid-card">
+                                        <strong style="color: #4299e1;">Use "HAVE / HAS" to:</strong><br><br>
+                                        • express ownership or possession<br>
+                                        • say what a person owns<br>
+                                        • describe features of an organisation<br>
+                                        • talk about what belongs to a subject
+                                    </div>
+                                </div>
+                                <div class="note-box">
+                                    <strong>Key Idea!</strong>
+                                    <p>"There is/are" talks about <em>existence</em> — something is present somewhere. "Have/has" talks about <em>possession</em> — a person or organisation owns something.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>"There is / There are" — Existence</h2>
+                            <div class="explanation-box">
+                                <h3>Use <span class="subject">THERE IS / THERE ARE</span> to say that something exists in a place or situation</h3>
+
+                                <div class="rule-box">
+                                    <h4>Rule 1 — Singular: "There is" (or "There's")</h4>
+                                    <p>• <strong>There is</strong> a supermarket near my house.</p>
+                                    <p>• <strong>There is</strong> a problem with the computer.</p>
+                                    <p>• <strong>There's</strong> only one chair in the room.</p>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>Rule 2 — Plural: "There are"</h4>
+                                    <p>• <strong>There are</strong> many people in my office.</p>
+                                    <p>• <strong>There are</strong> three parks in this neighbourhood.</p>
+                                    <p>• <strong>There are</strong> no seats on the bus.</p>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>Rule 3 — Uncountable nouns use "There is"</h4>
+                                    <p>• <strong>There is</strong> some milk in the fridge.</p>
+                                    <p>• <strong>There is</strong> a lot of traffic today.</p>
+                                    <p>• <strong>There is</strong> no sugar left.</p>
+                                </div>
+
+                                <div class="note-box">
+                                    <strong>Remember!</strong>
+                                    <p>The subject comes <em>after</em> the verb: "There is a dog." — "a dog" is the subject. The verb agrees with this subject, not with "there."</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>"Have / Has" — Possession</h2>
+                            <div class="explanation-box">
+                                <h3>Use <span class="yes-no">HAVE / HAS</span> when a person or organisation owns or possesses something</h3>
+
+                                <p style="margin-bottom: 10px;">The subject comes first and must be capable of owning something — usually a person, group, or organisation.</p>
+
+                                <div class="rule-box">
+                                    <h4>I / You / We / They → "have"</h4>
+                                    <p>• I <strong>have</strong> a new laptop.</p>
+                                    <p>• We <strong>have</strong> a meeting at 3 o'clock.</p>
+                                    <p>• They <strong>have</strong> two children.</p>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>He / She / It → "has"</h4>
+                                    <p>• She <strong>has</strong> a beautiful apartment.</p>
+                                    <p>• The company <strong>has</strong> offices in five countries.</p>
+                                    <p>• My brother <strong>has</strong> a dog and a cat.</p>
+                                </div>
+
+                                <div class="note-box">
+                                    <strong>Key Point!</strong>
+                                    <p>With "have/has," the subject is the <em>owner</em>. The subject actively possesses the thing. This is very different from "there is/are," where we simply announce that something exists.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>The Key Difference</h2>
+                            <div class="explanation-box">
+                                <h3>Describing a place or scene → use <span class="subject">THERE IS / ARE</span></h3>
+                                <h3 style="margin-top: 10px;">Describing ownership → use <span class="yes-no">HAVE / HAS</span></h3>
+
+                                <div class="example-box" style="margin-top: 15px;">
+                                    <p>✓ <strong>There are</strong> many people in my office. (= people exist in the office)</p>
+                                    <p>✗ My office <strong>has</strong> many people. (= an office cannot own people!)</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p>✓ <strong>There are</strong> twenty students in the classroom. (= students exist there)</p>
+                                    <p>✗ The classroom <strong>has</strong> twenty students. (= a classroom cannot own students)</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p>✓ <strong>There is</strong> a swimming pool in our school. (= the pool exists in that location)</p>
+                                    <p>✓ Our school <strong>has</strong> a swimming pool. (= also correct — the school, as an organisation, can own a pool)</p>
+                                </div>
+
+                                <div class="note-box">
+                                    <strong>The Golden Rule!</strong>
+                                    <p>A place (room, city, street) can describe what <em>exists</em> in it with "there is/are." Only people and organisations can <em>own</em> things with "have/has." When describing people or living things in a location, always use "there is/are."</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Side-by-Side Comparison</h2>
+                            <div class="explanation-box">
+                                <table class="comparison-table">
+                                    <tr>
+                                        <th>Feature</th>
+                                        <th>"There is / are"</th>
+                                        <th>"Have / Has"</th>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Announces existence</strong></td>
+                                        <td>✓ Yes</td>
+                                        <td>✗ No</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Expresses ownership</strong></td>
+                                        <td>✗ No</td>
+                                        <td>✓ Yes</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>People in a place</strong></td>
+                                        <td>✓ "There are 5 people here."</td>
+                                        <td>✗ A place cannot own people</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Organisation owns something</strong></td>
+                                        <td>✓ "There is a gym in the hotel."</td>
+                                        <td>✓ "The hotel has a gym."</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Person owns something</strong></td>
+                                        <td>✗ No</td>
+                                        <td>✓ "She has a car."</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Uncountable nouns</strong></td>
+                                        <td>✓ "There is some water."</td>
+                                        <td>✓ "I have some water."</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Negative</strong></td>
+                                        <td>"There isn't / There aren't"</td>
+                                        <td>"don't have / doesn't have"</td>
+                                    </tr>
+                                </table>
+                                <div class="note-box" style="margin-top: 10px;">
+                                    <strong>Quick Memory Trick!</strong>
+                                    <p>"There is/are" = <em>existence</em>. "Have/has" = <em>ownership</em>. Ask: "Am I saying something exists, or am I saying someone owns it?"</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="explanation">
+                            <h2>Common Errors &amp; How to Fix Them</h2>
+                            <div class="explanation-box">
+                                <div class="rule-box">
+                                    <h4>Error 1 — Using "have/has" for people in a place:</h4>
+                                    <p>✗ My office <strong>has</strong> many people today.</p>
+                                    <p>✓ <strong>There are</strong> many people in my office today.</p>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>Error 2 — Using "there is/are" for personal possession:</h4>
+                                    <p>✗ <strong>There is</strong> a car to me. / <strong>There is</strong> a car for me.</p>
+                                    <p>✓ I <strong>have</strong> a car.</p>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>Error 3 — Wrong agreement with "there are":</h4>
+                                    <p>✗ <strong>There is</strong> many restaurants in this city.</p>
+                                    <p>✓ <strong>There are</strong> many restaurants in this city.</p>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>Error 4 — Confusing a room with an owner:</h4>
+                                    <p>✗ The waiting room <strong>has</strong> fifteen patients right now.</p>
+                                    <p>✓ <strong>There are</strong> fifteen patients in the waiting room right now.</p>
+                                </div>
+
+                                <div class="note-box">
+                                    <strong>Always ask:</strong>
+                                    <p>Is this about <em>existence</em> (something is present somewhere) or <em>possession</em> (someone owns something)? That question will almost always give you the right answer.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="explanation-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(6)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Examples Section -->
+            <div class="section" id="examples">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="examples">
+                            <h2>"There is / There are" — Example Sentences</h2>
+                            <div class="explanation-box">
+                                <h3>Existence &amp; Location — "THERE IS / THERE ARE"</h3>
+
+                                <div class="example-box">
+                                    <p>• <strong>There is</strong> a post office on the corner of my street.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ Announcing the existence of a post office in a specific location.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• <strong>There are</strong> many people waiting outside the restaurant.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ Describing how many people exist in a particular place.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• <strong>There is</strong> no milk left in the fridge.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ Saying that milk does not exist in the fridge (uncountable noun).</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• <strong>There are</strong> three bedrooms in our apartment.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ Describing what rooms exist in the apartment.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• <strong>There is</strong> a lot of noise coming from upstairs.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ Noting the existence of noise in a place.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• <strong>There are</strong> no seats available on the 8 o'clock train.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ Saying that seats do not exist (are not available) on that train.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="examples">
+                            <h2>"Have / Has" — Example Sentences</h2>
+                            <div class="explanation-box">
+                                <h3>Possession &amp; Ownership — "HAVE / HAS"</h3>
+
+                                <div class="example-box">
+                                    <p>• I <strong>have</strong> a meeting at 10 o'clock this morning.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ The speaker personally has/owns a commitment.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• She <strong>has</strong> a beautiful house in the countryside.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ The house belongs to her — she owns it.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• The hotel <strong>has</strong> a rooftop pool and a gym.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ The hotel (as an organisation) owns these facilities.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• My brother <strong>has</strong> two dogs and a cat.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ The animals belong to my brother.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• We <strong>have</strong> a problem — the printer isn't working.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ The problem belongs to "us" in a figurative sense.</p>
+                                </div>
+                                <div class="example-box">
+                                    <p>• The company <strong>has</strong> offices in ten different countries.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ The company owns / operates those offices.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="examples">
+                            <h2>"There is/are" vs "Have" — Spot the Difference</h2>
+                            <div class="explanation-box">
+                                <h3>Compare these pairs — can you see why each choice is correct?</h3>
+
+                                <div class="example-box">
+                                    <p>✓ <strong>There are</strong> thirty employees in this office.</p>
+                                    <p>✗ This office <strong>has</strong> thirty employees. (an office cannot own people)</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ People in a place always use "there are."</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p>✓ <strong>There is</strong> a gym on the second floor.</p>
+                                    <p>✓ The building <strong>has</strong> a gym on the second floor.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ Both are correct when talking about facilities — "there is" describes existence; "has" describes the building's features.</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p>✓ I <strong>have</strong> two sisters. &nbsp; ✓ <strong>There are</strong> two sisters in my family.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ Both correct but different focus: "I have" = my family; "there are" = they exist in my family.</p>
+                                </div>
+
+                                <div class="example-box">
+                                    <p>✓ <strong>There are</strong> a hundred students in the school right now.</p>
+                                    <p>✓ The school <strong>has</strong> over five hundred students enrolled.</p>
+                                    <p style="color: #667eea; font-size: 0.9rem;">→ "There are" = present in the building now; "has" = enrolled (the school owns/manages them as an institution).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="examples-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Section -->
+            <div class="section" id="reading">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="reading">
+                            <h2>Reading: A New Flat</h2>
+                            <div class="explanation-box">
+                                <div class="reading-text">
+                                    <p>Marco just moved into a new flat in the city. He called his friend to tell him about it. "You have to come and visit!" he said. "It's amazing. <span class="highlight-question">There are</span> two big bedrooms and a modern kitchen. <span class="highlight-question">There is</span> also a balcony with a great view of the park."</p>
+
+                                    <p>His friend asked about the neighbourhood. "Is it good?" Marco laughed. "It's perfect! <span class="highlight-question">There are</span> lots of cafés and restaurants nearby. <span class="highlight-question">There is</span> a supermarket right on the corner and a gym two minutes away." He added, "The building <span class="highlight-answer">has</span> a rooftop terrace and a concierge."</p>
+
+                                    <p>His friend was curious about Marco's things. "Do you <span class="highlight-answer">have</span> all your furniture yet?" Marco replied, "Not yet. I <span class="highlight-answer">have</span> a bed and a sofa, but I don't <span class="highlight-answer">have</span> a dining table. Right now, <span class="highlight-question">there are</span> boxes everywhere! <span class="highlight-question">There is</span> no space to sit down."</p>
+
+                                    <p>His friend said he would come to help at the weekend. Marco was happy. "Great! I <span class="highlight-answer">have</span> a coffee machine, so I can make us coffee. And don't worry — <span class="highlight-question">there is</span> plenty of room for you to stay."</p>
+                                </div>
+
+                                <div class="note-box">
+                                    <strong>Color Code:</strong>
+                                    <p><span class="highlight-question">Blue</span> = "there is / there are" &nbsp;|&nbsp; <span class="highlight-answer">Green</span> = "have / has" — Go to the next slide to analyse each example!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="reading">
+                            <h2>Reading Analysis</h2>
+                            <div class="explanation-box">
+                                <h3>"There is/are" and "Have/Has" found in the text:</h3>
+
+                                <div class="grid-examples" style="grid-template-columns: repeat(2, 1fr);">
+                                    <div class="example-box">
+                                        <strong style="color: #4299e1;">THERE IS / ARE (blue) — existence:</strong><br><br>
+                                        <p>• <strong>"There are two bedrooms"</strong> — rooms exist in the flat</p>
+                                        <p>• <strong>"There is a balcony"</strong> — the balcony exists</p>
+                                        <p>• <strong>"There are lots of cafés"</strong> — cafés exist nearby</p>
+                                        <p>• <strong>"There are boxes everywhere"</strong> — boxes exist in the space</p>
+                                        <p>• <strong>"There is plenty of room"</strong> — space exists</p>
+                                    </div>
+                                    <div class="example-box">
+                                        <strong style="color: #48bb78;">HAVE / HAS (green) — possession:</strong><br><br>
+                                        <p>• <strong>"The building has a rooftop"</strong> — the building (organisation) owns this feature</p>
+                                        <p>• <strong>"Do you have furniture?"</strong> — personal ownership</p>
+                                        <p>• <strong>"I have a bed and a sofa"</strong> — Marco owns them</p>
+                                        <p>• <strong>"I don't have a dining table"</strong> — he doesn't own one</p>
+                                        <p>• <strong>"I have a coffee machine"</strong> — he owns it</p>
+                                    </div>
+                                </div>
+
+                                <div class="rule-box">
+                                    <h4>Notice the pattern:</h4>
+                                    <p>• Rooms, spaces, and things in a location → "there is/are"</p>
+                                    <p>• Marco personally owns something → "I have"</p>
+                                    <p>• The building owns its features → "the building has"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="reading-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Section -->
+            <div class="section" id="media">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="media">
+                            <h2>Video: "There is / There are" Explained</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.1rem; margin-bottom: 20px;">Watch this video for a clear explanation of how to use "there is" and "there are" in English:</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <iframe width="800" height="450"
+                                        src="https://www.youtube.com/embed/VIDEO_ID_1"
+                                        style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <p style="font-size: 1rem; color: #666; text-align: center; font-style: italic;">
+                                    Learn when to use "there is" vs "there are" with clear examples
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="media">
+                            <h2>Video: "Have / Has" in Context</h2>
+                            <div class="explanation-box">
+                                <p style="font-size: 1.1rem; margin-bottom: 20px;">See how "have" and "has" are used naturally by native speakers to express possession:</p>
+                                <div style="text-align: center; margin: 30px 0;">
+                                    <iframe width="800" height="450"
+                                        src="https://www.youtube.com/embed/VIDEO_ID_2"
+                                        style="border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <p style="font-size: 1rem; color: #666; text-align: center; font-style: italic;">
+                                    Listen for "have/has" in natural speech to build your intuition
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="media-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Section -->
+            <div class="section" id="practice">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="practice">
+                            <h2>Practice 1: "There is/are" or "Have/Has"?</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>_____ a pharmacy near the train station. You can buy medicine there.</p>
+                                    <input type="text" id="q1" placeholder='Type "there is", "there are", "have", or "has"' onkeypress="if(event.key==='Enter') checkAnswer1()">
+                                    <button class="check-button" onclick="checkAnswer1()">Check Answer</button>
+                                    <div id="feedback1" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 2: "There is/are" or "Have/Has"?</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>My parents _____ a house in the countryside. It's very peaceful there.</p>
+                                    <input type="text" id="q2" placeholder='Type "there is", "there are", "have", or "has"' onkeypress="if(event.key==='Enter') checkAnswer2()">
+                                    <button class="check-button" onclick="checkAnswer2()">Check Answer</button>
+                                    <div id="feedback2" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 3: "There is/are" or "Have/Has"?</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>_____ fifty people at the conference today. The room is almost full.</p>
+                                    <input type="text" id="q3" placeholder='Type "there is", "there are", "have", or "has"' onkeypress="if(event.key==='Enter') checkAnswer3()">
+                                    <button class="check-button" onclick="checkAnswer3()">Check Answer</button>
+                                    <div id="feedback3" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 4: "There is/are" or "Have/Has"?</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>She _____ a very good memory. She never forgets anyone's name.</p>
+                                    <input type="text" id="q4" placeholder='Type "there is", "there are", "have", or "has"' onkeypress="if(event.key==='Enter') checkAnswer4()">
+                                    <button class="check-button" onclick="checkAnswer4()">Check Answer</button>
+                                    <div id="feedback4" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 5: "There is/are" or "Have/Has"?</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>_____ no sugar in the kitchen. Can you buy some on your way home?</p>
+                                    <input type="text" id="q5" placeholder='Type "there is", "there are", "have", or "has"' onkeypress="if(event.key==='Enter') checkAnswer5()">
+                                    <button class="check-button" onclick="checkAnswer5()">Check Answer</button>
+                                    <div id="feedback5" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 6: "There is/are" or "Have/Has"?</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>I _____ a question about the homework. Can you explain it again?</p>
+                                    <input type="text" id="q6" placeholder='Type "there is", "there are", "have", or "has"' onkeypress="if(event.key==='Enter') checkAnswer6()">
+                                    <button class="check-button" onclick="checkAnswer6()">Check Answer</button>
+                                    <div id="feedback6" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 7: "There is/are" or "Have/Has"?</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>_____ many tourists in the city centre during the summer months.</p>
+                                    <input type="text" id="q7" placeholder='Type "there is", "there are", "have", or "has"' onkeypress="if(event.key==='Enter') checkAnswer7()">
+                                    <button class="check-button" onclick="checkAnswer7()">Check Answer</button>
+                                    <div id="feedback7" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide" data-section="practice">
+                            <h2>Practice 8: "There is/are" or "Have/Has"?</h2>
+                            <div class="exercise-container">
+                                <div class="question-box">
+                                    <p>The university _____ a large library with over a million books.</p>
+                                    <input type="text" id="q8" placeholder='Type "there is", "there are", "have", or "has"' onkeypress="if(event.key==='Enter') checkAnswer8()">
+                                    <button class="check-button" onclick="checkAnswer8()">Check Answer</button>
+                                    <div id="feedback8" class="feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="practice-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(2)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(3)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(4)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(5)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(6)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(7)"></span>
+                        <span class="indicator-dot" onclick="goToSlide(8)"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Writing Section -->
+            <div class="section" id="writing">
+                <div class="slideshow-container">
+                    <div class="slide-content-wrapper">
+                        <button class="slide-arrow prev" onclick="changeSlide(-1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button class="slide-arrow next" onclick="changeSlide(1)">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+
+                        <div class="slide active" data-section="writing" style="overflow-y: auto;">
+                            <h2>Writing Practice</h2>
+                            <div class="explanation-box">
+                                <h3>Describe a place you know well using "there is/are" and "have/has"</h3>
+                                <p style="margin-bottom: 15px;">Write 5–8 sentences about your home, neighbourhood, office, or school. Use at least 3 examples of "there is/are" and 2 examples of "have/has." Put THERE IS, THERE ARE, HAVE, and HAS in CAPITALS each time.</p>
+                                <div class="question-box">
+                                    <textarea id="writing1" rows="8" style="width: 100%; padding: 12px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 8px; font-size: 1.05rem; font-family: 'Inter', sans-serif; resize: vertical;" spellcheck="true" placeholder="Example:&#10;I live in a flat in the city centre. THERE ARE two bedrooms and a small balcony.&#10;THERE IS a supermarket downstairs, which is very convenient. I HAVE a car, but I rarely use it&#10;because THERE IS a metro station right next to my building. My building HAS a gym on the ground floor.&#10;THERE ARE also many restaurants nearby, so I often eat out."></textarea>
+                                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                        <button class="check-button" onclick="checkGrammar()">Check Grammar</button>
+                                        <button id="send-teacher-btn" class="check-button" onclick="sendToTeacher()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); opacity: 0.5; cursor: not-allowed;" disabled>Send to Teacher</button>
+                                    </div>
+                                    <div id="grammar-feedback" style="margin-top: 15px; padding: 15px; border-radius: 8px; display: none;"></div>
+                                    <p style="font-size: 0.95rem; color: #666; margin-top: 10px;">Try to use: "There is a...", "There are many...", "There isn't any...", "I have...", "She has...", "The building has..."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slide-indicators" id="writing-indicators">
+                        <span class="indicator-dot active" onclick="goToSlide(1)"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        let currentSection = 'explanation';
+
+        function showSection(sectionName, element) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
+            document.getElementById(sectionName).classList.add('active');
+
+            if (element) {
+                element.classList.add('active');
+            }
+
+            currentSection = sectionName;
+            currentSlide = 1;
+
+            setTimeout(() => {
+                const activeSection = document.querySelector('.section.active');
+                const inputField = activeSection.querySelector('input[type="text"]');
+                if (inputField) {
+                    inputField.focus();
+                }
+            }, 100);
+        }
+
+        function changeSlide(direction) {
+            const activeSection = document.querySelector('.section.active');
+            const slides = activeSection.querySelectorAll('.slide');
+            const dots = activeSection.querySelectorAll('.indicator-dot');
+
+            if (slides.length === 1) return;
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide += direction;
+
+            if (currentSlide > slides.length) {
+                currentSlide = 1;
+            }
+            if (currentSlide < 1) {
+                currentSlide = slides.length;
+            }
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+
+            setTimeout(() => {
+                const activeSlide = slides[currentSlide - 1];
+                const inputField = activeSlide.querySelector('input[type="text"]');
+                if (inputField) {
+                    inputField.focus();
+                    inputField.value = '';
+                }
+            }, 100);
+        }
+
+        function goToSlide(slideNum) {
+            const activeSection = document.querySelector('.section.active');
+            const slides = activeSection.querySelectorAll('.slide');
+            const dots = activeSection.querySelectorAll('.indicator-dot');
+
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+
+            currentSlide = slideNum;
+
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        function normalize(str) {
+            return str.replace(/[\s\-]/g, '').toLowerCase();
+        }
+
+        function checkAnswer1() {
+            const answer = normalize(document.getElementById('q1').value.trim());
+            const feedback = document.getElementById('feedback1');
+
+            if (answer === 'thereis' || answer === "there's") {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! "There is a pharmacy" — we are saying that a pharmacy exists near the station. Use "there is" for a singular noun.';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ The answer is "There is". We are announcing the existence of one pharmacy in a location. Use "there is" for singular nouns.';
+            }
+        }
+
+        function checkAnswer2() {
+            const answer = normalize(document.getElementById('q2').value.trim());
+            const feedback = document.getElementById('feedback2');
+
+            if (answer === 'have') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! "My parents have a house" — they own the house. "My parents" is a plural subject, so we use "have."';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ The answer is "have". My parents own (possess) the house. With I/you/we/they, use "have."';
+            }
+        }
+
+        function checkAnswer3() {
+            const answer = normalize(document.getElementById('q3').value.trim());
+            const feedback = document.getElementById('feedback3');
+
+            if (answer === 'thereare') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! "There are fifty people" — we are describing how many people exist in the conference room. People in a place always use "there are."';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ The answer is "There are". We are saying that people exist in a location — a conference room cannot own people. Use "there are" for plural nouns.';
+            }
+        }
+
+        function checkAnswer4() {
+            const answer = normalize(document.getElementById('q4').value.trim());
+            const feedback = document.getElementById('feedback4');
+
+            if (answer === 'has') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! "She has a very good memory" — "she" possesses this quality. With he/she/it, use "has."';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ The answer is "has". She possesses a good memory — this is personal ownership/quality. With he/she/it, use "has."';
+            }
+        }
+
+        function checkAnswer5() {
+            const answer = normalize(document.getElementById('q5').value.trim());
+            const feedback = document.getElementById('feedback5');
+
+            if (answer === 'thereis' || answer === "there's") {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! "There is no sugar" — we are saying that sugar does not exist in the kitchen. "Sugar" is uncountable, so we use "there is."';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ The answer is "There is". Sugar is an uncountable noun and we are saying it doesn\'t exist in the kitchen. Use "there is" for uncountable nouns.';
+            }
+        }
+
+        function checkAnswer6() {
+            const answer = normalize(document.getElementById('q6').value.trim());
+            const feedback = document.getElementById('feedback6');
+
+            if (answer === 'have') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! "I have a question" — the question belongs to me. The subject "I" possesses the question, so we use "have."';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ The answer is "have". "I" possess this question — it is mine to ask. Use "have" with "I" for personal possession.';
+            }
+        }
+
+        function checkAnswer7() {
+            const answer = normalize(document.getElementById('q7').value.trim());
+            const feedback = document.getElementById('feedback7');
+
+            if (answer === 'thereare') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! "There are many tourists" — tourists exist in the city centre. People in a location always use "there are," never "the city has tourists."';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ The answer is "There are". Tourists exist in the city centre — a city cannot own tourists. Always use "there are" for people in a place.';
+            }
+        }
+
+        function checkAnswer8() {
+            const answer = normalize(document.getElementById('q8').value.trim());
+            const feedback = document.getElementById('feedback8');
+
+            if (answer === 'has') {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct! "The university has a library" — the university (as an institution) owns/operates its library. An organisation can use "has" for its facilities.';
+                setTimeout(() => { changeSlide(1); }, 1500);
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = '✗ The answer is "has". The university is an organisation that owns its facilities. With he/she/it (and organisations), use "has."';
+            }
+        }
+
+        async function checkGrammar() {
+            const text = document.getElementById('writing1').value;
+            const feedbackDiv = document.getElementById('grammar-feedback');
+            const textarea = document.getElementById('writing1');
+
+            if (!text.trim()) {
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Please write your paragraph first!';
+                return;
+            }
+
+            textarea.style.display = 'none';
+            window.grammarCheckResult = { original: text, corrected: '' };
+
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.style.background = 'rgba(102, 126, 234, 0.1)';
+            feedbackDiv.style.border = '1px solid rgba(102, 126, 234, 0.3)';
+            feedbackDiv.style.color = '#667eea';
+            feedbackDiv.innerHTML = '⏳ Checking your grammar and spelling...';
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=AIzaSyBTH0NmDb3cqjrY6p7YROPIJel-iCxSxzs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `You are a strict grammar checker. Fix grammar and spelling errors. Do not change the meaning, style, or add punctuation unless absolutely necessary. Profanities are acceptable, but don't use shortened informal words like "cuz" or "wanna"\n\nText: "${text}"\n\nReturn only the corrected text with minimal changes.`
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                const correctedText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text;
+
+                if (correctedText !== text && correctedText.toLowerCase() !== text.toLowerCase()) {
+                    const originalWords = text.split(/(\s+)/);
+                    const correctedWords = correctedText.split(/(\s+)/);
+                    let highlightedText = '';
+
+                    originalWords.forEach((word, i) => {
+                        if (word.match(/\s+/)) {
+                            highlightedText += word;
+                        } else if (correctedWords[i] && word.toLowerCase() !== correctedWords[i].toLowerCase()) {
+                            highlightedText += `<span style="color: #e53e3e; font-weight: 600; background: rgba(245, 101, 101, 0.15); padding: 2px 4px; border-radius: 3px;">${word}</span>`;
+                        } else {
+                            highlightedText += word;
+                        }
+                    });
+
+                    let html = `
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #c53030;">Your Text (errors highlighted):</strong>
+                            <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid rgba(245, 101, 101, 0.3); line-height: 1.8;">
+                                ${highlightedText}
+                            </div>
+                        </div>
+                        <div>
+                            <strong style="color: #2f855a;">Corrected Text:</strong>
+                            <div style="background: rgba(72, 187, 120, 0.1); padding: 15px; border-radius: 8px; margin-top: 10px; border: 2px solid rgba(72, 187, 120, 0.3); color: #2d3748; line-height: 1.8;">
+                                ${correctedText}
+                            </div>
+                        </div>
+                    `;
+
+                    feedbackDiv.style.background = 'rgba(245, 101, 101, 0.05)';
+                    feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                    feedbackDiv.style.color = '#2d3748';
+                    feedbackDiv.innerHTML = html;
+
+                    window.grammarCheckResult.corrected = correctedText;
+                    const sendBtn = document.getElementById('send-teacher-btn');
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                } else {
+                    feedbackDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+                    feedbackDiv.style.border = '1px solid rgba(72, 187, 120, 0.3)';
+                    feedbackDiv.style.color = '#2f855a';
+                    feedbackDiv.innerHTML = '✓ Perfect! No grammar or spelling errors detected!';
+
+                    window.grammarCheckResult.corrected = text;
+                    const sendBtn = document.getElementById('send-teacher-btn');
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                }
+            } catch (error) {
+                feedbackDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                feedbackDiv.style.border = '1px solid rgba(245, 101, 101, 0.3)';
+                feedbackDiv.style.color = '#c53030';
+                feedbackDiv.innerHTML = '✗ Unable to check grammar. Error: ' + error.message;
+            }
+        }
+
+        function sendToTeacher() {
+            const essayTitle = "There is / There are vs Have";
+            const originalText = window.grammarCheckResult.original;
+            const correctedText = window.grammarCheckResult.corrected;
+
+            const emailBody = `Essay Title: ${essayTitle}\n\nOriginal Essay:\n${originalText}\n\nWe made some changes:\n\nCorrected Text:\n${correctedText}`;
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(essayTitle)}&body=${encodeURIComponent(emailBody)}`;
+            window.location.href = mailtoLink;
+        }
+    </script>
+</body>
+</html>
