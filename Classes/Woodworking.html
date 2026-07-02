@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Woodworking - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(30, 15, 5, 0.88) 0%, rgba(50, 25, 5, 0.88) 50%, rgba(35, 18, 5, 0.88) 100%), url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Woodworking_-_Flickr_-_Stace.jpg/1280px-Woodworking_-_Flickr_-_Stace.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(234, 162, 102, 0.9), 0 0 60px rgba(162, 118, 75, 0.6); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(234, 162, 102, 0.9), 0 0 60px rgba(162, 118, 75, 0.6); } 50% { text-shadow: 0 0 50px rgba(234, 162, 102, 1), 0 0 100px rgba(162, 118, 75, 0.9); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.a2-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b1-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.b2-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .a2-card .level-icon { color: #4ade80; } .b1-card .level-icon { color: #60a5fa; } .b2-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.a2 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b1 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.b2 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .grammar-box { background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; padding: 18px 22px; margin: 12px 0; }
+        .grammar-box .formula { font-size: 1.1rem; font-weight: 600; color: #4c51bf; font-family: monospace; }
+        .grammar-box .example { font-size: 1rem; color: #4a5568; margin-top: 8px; font-style: italic; }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Woodworking</h1>
+        <p class="game-subtitle">Tools, Materials &amp; Craftsmanship</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card a2-card" onclick="startGame('A2')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">A2</div>
+                    <div class="level-desc">Elementary</div>
+                </div>
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>Woodworking</h1>
+                    <div class="current-level-badge b1" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B1</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(30, 15, 5, 0.92) 0%, rgba(50, 25, 5, 0.92) 50%, rgba(35, 18, 5, 0.92) 100%), url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Woodworking_-_Flickr_-_Stace.jpg/1280px-Woodworking_-_Flickr_-_Stace.jpg'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(234, 162, 102, 0.9);">Woodworking</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Tools, Materials &amp; Craftsmanship</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - Introduction to Woodworking -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What is Woodworking?</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>Woodworking is the skill of making things from <span class="vocab-link" onclick="showPopup('lumber', 'Wood that has been cut into boards and planks, ready to use for building')">wood</span>. People have been building with wood for thousands of years. Today, woodworking is both a job and a popular hobby.</p>
+                                        <p>A woodworker might build furniture, houses, toys, or art. To work safely and well, you need to know three things:</p>
+                                        <ul>
+                                            <li><strong>Tools</strong> — the instruments you use to cut, shape, and join wood.</li>
+                                            <li><strong>Materials</strong> — the types of wood and other things you work with.</li>
+                                            <li><strong>Actions</strong> — the verbs that describe what you do in the workshop.</li>
+                                        </ul>
+                                        <p>Today's lesson covers all three, plus a discussion about famous tool brands and how their quality has changed over time.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Woodworking is one of humanity's oldest crafts, ranging from rough carpentry to fine furniture making. As a discipline, it divides into several specialisations:</p>
+                                        <ul>
+                                            <li><strong>Carpentry:</strong> structural building work — frames, floors, roofs.</li>
+                                            <li><strong>Joinery:</strong> fitting pieces of wood together without nails, using interlocking <span class="vocab-link" onclick="showPopup('joint', 'A connection point where two pieces of wood are fitted together')">joints</span>.</li>
+                                            <li><strong>Cabinet-making:</strong> highly precise furniture construction requiring advanced skill.</li>
+                                        </ul>
+                                        <p>Modern woodworking combines traditional hand-tool techniques with electric power tools, allowing a single craftsperson to achieve results that would have taken a team of workers in the past. Mastering the vocabulary of woodworking unlocks the ability to follow instructions, read <span class="vocab-link" onclick="showPopup('blueprint', 'A detailed technical drawing showing exactly how to build something')">blueprints</span>, and communicate professionally in any workshop environment.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Woodworking occupies a fascinating position in contemporary culture — simultaneously a vanishing trade skill, a booming hobbyist pursuit, and a source of premium artisan goods. The craft's resurgence as a leisure activity parallels broader consumer interest in authenticity, tangible skills, and handmade goods that outlast mass-produced alternatives.</p>
+                                        <p>At a linguistic level, woodworking provides an ideal context for studying <strong>imperative verbs</strong> in instructional text, <strong>technical noun phrases</strong> describing tools and materials, and the discourse of quality and <span class="vocab-link" onclick="showPopup('craftsmanship', 'The skill and quality put into making something by hand, evident in precision and finish')">craftsmanship</span>. The vocabulary divides naturally into three registers: operational (what tools do), descriptive (properties of materials), and evaluative (judgements about quality and brand reliability).</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mallet_and_chisels.jpg/640px-Mallet_and_chisels.jpg" alt="Woodworking chisels and mallet" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - Hand & Power Tools -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Hand &amp; Power Tools</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>These are the most important tools in a woodworking workshop. You need to know their names and what they do:</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('saw', 'A tool with a jagged blade used for cutting wood — hand saw, circular saw, jigsaw')">Saw</span>:</strong> A tool with a sharp, jagged blade used for cutting wood.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('hammer', 'A tool with a heavy metal head used for driving nails into wood')">Hammer</span>:</strong> A heavy tool used to drive nails into wood.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('chisel', 'A hand tool with a sharp flat edge used for carving or cutting small pieces of wood')">Chisel</span>:</strong> A sharp hand tool used for carving or cutting small pieces of wood.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('drill', 'A power tool used to make round holes or drive screws into wood')">Drill</span>:</strong> A power tool that makes round holes or drives screws.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('sander', 'A tool used to make wood surfaces smooth by rubbing with abrasive material')">Sander</span>:</strong> A tool that makes wood surfaces smooth.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('tape measure', 'A flexible ruler used to measure the length, width, and depth of wood')">Tape Measure</span>:</strong> A flexible ruler for measuring length, width, and depth.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('clamp', 'A device used to hold pieces of wood tightly together, especially while glue is drying')">Clamp</span>:</strong> A device that holds pieces of wood together while they are glued or drilled.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Woodworking tools fall into two broad categories: <strong>hand tools</strong> (powered by the user) and <strong>power tools</strong> (electrically powered). Each has its place:</p>
+                                        <ul>
+                                            <li><strong>Saws:</strong> A hand <span class="vocab-link" onclick="showPopup('saw', 'A tool with a jagged blade for cutting wood — available as hand saw, circular saw, or jigsaw')">saw</span> offers control; a circular saw offers speed. A jigsaw cuts curves.</li>
+                                            <li><strong>Hammer &amp; Chisel:</strong> The <span class="vocab-link" onclick="showPopup('hammer', 'A tool with a heavy metal head used to drive nails — the claw end removes nails')">hammer</span> drives nails; the <span class="vocab-link" onclick="showPopup('chisel', 'A sharp-edged hand tool for carving — must always be used with the blade moving away from the body')">chisel</span> refines shapes. Safety rule: always cut away from your body.</li>
+                                            <li><strong>Drill:</strong> A <span class="vocab-link" onclick="showPopup('drill', 'A power tool for boring holes or driving screws — use the correct bit for each task')">drill</span> with the right bit can bore holes or drive screws. Always use a pilot hole in hardwood.</li>
+                                            <li><strong>Sander:</strong> A <span class="vocab-link" onclick="showPopup('sander', 'A power tool for smoothing surfaces — belt sanders remove material quickly; orbital sanders produce a fine finish')">belt sander</span> removes material quickly; an orbital sander produces a fine finish.</li>
+                                            <li><strong>Tape Measure &amp; Clamp:</strong> The <span class="vocab-link" onclick="showPopup('tape measure', 'Essential for accurate measurement — remember: measure twice, cut once!')">tape measure</span> is essential for every cut. <span class="vocab-link" onclick="showPopup('clamp', 'Holds the workpiece steady — a safe workshop always has enough clamps')">Clamps</span> are your "extra hands" — you can never have too many.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The hand-tool vs. power-tool debate reflects a genuine division in woodworking philosophy. Hand-tool advocates — aligned with the Arts and Crafts tradition — argue that hand tools develop tactile sensitivity and produce superior surface quality through processes like hand-planing. Power-tool practitioners prioritise efficiency and consistency, particularly valuable in production environments.</p>
+                                        <p>The seven essential tools span both traditions:</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('saw', 'Exists on a spectrum from the precise Japanese pull-saw to the aggressive circular saw — tool selection determines cut quality')">Saws</span></strong> exist on a spectrum from the refined Japanese pull-saw to the aggressive track saw.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('chisel', 'The quality of a chisel is judged by its steel hardness (Rockwell scale), edge retention, and handle ergonomics')">Chisels</span></strong> are judged by steel quality (Rockwell hardness) and edge retention.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('drill', 'Brushless motor drills offer longer battery life and more torque — worth the premium for professional use')">Drills</span></strong> with brushless motors offer significantly improved efficiency and torque.</li>
+                                            <li>The <strong><span class="vocab-link" onclick="showPopup('tape measure', 'Accuracy degrades over time — a tape measure that is off by 1mm across its length can ruin a precision project')">tape measure</span></strong> is often underestimated — <span class="vocab-link" onclick="showPopup('calibration', 'The process of verifying and adjusting a tool to ensure accurate results')">calibration</span> matters in precision work.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Table_saw.jpg/640px-Table_saw.jpg" alt="Workshop power tools" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - Materials & Components -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Materials &amp; Components</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>To work with wood, you need to know the names of the materials you use:</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('lumber', 'Wood that has been cut into boards and planks, ready to use for building')">Lumber / Timber</span>:</strong> Wood cut into boards and planks for building.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('grain', 'The natural direction, pattern, and texture of the fibres in wood')">Grain</span>:</strong> The natural pattern of lines in a piece of wood. Always sand with the grain!</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('sawdust', 'The tiny particles of wood created when cutting or sanding — a fire hazard in the workshop')">Sawdust</span>:</strong> The tiny wood particles created when you cut or sand wood.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('nail', 'A sharp piece of metal hammered into wood to join pieces together')">Nail</span>:</strong> A sharp metal pin hammered into wood to join pieces together.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('screw', 'A metal fastener with a spiral thread twisted into wood using a screwdriver or drill')">Screw</span>:</strong> A metal fastener with a spiral thread for a stronger hold than a nail.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('sandpaper', 'Paper coated with an abrasive material used to smooth wood surfaces')">Sandpaper</span>:</strong> Paper with an abrasive surface used to smooth wood.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('adhesive', 'A liquid or paste used to bond pieces of wood together permanently — often stronger than the wood itself')">Adhesive / Glue</span>:</strong> A liquid used to bond pieces of wood together permanently.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Understanding materials separates a competent woodworker from a beginner. Key knowledge:</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('lumber', 'Available as hardwood (oak, walnut, maple) or softwood (pine, spruce) — hardwoods are denser and more durable')">Lumber</span>:</strong> Choose <em>hardwood</em> (oak, walnut) for furniture durability; <em>softwood</em> (pine) for structural work. Buy kiln-dried to prevent warping.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('grain', 'Always sand and plane in the direction of the grain to avoid tearing the wood fibres')">Grain</span>:</strong> Always work <em>with</em> the grain when sanding or planing. Cutting against the grain causes tear-out and splitting.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('sawdust', 'Fine sawdust is a respiratory hazard — always wear a dust mask and maintain good ventilation')">Sawdust</span>:</strong> A fire and respiratory hazard. Fine dust from sanders is more dangerous than coarse chips from saws. Always wear a dust mask.</li>
+                                            <li><strong>Fasteners:</strong> <span class="vocab-link" onclick="showPopup('nail', 'Nails are fast but weaker than screws — best for rough carpentry and framing')">Nails</span> are fast but weaker; <span class="vocab-link" onclick="showPopup('screw', 'Screws grip the wood from multiple angles, creating a much stronger joint than nails')">screws</span> grip the fibres and create a far stronger joint. Use screws for furniture.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('sandpaper', 'Grit numbers indicate coarseness — 80 grit is very rough, 240 grit is very fine. Always finish with fine grit.')">Sandpaper</span>:</strong> Progress from coarse (80 grit) to fine (240 grit). Never skip grits — each removes the scratches left by the previous one.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('adhesive', 'PVA woodworking glue creates a bond stronger than the wood itself — clamp for at least one hour')">Adhesive</span>:</strong> PVA woodworking glue is stronger than the wood itself when properly clamped. Use waterproof adhesive for outdoor projects.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Material selection is among the most consequential decisions in woodworking. The key variables are species, <span class="vocab-link" onclick="showPopup('grain', 'Grain direction, pattern, and figure all affect both the workability and aesthetic of a finished piece')">grain</span> characteristics, moisture content, and sourcing ethics.</p>
+                                        <ul>
+                                            <li><strong>Species selection:</strong> Hardwood <span class="vocab-link" onclick="showPopup('lumber', 'Janka hardness ratings quantify resistance to denting — critical for flooring and worktop applications')">lumber</span> is categorised by Janka hardness ratings. Brazilian walnut (3684 lbf) vs. white pine (380 lbf) — both are "wood" but behave entirely differently under tools.</li>
+                                            <li><strong>Grain &amp; figure:</strong> Quarter-sawn timber exposes the grain's medullary rays, producing visual figure (such as in quarter-sawn oak) while also being more dimensionally stable — resistant to cupping and warping.</li>
+                                            <li><strong>Fasteners &amp; joinery philosophy:</strong> The choice between mechanical fasteners (<span class="vocab-link" onclick="showPopup('nail', 'Hot-dipped galvanised nails resist corrosion in outdoor applications')">nails</span>, <span class="vocab-link" onclick="showPopup('screw', 'Self-tapping screws are used in manufactured board; traditional wood screws in solid timber')">screws</span>) and wood joinery (mortise-and-tenon, dovetail, box joint) reflects the maker's philosophy: speed and accessibility vs. longevity and aesthetics.</li>
+                                            <li><strong>Sustainable sourcing:</strong> FSC-certified <span class="vocab-link" onclick="showPopup('lumber', 'FSC certification ensures timber is harvested from responsibly managed forests')">lumber</span> verifies responsible forest management. Reclaimed timber carries an additional premium for both its character and environmental credentials.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Oak_board.jpg/640px-Oak_board.jpg" alt="Oak wood planks showing grain" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Grammar: Imperatives in Instructions -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Grammar: Giving Instructions</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>In the workshop, instructions use <strong>imperative verbs</strong> — the base form of the verb, with no subject. These are commands that tell you exactly what to do.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">Positive imperative: Verb + object</div>
+                                            <div class="example">"<strong>Measure</strong> the wood before you cut it."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">Negative imperative: Don't + verb + object</div>
+                                            <div class="example">"<strong>Don't touch</strong> the blade while the saw is running."</div>
+                                        </div>
+                                        <p>The most famous rule in woodworking is the golden mantra:</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">"Measure twice, cut once!"</div>
+                                            <div class="example">This means: always check your measurements before making a cut. You cannot put wood back once it is cut!</div>
+                                        </div>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Professional instructions use a mix of imperatives, passive constructions, and sequence connectors. Recognising these patterns allows you to follow blueprints and safety guides accurately.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">Passive instruction: The wood should be / must be + past participle</div>
+                                            <div class="example">"The surface <strong>should be sanded</strong> before applying varnish."<br>"Eye protection <strong>must be worn</strong> at all times."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">Sequence connectors: First... Next... Then... After that... Finally...</div>
+                                            <div class="example">"<strong>First</strong>, measure and mark. <strong>Then</strong>, clamp the workpiece. <strong>Finally</strong>, make the cut."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">The golden mantra: "Measure twice, cut once."</div>
+                                            <div class="example">Cutting is irreversible — always verify measurements with two separate checks before committing.</div>
+                                        </div>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Workshop and safety documentation deploys a distinctive grammatical register combining imperative mood, deontic modality, and conditional structures.</p>
+                                        <div class="grammar-box">
+                                            <div class="formula">Deontic modality: must / should / ought to + infinitive</div>
+                                            <div class="example">"Guards <strong>must not</strong> be removed." (prohibition) | "The blade <strong>ought to</strong> be replaced regularly." (recommendation)</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">Conditional safety: If + present simple, imperative</div>
+                                            <div class="example">"<strong>If</strong> the blade catches the wood, <strong>release</strong> the trigger immediately."<br>"<strong>Should</strong> the tool overheat, <strong>allow</strong> it to cool before continuing."</div>
+                                        </div>
+                                        <div class="grammar-box">
+                                            <div class="formula">Nominalized mantra: "Measure twice, cut once."</div>
+                                            <div class="example">This imperative proverb encapsulates <strong>precision culture</strong> in woodworking — the irreversibility of cuts makes verification non-negotiable.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0a/Woman_writing_on_a_notebook_with_a_pen.jpg" alt="Instructions and blueprints" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Woodworking Actions (Verbs) -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Woodworking Actions (Verbs)</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>These are the most important action verbs in woodworking. You will see them in instructions and blueprints:</p>
+                                        <ul>
+                                            <li><strong>To <span class="vocab-link" onclick="showPopup('measure', 'To find the exact size or amount of something using a tape measure or ruler')">Measure</span>:</strong> To find the exact size of something. Remember: "Measure twice, cut once!"</li>
+                                            <li><strong>To <span class="vocab-link" onclick="showPopup('cut', 'To divide a piece of wood using a sharp tool like a saw')">Cut</span>:</strong> To divide a piece of wood using a saw or other sharp tool.</li>
+                                            <li><strong>To <span class="vocab-link" onclick="showPopup('drill', 'To make a round hole in wood using a drill')">Drill</span>:</strong> To make a hole in wood using a drill.</li>
+                                            <li><strong>To <span class="vocab-link" onclick="showPopup('sand', 'To rub the surface of wood with sandpaper to make it smooth')">Sand</span>:</strong> To rub a surface with sandpaper to make it smooth.</li>
+                                            <li><strong>To <span class="vocab-link" onclick="showPopup('carve', 'To cut into wood to create a specific shape or design')">Carve</span>:</strong> To cut into wood to create a shape or design.</li>
+                                            <li><strong>To <span class="vocab-link" onclick="showPopup('assemble', 'To put all the pieces of a project together')">Assemble</span>:</strong> To put all the pieces of a project together.</li>
+                                            <li><strong>To <span class="vocab-link" onclick="showPopup('finish', 'To apply a protective coating like varnish, stain, or paint to the completed wood surface')">Finish</span>:</strong> To apply a protective coating (varnish, stain, or paint) to the wood.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Woodworking verbs describe a logical sequence of operations. Understanding each verb in context helps you read blueprints and follow professional instructions:</p>
+                                        <ul>
+                                            <li><strong>Measure:</strong> Always <span class="vocab-link" onclick="showPopup('measure', 'Measurement errors compound — a 2mm error per piece can mean a 12mm error across six pieces')">measure</span> in the same direction and from the same reference point. Errors compound across multiple pieces.</li>
+                                            <li><strong>Cut:</strong> <span class="vocab-link" onclick="showPopup('cut', 'The type of cut determines the tool — rip cuts go with the grain; cross-cuts go across it')">Cutting</span> with the grain (a "rip cut") requires a different technique from cutting across the grain (a "cross-cut").</li>
+                                            <li><strong>Drill:</strong> <span class="vocab-link" onclick="showPopup('drill', 'A pilot hole prevents splitting in hardwood and ensures the screw drives in straight')">Drilling</span> a pilot hole before inserting a screw prevents the wood from splitting and ensures a straight entry.</li>
+                                            <li><strong>Sand:</strong> <span class="vocab-link" onclick="showPopup('sand', 'Sand progressively — never skip from coarse to very fine grit as scratches will remain visible')">Sanding</span> progressively from coarse to fine grit is essential. Skipping grits leaves scratches that become visible under a finish.</li>
+                                            <li><strong>Carve:</strong> <span class="vocab-link" onclick="showPopup('carve', 'Relief carving creates a raised design; chip carving removes material in geometric patterns')">Carving</span> is a specialised skill — relief carving, chip carving, and whittling each use different tools and techniques.</li>
+                                            <li><strong>Assemble &amp; Finish:</strong> <span class="vocab-link" onclick="showPopup('assemble', 'Always do a dry assembly first — test that all pieces fit before applying glue')">Assembling</span> without glue first (a "dry run") prevents disasters. <span class="vocab-link" onclick="showPopup('finish', 'The finish protects the wood and enhances its appearance — oil, wax, varnish, lacquer, and paint all behave differently')">Finishing</span> choices profoundly affect both the appearance and longevity of the piece.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The woodworking verb set maps onto a production sequence with precise technical implications at each stage:</p>
+                                        <ul>
+                                            <li><strong>Measure → Cut:</strong> The dyad at the heart of all woodworking. Irreversibility distinguishes wood from clay or metal — a mis-<span class="vocab-link" onclick="showPopup('cut', 'A kerf is the width of material removed by a saw blade — always cut on the waste side of the line')">cut</span> piece cannot be extended. The saw's <em>kerf</em> (the width of material removed) must be accounted for in measurements.</li>
+                                            <li><strong>Drill:</strong> <span class="vocab-link" onclick="showPopup('drill', 'Countersinking creates a recess for the screw head to sit flush — essential in fine furniture work')">Countersinking</span> and <em>counterboring</em> are precision drilling operations that allow screw heads to sit flush or below the surface — essential in professional joinery.</li>
+                                            <li><strong>Sand → Finish:</strong> The finish is what the user sees and feels. The relationship between <span class="vocab-link" onclick="showPopup('sand', 'Final sanding grit determines how the finish appears — 220 grit before oil, 320 grit before lacquer')">sanding</span> grit and finish type is critical: oil penetrates; lacquer builds on the surface; wax sits on top. Each requires a different preparation standard.</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('assemble', 'The assembly stage tests the accuracy of all previous operations — gaps in joints reveal measurement or cutting errors')">Assemble</span> → <span class="vocab-link" onclick="showPopup('finish', 'Finishing after assembly avoids masked areas; finishing before assembly allows even coverage but requires careful glue management')">Finish</span>:</strong> The sequencing debate — finish before or after assembly — has no universal answer and depends on design, accessibility, and finish type.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Holzhobel.jpg/640px-Holzhobel.jpg" alt="Woodworker using a hand plane" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - Tool Brands -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Tool Brands: Rise &amp; Decline in Quality</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>Some of the world's most famous tool brands include:</p>
+                                        <ul>
+                                            <li><strong>Stanley</strong> (USA): One of the oldest brands, famous for hand tools like planes and chisels.</li>
+                                            <li><strong>DeWalt</strong> (USA): Known for its yellow and black power tools, popular with professionals.</li>
+                                            <li><strong>Makita</strong> (Japan): Known for reliable, long-lasting power tools.</li>
+                                            <li><strong>Bosch</strong> (Germany): Makes tools for both professionals and home users.</li>
+                                            <li><strong>Festool</strong> (Germany): Considered the best quality — but also the most expensive!</li>
+                                        </ul>
+                                        <p>Many people today notice that tools do not last as long as they used to. A Stanley chisel from the 1960s is often better than a new one bought today. Why? Many companies moved their factories to countries with lower costs. The materials became cheaper, and the <span class="vocab-link" onclick="showPopup('quality control', 'The process of checking that products meet a required standard before they are sold')">quality control</span> became less strict.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The story of tool brand quality is largely a story of <strong>ownership changes and offshoring</strong>.</p>
+                                        <p>For most of the 20th century, a Stanley plane or chisel was a benchmark of quality. Craftspeople today still seek out vintage Stanley tools from the 1940s-60s at flea markets, paying more for them than new equivalents. After Stanley merged with Black &amp; Decker and production moved overseas, the quality of its hand tools declined significantly.</p>
+                                        <p>DeWalt followed a similar path — once entirely American-made, its acquisition and offshore production led to inconsistent tolerances and <span class="vocab-link" onclick="showPopup('durability', 'The ability of a tool or material to withstand wear and last over time')">durability</span> issues in some product lines.</p>
+                                        <p>In contrast, brands like <strong>Festool</strong> (Germany) and <strong>Makita</strong> (Japan) have largely maintained standards. Festool in particular is renowned for precision, <span class="vocab-link" onclick="showPopup('durability', 'Festool tools are designed to last decades, with replacement parts available long after purchase')">durability</span>, and a system of interconnected components — at a premium price that reflects genuine quality.</p>
+                                        <p><em>Discussion: Is a $500 Festool always better than a $50 alternative, or has the budget tool market also improved?</em></p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The trajectory of tool brand quality reflects a systemic pattern in advanced manufacturing: the tension between financial optimisation and <span class="vocab-link" onclick="showPopup('craftsmanship', 'Craftsmanship requires investment in materials, training, and quality control — all of which reduce short-term profit margins')">craftsmanship</span>.</p>
+                                        <p>When private equity firms acquire heritage tool brands — as occurred with Stanley/Black &amp; Decker, and later Craftsman — the dominant business logic prioritises shareholder return over product longevity. This manifests in three changes: offshore production with reduced material tolerances, <span class="vocab-link" onclick="showPopup('planned obsolescence', 'The deliberate design of products to become outdated or fail after a set period, driving repeat purchases')">planned obsolescence</span> through battery <span class="vocab-link" onclick="showPopup('proprietary technology', 'Technology owned exclusively by one company, preventing interoperability with competitors — a form of customer lock-in')">proprietary technology</span>, and the replacement of repairable designs with sealed, disposable units.</p>
+                                        <p>The market response has bifurcated:</p>
+                                        <ul>
+                                            <li><strong>Mass market:</strong> Budget-to-mid-range brands (Ryobi, Ridgid, Milwaukee entry-level) serve buyers for whom tools are consumables.</li>
+                                            <li><strong>Premium market:</strong> Festool, Knipex, Lie-Nielsen, and Veritas serve professionals and serious hobbyists who view tools as multi-decade investments. These brands resist offshore production and maintain rigorous <span class="vocab-link" onclick="showPopup('quality control', 'Stringent quality control — including hand-calibration of precision tools — is the primary differentiator of premium brands')">quality control</span>.</li>
+                                        </ul>
+                                        <p>The key insight is that quality decline is a <em>choice</em>, not an inevitability of scale — as Japanese and German manufacturers continue to demonstrate.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Festool_Domino_DF_500_Q_Plus.jpg/640px-Festool_Domino_DF_500_Q_Plus.jpg" alt="Professional power tools" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Key Takeaways & Discussion -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways &amp; Discussion</h3>
+                                    <div class="difficulty-content difficulty-A2">
+                                        <p>Let's review what we learned today:</p>
+                                        <ul>
+                                            <li>The 7 essential <strong>tools</strong>: saw, hammer, chisel, drill, sander, tape measure, clamp</li>
+                                            <li>The 7 key <strong>materials</strong>: lumber, grain, sawdust, nail, screw, sandpaper, adhesive</li>
+                                            <li>The 7 main <strong>verbs</strong>: measure, cut, drill, sand, carve, assemble, finish</li>
+                                            <li>The golden mantra: <strong>"Measure twice, cut once!"</strong></li>
+                                            <li>Famous tool brands have changed — older tools were sometimes better quality</li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>Have you ever made something from wood? What was it?</li>
+                                            <li>Which tool do you think is the most important? Why?</li>
+                                            <li>Do you think it is better to buy a cheap tool or an expensive one? Why?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Core conclusions from today's lesson:</p>
+                                        <ul>
+                                            <li>Tools divide into hand tools (control, feel) and power tools (speed, consistency) — both have their place</li>
+                                            <li>Material selection — species, grain direction, moisture content — is as important as technique</li>
+                                            <li>The <span class="vocab-link" onclick="showPopup('grain', 'Always work with the grain when sanding and planing to avoid tearing the wood fibres')">grain</span> must be respected: sand with it, cut across it carefully, and choose lumber with it in mind</li>
+                                            <li>Brand quality is not fixed — it is a product of ownership decisions and manufacturing choices</li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>Is woodworking more of a technical skill or a creative art? Can it be both?</li>
+                                            <li>Why do you think people are willing to pay much more for handmade furniture than factory-made?</li>
+                                            <li>Do you think tool quality has declined because of globalisation, or because consumers prioritise price over quality?</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Salient conclusions:</p>
+                                        <ul>
+                                            <li>The vocabulary of woodworking maps onto three registers: operational (tools), descriptive (materials), and evaluative (<span class="vocab-link" onclick="showPopup('craftsmanship', 'The evaluative register of woodworking — judging quality, finish, precision, and longevity')">craftsmanship</span> and quality)</li>
+                                            <li>The brand quality decline narrative is not merely anecdotal — it reflects documented manufacturing and business strategy changes</li>
+                                            <li><span class="vocab-link" onclick="showPopup('planned obsolescence', 'A deliberate design strategy to ensure products need replacement, maximising repeat revenue')">Planned obsolescence</span> and <span class="vocab-link" onclick="showPopup('proprietary technology', 'Exclusive technology that creates dependency on a single brand ecosystem')">proprietary technology</span> are deliberate strategies, not accidents of globalisation</li>
+                                            <li>The artisan revival in woodworking mirrors broader cultural responses to mass production: a premium placed on repairability, longevity, and visible skill</li>
+                                        </ul>
+                                        <p><strong>Discussion questions:</strong></p>
+                                        <ul>
+                                            <li>To what extent is <span class="vocab-link" onclick="showPopup('planned obsolescence', 'Designing products to fail or become outdated, forcing replacement purchases')">planned obsolescence</span> an ethical issue rather than simply a business strategy?</li>
+                                            <li>Does the resurgence of artisan woodworking represent a genuine shift in values or a niche luxury market?</li>
+                                            <li>If a tool performs adequately for five years before failing, is that a quality problem — or exactly what was promised?</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Ripple_effect_on_water.jpg" alt="Ripple Effect" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(30, 15, 5, 0.95) 0%, rgba(50, 25, 5, 0.95) 50%, rgba(35, 18, 5, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-A2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Saw</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A tool with a jagged blade used for cutting wood (hand saw, circular saw, jigsaw)</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Hammer</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A tool with a heavy metal head used for driving nails into wood</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Chisel</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A hand tool with a sharp, flat edge used for carving or cutting small pieces of wood</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Drill</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A power tool used to make round holes or drive screws into wood</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sander</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A tool used to make wood surfaces smooth by rubbing with abrasive material</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Tape Measure</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A flexible ruler used to measure the length, width, and depth of wood</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Clamp</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A device used to hold pieces of wood tightly together, especially while glue is drying</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Blueprint</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A detailed technical drawing or plan showing exactly how to build something</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Lumber / Timber</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Wood that has been processed into boards and planks for building and construction</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Grain</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The natural direction, pattern, and texture of the fibres in a piece of wood</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sawdust</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The tiny particles of wood created when cutting or sanding — a fire and respiratory hazard</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Nail</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A sharp, slender piece of metal hammered into wood to join pieces together</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Screw</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A metal fastener with a threaded ridge twisted into wood, creating a stronger joint than a nail</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sandpaper</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Paper coated with an abrasive material used to smooth wood surfaces — available in different grits</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Adhesive</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A liquid or paste used to bond pieces of wood together permanently — often stronger than the wood itself</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Joint</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A connection point where two pieces of wood are fitted together — the foundation of strong woodworking</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Craftsmanship</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The skill and quality of work put into making something by hand, evident in precision, finish, and longevity</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Planned Obsolescence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The deliberate design of products to become outdated or fail after a set period, driving repeat purchases</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Artisan</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A skilled craftsperson who makes products by hand using traditional methods and takes pride in quality</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Quality Control</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of ensuring products meet a required standard before they leave the factory</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Durability</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The ability of a material or product to withstand wear, damage, and the test of time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Precision</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The quality of being exact and accurate — critical in woodworking where even 1mm can ruin a joint</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Proprietary Technology</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Technology owned exclusively by one company, preventing use with competitor products (e.g. brand-specific batteries)</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Calibration</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of adjusting a tool to ensure it gives accurate, consistent results — essential before precision work</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task: Tools, Quality &amp; Craftsmanship</h3>
+                            <p>Consider the following statement: <em>"The best woodworking is done by hand, not by machine — and the best tools are made the same way."</em></p>
+                            <p style="margin-top: 12px;">Do you agree or disagree? Write a response using imperative structures, cause &amp; effect connectors, and vocabulary from today's lesson. For example: <em>"Because of... This leads to... It could be argued that... As a result..."</em></p>
+                            <p style="margin-top: 12px;">Try to present <strong>at least two perspectives</strong> — one supporting and one challenging the statement — before giving your own conclusion. Aim for 150–250 words.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="It could be argued that... Because of... This leads to..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B1';
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Woodworking - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            A2: [
+                { term: "Saw", definition: "A tool with a jagged blade used for cutting wood", sentences: ["Use a ___ to cut the wood to the right length.", "A circular ___ is faster than a hand ___.", "Always keep your fingers away from the ___ blade."] },
+                { term: "Hammer", definition: "A tool with a heavy metal head used for driving nails into wood", sentences: ["He used a ___ to drive the nail into the plank.", "A ___ has a heavy metal head and a long handle.", "Be careful not to miss the nail when you use the ___."] },
+                { term: "Chisel", definition: "A hand tool with a sharp flat edge used for carving or cutting small pieces of wood", sentences: ["A ___ is a sharp hand tool used for shaping wood.", "The craftsman used a ___ to cut a neat groove.", "Always use a ___ with the blade moving away from your body."] },
+                { term: "Drill", definition: "A power tool used to make round holes or drive screws into wood", sentences: ["Use a ___ to make holes for the screws.", "An electric ___ saves a lot of time and effort.", "The ___ made a perfectly round hole in the board."] },
+                { term: "Sander", definition: "A tool used to make wood surfaces smooth", sentences: ["After cutting, use a ___ to smooth the surface.", "A belt ___ removes material quickly on large areas.", "The ___ made the rough wood feel perfectly smooth."] },
+                { term: "Tape Measure", definition: "A flexible ruler used to measure length, width, and depth", sentences: ["He used a ___ to check the length of the board.", "A good ___ is one of the most important tools in any workshop.", "Measure twice with the ___, then cut once!"] },
+                { term: "Clamp", definition: "A device used to hold pieces of wood tightly together, especially while glue is drying", sentences: ["Use a ___ to hold the glued pieces together while they dry.", "Without a ___, the wood would move while you are drilling.", "A ___ keeps both hands free to work safely."] },
+                { term: "Blueprint", definition: "A detailed technical drawing showing how to build something", sentences: ["Study the ___ carefully before you start cutting any wood.", "The ___ showed the exact dimensions of every piece.", "A clear ___ prevents costly mistakes in the workshop."] }
+            ],
+            B1: [
+                { term: "Lumber", definition: "Wood that has been processed into boards and planks for building", sentences: ["Softwood ___ is commonly used in house construction.", "Choose kiln-dried ___ to avoid warping after assembly.", "The ___ yard had boards in every length and thickness."] },
+                { term: "Grain", definition: "The natural direction, pattern, and texture of the fibres in a piece of wood", sentences: ["Always sand with the ___ to avoid scratches on the surface.", "The ___ of oak is strong and beautiful, making it ideal for furniture.", "Cutting against the ___ can cause the wood to split unexpectedly."] },
+                { term: "Sawdust", definition: "The tiny particles of wood created when cutting or sanding", sentences: ["___ is a fire hazard — keep your workshop clean at all times.", "After an hour of cutting, the floor was covered in ___.", "Some woodworkers mix ___ with glue to create a natural wood filler."] },
+                { term: "Nail", definition: "A sharp, slender piece of metal hammered into wood to join pieces together", sentences: ["A ___ is the quickest way to join two pieces of wood.", "Drive the ___ in straight to avoid splitting the timber.", "You can remove a bent ___ with the claw end of a hammer."] },
+                { term: "Screw", definition: "A metal fastener with a threaded ridge twisted into wood for a stronger hold", sentences: ["A ___ creates a stronger joint than a nail because it grips the wood fibres.", "Always drill a pilot hole before inserting a ___ into hardwood.", "Choose the correct length of ___ for the thickness of your material."] },
+                { term: "Sandpaper", definition: "Paper coated with an abrasive material used to smooth wood surfaces", sentences: ["Start with coarse ___ and finish with fine ___ for a smooth result.", "___ comes in different grades — the lower the number, the rougher it is.", "Use fine ___ between coats of varnish for a professional finish."] },
+                { term: "Adhesive", definition: "A liquid or paste used to bond pieces of wood together permanently", sentences: ["Wood ___ creates a bond that is often stronger than the wood itself.", "Apply the ___ evenly and use clamps while it sets.", "Choose a waterproof ___ for any outdoor woodworking project."] },
+                { term: "Joint", definition: "A connection point where two pieces of wood are fitted together", sentences: ["A dovetail ___ is both strong and decorative, often used in drawer construction.", "The ___ was so precise that no glue was needed to hold the pieces together.", "The strength of your finished piece depends on the quality of every ___."] }
+            ],
+            B2: [
+                { term: "Craftsmanship", definition: "The skill and quality put into making something by hand", sentences: ["True ___ is visible in the precision of the joints and the smoothness of the finish.", "Japanese ___ in woodworking is widely regarded as the finest in the world.", "Mass production has made genuine ___ increasingly rare and expensive."] },
+                { term: "Planned Obsolescence", definition: "The deliberate design of products to become outdated or fail after a set period", sentences: ["Critics argue that tool manufacturers practise ___ by using components that cannot be repaired.", "___ ensures repeat purchases but frustrates professionals who depend on long-lasting tools.", "The shift from repairable to disposable power tools reflects a deliberate strategy of ___."] },
+                { term: "Artisan", definition: "A skilled craftsperson who makes products by hand using traditional methods", sentences: ["An ___ woodworker may spend weeks crafting a single piece of furniture.", "There is growing consumer demand for ___ goods as a reaction against mass production.", "Unlike factory workers, an ___ controls every stage of the production process."] },
+                { term: "Quality Control", definition: "The process of ensuring products meet a required standard before they are sold", sentences: ["Rigorous ___ in German factories has helped brands like Festool maintain their reputation.", "A decline in ___ was the first sign that the brand had moved manufacturing offshore.", "___ procedures ensure that every tool performs to the same standard."] },
+                { term: "Durability", definition: "The ability of a material or product to withstand wear and last over time", sentences: ["The ___ of hardwood makes it the preferred choice for flooring and worktops.", "Tool ___ has declined as manufacturers prioritise cost reduction over material quality.", "Investing in tools with proven ___ saves money in the long run."] },
+                { term: "Precision", definition: "The quality of being exact and accurate in measurement or cutting", sentences: ["___ is critical in joinery — even a fraction of a millimetre can ruin a fitted joint.", "Laser-guided saws achieve levels of ___ that were previously impossible by hand.", "Experienced woodworkers develop a sense of ___ that goes beyond what any instrument can measure."] },
+                { term: "Proprietary Technology", definition: "Technology owned exclusively by one company, preventing use with competitor products", sentences: ["___ in battery systems means that a Makita battery cannot be used in a DeWalt tool.", "The proliferation of ___ platforms increases costs for professionals who use multiple brands.", "Some industry analysts argue that ___ lock-in is a form of anti-competitive behaviour."] },
+                { term: "Calibration", definition: "The process of adjusting a tool to ensure it gives accurate, consistent results", sentences: ["A table saw must be regularly checked for ___ to ensure it makes perfectly square cuts.", "Poor ___ is one of the most common causes of inaccurate work in the workshop.", "Always perform ___ checks on your measuring tools before beginning a precision project."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B1;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
