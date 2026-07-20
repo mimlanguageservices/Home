@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png">
+    <title>FAST PM3 – Mock Exam 3 | Grade 9–10 ELA</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(10px);
+            padding: 14px 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            flex-shrink: 0;
+        }
+
+        .header-left h1 {
+            color: #1a365d;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-left p {
+            color: #4a5568;
+            font-size: 0.95rem;
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .score-display {
+            background: #1a365d;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .header-image {
+            width: 100px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 88px);
+            overflow: hidden;
+        }
+
+        /* NAV */
+        .navigation {
+            width: 240px;
+            background: rgba(26,54,93,0.97);
+            padding: 25px 15px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .nav-section-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 10px 8px 4px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.92rem;
+            line-height: 1.3;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(49,130,206,0.4);
+        }
+
+        .nav-item .nav-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: rgba(255,255,255,0.2);
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-bottom: 3px;
+        }
+
+        /* CONTENT */
+        .content {
+            flex: 1;
+            overflow: hidden;
+            background: #f7fafc;
+        }
+
+        .section { display: none; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+
+        /* INSTRUCTIONS */
+        .instructions-panel {
+            padding: 50px 60px;
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exam-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 60px;
+            max-width: 720px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .exam-badge {
+            display: inline-block;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .exam-card h2 {
+            font-size: 2rem;
+            color: #1a365d;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .exam-card .subtitle {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 16px 20px;
+            border-left: 4px solid #3182ce;
+        }
+
+        .info-box .label { color: #718096; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-box .value { color: #1a365d; font-size: 1.1rem; font-weight: 600; margin-top: 4px; }
+
+        .directions-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .directions-list li {
+            padding: 8px 0;
+            padding-left: 24px;
+            color: #4a5568;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .directions-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #3182ce;
+            font-weight: 600;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(49,130,206,0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(49,130,206,0.4);
+        }
+
+        /* EXAM LAYOUT: split passage | questions */
+        .exam-layout {
+            display: flex;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .passage-panel {
+            width: 48%;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            padding: 30px 35px;
+            background: #fff;
+        }
+
+        .passage-label {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .passage-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a365d;
+            margin-bottom: 4px;
+        }
+
+        .passage-author {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .passage-text {
+            color: #2d3748;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+
+        .passage-text p {
+            margin-bottom: 14px;
+            text-indent: 1.5em;
+        }
+
+        .passage-text p:first-child { text-indent: 0; }
+
+        /* QUESTIONS PANEL */
+        .questions-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 30px;
+            background: #f7fafc;
+        }
+
+        .questions-header {
+            margin-bottom: 20px;
+        }
+
+        .questions-header h3 {
+            font-size: 1.1rem;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .questions-header p {
+            color: #718096;
+            font-size: 0.85rem;
+            margin-top: 3px;
+        }
+
+        .question-block {
+            background: white;
+            border-radius: 14px;
+            padding: 22px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .question-block.answered { border-color: #bee3f8; }
+        .question-block.correct { border-color: #9ae6b4; background: #f0fff4; }
+        .question-block.incorrect { border-color: #feb2b2; background: #fff5f5; }
+
+        .q-number {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #3182ce;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .q-text {
+            font-size: 0.97rem;
+            color: #2d3748;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        .q-type-tag {
+            font-size: 0.7rem;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 8px; }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .option:hover { border-color: #90cdf4; background: #ebf8ff; }
+        .option.selected { border-color: #3182ce; background: #ebf8ff; }
+        .option.correct-ans { border-color: #38a169; background: #f0fff4; }
+        .option.wrong-ans { border-color: #e53e3e; background: #fff5f5; }
+
+        .option-letter {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-letter { background: #3182ce; color: white; }
+        .option.correct-ans .option-letter { background: #38a169; color: white; }
+        .option.wrong-ans .option-letter { background: #e53e3e; color: white; }
+
+        .option-text { font-size: 0.9rem; color: #2d3748; line-height: 1.45; padding-top: 3px; }
+
+        .feedback-box {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .feedback-box.correct { background: #c6f6d5; color: #22543d; display: block; }
+        .feedback-box.incorrect { background: #fed7d7; color: #742a2a; display: block; }
+
+        .multi-select-note {
+            font-size: 0.8rem;
+            color: #e53e3e;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* NAV buttons at bottom of questions */
+        .section-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 10px;
+            border-top: 2px solid #e2e8f0;
+            margin-top: 10px;
+        }
+
+        .section-nav button {
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-check {
+            background: #3182ce;
+            color: white;
+            box-shadow: 0 4px 12px rgba(49,130,206,0.3);
+        }
+
+        .btn-check:hover { background: #2b6cb0; transform: translateY(-1px); }
+
+        .btn-next {
+            background: #1a365d;
+            color: white;
+            box-shadow: 0 4px 12px rgba(26,54,93,0.3);
+        }
+
+        .btn-next:hover { background: #153159; transform: translateY(-1px); }
+        .btn-next:disabled { background: #cbd5e0; box-shadow: none; cursor: not-allowed; transform: none; }
+
+        .progress-text { color: #718096; font-size: 0.85rem; }
+
+        /* RESULTS */
+        .results-panel {
+            padding: 50px;
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 24px;
+            padding: 50px 60px;
+            max-width: 680px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 8px 30px rgba(49,130,206,0.35);
+        }
+
+        .score-circle .big-num { font-size: 2.8rem; font-weight: 700; line-height: 1; }
+        .score-circle .score-label { font-size: 0.8rem; opacity: 0.85; margin-top: 4px; }
+
+        .results-card h2 { font-size: 1.8rem; color: #1a365d; margin-bottom: 10px; }
+        .results-card .result-sub { color: #718096; font-size: 1rem; margin-bottom: 30px; }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .breakdown-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .breakdown-item .b-num { font-size: 1.6rem; font-weight: 700; color: #1a365d; }
+        .breakdown-item .b-label { font-size: 0.8rem; color: #718096; margin-top: 3px; }
+
+        .level-bar-wrap { margin-bottom: 30px; text-align: left; }
+        .level-bar-label { font-size: 0.85rem; color: #4a5568; margin-bottom: 8px; font-weight: 500; }
+        .level-bar-bg { background: #e2e8f0; border-radius: 10px; height: 12px; }
+        .level-bar-fill { height: 12px; border-radius: 10px; background: linear-gradient(90deg, #3182ce, #2b6cb0); transition: width 1s ease; }
+
+        .retry-btn {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(49,130,206,0.3);
+            margin-right: 12px;
+        }
+
+        .retry-btn:hover { transform: translateY(-2px); }
+
+        .review-btn {
+            background: white;
+            color: #1a365d;
+            border: 2px solid #1a365d;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .review-btn:hover { background: #ebf8ff; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <h1>FAST PM3 – Mock Exam 3</h1>
+        <p>Grade 9–10 ELA Reading &nbsp;|&nbsp; Florida B.E.S.T. Standards</p>
+    </div>
+    <div class="header-right">
+        <div class="score-display" id="liveScore">Score: 0 / 0</div>
+        <img class="header-image"
+             src="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png"
+             alt="MIM Language Services">
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- NAV -->
+    <nav class="navigation">
+        <div class="nav-section-label">Exam Sections</div>
+        <div class="nav-item active" onclick="showSection('intro')">📋 Instructions</div>
+
+        <div class="nav-section-label">Part 1 – Literary</div>
+        <div class="nav-item" onclick="showSection('lit-passage')">
+            <span class="nav-tag">PASSAGE</span><br>The Long Way Home
+        </div>
+        <div class="nav-item" onclick="showSection('lit-questions')">
+            <span class="nav-tag">Q 1–8</span><br>Literary Questions
+        </div>
+
+        <div class="nav-section-label">Part 2 – Informational</div>
+        <div class="nav-item" onclick="showSection('info-passage')">
+            <span class="nav-tag">PASSAGE</span><br>Life Without Light
+        </div>
+        <div class="nav-item" onclick="showSection('info-questions')">
+            <span class="nav-tag">Q 9–16</span><br>Informational Questions
+        </div>
+
+        <div class="nav-section-label">Part 3 – Paired</div>
+        <div class="nav-item" onclick="showSection('paired-passage')">
+            <span class="nav-tag">PASSAGES</span><br>Silence and Sound: Two Views
+        </div>
+        <div class="nav-item" onclick="showSection('paired-questions')">
+            <span class="nav-tag">Q 17–22</span><br>Paired Questions
+        </div>
+
+        <div class="nav-section-label">Results</div>
+        <div class="nav-item" onclick="showResults()">🏆 View Score</div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- INTRO -->
+        <div class="section active" id="section-intro">
+            <div class="instructions-panel">
+                <div class="exam-card">
+                    <div class="exam-badge">FAST PM3 · Grade 9–10 ELA · Reading</div>
+                    <h2>Mock Exam 3</h2>
+                    <p class="subtitle">Practice test aligned to Florida B.E.S.T. ELA Standards. Covers literary analysis, informational reading, and paired-passage comparison.</p>
+
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <div class="label">Total Questions</div>
+                            <div class="value">22 Questions</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Sections</div>
+                            <div class="value">3 Sections</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Question Types</div>
+                            <div class="value">MC · Multi-Select · EBSR</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Suggested Time</div>
+                            <div class="value">45–60 minutes</div>
+                        </div>
+                    </div>
+
+                    <ul class="directions-list">
+                        <li>Read each passage carefully before answering questions.</li>
+                        <li>For multiple-choice questions, choose the <strong>best</strong> answer.</li>
+                        <li>For multi-select questions, select <strong>exactly two</strong> answers unless told otherwise.</li>
+                        <li>EBSR questions have <strong>Part A and Part B</strong> — answer both; Part B must support Part A.</li>
+                        <li>Use evidence from the text to support your answers.</li>
+                        <li>Click "Check Answers" at the end of each section to see your score.</li>
+                    </ul>
+
+                    <button class="start-btn" onclick="showSection('lit-passage')">Begin Exam →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 1: LITERARY PASSAGE -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-lit-passage">
+            <div class="exam-layout">
+                <div class="passage-panel">
+                    <div class="passage-label">Literary Text · Short Story</div>
+                    <div class="passage-title">The Long Way Home</div>
+                    <div class="passage-author">An original short story for FAST PM3 practice</div>
+
+                    <div class="passage-text">
+                        <p>DeShawn found the bicycle wedged behind Mr. Alvarez's garage on a Saturday in October, its frame orange with rust, one wheel bent into something closer to an oval than a circle. He almost walked past it. Almost.</p>
+
+                        <p>He knew whose block needed a bicycle repaired, though the bicycle wasn't for him. Three weeks earlier, the city had cut the number 14 bus route — the only one that stopped near their street — citing low ridership and a shrinking budget. For most people on the block, this was an inconvenience. For Ms. Odessa, who was seventy-eight and walked with a cane after her hip surgery, it meant a forty-minute walk to the grocery store on Fifth, each way, twice a week, in whatever weather decided to show up.</p>
+
+                        <p>"That's not your problem to fix, baby," his mother said when he mentioned it, not unkindly, drying a dish at the sink. "You've got school. You've got basketball. Let the city figure out the bus."</p>
+
+                        <p>DeShawn didn't argue. He just started spending his Saturday mornings in the garage with a wrench that was too big for half the bolts and a video tutorial paused every four seconds. Fixing the wheel took three weekends — he bent it back by degrees, the way you might slowly convince someone of something they didn't want to believe, a little more each time, never all at once.</p>
+
+                        <p>Ms. Odessa noticed him working before he was ready to explain. She came out onto her porch one Saturday holding two glasses of lemonade and simply set one down on the step near him, without a word about what he was doing or why. She did this every Saturday after that. Neither of them mentioned the bicycle directly for weeks.</p>
+
+                        <p>The cost of all this was small but real. DeShawn missed two Saturday pickup games at the courts on Bellamy, and Marcus texted him twice asking where he'd been, and DeShawn didn't know how to explain — not because it was embarrassing, exactly, but because it was hard to make "I'm fixing an old bike for my elderly neighbor" sound like something a fifteen-year-old was supposed to care about. So he just said he was busy.</p>
+
+                        <p>By the second week of November, the bicycle worked. Really worked — chain oiled, brakes gripping, wheel spinning true. DeShawn wheeled it over to Ms. Odessa's porch on a Saturday morning and didn't say much, just: "Basket's a little small, but it should hold your groceries."</p>
+
+                        <p>Ms. Odessa looked at the bicycle for a long moment, then at DeShawn, then back at the bicycle. "I haven't ridden a bicycle since 1987," she said finally. "You think these knees remember how?"</p>
+
+                        <p>"Only one way to find out," DeShawn said.</p>
+
+                        <p>She didn't ride it that day. But the following Tuesday, DeShawn saw her from his window, wobbling a little at first down the sidewalk, cane strapped to the frame, moving toward Fifth Street at a pace that would have taken her forty minutes on foot and now took her twelve. She didn't wave. She didn't need to. Some kindnesses are loud enough to be understood in silence.</p>
+                    </div>
+                </div>
+
+                <div class="questions-panel">
+                    <div class="questions-header">
+                        <h3>Part 1: Literary Questions</h3>
+                        <p>Questions 1–8 &nbsp;·&nbsp; The Long Way Home</p>
+                    </div>
+
+                    <p style="font-size:0.85rem;color:#718096;margin-bottom:16px;">Read the passage on the left, then answer the questions below. Click <strong>Check Answers</strong> when you finish this section.</p>
+
+                    <!-- Q1 -->
+                    <div class="question-block" id="qb1">
+                        <div class="q-number">Question 1</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Which statement best expresses the <strong>central theme</strong> of the story?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q1','A')"><div class="option-letter">A</div><div class="option-text">Public transportation cuts always harm elderly residents the most severely.</div></div>
+                            <div class="option" onclick="selectOption(this,'q1','B')"><div class="option-letter">B</div><div class="option-text">Teenagers should prioritize helping their neighbors over sports and friendships.</div></div>
+                            <div class="option" onclick="selectOption(this,'q1','C')"><div class="option-letter">C</div><div class="option-text">Small, quiet, and sustained acts of care can meaningfully change another person's life.</div></div>
+                            <div class="option" onclick="selectOption(this,'q1','D')"><div class="option-letter">D</div><div class="option-text">Local governments are responsible for solving every problem in a community.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb1"></div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="question-block" id="qb2">
+                        <div class="q-number">Question 2</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Read this sentence from the story:<br><br><em>"He bent it back by degrees, the way you might slowly convince someone of something they didn't want to believe, a little more each time, never all at once."</em><br><br>What does this <strong>simile</strong> reveal about DeShawn's approach to repairing the bicycle?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q2','A')"><div class="option-letter">A</div><div class="option-text">He is frustrated and wants to give up on the project.</div></div>
+                            <div class="option" onclick="selectOption(this,'q2','B')"><div class="option-letter">B</div><div class="option-text">He works with patient, incremental persistence rather than expecting quick results.</div></div>
+                            <div class="option" onclick="selectOption(this,'q2','C')"><div class="option-letter">C</div><div class="option-text">He is more skilled at persuading people than fixing machines.</div></div>
+                            <div class="option" onclick="selectOption(this,'q2','D')"><div class="option-letter">D</div><div class="option-text">He doubts that the wheel can ever be fully repaired.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb2"></div>
+                    </div>
+
+                    <!-- Q3 EBSR -->
+                    <div class="question-block" id="qb3">
+                        <div class="q-number">Question 3 – Part A</div>
+                        <div class="q-type-tag">EBSR – Evidence-Based Selected Response</div>
+                        <div class="q-text">What <strong>primarily motivates</strong> DeShawn to keep working on the bicycle despite the cost to his own time?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q3a','A')"><div class="option-letter">A</div><div class="option-text">He wants his mother to be proud of his mechanical skills.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3a','B')"><div class="option-letter">B</div><div class="option-text">He is empathetic toward Ms. Odessa's difficult situation after the bus route was cut.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3a','C')"><div class="option-letter">C</div><div class="option-text">He hopes Ms. Odessa will pay him for the repair work.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3a','D')"><div class="option-letter">D</div><div class="option-text">He is avoiding his friends at the basketball courts.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb3a"></div>
+                    </div>
+
+                    <div class="question-block" id="qb3b">
+                        <div class="q-number">Question 3 – Part B</div>
+                        <div class="q-type-tag">EBSR – Select the best evidence</div>
+                        <div class="q-text">Which detail from the text <strong>best supports</strong> your answer to Part A?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q3b','A')"><div class="option-letter">A</div><div class="option-text">"That's not your problem to fix, baby," his mother said.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3b','B')"><div class="option-letter">B</div><div class="option-text">For Ms. Odessa, it meant a forty-minute walk to the grocery store on Fifth, each way, twice a week, in whatever weather decided to show up.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3b','C')"><div class="option-letter">C</div><div class="option-text">Marcus texted him twice asking where he'd been.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3b','D')"><div class="option-letter">D</div><div class="option-text">"Basket's a little small, but it should hold your groceries."</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb3b"></div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="question-block" id="qb4">
+                        <div class="q-number">Question 4</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Ms. Odessa's habit of leaving a glass of lemonade near DeShawn each Saturday, "without a word about what he was doing or why," primarily suggests that she:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q4','A')"><div class="option-letter">A</div><div class="option-text">Does not notice or care what DeShawn is doing in the garage.</div></div>
+                            <div class="option" onclick="selectOption(this,'q4','B')"><div class="option-letter">B</div><div class="option-text">Quietly acknowledges and appreciates his effort without needing an explanation.</div></div>
+                            <div class="option" onclick="selectOption(this,'q4','C')"><div class="option-letter">C</div><div class="option-text">Is too shy to ask DeShawn directly what he is building.</div></div>
+                            <div class="option" onclick="selectOption(this,'q4','D')"><div class="option-letter">D</div><div class="option-text">Disapproves of DeShawn spending his Saturdays this way.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb4"></div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="question-block" id="qb5">
+                        <div class="q-number">Question 5</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">The description of the bicycle wheel — bent "into something closer to an oval than a circle" and painstakingly restored — primarily functions as a symbol of:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q5','A')"><div class="option-letter">A</div><div class="option-text">Something broken that can be gradually made whole again through patient effort.</div></div>
+                            <div class="option" onclick="selectOption(this,'q5','B')"><div class="option-letter">B</div><div class="option-text">The city government's failure to maintain public property.</div></div>
+                            <div class="option" onclick="selectOption(this,'q5','C')"><div class="option-letter">C</div><div class="option-text">DeShawn's poor mechanical skills at the start of the story.</div></div>
+                            <div class="option" onclick="selectOption(this,'q5','D')"><div class="option-letter">D</div><div class="option-text">The unreliability of Ms. Odessa's memory of riding bicycles.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb5"></div>
+                    </div>
+
+                    <!-- Q6 Multi-select -->
+                    <div class="question-block" id="qb6">
+                        <div class="q-number">Question 6</div>
+                        <div class="q-type-tag">Multi-Select</div>
+                        <div class="q-text">Select <strong>TWO</strong> details that best show DeShawn's <strong>internal conflict</strong> about the personal cost of helping Ms. Odessa.</div>
+                        <div class="multi-select-note">★ Select exactly 2 answers</div>
+                        <div class="options">
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">A</div><div class="option-text">His mother told him the bus route was not his problem to fix.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">B</div><div class="option-text">DeShawn missed two Saturday pickup games and didn't know how to explain his absence to Marcus.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">C</div><div class="option-text">DeShawn told Marcus he was "busy" rather than explain what he was really doing.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">D</div><div class="option-text">Ms. Odessa had not ridden a bicycle since 1987.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">E</div><div class="option-text">The city cut the number 14 bus route due to a shrinking budget.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb6"></div>
+                    </div>
+
+                    <!-- Q7 -->
+                    <div class="question-block" id="qb7">
+                        <div class="q-number">Question 7</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Read the final line of the story: <em>"Some kindnesses are loud enough to be understood in silence."</em> What does this line most likely mean?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q7','A')"><div class="option-letter">A</div><div class="option-text">Ms. Odessa is too proud to thank DeShawn directly for his help.</div></div>
+                            <div class="option" onclick="selectOption(this,'q7','B')"><div class="option-letter">B</div><div class="option-text">An act of care can be deeply felt and clearly understood even without being announced or explained.</div></div>
+                            <div class="option" onclick="selectOption(this,'q7','C')"><div class="option-letter">C</div><div class="option-text">DeShawn regrets that Ms. Odessa never properly thanked him.</div></div>
+                            <div class="option" onclick="selectOption(this,'q7','D')"><div class="option-letter">D</div><div class="option-text">Loud, public gestures of kindness are more meaningful than quiet ones.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb7"></div>
+                    </div>
+
+                    <!-- Q8 -->
+                    <div class="question-block" id="qb8">
+                        <div class="q-number">Question 8</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">How does the author use <strong>sentence length</strong> in the paragraph describing what DeShawn missed and how he explained himself to Marcus?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q8','A')"><div class="option-letter">A</div><div class="option-text">The long, run-on sentence mimics DeShawn's rushed, tangled internal reasoning as he tries to justify his choice, before he settles on a short, simple excuse.</div></div>
+                            <div class="option" onclick="selectOption(this,'q8','B')"><div class="option-letter">B</div><div class="option-text">Short sentence fragments throughout the paragraph create urgency and suspense.</div></div>
+                            <div class="option" onclick="selectOption(this,'q8','C')"><div class="option-letter">C</div><div class="option-text">Repeated dialogue in the paragraph reveals Marcus's frustration with DeShawn.</div></div>
+                            <div class="option" onclick="selectOption(this,'q8','D')"><div class="option-letter">D</div><div class="option-text">The paragraph is written entirely in short sentences to show DeShawn's confidence.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb8"></div>
+                    </div>
+
+                    <div class="section-nav">
+                        <div class="progress-text">Questions 1–8 of 22</div>
+                        <div style="display:flex;gap:12px;">
+                            <button class="btn-check" onclick="checkSection('lit')">Check Answers</button>
+                            <button class="btn-next" onclick="showSection('info-passage')">Next Section →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 2: INFORMATIONAL PASSAGE -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-info-passage">
+            <div class="exam-layout">
+                <div class="passage-panel">
+                    <div class="passage-label">Informational Text · Science Article</div>
+                    <div class="passage-title">Life Without Light: Discovery at the Ocean Floor</div>
+                    <div class="passage-author">Adapted from marine science reporting · FAST PM3 practice</div>
+
+                    <div class="passage-text">
+                        <p>In 1977, a team of geologists aboard the submersible Alvin descended nearly 8,000 feet to the ocean floor near the Galápagos Islands, expecting to study underwater volcanic activity. They did not expect to find life. Yet clustered around towering plumes of mineral-rich, superheated water — later named hydrothermal vents — the scientists observed dense colonies of organisms unlike anything previously catalogued: giant tube worms over six feet long, ghostly white crabs, and clams the size of dinner plates, thriving in what should have been one of the most hostile environments on Earth.</p>
+
+                        <p>The discovery upended a foundational assumption of biology. Virtually all known ecosystems on Earth were understood to depend, directly or indirectly, on photosynthesis — the process by which plants and algae convert sunlight into usable energy. At depths of 8,000 feet, sunlight does not penetrate; the vent ecosystems exist in permanent, absolute darkness. If not sunlight, what powered this thriving community?</p>
+
+                        <p>The answer, biologists soon discovered, was chemosynthesis. Bacteria living inside the tissues of the tube worms and other vent organisms convert hydrogen sulfide — a chemical compound spewed from the vents that is toxic to most life — into usable energy through a chemical process entirely independent of sunlight. The tube worms, remarkably, have no mouth, no stomach, and no digestive tract; they rely entirely on their internal bacterial partners to convert chemicals into nutrients, a relationship so complete that neither organism can survive without the other.</p>
+
+                        <p>This discovery had implications far beyond marine biology. If life could flourish in total darkness, fueled by chemistry rather than sunlight, scientists began to reconsider where else in the universe life might exist. Jupiter's moon Europa and Saturn's moon Enceladus are both believed to harbor vast oceans of liquid water beneath thick ice shells — environments that, like the deep ocean floor, never receive sunlight. NASA has since prioritized both moons for future exploration missions, reasoning that if chemosynthetic life can exist in Earth's darkest depths, similar life might exist in the darkest depths of other worlds.</p>
+
+                        <p>Hydrothermal vent ecosystems are also remarkably temporary by geological standards. A single vent may remain active for only a few decades before the underlying magma shifts and the flow of mineral-rich water stops, killing the community that depended on it. Yet within a few years, an entirely new community typically colonizes a newly formed vent nearby — evidence that vent organisms, despite their alien appearance, have evolved efficient strategies for dispersal and rapid colonization across the otherwise empty seafloor.</p>
+
+                        <p>Fewer people have visited hydrothermal vents than have walked on the moon. Yet the ecosystems clustered around them have quietly reshaped one of biology's oldest assumptions: that all life, everywhere, depends on the sun.</p>
+                    </div>
+                </div>
+
+                <div class="questions-panel">
+                    <div class="questions-header">
+                        <h3>Part 2: Informational Questions</h3>
+                        <p>Questions 9–16 &nbsp;·&nbsp; Life Without Light</p>
+                    </div>
+
+                    <!-- Q9 -->
+                    <div class="question-block" id="qb9">
+                        <div class="q-number">Question 9</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">What is the <strong>central idea</strong> of this article?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q9','A')"><div class="option-letter">A</div><div class="option-text">The discovery of chemosynthesis-based ecosystems at hydrothermal vents overturned the assumption that all life depends on sunlight and reshaped the search for life beyond Earth.</div></div>
+                            <div class="option" onclick="selectOption(this,'q9','B')"><div class="option-letter">B</div><div class="option-text">The submersible Alvin was the first vehicle capable of reaching the deepest parts of the ocean.</div></div>
+                            <div class="option" onclick="selectOption(this,'q9','C')"><div class="option-letter">C</div><div class="option-text">Tube worms are the most dangerous predators found near hydrothermal vents.</div></div>
+                            <div class="option" onclick="selectOption(this,'q9','D')"><div class="option-letter">D</div><div class="option-text">NASA has already confirmed the existence of life on Europa and Enceladus.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb9"></div>
+                    </div>
+
+                    <!-- Q10 -->
+                    <div class="question-block" id="qb10">
+                        <div class="q-number">Question 10</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Why does the author mention Jupiter's moon Europa and Saturn's moon Enceladus?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q10','A')"><div class="option-letter">A</div><div class="option-text">To prove that life definitely exists somewhere else in the solar system.</div></div>
+                            <div class="option" onclick="selectOption(this,'q10','B')"><div class="option-letter">B</div><div class="option-text">To show how the discovery of chemosynthesis expanded scientific thinking about where life might exist beyond Earth.</div></div>
+                            <div class="option" onclick="selectOption(this,'q10','C')"><div class="option-letter">C</div><div class="option-text">To argue that NASA should stop funding ocean research in favor of space missions.</div></div>
+                            <div class="option" onclick="selectOption(this,'q10','D')"><div class="option-letter">D</div><div class="option-text">To compare the temperature of these moons to the temperature of hydrothermal vents.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb10"></div>
+                    </div>
+
+                    <!-- Q11 EBSR -->
+                    <div class="question-block" id="qb11">
+                        <div class="q-number">Question 11 – Part A</div>
+                        <div class="q-type-tag">EBSR – Part A</div>
+                        <div class="q-text">According to the article, what is the <strong>primary evidence</strong> that tube worms depend entirely on their internal bacteria for survival?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q11a','A')"><div class="option-letter">A</div><div class="option-text">Tube worms are found only near hydrothermal vents and nowhere else in the ocean.</div></div>
+                            <div class="option" onclick="selectOption(this,'q11a','B')"><div class="option-letter">B</div><div class="option-text">Tube worms have no mouth, stomach, or digestive tract of their own.</div></div>
+                            <div class="option" onclick="selectOption(this,'q11a','C')"><div class="option-letter">C</div><div class="option-text">Tube worms can grow to be over six feet long.</div></div>
+                            <div class="option" onclick="selectOption(this,'q11a','D')"><div class="option-letter">D</div><div class="option-text">Tube worms were first observed by the crew of the submersible Alvin in 1977.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb11a"></div>
+                    </div>
+
+                    <div class="question-block" id="qb11b">
+                        <div class="q-number">Question 11 – Part B</div>
+                        <div class="q-type-tag">EBSR – Part B: Best Evidence</div>
+                        <div class="q-text">Which sentence from the article <strong>best supports</strong> your answer to Part A?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q11b','A')"><div class="option-letter">A</div><div class="option-text">"They did not expect to find life."</div></div>
+                            <div class="option" onclick="selectOption(this,'q11b','B')"><div class="option-letter">B</div><div class="option-text">"The tube worms, remarkably, have no mouth, no stomach, and no digestive tract; they rely entirely on their internal bacterial partners to convert chemicals into nutrients."</div></div>
+                            <div class="option" onclick="selectOption(this,'q11b','C')"><div class="option-letter">C</div><div class="option-text">"A single vent may remain active for only a few decades before the underlying magma shifts."</div></div>
+                            <div class="option" onclick="selectOption(this,'q11b','D')"><div class="option-letter">D</div><div class="option-text">"NASA has since prioritized both moons for future exploration missions."</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb11b"></div>
+                    </div>
+
+                    <!-- Q12 -->
+                    <div class="question-block" id="qb12">
+                        <div class="q-number">Question 12</div>
+                        <div class="q-type-tag">Multiple Choice – Vocabulary in Context</div>
+                        <div class="q-text">As used in paragraph 3, the word <strong>"chemosynthesis"</strong> most nearly refers to:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q12','A')"><div class="option-letter">A</div><div class="option-text">A process of converting chemical compounds into usable energy without sunlight.</div></div>
+                            <div class="option" onclick="selectOption(this,'q12','B')"><div class="option-letter">B</div><div class="option-text">The chemical breakdown of rock into mineral-rich water.</div></div>
+                            <div class="option" onclick="selectOption(this,'q12','C')"><div class="option-letter">C</div><div class="option-text">A laboratory technique used to study deep-sea organisms.</div></div>
+                            <div class="option" onclick="selectOption(this,'q12','D')"><div class="option-letter">D</div><div class="option-text">The process by which plants convert sunlight into energy.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb12"></div>
+                    </div>
+
+                    <!-- Q13 -->
+                    <div class="question-block" id="qb13">
+                        <div class="q-number">Question 13</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">What is the author's most likely <strong>purpose</strong> in ending the article with the sentence: <em>"Fewer people have visited hydrothermal vents than have walked on the moon. Yet the ecosystems clustered around them have quietly reshaped one of biology's oldest assumptions"</em>?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q13','A')"><div class="option-letter">A</div><div class="option-text">To criticize NASA for prioritizing space exploration over ocean research.</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','B')"><div class="option-letter">B</div><div class="option-text">To emphasize how significant this discovery has been, despite how few people have directly witnessed it.</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','C')"><div class="option-letter">C</div><div class="option-text">To suggest that hydrothermal vents are more difficult to study than the surface of the moon.</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','D')"><div class="option-letter">D</div><div class="option-text">To argue that biology textbooks should be rewritten immediately.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb13"></div>
+                    </div>
+
+                    <!-- Q14 Multi-select -->
+                    <div class="question-block" id="qb14">
+                        <div class="q-number">Question 14</div>
+                        <div class="q-type-tag">Multi-Select</div>
+                        <div class="q-text">Select <strong>TWO</strong> reasons the article describes hydrothermal vent ecosystems as "remarkably temporary."</div>
+                        <div class="multi-select-note">★ Select exactly 2 answers</div>
+                        <div class="options">
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">A</div><div class="option-text">A single vent may stay active for only a few decades before shifting magma stops its water flow.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">B</div><div class="option-text">Tube worms have no mouth, stomach, or digestive tract.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">C</div><div class="option-text">New communities typically colonize a newly formed vent within a few years of an old one dying.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">D</div><div class="option-text">Sunlight does not penetrate to a depth of 8,000 feet.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">E</div><div class="option-text">NASA plans to send future missions to Europa and Enceladus.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb14"></div>
+                    </div>
+
+                    <!-- Q15 -->
+                    <div class="question-block" id="qb15">
+                        <div class="q-number">Question 15</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">What is the most likely purpose of the rhetorical question in paragraph 2: <em>"If not sunlight, what powered this thriving community?"</em></div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q15','A')"><div class="option-letter">A</div><div class="option-text">To admit that scientists were never able to answer this question.</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','B')"><div class="option-letter">B</div><div class="option-text">To frame the central scientific mystery that the rest of the article goes on to resolve.</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','C')"><div class="option-letter">C</div><div class="option-text">To criticize earlier scientists for not asking this question sooner.</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','D')"><div class="option-letter">D</div><div class="option-text">To suggest that the vent ecosystems do not actually require any energy source.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb15"></div>
+                    </div>
+
+                    <!-- Q16 -->
+                    <div class="question-block" id="qb16">
+                        <div class="q-number">Question 16</div>
+                        <div class="q-type-tag">Multiple Choice – Text Structure</div>
+                        <div class="q-text">How is this article primarily organized?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q16','A')"><div class="option-letter">A</div><div class="option-text">Compare and contrast: two competing theories of deep-sea life are weighed equally throughout.</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','B')"><div class="option-letter">B</div><div class="option-text">Problem and solution: a single environmental problem is identified and a proven solution is proposed.</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','C')"><div class="option-letter">C</div><div class="option-text">Scientific discovery, explanation, and broader implications: the article builds from an unexpected finding to its underlying cause to its wider significance.</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','D')"><div class="option-letter">D</div><div class="option-text">Chronological biography: the article traces the career of a single scientist from start to finish.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb16"></div>
+                    </div>
+
+                    <div class="section-nav">
+                        <div class="progress-text">Questions 9–16 of 22</div>
+                        <div style="display:flex;gap:12px;">
+                            <button class="btn-check" onclick="checkSection('info')">Check Answers</button>
+                            <button class="btn-next" onclick="showSection('paired-passage')">Next Section →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 3: PAIRED PASSAGES -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-paired-passage">
+            <div class="exam-layout">
+                <div class="passage-panel">
+                    <div class="passage-label">Paired Passages · Informational + Literary</div>
+                    <div class="passage-title">Silence and Sound: Two Views</div>
+                    <div class="passage-author">FAST PM3 practice · Paired texts</div>
+
+                    <div class="passage-text">
+                        <p style="font-weight:700;color:#1a365d;text-indent:0;margin-bottom:4px;">Passage 1 — "The Vanishing Quiet" (Informational)</p>
+                        <p style="color:#718096;font-size:0.85rem;text-indent:0;margin-bottom:14px;">Adapted from environmental and health science reporting</p>
+
+                        <p>In 2011, the World Health Organization estimated that traffic noise alone was responsible for the loss of more than one million healthy life years annually across Western Europe — a burden the WHO ranked second only to air pollution among environmental health threats. Yet unlike air pollution, chronic noise exposure remains largely invisible in public conversation, treated as an unavoidable feature of modern life rather than a measurable danger.</p>
+
+                        <p>The health effects of constant noise exposure are well documented. Even at levels too low to cause hearing damage, chronic exposure to environmental noise elevates cortisol and other stress hormones, disrupts sleep architecture, and has been linked to increased rates of hypertension and cardiovascular disease. Researchers studying residents near airports and highways have found measurable increases in heart attack risk correlated with proximity to consistent noise sources — effects that persist even among people who report having "gotten used to" the sound.</p>
+
+                        <p>Wildlife faces its own version of this crisis. Many songbird species have been documented singing at higher pitches and greater volumes in urban environments, straining to be heard over traffic — a costly adaptation that can reduce the range and complexity of their songs, which are essential for attracting mates. Whales, which rely on low-frequency calls to communicate across vast stretches of ocean, must now compete with the noise of commercial shipping traffic; some researchers estimate that the effective range of whale communication has been reduced by as much as ninety percent in heavily trafficked waters compared to a century ago.</p>
+
+                        <p>In response, a small but growing movement has emerged to identify and protect the world's remaining quiet places. The nonprofit Quiet Parks International has begun certifying locations — from remote forests to sections of open ocean — that meet strict criteria for the absence of persistent human-made noise. Acoustic ecologist Gordon Hempton, who helped pioneer this effort, has argued that natural silence is not merely the absence of sound but a resource in its own right, one that is disappearing as quickly as any endangered species.</p>
+
+                        <p>Unlike a forest or a wetland, silence cannot be replanted once it is gone; a single flight path, highway, or drilling operation can permanently alter the acoustic character of a landscape that took no human effort to create and, once lost, may take generations of policy change to restore, if it can be restored at all.</p>
+                    </div>
+
+                    <div class="passage-text" style="margin-top:28px;">
+                        <p style="font-weight:700;color:#1a365d;text-indent:0;margin-bottom:4px;">Passage 2 — "What the Quiet Holds" (Literary · Poem)</p>
+                        <p style="color:#718096;font-size:0.85rem;text-indent:0;margin-bottom:14px;">An original poem for FAST PM3 practice</p>
+
+                        <p style="text-indent:0;line-height:2.1;">
+                            My grandfather used to cut the engine<br>
+                            halfway across the lake<br>
+                            and let the boat drift,<br>
+                            not fishing, not really —<br>
+                            just floating in what he called<br>
+                            the good kind of nothing.<br><br>
+
+                            I was young enough to find this strange.<br>
+                            I wanted the radio, the motor's hum,<br>
+                            anything with a shape I could name.<br><br>
+
+                            He'd say: listen long enough<br>
+                            and the quiet stops being empty.<br>
+                            You start to hear the water<br>
+                            against the hull, a heron<br>
+                            somewhere deciding whether to trust you,<br>
+                            your own breath, which you forget<br>
+                            you're always making.<br><br>
+
+                            Now I drive home each night<br>
+                            past the airport, the interstate,<br>
+                            a hundred small machines<br>
+                            insisting on themselves,<br>
+                            and I understand what he was teaching me<br>
+                            was not about the lake at all —<br><br>
+
+                            it was that a person needs<br>
+                            somewhere the world stops shouting<br>
+                            long enough to hear<br>
+                            what they actually think.<br><br>
+
+                            Last summer I brought my daughter<br>
+                            to that same lake, cut the engine<br>
+                            the way he taught me,<br>
+                            and watched her face change<br>
+                            the way mine must have,<br>
+                            from waiting for something<br>
+                            to happening to notice everything.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="questions-panel">
+                    <div class="questions-header">
+                        <h3>Part 3: Paired Passage Questions</h3>
+                        <p>Questions 17–22 &nbsp;·&nbsp; Silence and Sound: Two Views</p>
+                    </div>
+
+                    <!-- Q17 -->
+                    <div class="question-block" id="qb17">
+                        <div class="q-number">Question 17</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Both passages share the idea that quiet or silence:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q17','A')"><div class="option-letter">A</div><div class="option-text">Is a valuable resource that is easy to overlook until it becomes scarce.</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','B')"><div class="option-letter">B</div><div class="option-text">Is unpleasant and something most people actively try to avoid.</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','C')"><div class="option-letter">C</div><div class="option-text">Can be fully restored through government regulation alone.</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','D')"><div class="option-letter">D</div><div class="option-text">Matters only to older generations and not to young people.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb17"></div>
+                    </div>
+
+                    <!-- Q18 -->
+                    <div class="question-block" id="qb18">
+                        <div class="q-number">Question 18</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">How does the poem <strong>extend</strong> the idea presented in Passage 1 beyond its scientific and policy scope?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q18','A')"><div class="option-letter">A</div><div class="option-text">By providing additional statistics about the health effects of noise pollution.</div></div>
+                            <div class="option" onclick="selectOption(this,'q18','B')"><div class="option-letter">B</div><div class="option-text">By arguing that noise regulation laws should be stricter than those Passage 1 describes.</div></div>
+                            <div class="option" onclick="selectOption(this,'q18','C')"><div class="option-letter">C</div><div class="option-text">By depicting the personal, intergenerational value of quiet as a felt human experience of self-awareness, something that cannot be captured in data.</div></div>
+                            <div class="option" onclick="selectOption(this,'q18','D')"><div class="option-letter">D</div><div class="option-text">By contradicting Passage 1's claim that natural silence is disappearing.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb18"></div>
+                    </div>
+
+                    <!-- Q19 -->
+                    <div class="question-block" id="qb19">
+                        <div class="q-number">Question 19</div>
+                        <div class="q-type-tag">Multiple Choice – Vocabulary in Context</div>
+                        <div class="q-text">In Passage 1, paragraph 2, the phrase <strong>"disrupts sleep architecture"</strong> most nearly means that noise exposure:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q19','A')"><div class="option-letter">A</div><div class="option-text">Damages the physical structure of a person's bedroom.</div></div>
+                            <div class="option" onclick="selectOption(this,'q19','B')"><div class="option-letter">B</div><div class="option-text">Interferes with the normal structure and stages of a person's sleep.</div></div>
+                            <div class="option" onclick="selectOption(this,'q19','C')"><div class="option-letter">C</div><div class="option-text">Prevents a person from falling asleep at all.</div></div>
+                            <div class="option" onclick="selectOption(this,'q19','D')"><div class="option-letter">D</div><div class="option-text">Causes permanent hearing loss during sleep.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb19"></div>
+                    </div>
+
+                    <!-- Q20 -->
+                    <div class="question-block" id="qb20">
+                        <div class="q-number">Question 20</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Read the final lines of the poem:<br><br><em>"and watched her face change / the way mine must have, / from waiting for something / to happening to notice everything."</em><br><br>What do these lines suggest about the speaker's daughter?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q20','A')"><div class="option-letter">A</div><div class="option-text">She is bored and impatient during the boat ride, just as the speaker once was.</div></div>
+                            <div class="option" onclick="selectOption(this,'q20','B')"><div class="option-letter">B</div><div class="option-text">She experiences the same shift from restlessness to mindful attention that the speaker once learned from the grandfather, showing the lesson being passed to a new generation.</div></div>
+                            <div class="option" onclick="selectOption(this,'q20','C')"><div class="option-letter">C</div><div class="option-text">She is frightened by the sudden silence after the engine is cut.</div></div>
+                            <div class="option" onclick="selectOption(this,'q20','D')"><div class="option-letter">D</div><div class="option-text">She prefers the noise of the interstate to the quiet of the lake.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb20"></div>
+                    </div>
+
+                    <!-- Q21 Multi-select -->
+                    <div class="question-block" id="qb21">
+                        <div class="q-number">Question 21</div>
+                        <div class="q-type-tag">Multi-Select</div>
+                        <div class="q-text">Select <strong>TWO</strong> ways the two passages <em>differ</em> in their approach to the subject of quiet and noise.</div>
+                        <div class="multi-select-note">★ Select exactly 2 answers</div>
+                        <div class="options">
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">A</div><div class="option-text">Passage 1 uses research data and expert testimony; the poem uses personal memory and imagery to convey its meaning.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">B</div><div class="option-text">Passage 1 argues that noise pollution has no real health effects; the poem argues that it does.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">C</div><div class="option-text">Passage 1 addresses noise as a public health and ecological issue in an objective tone; the poem explores quiet as a personal, intergenerational experience in a subjective, first-person voice.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">D</div><div class="option-text">Passage 1 focuses only on whale communication; the poem focuses only on birds.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">E</div><div class="option-text">Both passages rely entirely on statistics and cite no personal experiences.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb21"></div>
+                    </div>
+
+                    <!-- Q22 -->
+                    <div class="question-block" id="qb22">
+                        <div class="q-number">Question 22</div>
+                        <div class="q-type-tag">Multiple Choice – Synthesis</div>
+                        <div class="q-text">A student wants to write an essay arguing that quiet has value that is both <em>measurable</em> and <em>immeasurable</em>. Which combination of evidence would <strong>best</strong> support this claim?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q22','A')"><div class="option-letter">A</div><div class="option-text">The WHO's statistics on cortisol and cardiovascular disease from Passage 1, and the speaker's memory of learning to listen from his grandfather in the poem.</div></div>
+                            <div class="option" onclick="selectOption(this,'q22','B')"><div class="option-letter">B</div><div class="option-text">Only the statistics about whale communication range from Passage 1.</div></div>
+                            <div class="option" onclick="selectOption(this,'q22','C')"><div class="option-letter">C</div><div class="option-text">Only the poem's description of the heron and the water against the hull.</div></div>
+                            <div class="option" onclick="selectOption(this,'q22','D')"><div class="option-letter">D</div><div class="option-text">The description of Quiet Parks International from Passage 1 and the mention of the interstate in the poem.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb22"></div>
+                    </div>
+
+                    <div class="section-nav">
+                        <div class="progress-text">Questions 17–22 of 22</div>
+                        <div style="display:flex;gap:12px;">
+                            <button class="btn-check" onclick="checkSection('paired')">Check Answers</button>
+                            <button class="btn-next" onclick="showResults()">View Final Score →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- RESULTS -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-results">
+            <div class="results-panel">
+                <div class="results-card">
+                    <div class="score-circle">
+                        <div class="big-num" id="finalNum">–</div>
+                        <div class="score-label">out of 22</div>
+                    </div>
+                    <h2 id="resultTitle">Your Results</h2>
+                    <p class="result-sub" id="resultSub">Complete all sections to see your score breakdown.</p>
+
+                    <div class="breakdown-grid">
+                        <div class="breakdown-item">
+                            <div class="b-num" id="litScore">–</div>
+                            <div class="b-label">Literary<br>(Q 1–8)</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="b-num" id="infoScore">–</div>
+                            <div class="b-label">Informational<br>(Q 9–16)</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="b-num" id="pairedScore">–</div>
+                            <div class="b-label">Paired<br>(Q 17–22)</div>
+                        </div>
+                    </div>
+
+                    <div class="level-bar-wrap">
+                        <div class="level-bar-label" id="barLabel">Score</div>
+                        <div class="level-bar-bg">
+                            <div class="level-bar-fill" id="levelBar" style="width:0%"></div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+                        <button class="retry-btn" onclick="retryExam()">Retry Exam</button>
+                        <button class="review-btn" onclick="showSection('lit-questions')">Review Answers</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</div><!-- /container -->
+
+<script>
+// ── Answer Key ──────────────────────────────────────────────────
+const answers = {
+    q1:  { correct: 'C', feedback: 'The story shows how DeShawn\'s patient, unglamorous effort — spending weeks fixing a bicycle for a neighbor — meaningfully changes Ms. Odessa\'s daily life.' },
+    q2:  { correct: 'B', feedback: 'The comparison to slowly convincing someone shows that DeShawn works with steady, incremental patience rather than expecting quick results.' },
+    q3a: { correct: 'B', feedback: 'DeShawn is moved by Ms. Odessa\'s difficult situation after the bus route was cut — an act of empathy, not obligation or reward.' },
+    q3b: { correct: 'B', feedback: 'This detail establishes exactly why Ms. Odessa needs help — the forty-minute walk in any weather — which is what motivates DeShawn\'s empathy.' },
+    q4:  { correct: 'B', feedback: 'Leaving lemonade without asking questions is a quiet way of acknowledging and supporting DeShawn\'s effort without requiring him to explain himself.' },
+    q5:  { correct: 'A', feedback: 'The bent wheel, gradually restored to true, mirrors the story\'s larger theme: something broken (the wheel, the community connection lost with the bus) can be repaired through patient, sustained effort.' },
+    q6:  { correct: ['B','C'], feedback: 'Missing pickup games and Marcus\'s texts (B), and telling Marcus he was simply "busy" instead of explaining (C), both reveal the personal cost and quiet tension DeShawn feels about his choice. The other options are background facts, not internal conflict.' },
+    q7:  { correct: 'B', feedback: 'The line is a paradox: a kind act can be powerfully felt and understood even though it makes no noise or announcement — as Ms. Odessa\'s quiet ride shows.' },
+    q8:  { correct: 'A', feedback: 'The long, list-like sentence mirrors DeShawn\'s tangled, rushed thoughts as he tries to justify missing time with friends, before he settles on the short, simple excuse: "he was busy."' },
+
+    q9:  { correct: 'A', feedback: 'The article traces the discovery of chemosynthetic ecosystems, explains how they work, and shows how the finding reshaped both biology and the search for life on other worlds.' },
+    q10: { correct: 'B', feedback: 'The mention of Europa and Enceladus shows a concrete consequence of the vent discovery: scientists now consider sunless, chemical-based environments as possible homes for life elsewhere in the solar system.' },
+    q11a:{ correct: 'B', feedback: 'The article states directly that tube worms lack a mouth, stomach, and digestive tract, meaning they cannot process food on their own and must rely entirely on bacteria.' },
+    q11b:{ correct: 'B', feedback: 'This sentence is the direct textual statement of the tube worms\' total physical dependence on their internal bacteria.' },
+    q12: { correct: 'A', feedback: 'Chemosynthesis is defined in the passage as converting chemical compounds (like hydrogen sulfide) into usable energy, entirely independent of sunlight.' },
+    q13: { correct: 'B', feedback: 'The closing comparison — fewer visitors than moon-walkers, yet a reshaped scientific assumption — emphasizes how significant and far-reaching this little-seen discovery has been.' },
+    q14: { correct: ['A','C'], feedback: 'The article explicitly states that a vent may only stay active for a few decades (A) and that new communities colonize new vents within a few years (C), which together support the "temporary" description.' },
+    q15: { correct: 'B', feedback: 'The rhetorical question sets up the mystery that the article resolves in the following paragraph, when chemosynthesis is introduced as the answer.' },
+    q16: { correct: 'C', feedback: 'The article moves from an unexpected discovery, to the scientific explanation (chemosynthesis), to broader implications for astrobiology and forestry-style ecological patterns — a discovery-explanation-implications structure.' },
+
+    q17: { correct: 'A', feedback: 'Both texts treat quiet as something valuable and easily taken for granted — Passage 1 through data on its disappearance, the poem through a personal memory of learning to appreciate it.' },
+    q18: { correct: 'C', feedback: 'Passage 1 documents measurable health and ecological harm from noise. The poem goes further, showing what quiet offers a person emotionally and psychologically — something no statistic can capture.' },
+    q19: { correct: 'B', feedback: '"Sleep architecture" refers to the normal structure and stages of sleep; noise exposure disrupts that structure even when it doesn\'t fully prevent sleep.' },
+    q20: { correct: 'B', feedback: 'The daughter\'s shift from restlessness to noticing everything echoes the speaker\'s own experience as a child, showing the grandfather\'s lesson about quiet being passed down another generation.' },
+    q21: { correct: ['A','C'], feedback: 'A and C are both correct: Passage 1 relies on research and expert testimony delivered in an objective tone, while the poem relies on personal memory and imagery delivered in a subjective, first-person voice.' },
+    q22: { correct: 'A', feedback: 'The WHO statistics show quiet\'s measurable, physical value; the grandfather\'s lesson shows its immeasurable, personal value. Together they support both halves of the claim.' }
+};
+
+// ── State ────────────────────────────────────────────────────────
+const userAnswers = {};
+const sectionChecked = { lit: false, info: false, paired: false };
+
+// ── Navigation ───────────────────────────────────────────────────
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+        if (n.getAttribute('onclick') === `showSection('${name}')`) n.classList.add('active');
+    });
+}
+
+function showResults() {
+    calcResults();
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section-results').classList.add('active');
+}
+
+// ── Option selection ─────────────────────────────────────────────
+function selectOption(el, qid, letter) {
+    const block = el.closest('.question-block');
+    if (block.classList.contains('correct') || block.classList.contains('incorrect')) return;
+    block.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    userAnswers[qid] = letter;
+    block.classList.add('answered');
+}
+
+function selectMulti(el, qid) {
+    const block = el.closest('.question-block');
+    if (block.classList.contains('correct') || block.classList.contains('incorrect')) return;
+    el.classList.toggle('selected');
+    const selected = [...block.querySelectorAll('.option.selected')];
+    if (!userAnswers[qid]) userAnswers[qid] = [];
+    userAnswers[qid] = selected.map(o => o.querySelector('.option-letter').textContent);
+    if (userAnswers[qid].length > 0) block.classList.add('answered');
+}
+
+// ── Check answers for a section ──────────────────────────────────
+function checkSection(sec) {
+    const qmap = {
+        lit:    ['q1','q2','q3a','q3b','q4','q5','q6','q7','q8'],
+        info:   ['q9','q10','q11a','q11b','q12','q13','q14','q15','q16'],
+        paired: ['q17','q18','q19','q20','q21','q22']
+    };
+    sectionChecked[sec] = true;
+    qmap[sec].forEach(qid => gradeQuestion(qid));
+    updateLiveScore();
+}
+
+function gradeQuestion(qid) {
+    const ans = answers[qid];
+    if (!ans) return;
+    const ua = userAnswers[qid];
+    const block = document.getElementById('qb' + qid.replace('q','').replace('a','').replace('b','b'));
+    const correctArr = Array.isArray(ans.correct) ? ans.correct : [ans.correct];
+    const userArr = Array.isArray(ua) ? ua : (ua ? [ua] : []);
+
+    const isCorrect = correctArr.length === userArr.length &&
+                      correctArr.every(c => userArr.includes(c));
+
+    if (!block) return;
+
+    block.querySelectorAll('.option').forEach(opt => {
+        const letter = opt.querySelector('.option-letter').textContent;
+        if (correctArr.includes(letter)) opt.classList.add('correct-ans');
+        else if (userArr.includes(letter) && !correctArr.includes(letter)) opt.classList.add('wrong-ans');
+    });
+
+    block.classList.remove('answered');
+    block.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+    const fb = block.querySelector('.feedback-box');
+    if (fb) {
+        fb.className = 'feedback-box ' + (isCorrect ? 'correct' : 'incorrect');
+        fb.innerHTML = (isCorrect ? '✓ Correct! ' : '✗ Incorrect. ') + ans.feedback;
+    }
+}
+
+// ── Score calculation ─────────────────────────────────────────────
+function countCorrect(qids) {
+    return qids.filter(qid => {
+        const ua = userAnswers[qid];
+        const ans = answers[qid];
+        if (!ans) return false;
+        const correctArr = Array.isArray(ans.correct) ? ans.correct : [ans.correct];
+        const userArr = Array.isArray(ua) ? ua : (ua ? [ua] : []);
+        return correctArr.length === userArr.length && correctArr.every(c => userArr.includes(c));
+    }).length;
+}
+
+function updateLiveScore() {
+    const allQ = Object.keys(answers);
+    const total = countCorrect(allQ);
+    const el = document.getElementById('liveScore');
+    el.textContent = `Score: ${total} / ${allQ.length}`;
+    el.style.display = 'block';
+}
+
+function calcResults() {
+    const litQ    = ['q1','q2','q3a','q3b','q4','q5','q6','q7','q8'];
+    const infoQ   = ['q9','q10','q11a','q11b','q12','q13','q14','q15','q16'];
+    const pairedQ = ['q17','q18','q19','q20','q21','q22'];
+
+    const litC    = countCorrect(litQ);
+    const infoC   = countCorrect(infoQ);
+    const pairedC = countCorrect(pairedQ);
+    const total   = litC + infoC + pairedC;
+    const max     = litQ.length + infoQ.length + pairedQ.length;
+    const pct     = Math.round((total / max) * 100);
+
+    document.getElementById('finalNum').textContent = total;
+    document.getElementById('litScore').textContent  = litC + '/9';
+    document.getElementById('infoScore').textContent  = infoC + '/9';
+    document.getElementById('pairedScore').textContent = pairedC + '/6';
+
+    let label = pct >= 80 ? '🎉 Excellent — approaching mastery!' :
+                pct >= 65 ? '👍 Good — keep practicing targeted skills.' :
+                pct >= 50 ? '📖 Developing — review and retry.' :
+                            '🔁 Needs more practice — try again after reviewing.';
+
+    document.getElementById('resultTitle').textContent = pct >= 80 ? 'Great Work!' : 'Results';
+    document.getElementById('resultSub').textContent = `${pct}% — ${label}`;
+    document.getElementById('barLabel').textContent = `${pct}% Score`;
+    setTimeout(() => {
+        document.getElementById('levelBar').style.width = pct + '%';
+    }, 200);
+}
+
+function retryExam() {
+    Object.keys(userAnswers).forEach(k => delete userAnswers[k]);
+    Object.keys(sectionChecked).forEach(k => sectionChecked[k] = false);
+    document.querySelectorAll('.option').forEach(o => {
+        o.classList.remove('selected','correct-ans','wrong-ans');
+    });
+    document.querySelectorAll('.question-block').forEach(b => {
+        b.classList.remove('answered','correct','incorrect');
+    });
+    document.querySelectorAll('.feedback-box').forEach(f => {
+        f.className = 'feedback-box';
+        f.innerHTML = '';
+    });
+    document.getElementById('liveScore').style.display = 'none';
+    document.getElementById('levelBar').style.width = '0%';
+    showSection('intro');
+}
+</script>
+</body>
+</html>

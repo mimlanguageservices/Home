@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flashcards</title>
+  <style>
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: #334155;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    #lang-label {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Card ── */
+    .scene {
+      width: 340px;
+      height: 260px;
+      perspective: 900px;
+      cursor: pointer;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .card.flipped { transform: rotateY(180deg); }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 1.5rem;
+    }
+
+    /* Front = image + L1 word */
+    .face.front { background: #ffffff; }
+
+    .face.front img {
+      width: 100%;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .face.front .word {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .face.front .lang-tag {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Back = L2 translation */
+    .face.back {
+      background: #3b82f6;
+      transform: rotateY(180deg);
+    }
+
+    .face.back .translation {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .face.back .lang-tag {
+      font-size: 0.72rem;
+      color: #bfdbfe;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #2563eb; }
+    .btn:disabled { background: #cbd5e1; cursor: default; }
+
+    #counter {
+      font-size: 0.9rem;
+      color: #64748b;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    /* ── Hint ── */
+    #hint {
+      margin-top: 1.2rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    /* ── Loading / Error ── */
+    #status {
+      color: #64748b;
+      font-size: 1rem;
+      margin-top: 4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Flashcards</h1>
+  <p id="lang-label">Loading…</p>
+
+  <div id="status">Loading cards…</div>
+
+  <div class="scene" id="scene" style="display:none" onclick="flipCard()">
+    <div class="card" id="card">
+      <div class="face front">
+        <img id="card-img" src="" alt="" />
+        <div class="word" id="card-l1"></div>
+        <div class="lang-tag" id="front-lang"></div>
+      </div>
+      <div class="face back">
+        <div class="lang-tag" id="back-lang"></div>
+        <div class="translation" id="card-l2"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls" id="controls" style="display:none">
+    <button class="btn" id="btn-prev" onclick="navigate(-1)">&#8592; Prev</button>
+    <span id="counter"></span>
+    <button class="btn" id="btn-next" onclick="navigate(1)">Next &#8594;</button>
+  </div>
+
+  <p id="hint" style="display:none">Click the card to reveal the translation</p>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION — update SHEET_ID for each student
+    // ============================================================
+    const SHEET_ID = 'PASTE_STUDENT_SHEET_ID_HERE';
+    // ============================================================
+
+    let cards   = [];
+    let current = 0;
+
+    async function loadSheet() {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&cachebust=${Date.now()}`;
+
+      try {
+        const res  = await fetch(url);
+        const text = await res.text();
+        parseCSV(text);
+      } catch (err) {
+        document.getElementById('status').textContent =
+          'Could not load sheet. Make sure it is shared as "Anyone with the link can view".';
+      }
+    }
+
+    // Proper CSV parser — handles quoted fields containing commas
+    function parseCSVRow(row) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < row.length; i++) {
+        const ch = row[i];
+        if (ch === '"') {
+          if (inQuotes && row[i + 1] === '"') { current += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    function parseCSV(text) {
+      const rows = text.trim().split('\n').map(parseCSVRow);
+
+      if (rows.length < 2) {
+        document.getElementById('status').textContent = 'No words found in the sheet yet.';
+        return;
+      }
+
+      const lang1 = rows[0][0] || 'Language 1';
+      const lang2 = rows[0][1] || 'Language 2';
+
+      document.getElementById('lang-label').textContent = `${lang1} → ${lang2}`;
+      document.getElementById('front-lang').textContent = lang1;
+      document.getElementById('back-lang').textContent  = lang2;
+
+      cards = rows.slice(1)
+        .filter(r => r[0])   // skip empty rows
+        .map(r => ({ l1: r[0], l2: r[1] || '—', img: r[2] || '' }));
+
+      if (cards.length === 0) {
+        document.getElementById('status').textContent = 'No words found in the sheet yet.';
+        return;
+      }
+
+      document.getElementById('status').style.display   = 'none';
+      document.getElementById('scene').style.display    = '';
+      document.getElementById('controls').style.display = '';
+      document.getElementById('hint').style.display     = '';
+
+      showCard(0);
+    }
+
+    function showCard(index) {
+      const c = cards[index];
+      document.getElementById('card-l1').textContent  = c.l1;
+      document.getElementById('card-l2').textContent  = c.l2;
+
+      const img = document.getElementById('card-img');
+      if (c.img) {
+        img.style.display = '';
+        img.onerror = () => { img.style.display = 'none'; };
+        img.src = c.img;
+      } else {
+        img.src = '';
+        img.style.display = 'none';
+      }
+
+      // Reset flip
+      document.getElementById('card').classList.remove('flipped');
+
+      // Update counter & buttons
+      document.getElementById('counter').textContent = `${index + 1} / ${cards.length}`;
+      document.getElementById('btn-prev').disabled = (index === 0);
+      document.getElementById('btn-next').disabled = (index === cards.length - 1);
+    }
+
+    function flipCard() {
+      document.getElementById('card').classList.toggle('flipped');
+    }
+
+    function navigate(dir) {
+      const next = current + dir;
+      if (next < 0 || next >= cards.length) return;
+      current = next;
+      showCard(current);
+    }
+
+    loadSheet();
+  </script>
+</body>
+</html>

@@ -442,10 +442,11 @@
                 justify-content: center;
             }
 
-            /* Hide Vocabulary tab on mobile */
-            .nav-item[onclick*="vocabulary"] {
-                display: none !important;
+            .nav-item span {
+                display: none;
             }
+
+            /* Vocabulary tab visible on mobile */
 
             .container {
                 flex-direction: column;
@@ -678,10 +679,7 @@
                 line-height: 1.1;
             }
 
-            /* Hide Vocabulary tab on small mobile too */
-            .nav-item[onclick*="vocabulary"] {
-                display: none !important;
-            }
+            /* Vocabulary tab visible on small mobile too */
 
             .section {
                 padding: 10px 5px;
@@ -736,6 +734,9 @@
             <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
             <div class="nav-item" onclick="showSection('contact', this)">
                 <span style="font-size: 1.2rem; margin-right: 8px;">☎</span>Contact
+            </div>
+            <div class="nav-item" onclick="window.open('{{BOOKING_URL}}', '_blank')">
+                <span style="font-size: 1.2rem; margin-right: 8px;">📅</span>Book Lesson
             </div>
         </div>
 
@@ -835,15 +836,205 @@
 
             <!-- Vocabulary Section -->
             <div class="section" id="vocabulary">
-                <div style="height: 100%; padding: 10px; display: flex; flex-direction: column;">
-                    <!-- Google Sheets Embed - Maximized -->
-                    <iframe
-                        src="{{VOCABULARY_URL}}"
-                        style="width: 100%; height: 100%; border: none; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);"
-                        title="Student Vocabulary Tracker">
-                    </iframe>
+                <div style="height: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto;">
+
+                    <p id="fc-lang-label" style="font-size: 0.95rem; color: #718096; margin-bottom: 1.5rem; letter-spacing: 0.03em;">Loading…</p>
+                    <p id="fc-status" style="color: #718096; font-size: 1rem; margin-top: 2rem;"></p>
+
+                    <!-- Card -->
+                    <div class="fc-scene" id="fc-scene" style="display:none" onclick="fcFlip()">
+                        <div class="fc-card" id="fc-card">
+                            <div class="fc-face fc-front">
+                                <img id="fc-img" src="" alt="" />
+                                <div class="fc-word" id="fc-l1"></div>
+                                <div style="display:flex; align-items:center; gap:0.6rem;">
+                                    <div class="fc-tag" id="fc-front-lang"></div>
+                                    <button class="fc-audio-btn" onclick="event.stopPropagation(); fcSpeak()" title="Listen">&#128266;</button>
+                                </div>
+                            </div>
+                            <div class="fc-face fc-back">
+                                <div class="fc-tag" id="fc-back-lang"></div>
+                                <div class="fc-translation" id="fc-l2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div id="fc-controls" style="display:none; display:none; flex-direction:row; align-items:center; gap:1.2rem; margin-top: 1.5rem;">
+                        <button class="fc-btn" id="fc-prev" onclick="fcNavigate(-1)">&#8592; Prev</button>
+                        <span id="fc-counter" style="font-size:0.9rem; color:#718096; min-width:60px; text-align:center;"></span>
+                        <button class="fc-btn" id="fc-next" onclick="fcNavigate(1)">Next &#8594;</button>
+                    </div>
+
+                    <!-- Master link -->
+                    <a href="{{FLASHCARD_SHEET_URL}}" target="_blank" id="fc-master-btn"
+                       style="display:none; margin-top:1rem; font-size:0.78rem; color:#a0aec0; text-decoration:none;
+                              border:1px solid #e2e8f0; border-radius:6px; padding:4px 12px;
+                              transition: all 0.2s;"
+                       onmouseover="this.style.color='#667eea';this.style.borderColor='#667eea';"
+                       onmouseout="this.style.color='#a0aec0';this.style.borderColor='#e2e8f0';">
+                        Master ↗
+                    </a>
+
+                    <p id="fc-hint" style="display:none; margin-top:1rem; font-size:0.8rem; color:#a0aec0;">Click the card to reveal the translation</p>
                 </div>
             </div>
+
+            <style>
+                .fc-scene {
+                    width: min(520px, 90vw);
+                    height: min(400px, 55vh);
+                    perspective: 900px; cursor: pointer;
+                }
+                .fc-card {
+                    width: 100%; height: 100%;
+                    position: relative; transform-style: preserve-3d;
+                    transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
+                    border-radius: 20px;
+                    box-shadow: 0 12px 40px rgba(102,126,234,0.3);
+                }
+                .fc-card.flipped { transform: rotateY(180deg); }
+                .fc-face {
+                    position: absolute; inset: 0; border-radius: 20px;
+                    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+                    display: flex; flex-direction: column;
+                    align-items: center; justify-content: center;
+                    gap: 1rem; padding: 2rem;
+                }
+                .fc-front { background: #ffffff; border: 1px solid rgba(102,126,234,0.15); }
+                .fc-front img { width: 100%; max-height: 240px; object-fit: cover; border-radius: 12px; }
+                .fc-word { font-size: 1.9rem; font-weight: 700; color: #2d3748; }
+                .fc-tag { font-size: 0.78rem; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.08em; }
+                .fc-back {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    transform: rotateY(180deg);
+                }
+                .fc-translation { font-size: 2.6rem; font-weight: 800; color: #ffffff; text-align: center; }
+                .fc-back .fc-tag { color: #c3cffe; }
+                .fc-btn {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: #fff; border: none; border-radius: 8px;
+                    padding: 0.65rem 1.8rem; font-size: 1rem;
+                    font-weight: 600; cursor: pointer; font-family: inherit;
+                    transition: opacity 0.2s;
+                }
+                .fc-btn:hover { opacity: 0.88; }
+                .fc-btn:disabled { background: #cbd5e0; cursor: default; }
+                .fc-audio-btn {
+                    background: none; border: none; cursor: pointer;
+                    font-size: 1.1rem; padding: 2px 4px; line-height: 1;
+                    opacity: 0.6; transition: opacity 0.2s; border-radius: 4px;
+                }
+                .fc-audio-btn:hover { opacity: 1; }
+            </style>
+
+            <script>
+                (function () {
+                    const SHEET_RAW = '{{FLASHCARD_SHEET_URL}}';
+                    const SHEET_ID  = (SHEET_RAW.match(/\/d\/([a-zA-Z0-9_-]+)/) || [, SHEET_RAW])[1];
+                    let cards = [], current = 0;
+
+                    async function load() {
+                        const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/export?format=csv&cachebust=' + Date.now();
+                        console.log('[Flashcard] SHEET_RAW:', SHEET_RAW);
+                        console.log('[Flashcard] SHEET_ID:', SHEET_ID);
+                        console.log('[Flashcard] Fetching:', url);
+                        try {
+                            const text = await (await fetch(url)).text();
+                            console.log('[Flashcard] Response length:', text.length, '| First 200 chars:', text.substring(0, 200));
+                            parse(text);
+                        } catch (e) {
+                            console.error('[Flashcard] Fetch error:', e);
+                            document.getElementById('fc-status').textContent = 'Could not load vocabulary. Make sure the sheet is shared publicly.';
+                        }
+                    }
+
+                    function parseRow(row) {
+                        const out = []; let cur = '', inQ = false;
+                        for (let i = 0; i < row.length; i++) {
+                            const ch = row[i];
+                            if (ch === '"') { if (inQ && row[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+                            else if (ch === ',' && !inQ) { out.push(cur.trim()); cur = ''; }
+                            else cur += ch;
+                        }
+                        out.push(cur.trim()); return out;
+                    }
+
+                    function parse(text) {
+                        const rows = text.trim().split('\n').map(parseRow);
+                        if (rows.length < 2) { document.getElementById('fc-status').textContent = 'No vocabulary added yet.'; return; }
+                        const lang1 = rows[0][0] || 'Language 1', lang2 = rows[0][1] || 'Language 2';
+                        lang1Code = SPEECH_LANGS[lang1.toLowerCase().trim()] || 'en-US';
+                        document.getElementById('fc-lang-label').textContent = lang1 + ' → ' + lang2;
+                        document.getElementById('fc-front-lang').textContent = lang1;
+                        document.getElementById('fc-back-lang').textContent  = lang2;
+                        cards = rows.slice(1).filter(r => r[0]).map(r => ({ l1: r[0], l2: r[1] || '—', img: r[2] || '' }));
+                        if (!cards.length) { document.getElementById('fc-status').textContent = 'No vocabulary added yet.'; return; }
+                        document.getElementById('fc-status').textContent = '';
+                        document.getElementById('fc-scene').style.display      = '';
+                        document.getElementById('fc-controls').style.display   = 'flex';
+                        document.getElementById('fc-hint').style.display       = '';
+                        document.getElementById('fc-master-btn').style.display = '';
+                        show(0);
+                    }
+
+                    function show(i) {
+                        const c = cards[i];
+                        document.getElementById('fc-l1').textContent = c.l1;
+                        document.getElementById('fc-l2').textContent = c.l2;
+                        const img = document.getElementById('fc-img');
+                        if (c.img) { img.style.display = ''; img.onerror = () => img.style.display = 'none'; img.src = c.img; }
+                        else { img.src = ''; img.style.display = 'none'; }
+                        document.getElementById('fc-card').classList.remove('flipped');
+                        document.getElementById('fc-counter').textContent = (i + 1) + ' / ' + cards.length;
+                        document.getElementById('fc-prev').disabled = i === 0;
+                        document.getElementById('fc-next').disabled = i === cards.length - 1;
+                    }
+
+                    const flipSound = new Audio('https://music.wixstatic.com/mp3/593d03_067ca72b08f1412eae427c86254b4491.mp3');
+                    flipSound.volume = 0.6;
+
+                    function playFlip() {
+                        try {
+                            flipSound.currentTime = 0;
+                            flipSound.play();
+                        } catch(e) {}
+                    }
+
+                    const SPEECH_LANGS = {
+                        'english':'en-US','spanish':'es-ES','french':'fr-FR','german':'de-DE',
+                        'italian':'it-IT','portuguese':'pt-BR','japanese':'ja-JP','chinese':'zh-CN',
+                        'mandarin':'zh-CN','cantonese':'zh-TW','korean':'ko-KR','arabic':'ar-SA',
+                        'russian':'ru-RU','dutch':'nl-NL','swedish':'sv-SE','turkish':'tr-TR',
+                        'polish':'pl-PL','greek':'el-GR','hindi':'hi-IN','thai':'th-TH',
+                        'vietnamese':'vi-VN','indonesian':'id-ID','ukrainian':'uk-UA',
+                        'hungarian':'hu-HU','czech':'cs-CZ','slovak':'sk-SK','romanian':'ro-RO',
+                        'bulgarian':'bg-BG','serbian':'sr-RS','croatian':'hr-HR','norwegian':'nb-NO',
+                        'danish':'da-DK','finnish':'fi-FI','hebrew':'he-IL','persian':'fa-IR',
+                        'malay':'ms-MY','tagalog':'tl-PH','bengali':'bn-BD','urdu':'ur-PK',
+                        'swahili':'sw-KE','afrikaans':'af-ZA','catalan':'ca-ES','latvian':'lv-LV',
+                        'lithuanian':'lt-LT','estonian':'et-EE','georgian':'ka-GE','armenian':'hy-AM',
+                        'azerbaijani':'az-AZ','kazakh':'kk-KZ','uzbek':'uz-UZ','tamil':'ta-IN',
+                        'telugu':'te-IN','marathi':'mr-IN','nepali':'ne-NP','burmese':'my-MM'
+                    };
+                    let lang1Code = 'en-US';
+
+                    window.fcSpeak = function() {
+                        const word = document.getElementById('fc-l1').textContent;
+                        if (!word || !window.speechSynthesis) return;
+                        window.speechSynthesis.cancel();
+                        const utter = new SpeechSynthesisUtterance(word);
+                        utter.lang = lang1Code;
+                        utter.rate = 0.9;
+                        window.speechSynthesis.speak(utter);
+                    };
+
+                    window.fcFlip     = () => { playFlip(); document.getElementById('fc-card').classList.toggle('flipped'); };
+                    window.fcNavigate = dir => { const n = current + dir; if (n >= 0 && n < cards.length) { playFlip(); show(current = n); } };
+
+                    load();
+                })();
+            </script>
 
             <!-- Finished Activities Section -->
             <div class="section" id="activities">
@@ -857,9 +1048,67 @@
                         <div id="activitiesList" style="flex: 1; padding: 20px; overflow-y: auto;">
                             {{FINISHED_ACTIVITIES_HTML}}
                         </div>
+                        <!-- Add Lesson Input -->
+                        <div style="padding: 16px 20px; border-top: 1px solid rgba(0,0,0,0.08); display: flex; gap: 10px; align-items: center;">
+                            <input
+                                type="text"
+                                id="lessonInput"
+                                placeholder="Paste lesson URL..."
+                                style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s;"
+                                onfocus="this.style.borderColor='#4c51bf'"
+                                onblur="this.style.borderColor='#cbd5e0'"
+                                onkeydown="if(event.key==='Enter') addLesson()"
+                            />
+                            <button
+                                onclick="addLesson()"
+                                style="padding: 10px 20px; background: #4c51bf; color: white; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
+                                onmouseover="this.style.background='#434190'"
+                                onmouseout="this.style.background='#4c51bf'"
+                            >Add Lesson</button>
+                            <span id="lessonStatus" style="font-size: 0.85rem; color: #48bb78; display: none;"></span>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <script>
+                const STUDENT_NAME_FOR_LESSONS = '{{STUDENT_NAME}}';
+                const LESSONS_SCRIPT_URL = 'https://script.google.com/a/macros/mimlanguageservices.com/s/AKfycbzpv6MIPt7pBezd3keNDZ_d7hUG1gHHiRCoMDbk6L7VNRw6LBdHRfIgfj0NZGfNfANRXg/exec';
+
+                function addLesson() {
+                    const input  = document.getElementById('lessonInput');
+                    const status = document.getElementById('lessonStatus');
+                    const url    = input.value.trim();
+
+                    if (!url) return;
+
+                    const btn = document.querySelector('#activities button[onclick="addLesson()"]');
+                    btn.disabled = true;
+                    btn.textContent = 'Saving...';
+                    status.style.display = 'none';
+
+                    const endpoint = LESSONS_SCRIPT_URL
+                        + '?studentName=' + encodeURIComponent(STUDENT_NAME_FOR_LESSONS)
+                        + '&lessonUrl='   + encodeURIComponent(url);
+
+                    // Use an Image request — avoids CORS entirely for GET calls to Apps Script
+                    const img = new Image();
+                    img.onload = img.onerror = function() {
+                        btn.disabled = false;
+                        btn.textContent = 'Add Lesson';
+                    };
+                    img.src = endpoint;
+
+                    // Optimistically clear input and show confirmation after a short delay
+                    setTimeout(() => {
+                        input.value = '';
+                        status.textContent = 'Sent!';
+                        status.style.color  = '#48bb78';
+                        status.style.display = 'inline';
+                        setTimeout(() => { status.style.display = 'none'; }, 3000);
+                    }, 1500);
+                }
+            </script>
 
             <!-- Writing Section -->
             <div class="section" id="writing">
@@ -926,6 +1175,13 @@
                     </div>
                 </div>
             </div>
+            <!-- Book Lesson Section -->
+            <div class="section" id="book">
+                <h2><span style="font-size: 2rem; margin-right: 10px;">📅</span>Book a Lesson</h2>
+                <div style="flex: 1; padding: 20px; display: flex; flex-direction: column;">
+                    {{TIDYCAL_EMBED}}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -957,12 +1213,12 @@
 
             let iconUrl;
 
-            if (classLink.includes('teams.microsoft.com') || classLink.includes('teams.live.com')) {
-                iconUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg/1200px-Microsoft_Office_Teams_%282018%E2%80%93present%29.svg.png';
+            if (classLink.includes('teams.live.com') || classLink.includes('teams.microsoft.com')) {
+                iconUrl = 'https://upload.wikimedia.org/wikipedia/commons/5/50/Microsoft_Teams.png';
+            } else if (classLink.includes('preply.com')) {
+                iconUrl = 'https://static.wixstatic.com/media/593d03_f48567670bfd4fe0a3c540e957d102c9~mv2.png';
             } else if (classLink.includes('meet.google.com')) {
-                iconUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Meet_icon_%282020%29.svg/512px-Google_Meet_icon_%282020%29.svg.png?20221213135236';
-            } else {
-                iconUrl = 'https://static.wixstatic.com/media/593d03_b3673f0bdf4248fc9cbbb9a009330935~mv2.jpg';
+                iconUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Meet_icon_%282020%29.svg/960px-Google_Meet_icon_%282020%29.svg.png?_=20221213135236';
             }
 
             iconElement.src = iconUrl;

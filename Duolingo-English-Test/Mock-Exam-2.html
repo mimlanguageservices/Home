@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png">
+    <title>Duolingo English Test – Mock Exam 2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f4c0f 0%, #1a2e1a 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            padding: 14px 40px;
+            border-bottom: 3px solid #58CC02;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+
+        .det-logo-text { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.5px; }
+        .det-logo-text .duo   { color: #58CC02; }
+        .det-logo-text .lingo { color: #1f2937; }
+
+        .header-left p { color: #6b7280; font-size: 0.92rem; margin-top: 2px; }
+
+        .header-right { display: flex; align-items: center; gap: 20px; }
+
+        .score-display {
+            background: #58CC02;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .header-image {
+            width: 100px; height: 60px;
+            border-radius: 10px; object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .container { display: flex; height: calc(100vh - 88px); overflow: hidden; }
+
+        /* NAV */
+        .navigation {
+            width: 245px;
+            background: rgba(15,76,15,0.97);
+            padding: 20px 12px;
+            border-right: 1px solid rgba(88,204,2,0.2);
+            display: flex; flex-direction: column; gap: 6px;
+            flex-shrink: 0; overflow-y: auto;
+        }
+
+        .nav-section-label {
+            color: rgba(255,255,255,0.45);
+            font-size: 0.68rem; font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            padding: 10px 8px 4px;
+        }
+
+        .nav-item {
+            padding: 11px 14px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #d1fae5; cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: left; font-weight: 500; font-size: 0.88rem; line-height: 1.3;
+        }
+
+        .nav-item:hover { background: rgba(88,204,2,0.15); color: #fff; border-color: rgba(88,204,2,0.3); transform: translateX(3px); }
+        .nav-item.active { background: linear-gradient(135deg, #58CC02 0%, #45a800 100%); color: #fff; border-color: transparent; box-shadow: 0 4px 15px rgba(88,204,2,0.4); font-weight: 600; }
+        .nav-item .nav-tag { display: inline-block; font-size: 0.67rem; background: rgba(255,255,255,0.18); padding: 1px 6px; border-radius: 4px; margin-bottom: 3px; font-weight: 700; letter-spacing: 0.5px; }
+
+        /* CONTENT */
+        .content { flex: 1; overflow: hidden; background: #f9fafb; }
+        .section { display: none; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+
+        /* INSTRUCTIONS */
+        .instructions-panel { padding: 40px 60px; overflow-y: auto; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        .exam-card { background: white; border-radius: 20px; padding: 46px 56px; max-width: 740px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+
+        .exam-badge { display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 6px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 20px; }
+        .det-dot { width: 8px; height: 8px; border-radius: 50%; background: #58CC02; }
+
+        .exam-card h2 { font-size: 2rem; color: #111827; font-weight: 700; margin-bottom: 10px; }
+        .exam-card .subtitle { color: #6b7280; font-size: 0.97rem; margin-bottom: 28px; line-height: 1.6; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+        .info-box { background: #f9fafb; border-radius: 12px; padding: 15px 18px; border-left: 4px solid #58CC02; }
+        .info-box .label { color: #9ca3af; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-box .value { color: #111827; font-size: 1.05rem; font-weight: 600; margin-top: 4px; }
+
+        .section-types { margin-bottom: 24px; }
+        .section-types h4 { font-size: 0.82rem; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+        .type-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+        .type-chip { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+
+        .directions-list { list-style: none; margin-bottom: 28px; }
+        .directions-list li { padding: 7px 0; padding-left: 22px; color: #4b5563; position: relative; font-size: 0.92rem; line-height: 1.55; }
+        .directions-list li::before { content: '→'; position: absolute; left: 0; color: #58CC02; font-weight: 700; }
+
+        .start-btn { background: linear-gradient(135deg, #58CC02 0%, #45a800 100%); color: white; border: none; padding: 16px 40px; border-radius: 12px; font-size: 1.08rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; width: 100%; box-shadow: 0 4px 20px rgba(88,204,2,0.35); letter-spacing: 0.3px; }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(88,204,2,0.45); }
+
+        /* FULL PANEL */
+        .full-panel { height: 100%; overflow-y: auto; padding: 30px 50px; background: #f9fafb; }
+
+        .section-header { background: white; border-radius: 14px; padding: 20px 26px; margin-bottom: 22px; border-left: 5px solid #58CC02; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .section-header h3 { font-size: 1.1rem; color: #111827; font-weight: 700; }
+        .section-header p { color: #6b7280; font-size: 0.85rem; margin-top: 4px; line-height: 1.5; }
+
+        /* SPLIT LAYOUT */
+        .exam-layout { display: flex; height: 100%; overflow: hidden; }
+        .passage-panel { width: 47%; border-right: 2px solid #e5e7eb; overflow-y: auto; padding: 28px 32px; background: #fff; }
+
+        .passage-label { background: #f0fdf4; color: #166534; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 12px; border-radius: 6px; display: inline-block; margin-bottom: 14px; border: 1px solid #bbf7d0; }
+        .passage-title { font-size: 1.3rem; font-weight: 700; color: #111827; margin-bottom: 4px; }
+        .passage-meta  { color: #9ca3af; font-size: 0.85rem; margin-bottom: 18px; font-style: italic; }
+        .passage-text  { color: #374151; font-size: 0.97rem; line-height: 1.9; }
+        .passage-text p { margin-bottom: 14px; }
+
+        .blank-word { display: inline-block; min-width: 90px; border-bottom: 2px solid #58CC02; text-align: center; font-weight: 600; color: #166534; background: #f0fdf4; padding: 0 6px; border-radius: 4px; margin: 0 2px; }
+
+        /* QUESTIONS */
+        .questions-panel { flex: 1; overflow-y: auto; padding: 28px 28px; background: #f9fafb; }
+        .questions-header { margin-bottom: 18px; }
+        .questions-header h3 { font-size: 1.05rem; color: #111827; font-weight: 700; }
+        .questions-header p { color: #6b7280; font-size: 0.83rem; margin-top: 3px; }
+
+        .question-block { background: white; border-radius: 14px; padding: 20px 22px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 2px solid transparent; transition: border-color 0.2s; }
+        .question-block.answered  { border-color: #bbf7d0; }
+        .question-block.correct   { border-color: #86efac; background: #f0fdf4; }
+        .question-block.incorrect { border-color: #fca5a5; background: #fef2f2; }
+
+        .q-number   { font-size: 0.72rem; font-weight: 700; color: #58CC02; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 6px; }
+        .q-text     { font-size: 0.95rem; color: #1f2937; line-height: 1.55; margin-bottom: 13px; font-weight: 500; }
+        .q-type-tag { font-size: 0.68rem; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-bottom: 10px; display: inline-block; }
+
+        .options { display: flex; flex-direction: column; gap: 7px; }
+        .option { display: flex; align-items: flex-start; gap: 10px; padding: 10px 13px; border: 2px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: white; }
+        .option:hover      { border-color: #86efac; background: #f0fdf4; }
+        .option.selected   { border-color: #58CC02; background: #f0fdf4; }
+        .option.correct-ans { border-color: #16a34a; background: #dcfce7; }
+        .option.wrong-ans  { border-color: #dc2626; background: #fef2f2; }
+
+        .option-letter { width: 26px; height: 26px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.78rem; flex-shrink: 0; }
+        .option.selected    .option-letter { background: #58CC02; color: white; }
+        .option.correct-ans .option-letter { background: #16a34a; color: white; }
+        .option.wrong-ans   .option-letter { background: #dc2626; color: white; }
+        .option-text { font-size: 0.88rem; color: #374151; line-height: 1.45; padding-top: 3px; }
+
+        /* Word cards — Read & Select */
+        .word-options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .word-card { padding: 12px 22px; border: 2px solid #e5e7eb; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: white; font-size: 1rem; font-weight: 600; color: #374151; text-align: center; min-width: 100px; }
+        .word-card:hover       { border-color: #86efac; background: #f0fdf4; color: #166534; }
+        .word-card.selected    { border-color: #58CC02; background: #f0fdf4; color: #166534; }
+        .word-card.correct-ans { border-color: #16a34a; background: #dcfce7; color: #14532d; }
+        .word-card.wrong-ans   { border-color: #dc2626; background: #fef2f2; color: #991b1b; }
+
+        .feedback-box { margin-top: 10px; padding: 9px 13px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; display: none; }
+        .feedback-box.correct   { background: #dcfce7; color: #14532d; display: block; border-left: 3px solid #16a34a; }
+        .feedback-box.incorrect { background: #fee2e2; color: #7f1d1d; display: block; border-left: 3px solid #dc2626; }
+
+        /* Open response */
+        .open-textarea { width: 100%; min-height: 120px; border: 2px solid #e5e7eb; border-radius: 10px; padding: 12px 14px; font-family: inherit; font-size: 0.92rem; color: #374151; resize: vertical; transition: border-color 0.2s; line-height: 1.6; }
+        .open-textarea:focus { outline: none; border-color: #58CC02; }
+        .word-count { font-size: 0.75rem; color: #9ca3af; text-align: right; margin-top: 5px; }
+
+        .photo-box { background: #f3f4f6; border-radius: 12px; overflow: hidden; margin-bottom: 14px; border: 2px solid #e5e7eb; }
+        .photo-box img { width: 100%; height: 220px; object-fit: cover; display: block; }
+        .photo-caption { padding: 8px 14px; font-size: 0.78rem; color: #9ca3af; font-style: italic; }
+
+        .submit-open-btn { background: #f0fdf4; color: #166534; border: 2px solid #86efac; padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
+        .submit-open-btn:hover { background: #dcfce7; }
+
+        .rubric-box { margin-top: 12px; background: #f9fafb; border-radius: 8px; padding: 12px 14px; font-size: 0.82rem; color: #4b5563; line-height: 1.6; border-left: 3px solid #e5e7eb; display: none; }
+
+        /* Nav buttons */
+        .section-nav { display: flex; justify-content: space-between; align-items: center; padding: 18px 0 8px; border-top: 2px solid #e5e7eb; margin-top: 10px; }
+        .section-nav button { padding: 11px 26px; border-radius: 10px; border: none; font-weight: 700; font-size: 0.93rem; cursor: pointer; transition: all 0.2s; }
+        .btn-check { background: #58CC02; color: white; box-shadow: 0 4px 12px rgba(88,204,2,0.3); }
+        .btn-check:hover { background: #45a800; transform: translateY(-1px); }
+        .btn-next { background: #111827; color: white; box-shadow: 0 4px 12px rgba(17,24,39,0.3); }
+        .btn-next:hover { background: #1f2937; transform: translateY(-1px); }
+        .btn-next:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; transform: none; }
+        .progress-text { color: #9ca3af; font-size: 0.83rem; font-weight: 500; }
+
+        /* Results */
+        .results-panel { padding: 50px; overflow-y: auto; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .results-card { background: white; border-radius: 24px; padding: 46px 56px; max-width: 720px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.08); text-align: center; }
+
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, #58CC02, #45a800); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 28px; box-shadow: 0 8px 30px rgba(88,204,2,0.4); }
+        .score-circle .big-num   { font-size: 3rem; font-weight: 700; line-height: 1; }
+        .score-circle .score-label { font-size: 0.75rem; opacity: 0.9; margin-top: 4px; font-weight: 600; }
+
+        .results-card h2       { font-size: 1.8rem; color: #111827; margin-bottom: 8px; font-weight: 700; }
+        .results-card .result-sub { color: #6b7280; font-size: 0.97rem; margin-bottom: 28px; }
+
+        .subscore-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+        .subscore-item { background: #f9fafb; border-radius: 12px; padding: 16px; border-top: 3px solid #58CC02; }
+        .subscore-item .b-num   { font-size: 1.5rem; font-weight: 700; color: #111827; }
+        .subscore-item .b-label { font-size: 0.78rem; color: #6b7280; margin-top: 3px; font-weight: 500; }
+
+        .level-bar-wrap  { margin-bottom: 28px; text-align: left; }
+        .level-bar-label { font-size: 0.82rem; color: #4b5563; margin-bottom: 7px; font-weight: 600; }
+        .level-bar-bg    { background: #e5e7eb; border-radius: 10px; height: 12px; }
+        .level-bar-fill  { height: 12px; border-radius: 10px; background: linear-gradient(90deg, #58CC02, #45a800); transition: width 1s ease; }
+
+        .det-scale-note { font-size: 0.8rem; color: #9ca3af; margin-bottom: 24px; background: #f9fafb; border-radius: 8px; padding: 10px 14px; text-align: left; }
+
+        .retry-btn  { background: linear-gradient(135deg, #58CC02 0%, #45a800 100%); color: white; border: none; padding: 13px 34px; border-radius: 12px; font-size: 0.97rem; font-weight: 700; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 20px rgba(88,204,2,0.3); margin-right: 12px; }
+        .retry-btn:hover { transform: translateY(-2px); }
+        .review-btn { background: white; color: #111827; border: 2px solid #111827; padding: 13px 34px; border-radius: 12px; font-size: 0.97rem; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .review-btn:hover { background: #f9fafb; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <div class="det-logo-text"><span class="duo">Duo</span><span class="lingo">lingo</span> English Test</div>
+        <p>Mock Exam 2 &nbsp;|&nbsp; Practice for the DET &nbsp;|&nbsp; MIM Language Services</p>
+    </div>
+    <div class="header-right">
+        <div class="score-display" id="liveScore">DET Score: ~0</div>
+        <img class="header-image"
+             src="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png"
+             alt="MIM Language Services">
+    </div>
+</div>
+
+<div class="container">
+
+    <nav class="navigation">
+        <div class="nav-section-label">Exam</div>
+        <div class="nav-item active" onclick="showSection('intro')">📋 Instructions</div>
+
+        <div class="nav-section-label">Part 1 — Vocabulary</div>
+        <div class="nav-item" onclick="showSection('ras')">
+            <span class="nav-tag">Q 1–6</span><br>Read &amp; Select
+        </div>
+
+        <div class="nav-section-label">Part 2 — Grammar</div>
+        <div class="nav-item" onclick="showSection('fitb')">
+            <span class="nav-tag">Q 7–12</span><br>Fill in the Blanks
+        </div>
+
+        <div class="nav-section-label">Part 3 — Reading</div>
+        <div class="nav-item" onclick="showSection('rac-passage')">
+            <span class="nav-tag">PASSAGE</span><br>Read &amp; Complete
+        </div>
+        <div class="nav-item" onclick="showSection('rac-questions')">
+            <span class="nav-tag">Q 13–17</span><br>Comprehension
+        </div>
+
+        <div class="nav-section-label">Part 4 — Writing</div>
+        <div class="nav-item" onclick="showSection('writing')">
+            <span class="nav-tag">Q 18–19</span><br>Write About the Photo
+        </div>
+
+        <div class="nav-section-label">Part 5 — Listening</div>
+        <div class="nav-item" onclick="showSection('listening')">
+            <span class="nav-tag">Q 20–22</span><br>Listen &amp; Type (Sim.)
+        </div>
+
+        <div class="nav-section-label">Results</div>
+        <div class="nav-item" onclick="showResults()">🏆 View DET Score</div>
+    </nav>
+
+    <div class="content">
+
+        <!-- ============================================================ -->
+        <!-- INTRO -->
+        <!-- ============================================================ -->
+        <div class="section active" id="section-intro">
+            <div class="instructions-panel">
+                <div class="exam-card">
+                    <div class="exam-badge"><div class="det-dot"></div> Duolingo English Test · Mock Exam 2</div>
+                    <h2>Practice Test — Level 2</h2>
+                    <p class="subtitle">A second full-length DET practice exam with all-new questions. This exam covers the same question types as Mock Exam 1 but at a slightly higher difficulty level. Aim for accuracy and speed — the real DET gives you about 45 minutes for the core test.</p>
+
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <div class="label">Total Questions</div>
+                            <div class="value">22 Questions</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">DET Score Scale</div>
+                            <div class="value">10 – 160 points</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Skills Tested</div>
+                            <div class="value">Read · Write · Listen</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Suggested Time</div>
+                            <div class="value">40 – 50 minutes</div>
+                        </div>
+                    </div>
+
+                    <div class="section-types">
+                        <h4>Question Types in This Mock</h4>
+                        <div class="type-chips">
+                            <span class="type-chip">Read &amp; Select</span>
+                            <span class="type-chip">Fill in the Blanks</span>
+                            <span class="type-chip">Read &amp; Complete</span>
+                            <span class="type-chip">Reading Comprehension</span>
+                            <span class="type-chip">Write About the Photo</span>
+                            <span class="type-chip">Listen &amp; Type (Simulated)</span>
+                        </div>
+                    </div>
+
+                    <ul class="directions-list">
+                        <li><strong>Read &amp; Select:</strong> Click on every word that is a real English word. Some options are invented (non-words).</li>
+                        <li><strong>Fill in the Blanks:</strong> Choose the word or phrase that best completes each sentence grammatically and logically.</li>
+                        <li><strong>Read &amp; Complete:</strong> Read the passage with blanks and choose the best word for each gap.</li>
+                        <li><strong>Write About the Photo:</strong> Write at least 50 words describing what you see. Use the rubric to self-score.</li>
+                        <li><strong>Listen &amp; Type (Simulated):</strong> Choose the version of the sentence with perfect spelling, grammar, and punctuation.</li>
+                        <li>Click <strong>Check Answers</strong> at the end of each scored part to see feedback.</li>
+                    </ul>
+
+                    <button class="start-btn" onclick="showSection('ras')">Begin Mock Exam 2 →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PART 1: READ AND SELECT -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-ras">
+            <div class="full-panel">
+                <div class="section-header">
+                    <h3>Part 1: Read &amp; Select</h3>
+                    <p>Click on <strong>every word</strong> that is a real English word. Some words are invented and do not exist. You may select more than one word per question.</p>
+                </div>
+
+                <!-- Q1 -->
+                <div class="question-block" id="qb1">
+                    <div class="q-number">Question 1</div>
+                    <div class="q-type-tag">Read &amp; Select — click all real words</div>
+                    <div class="q-text">Select every word that is a real English word.</div>
+                    <div class="word-options">
+                        <div class="word-card" onclick="toggleWord(this,'q1','diligent')">diligent</div>
+                        <div class="word-card" onclick="toggleWord(this,'q1','splounge')">splounge</div>
+                        <div class="word-card" onclick="toggleWord(this,'q1','pragmatic')">pragmatic</div>
+                        <div class="word-card" onclick="toggleWord(this,'q1','worvent')">worvent</div>
+                    </div>
+                    <div class="feedback-box" id="fb1"></div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="question-block" id="qb2">
+                    <div class="q-number">Question 2</div>
+                    <div class="q-type-tag">Read &amp; Select — click all real words</div>
+                    <div class="q-text">Select every word that is a real English word.</div>
+                    <div class="word-options">
+                        <div class="word-card" onclick="toggleWord(this,'q2','frivolous')">frivolous</div>
+                        <div class="word-card" onclick="toggleWord(this,'q2','narbulate')">narbulate</div>
+                        <div class="word-card" onclick="toggleWord(this,'q2','vindicate')">vindicate</div>
+                        <div class="word-card" onclick="toggleWord(this,'q2','crelping')">crelping</div>
+                    </div>
+                    <div class="feedback-box" id="fb2"></div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="question-block" id="qb3">
+                    <div class="q-number">Question 3</div>
+                    <div class="q-type-tag">Read &amp; Select — click all real words</div>
+                    <div class="q-text">Select every word that is a real English word.</div>
+                    <div class="word-options">
+                        <div class="word-card" onclick="toggleWord(this,'q3','zumple')">zumple</div>
+                        <div class="word-card" onclick="toggleWord(this,'q3','tenacious')">tenacious</div>
+                        <div class="word-card" onclick="toggleWord(this,'q3','wrimble')">wrimble</div>
+                        <div class="word-card" onclick="toggleWord(this,'q3','obsolete')">obsolete</div>
+                    </div>
+                    <div class="feedback-box" id="fb3"></div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="question-block" id="qb4">
+                    <div class="q-number">Question 4</div>
+                    <div class="q-type-tag">Read &amp; Select — click all real words</div>
+                    <div class="q-text">Select every word that is a real English word.</div>
+                    <div class="word-options">
+                        <div class="word-card" onclick="toggleWord(this,'q4','fortitude')">fortitude</div>
+                        <div class="word-card" onclick="toggleWord(this,'q4','dremble')">dremble</div>
+                        <div class="word-card" onclick="toggleWord(this,'q4','pejorative')">pejorative</div>
+                        <div class="word-card" onclick="toggleWord(this,'q4','glipton')">glipton</div>
+                    </div>
+                    <div class="feedback-box" id="fb4"></div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="question-block" id="qb5">
+                    <div class="q-number">Question 5</div>
+                    <div class="q-type-tag">Read &amp; Select — click all real words</div>
+                    <div class="q-text">Select every word that is a real English word.</div>
+                    <div class="word-options">
+                        <div class="word-card" onclick="toggleWord(this,'q5','arbitrary')">arbitrary</div>
+                        <div class="word-card" onclick="toggleWord(this,'q5','flommox')">flommox</div>
+                        <div class="word-card" onclick="toggleWord(this,'q5','clandestine')">clandestine</div>
+                        <div class="word-card" onclick="toggleWord(this,'q5','struntle')">struntle</div>
+                    </div>
+                    <div class="feedback-box" id="fb5"></div>
+                </div>
+
+                <!-- Q6 -->
+                <div class="question-block" id="qb6">
+                    <div class="q-number">Question 6</div>
+                    <div class="q-type-tag">Read &amp; Select — click all real words</div>
+                    <div class="q-text">Select every word that is a real English word.</div>
+                    <div class="word-options">
+                        <div class="word-card" onclick="toggleWord(this,'q6','vexatious')">vexatious</div>
+                        <div class="word-card" onclick="toggleWord(this,'q6','plinket')">plinket</div>
+                        <div class="word-card" onclick="toggleWord(this,'q6','prolific')">prolific</div>
+                        <div class="word-card" onclick="toggleWord(this,'q6','grumset')">grumset</div>
+                    </div>
+                    <div class="feedback-box" id="fb6"></div>
+                </div>
+
+                <div class="section-nav">
+                    <div class="progress-text">Questions 1–6 of 22</div>
+                    <div style="display:flex;gap:12px;">
+                        <button class="btn-check" onclick="checkSection('ras')">Check Answers</button>
+                        <button class="btn-next" onclick="showSection('fitb')">Next Section →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PART 2: FILL IN THE BLANKS -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-fitb">
+            <div class="full-panel">
+                <div class="section-header">
+                    <h3>Part 2: Fill in the Blanks</h3>
+                    <p>Choose the word or phrase that best completes each sentence. Pay attention to grammar, word form, and meaning.</p>
+                </div>
+
+                <!-- Q7 -->
+                <div class="question-block" id="qb7">
+                    <div class="q-number">Question 7</div>
+                    <div class="q-type-tag">Fill in the Blanks</div>
+                    <div class="q-text">The committee will not make a final decision until all the evidence __________ carefully reviewed.</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q7','A')"><div class="option-letter">A</div><div class="option-text">is</div></div>
+                        <div class="option" onclick="selectOption(this,'q7','B')"><div class="option-letter">B</div><div class="option-text">has been</div></div>
+                        <div class="option" onclick="selectOption(this,'q7','C')"><div class="option-letter">C</div><div class="option-text">was</div></div>
+                        <div class="option" onclick="selectOption(this,'q7','D')"><div class="option-letter">D</div><div class="option-text">had been</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb7"></div>
+                </div>
+
+                <!-- Q8 -->
+                <div class="question-block" id="qb8">
+                    <div class="q-number">Question 8</div>
+                    <div class="q-type-tag">Fill in the Blanks</div>
+                    <div class="q-text">Her argument was __________ — it relied on emotion rather than facts, and the data simply did not support her conclusion.</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q8','A')"><div class="option-letter">A</div><div class="option-text">compelling</div></div>
+                        <div class="option" onclick="selectOption(this,'q8','B')"><div class="option-letter">B</div><div class="option-text">rigorous</div></div>
+                        <div class="option" onclick="selectOption(this,'q8','C')"><div class="option-letter">C</div><div class="option-text">flawed</div></div>
+                        <div class="option" onclick="selectOption(this,'q8','D')"><div class="option-letter">D</div><div class="option-text">transparent</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb8"></div>
+                </div>
+
+                <!-- Q9 -->
+                <div class="question-block" id="qb9">
+                    <div class="q-number">Question 9</div>
+                    <div class="q-type-tag">Fill in the Blanks</div>
+                    <div class="q-text">The more time students spend reading outside class, __________ their vocabulary tends to become.</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q9','A')"><div class="option-letter">A</div><div class="option-text">more rich</div></div>
+                        <div class="option" onclick="selectOption(this,'q9','B')"><div class="option-letter">B</div><div class="option-text">the richest</div></div>
+                        <div class="option" onclick="selectOption(this,'q9','C')"><div class="option-letter">C</div><div class="option-text">the richer</div></div>
+                        <div class="option" onclick="selectOption(this,'q9','D')"><div class="option-letter">D</div><div class="option-text">so richer</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb9"></div>
+                </div>
+
+                <!-- Q10 -->
+                <div class="question-block" id="qb10">
+                    <div class="q-number">Question 10</div>
+                    <div class="q-type-tag">Fill in the Blanks</div>
+                    <div class="q-text">The engineers realized __________ the deadline had passed that a critical error had been made in the original design.</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q10','A')"><div class="option-letter">A</div><div class="option-text">just after</div></div>
+                        <div class="option" onclick="selectOption(this,'q10','B')"><div class="option-letter">B</div><div class="option-text">so that</div></div>
+                        <div class="option" onclick="selectOption(this,'q10','C')"><div class="option-letter">C</div><div class="option-text">in case</div></div>
+                        <div class="option" onclick="selectOption(this,'q10','D')"><div class="option-letter">D</div><div class="option-text">provided that</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb10"></div>
+                </div>
+
+                <!-- Q11 -->
+                <div class="question-block" id="qb11">
+                    <div class="q-number">Question 11</div>
+                    <div class="q-type-tag">Fill in the Blanks</div>
+                    <div class="q-text">The athlete __________ her personal best by nearly three seconds, which far exceeded anyone's expectations.</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q11','A')"><div class="option-letter">A</div><div class="option-text">shattered</div></div>
+                        <div class="option" onclick="selectOption(this,'q11','B')"><div class="option-letter">B</div><div class="option-text">admitted</div></div>
+                        <div class="option" onclick="selectOption(this,'q11','C')"><div class="option-letter">C</div><div class="option-text">reduced</div></div>
+                        <div class="option" onclick="selectOption(this,'q11','D')"><div class="option-letter">D</div><div class="option-text">inherited</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb11"></div>
+                </div>
+
+                <!-- Q12 -->
+                <div class="question-block" id="qb12">
+                    <div class="q-number">Question 12</div>
+                    <div class="q-type-tag">Fill in the Blanks</div>
+                    <div class="q-text">It is __________ that children develop strong reading habits early, as these skills become increasingly difficult to build in adulthood.</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q12','A')"><div class="option-letter">A</div><div class="option-letter-hidden"></div><div class="option-text">vital</div></div>
+                        <div class="option" onclick="selectOption(this,'q12','A')"><div class="option-letter">A</div><div class="option-text">vital</div></div>
+                        <div class="option" onclick="selectOption(this,'q12','B')"><div class="option-letter">B</div><div class="option-text">vitally</div></div>
+                        <div class="option" onclick="selectOption(this,'q12','C')"><div class="option-letter">C</div><div class="option-text">vitalize</div></div>
+                        <div class="option" onclick="selectOption(this,'q12','D')"><div class="option-letter">D</div><div class="option-text">vitality</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb12"></div>
+                </div>
+
+                <div class="section-nav">
+                    <div class="progress-text">Questions 7–12 of 22</div>
+                    <div style="display:flex;gap:12px;">
+                        <button class="btn-check" onclick="checkSection('fitb')">Check Answers</button>
+                        <button class="btn-next" onclick="showSection('rac-passage')">Next Section →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PART 3: READ AND COMPLETE — PASSAGE -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-rac-passage">
+            <div class="exam-layout">
+                <div class="passage-panel">
+                    <div class="passage-label">Adaptive Reading — Read &amp; Complete</div>
+                    <div class="passage-title">The Future of Urban Green Space</div>
+                    <div class="passage-meta">Adapted passage · DET practice reading</div>
+
+                    <div class="passage-text">
+                        <p>As cities around the world continue to grow, urban planners face a growing <span class="blank-word">[BLANK 1]</span>: how to provide enough green space for expanding populations while managing the high cost of land. Parks, gardens, and tree-lined streets are no longer considered <span class="blank-word">[BLANK 2]</span> features of city design — research increasingly confirms that access to nature has measurable effects on mental health, air quality, and community wellbeing.</p>
+
+                        <p>One response to this challenge has been the rise of so-called "pocket parks" — small green spaces <span class="blank-word">[BLANK 3]</span> into unused urban lots, rooftops, and even the walls of buildings. These micro-gardens cannot replace large public parks, but they represent a practical way of <span class="blank-word">[BLANK 4]</span> green space into the densest parts of a city.</p>
+
+                        <p>Critics, however, argue that such approaches are cosmetic rather than <span class="blank-word">[BLANK 5]</span>. Without bold policy decisions — such as protecting existing parks from commercial development and requiring green space in all new construction — the problem will only worsen as urban populations <span class="blank-word">[BLANK 6]</span> to expand in the coming decades.</p>
+                    </div>
+                </div>
+
+                <div class="questions-panel">
+                    <div class="questions-header">
+                        <h3>Part 3: Read &amp; Complete</h3>
+                        <p>Questions 13–17 &nbsp;·&nbsp; The Future of Urban Green Space</p>
+                    </div>
+
+                    <p style="font-size:0.83rem;color:#6b7280;margin-bottom:16px;">Read the passage on the left and choose the word that best fills each blank.</p>
+
+                    <!-- Q13 -->
+                    <div class="question-block" id="qb13">
+                        <div class="q-number">Question 13 — Blank 1</div>
+                        <div class="q-type-tag">Read &amp; Complete</div>
+                        <div class="q-text"><em>"…urban planners face a growing __________: how to provide enough green space…"</em></div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q13','A')"><div class="option-letter">A</div><div class="option-text">triumph</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','B')"><div class="option-letter">B</div><div class="option-text">dilemma</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','C')"><div class="option-letter">C</div><div class="option-text">advantage</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','D')"><div class="option-letter">D</div><div class="option-text">tradition</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb13"></div>
+                    </div>
+
+                    <!-- Q14 -->
+                    <div class="question-block" id="qb14">
+                        <div class="q-number">Question 14 — Blank 2</div>
+                        <div class="q-type-tag">Read &amp; Complete</div>
+                        <div class="q-text"><em>"Parks…are no longer considered __________ features of city design."</em></div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q14','A')"><div class="option-letter">A</div><div class="option-text">optional</div></div>
+                            <div class="option" onclick="selectOption(this,'q14','B')"><div class="option-letter">B</div><div class="option-text">expensive</div></div>
+                            <div class="option" onclick="selectOption(this,'q14','C')"><div class="option-letter">C</div><div class="option-text">controversial</div></div>
+                            <div class="option" onclick="selectOption(this,'q14','D')"><div class="option-letter">D</div><div class="option-text">historic</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb14"></div>
+                    </div>
+
+                    <!-- Q15 -->
+                    <div class="question-block" id="qb15">
+                        <div class="q-number">Question 15 — Blank 3</div>
+                        <div class="q-type-tag">Read &amp; Complete</div>
+                        <div class="q-text"><em>"…small green spaces __________ into unused urban lots, rooftops, and even the walls of buildings."</em></div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q15','A')"><div class="option-letter">A</div><div class="option-text">destroyed</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','B')"><div class="option-letter">B</div><div class="option-text">harvested</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','C')"><div class="option-letter">C</div><div class="option-text">tucked</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','D')"><div class="option-letter">D</div><div class="option-text">banned</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb15"></div>
+                    </div>
+
+                    <!-- Q16 -->
+                    <div class="question-block" id="qb16">
+                        <div class="q-number">Question 16 — Blank 4</div>
+                        <div class="q-type-tag">Read &amp; Complete</div>
+                        <div class="q-text"><em>"…a practical way of __________ green space into the densest parts of a city."</em></div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q16','A')"><div class="option-letter">A</div><div class="option-letter-hidden"></div><div class="option-text">eliminating</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','A')"><div class="option-letter">A</div><div class="option-text">eliminating</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','B')"><div class="option-letter">B</div><div class="option-text">weaving</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','C')"><div class="option-letter">C</div><div class="option-text">avoiding</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','D')"><div class="option-letter">D</div><div class="option-text">replacing</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb16"></div>
+                    </div>
+
+                    <!-- Q17 -->
+                    <div class="question-block" id="qb17">
+                        <div class="q-number">Question 17 — Blank 5</div>
+                        <div class="q-type-tag">Read &amp; Complete</div>
+                        <div class="q-text"><em>"Critics…argue that such approaches are cosmetic rather than __________."</em></div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q17','A')"><div class="option-letter">A</div><div class="option-text">decorative</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','B')"><div class="option-letter">B</div><div class="option-text">transformative</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','C')"><div class="option-letter">C</div><div class="option-text">inexpensive</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','D')"><div class="option-letter">D</div><div class="option-text">temporary</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb17"></div>
+                    </div>
+
+                    <div class="section-nav">
+                        <div class="progress-text">Questions 13–17 of 22</div>
+                        <div style="display:flex;gap:12px;">
+                            <button class="btn-check" onclick="checkSection('rac')">Check Answers</button>
+                            <button class="btn-next" onclick="showSection('writing')">Next Section →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PART 4: WRITE ABOUT THE PHOTO -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-writing">
+            <div class="full-panel">
+                <div class="section-header">
+                    <h3>Part 4: Write About the Photo</h3>
+                    <p>Describe each photo in detail. On the real DET you have 1 minute per photo. Aim for <strong>at least 50 words</strong>. Focus on what you can <em>see</em> — people, actions, objects, colors, setting. After submitting, review the rubric to evaluate your response.</p>
+                </div>
+
+                <!-- Q18 -->
+                <div class="question-block" id="qb18">
+                    <div class="q-number">Question 18</div>
+                    <div class="q-type-tag">Write About the Photo — Open Response</div>
+                    <div class="photo-box">
+                        <img src="https://images.unsplash.com/photo-1461354464878-ad92f492a5a0?w=700&q=80"
+                             alt="People having a barbecue in a park on a sunny day"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                        <div style="display:none;padding:20px;background:#f3f4f6;text-align:center;">
+                            <strong>📷 Photo Description:</strong> A group of people are gathered in a park on a sunny day. Some are sitting on a picnic blanket on the grass, others are standing near a barbecue grill. There are trees in the background. People appear to be laughing and enjoying food and drinks together.
+                        </div>
+                        <div class="photo-caption">Photo: Group gathering in a park</div>
+                    </div>
+                    <textarea class="open-textarea" id="ta18" placeholder="Describe what you see in the photo. Include details about people, objects, colors, actions, and setting..."
+                              oninput="updateWordCount('ta18','wc18')"></textarea>
+                    <div class="word-count" id="wc18">0 words</div>
+                    <button class="submit-open-btn" onclick="showRubric('rb18')">Submit &amp; See Rubric</button>
+                    <div class="rubric-box" id="rb18">
+                        <strong>Self-Scoring Rubric (DET criteria):</strong><br>
+                        ✦ <strong>Excellent (4):</strong> Detailed description of multiple visual elements (people's actions, setting, objects, atmosphere). Varied sentence structure. Natural collocations (e.g., "gathered around," "bathed in sunlight"). 50+ words.<br>
+                        ✦ <strong>Good (3):</strong> Covers main elements, minor errors only. 35–50 words.<br>
+                        ✦ <strong>Fair (2):</strong> Basic details, limited vocabulary, some errors affect clarity. 20–35 words.<br>
+                        ✦ <strong>Needs Work (1):</strong> Under 20 words or difficult to understand.<br><br>
+                        <strong>Sample strong response:</strong> "The photo shows a lively outdoor gathering in a green park on a warm, sunny day. A group of people — including adults and possibly children — are relaxing on a picnic blanket spread across the grass. Nearby, someone is tending to a barbecue grill. The atmosphere appears relaxed and joyful, with people chatting and laughing. Trees provide shade in the background."
+                    </div>
+                </div>
+
+                <!-- Q19 -->
+                <div class="question-block" id="qb19">
+                    <div class="q-number">Question 19</div>
+                    <div class="q-type-tag">Write About the Photo — Open Response</div>
+                    <div class="photo-box">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80"
+                             alt="A modern open-plan office with people working at desks"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                        <div style="display:none;padding:20px;background:#f3f4f6;text-align:center;">
+                            <strong>📷 Photo Description:</strong> A modern, open-plan office. Several people are seated at large desks working on computers. The space has high ceilings with exposed pipes and natural light coming from large windows. There are plants and meeting pods visible in the background.
+                        </div>
+                        <div class="photo-caption">Photo: Modern open-plan office</div>
+                    </div>
+                    <textarea class="open-textarea" id="ta19" placeholder="Describe what you see in the photo..."
+                              oninput="updateWordCount('ta19','wc19')"></textarea>
+                    <div class="word-count" id="wc19">0 words</div>
+                    <button class="submit-open-btn" onclick="showRubric('rb19')">Submit &amp; See Rubric</button>
+                    <div class="rubric-box" id="rb19">
+                        <strong>Self-Scoring Rubric (DET criteria):</strong><br>
+                        ✦ <strong>Excellent (4):</strong> Uses precise workplace vocabulary (e.g., "open-plan," "workstations," "collaborate"). Describes layout, people, and atmosphere. 50+ words.<br>
+                        ✦ <strong>Good (3):</strong> Identifies the setting and main activities with minor errors. 35–50 words.<br>
+                        ✦ <strong>Fair (2):</strong> Very basic description. 20–35 words.<br>
+                        ✦ <strong>Needs Work (1):</strong> Under 20 words or hard to understand.<br><br>
+                        <strong>Sample strong response:</strong> "The photo depicts a bright, modern open-plan office. Multiple employees are seated at large shared workstations, each focused on their computer screens. The space features high ceilings with industrial-style exposed pipes and large windows that allow natural light to fill the room. In the background, there are several green plants and what appear to be small meeting areas or pods. The overall atmosphere feels productive and contemporary."
+                    </div>
+                </div>
+
+                <div class="section-nav">
+                    <div class="progress-text">Questions 18–19 of 22 (open response)</div>
+                    <div style="display:flex;gap:12px;">
+                        <button class="btn-next" onclick="showSection('listening')">Next Section →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PART 5: LISTEN AND TYPE (SIMULATED) -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-listening">
+            <div class="full-panel">
+                <div class="section-header">
+                    <h3>Part 5: Listen &amp; Type (Simulated)</h3>
+                    <p>On the real DET, a sentence is spoken aloud and you type it exactly. Here, four typed versions are shown — only one is perfectly accurate. Select the version with no errors in <strong>spelling, grammar, or punctuation</strong>.</p>
+                </div>
+
+                <!-- Q20 -->
+                <div class="question-block" id="qb20">
+                    <div class="q-number">Question 20</div>
+                    <div class="q-type-tag">Listen &amp; Type — Simulated: Choose the accurate transcription</div>
+                    <div class="q-text">A sentence was spoken aloud. Which version below was typed with perfect accuracy?</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q20','A')"><div class="option-letter">A</div><div class="option-text">The government's new policy on renewable energy has been praised by environmental groups but critisized by several industry leaders.</div></div>
+                        <div class="option" onclick="selectOption(this,'q20','B')"><div class="option-letter">B</div><div class="option-text">The government's new policy on renewable energy has been praised by environmental groups but criticized by several industry leaders.</div></div>
+                        <div class="option" onclick="selectOption(this,'q20','C')"><div class="option-letter">C</div><div class="option-text">The governments new policy on renewable energy has been praised by environmental groups but criticized by several industry leaders.</div></div>
+                        <div class="option" onclick="selectOption(this,'q20','D')"><div class="option-letter">D</div><div class="option-text">The government's new policy on renewable energy have been praised by environmental groups but criticized by several industry leaders.</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb20"></div>
+                </div>
+
+                <!-- Q21 -->
+                <div class="question-block" id="qb21">
+                    <div class="q-number">Question 21</div>
+                    <div class="q-type-tag">Listen &amp; Type — Simulated: Choose the accurate transcription</div>
+                    <div class="q-text">Which version was typed correctly?</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q21','A')"><div class="option-letter">A</div><div class="option-text">If you want to improve your writing, the most effective strategy is to read widely and practice consistently every day.</div></div>
+                        <div class="option" onclick="selectOption(this,'q21','B')"><div class="option-letter">B</div><div class="option-text">If you want to improve your writing, the most affective strategy is to read widely and practice consistently every day.</div></div>
+                        <div class="option" onclick="selectOption(this,'q21','C')"><div class="option-letter">C</div><div class="option-text">If you want to improve your writing, the most effective strategy is to read wide and practice consistently every day.</div></div>
+                        <div class="option" onclick="selectOption(this,'q21','D')"><div class="option-letter">D</div><div class="option-text">If you want to improve you're writing, the most effective strategy is to read widely and practice consistently every day.</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb21"></div>
+                </div>
+
+                <!-- Q22 -->
+                <div class="question-block" id="qb22">
+                    <div class="q-number">Question 22</div>
+                    <div class="q-type-tag">Listen &amp; Type — Simulated: Choose the accurate transcription</div>
+                    <div class="q-text">Which version was typed correctly?</div>
+                    <div class="options">
+                        <div class="option" onclick="selectOption(this,'q22','A')"><div class="option-letter">A</div><div class="option-text">Although the experiment produced unexpected results, the team decided to publish their findings rather then repeat the study.</div></div>
+                        <div class="option" onclick="selectOption(this,'q22','B')"><div class="option-letter">B</div><div class="option-text">Although the experiment produced unexpected results, the team decided to publish their findings rather than repeat the study.</div></div>
+                        <div class="option" onclick="selectOption(this,'q22','C')"><div class="option-letter">C</div><div class="option-text">Although the experiment produced unexpected results, the team decided to publish there findings rather than repeat the study.</div></div>
+                        <div class="option" onclick="selectOption(this,'q22','D')"><div class="option-letter">D</div><div class="option-text">Although the experiment produced unexpected results the team decided to publish their findings rather than repeat the study.</div></div>
+                    </div>
+                    <div class="feedback-box" id="fb22"></div>
+                </div>
+
+                <div class="section-nav">
+                    <div class="progress-text">Questions 20–22 of 22</div>
+                    <div style="display:flex;gap:12px;">
+                        <button class="btn-check" onclick="checkSection('listening')">Check Answers</button>
+                        <button class="btn-next" onclick="showResults()">View DET Score →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- RESULTS -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-results">
+            <div class="results-panel">
+                <div class="results-card">
+                    <div class="score-circle">
+                        <div class="big-num" id="finalNum">–</div>
+                        <div class="score-label">DET estimate</div>
+                    </div>
+                    <h2 id="resultTitle">Your DET Score Estimate</h2>
+                    <p class="result-sub" id="resultSub">Complete all scored sections to see your estimate.</p>
+
+                    <div class="subscore-grid">
+                        <div class="subscore-item">
+                            <div class="b-num" id="vocabScore">–</div>
+                            <div class="b-label">Vocabulary<br><span style="font-size:0.72rem">(Read &amp; Select Q1–6)</span></div>
+                        </div>
+                        <div class="subscore-item">
+                            <div class="b-num" id="grammarScore">–</div>
+                            <div class="b-label">Grammar<br><span style="font-size:0.72rem">(Fill in Blanks Q7–12)</span></div>
+                        </div>
+                        <div class="subscore-item">
+                            <div class="b-num" id="readingScore">–</div>
+                            <div class="b-label">Reading<br><span style="font-size:0.72rem">(Read &amp; Complete Q13–17)</span></div>
+                        </div>
+                        <div class="subscore-item">
+                            <div class="b-num" id="listenScore">–</div>
+                            <div class="b-label">Listening<br><span style="font-size:0.72rem">(Listen &amp; Type Q20–22)</span></div>
+                        </div>
+                    </div>
+
+                    <div class="det-scale-note">
+                        <strong>About the DET Scale (10–160):</strong> 95–110 = B1 (intermediate) · 110–120 = B2 (upper-intermediate) · 120–135 = C1 (advanced) · 135+ = C2 (mastery). Most universities require 105–120. Top programs require 125+. <em>This estimate is based on scored questions only (Q1–17, Q20–22).</em>
+                    </div>
+
+                    <div class="level-bar-wrap">
+                        <div class="level-bar-label" id="barLabel">Score</div>
+                        <div class="level-bar-bg">
+                            <div class="level-bar-fill" id="levelBar" style="width:0%"></div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+                        <button class="retry-btn" onclick="retryExam()">Retry Exam</button>
+                        <button class="review-btn" onclick="showSection('ras')">Review Answers</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</div><!-- /container -->
+
+<script>
+// ── Answer Key ───────────────────────────────────────────────────────────────
+const rasAnswers = {
+    q1: { real: ['diligent','pragmatic'],    fake: ['splounge','worvent'],   feedback: '"Diligent" (hardworking) and "pragmatic" (practical) are real English words. "Splounge" and "worvent" are invented.' },
+    q2: { real: ['frivolous','vindicate'],   fake: ['narbulate','crelping'], feedback: '"Frivolous" (not serious) and "vindicate" (to clear of blame) are real. "Narbulate" and "crelping" are non-words.' },
+    q3: { real: ['tenacious','obsolete'],    fake: ['zumple','wrimble'],     feedback: '"Tenacious" (determined) and "obsolete" (no longer used) are real. "Zumple" and "wrimble" are invented.' },
+    q4: { real: ['fortitude','pejorative'],  fake: ['dremble','glipton'],    feedback: '"Fortitude" (courage in difficulty) and "pejorative" (expressing disapproval) are real. The others are non-words.' },
+    q5: { real: ['arbitrary','clandestine'], fake: ['flommox','struntle'],   feedback: '"Arbitrary" (random) and "clandestine" (secret) are real. "Flommox" and "struntle" are invented.' },
+    q6: { real: ['vexatious','prolific'],    fake: ['plinket','grumset'],    feedback: '"Vexatious" (causing annoyance) and "prolific" (producing a lot) are real. "Plinket" and "grumset" are non-words.' },
+};
+
+const answers = {
+    q7:  { correct: 'B', feedback: '"Until" introduces a condition that must be completed before the main action. "Has been reviewed" (present perfect passive) is needed — the review hasn\'t happened yet (future perfect sense in a time clause). "Was" suggests it already happened; "had been" would need a past main clause.' },
+    q8:  { correct: 'C', feedback: 'The sentence explains that the argument relied on emotion and lacked data support — this describes a "flawed" argument. "Compelling" and "rigorous" are positive and contradict the explanation.' },
+    q9:  { correct: 'C', feedback: '"The more…the + comparative" is the correct structure for parallel comparisons in English. "The richer" follows this pattern correctly.' },
+    q10: { correct: 'A', feedback: '"Just after the deadline had passed" correctly sets up the time relationship — the error was discovered slightly after the deadline. "So that" implies purpose; "in case" implies precaution; "provided that" implies condition.' },
+    q11: { correct: 'A', feedback: '"Shattered her personal best" is a common English collocation meaning to dramatically beat a previous record. "Reduced" doesn\'t collocate with personal best; "admitted" and "inherited" don\'t fit the meaning.' },
+    q12: { correct: 'A', feedback: '"It is vital that + subject + verb" requires an adjective. "Vital" is correct. "Vitally" is an adverb; "vitality" and "vitalize" are a noun and verb respectively — both incorrect in this structure.' },
+
+    q13: { correct: 'B', feedback: 'A "dilemma" is a difficult choice between two options — exactly what urban planners face regarding green space vs. cost. "Triumph" and "advantage" are positive; "tradition" doesn\'t fit.' },
+    q14: { correct: 'A', feedback: '"No longer considered optional" means parks are now seen as essential, not as extras. This fits the passage\'s argument that green space has proven health benefits.' },
+    q15: { correct: 'C', feedback: '"Tucked into" is a natural phrasal verb meaning fitted neatly into a space. It suits the image of small gardens slotted into corners of the city. "Destroyed" and "banned" are opposite in meaning.' },
+    q16: { correct: 'B', feedback: '"Weaving green space into" the city means integrating it creatively — consistent with the passage\'s description of pocket parks as a creative solution. "Eliminating" and "avoiding" are contradictory.' },
+    q17: { correct: 'B', feedback: 'The critics say pocket parks don\'t go far enough — they are surface-level, not "transformative" (producing real, deep change). "Decorative" is a synonym of "cosmetic," not a contrast to it.' },
+
+    q20: { correct: 'B', feedback: 'Option B is correct. A: "critisized" is misspelled (should be "criticized"). C: "governments" is missing the apostrophe ("government\'s"). D: "has been" should agree with singular "policy" — but wait, "policy…has been" is actually correct; D\'s error is "have been" (incorrect plural agreement).' },
+    q21: { correct: 'A', feedback: 'Option A is correct. B: "affective" (relating to emotions) should be "effective" (producing results). C: "read wide" should be "read widely" (adverb needed). D: "you\'re" (you are) should be "your" (possessive).' },
+    q22: { correct: 'B', feedback: 'Option B is correct. A: "then" should be "than" (used in comparisons). C: "there" (location) should be "their" (possessive). D: missing a comma after "results" — the subordinate clause needs to be set off.' },
+};
+
+// ── State ────────────────────────────────────────────────────────────────────
+const userAnswers    = {};
+const sectionChecked = { ras: false, fitb: false, rac: false, listening: false };
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+        if (n.getAttribute('onclick') === `showSection('${name}')`) n.classList.add('active');
+    });
+}
+
+function showResults() {
+    calcResults();
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section-results').classList.add('active');
+}
+
+// ── Read & Select ─────────────────────────────────────────────────────────────
+function toggleWord(el, qid, word) {
+    const block = el.closest('.question-block');
+    if (block.classList.contains('correct') || block.classList.contains('incorrect')) return;
+    el.classList.toggle('selected');
+    if (!userAnswers[qid]) userAnswers[qid] = [];
+    if (el.classList.contains('selected')) {
+        if (!userAnswers[qid].includes(word)) userAnswers[qid].push(word);
+    } else {
+        userAnswers[qid] = userAnswers[qid].filter(w => w !== word);
+    }
+    block.classList.toggle('answered', userAnswers[qid].length > 0);
+}
+
+// ── Regular option selection ──────────────────────────────────────────────────
+function selectOption(el, qid, letter) {
+    const block = el.closest('.question-block');
+    if (block.classList.contains('correct') || block.classList.contains('incorrect')) return;
+    block.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    userAnswers[qid] = letter;
+    block.classList.add('answered');
+}
+
+// ── Open-response helpers ─────────────────────────────────────────────────────
+function updateWordCount(taId, wcId) {
+    const text  = document.getElementById(taId).value.trim();
+    const count = text === '' ? 0 : text.split(/\s+/).length;
+    document.getElementById(wcId).textContent = count + (count === 1 ? ' word' : ' words');
+}
+
+function showRubric(id) {
+    const rb = document.getElementById(id);
+    rb.style.display = rb.style.display === 'block' ? 'none' : 'block';
+}
+
+// ── Check answers ─────────────────────────────────────────────────────────────
+function checkSection(sec) {
+    sectionChecked[sec] = true;
+    if (sec === 'ras')       ['q1','q2','q3','q4','q5','q6'].forEach(gradeRAS);
+    else if (sec === 'fitb') ['q7','q8','q9','q10','q11','q12'].forEach(gradeQuestion);
+    else if (sec === 'rac')  ['q13','q14','q15','q16','q17'].forEach(gradeQuestion);
+    else if (sec === 'listening') ['q20','q21','q22'].forEach(gradeQuestion);
+    updateLiveScore();
+}
+
+function gradeRAS(qid) {
+    const ans    = rasAnswers[qid];
+    const ua     = userAnswers[qid] || [];
+    const num    = qid.replace('q','');
+    const block  = document.getElementById('qb' + num);
+    const correct = ans.real.slice().sort().join(',') === ua.slice().sort().join(',');
+
+    block.querySelectorAll('.word-card').forEach(card => {
+        const w = card.textContent.trim();
+        card.classList.remove('selected');
+        if (ans.real.includes(w))                     card.classList.add('correct-ans');
+        else if (ua.includes(w) && !ans.real.includes(w)) card.classList.add('wrong-ans');
+    });
+
+    block.classList.remove('answered');
+    block.classList.add(correct ? 'correct' : 'incorrect');
+
+    const fb = block.querySelector('.feedback-box');
+    if (fb) {
+        fb.className = 'feedback-box ' + (correct ? 'correct' : 'incorrect');
+        fb.innerHTML = (correct ? '✓ Correct! ' : '✗ Incorrect. ') + ans.feedback;
+    }
+}
+
+function gradeQuestion(qid) {
+    const ans   = answers[qid];
+    if (!ans) return;
+    const ua    = userAnswers[qid];
+    const block = document.getElementById('qb' + qid.replace('q',''));
+    if (!block) return;
+
+    const isCorrect = ua === ans.correct;
+
+    block.querySelectorAll('.option').forEach(opt => {
+        const letter = opt.querySelector('.option-letter').textContent;
+        opt.classList.remove('selected');
+        if (letter === ans.correct)              opt.classList.add('correct-ans');
+        else if (letter === ua && !isCorrect)    opt.classList.add('wrong-ans');
+    });
+
+    block.classList.remove('answered');
+    block.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+    const fb = block.querySelector('.feedback-box');
+    if (fb) {
+        fb.className = 'feedback-box ' + (isCorrect ? 'correct' : 'incorrect');
+        fb.innerHTML = (isCorrect ? '✓ Correct! ' : '✗ Incorrect. ') + ans.feedback;
+    }
+}
+
+// ── Scoring ───────────────────────────────────────────────────────────────────
+function countRASCorrect(qids) {
+    return qids.filter(qid => {
+        const ans = rasAnswers[qid];
+        const ua  = (userAnswers[qid] || []).slice().sort().join(',');
+        return ans.real.slice().sort().join(',') === ua;
+    }).length;
+}
+
+function countCorrect(qids) {
+    return qids.filter(qid => answers[qid] && userAnswers[qid] === answers[qid].correct).length;
+}
+
+function updateLiveScore() {
+    const total = countRASCorrect(['q1','q2','q3','q4','q5','q6'])
+                + countCorrect(['q7','q8','q9','q10','q11','q12'])
+                + countCorrect(['q13','q14','q15','q16','q17'])
+                + countCorrect(['q20','q21','q22']);
+    const est = Math.round(80 + (total / 20) * 80);
+    const el  = document.getElementById('liveScore');
+    el.textContent  = `DET Score: ~${est}`;
+    el.style.display = 'block';
+}
+
+function calcResults() {
+    const rasC  = countRASCorrect(['q1','q2','q3','q4','q5','q6']);
+    const fitbC = countCorrect(['q7','q8','q9','q10','q11','q12']);
+    const racC  = countCorrect(['q13','q14','q15','q16','q17']);
+    const lisC  = countCorrect(['q20','q21','q22']);
+    const total = rasC + fitbC + racC + lisC;
+    const pct   = total / 20;
+    const detEst = Math.round(80 + pct * 80);
+
+    document.getElementById('finalNum').textContent     = detEst;
+    document.getElementById('vocabScore').textContent   = rasC  + '/6';
+    document.getElementById('grammarScore').textContent = fitbC + '/6';
+    document.getElementById('readingScore').textContent = racC  + '/5';
+    document.getElementById('listenScore').textContent  = lisC  + '/3';
+
+    const band = detEst >= 135 ? 'C2 – Mastery' :
+                 detEst >= 120 ? 'C1 – Advanced' :
+                 detEst >= 110 ? 'B2 – Upper-Intermediate' :
+                 detEst >= 95  ? 'B1 – Intermediate' :
+                                 'A2 – Elementary';
+
+    const msg  = detEst >= 130 ? 'Excellent — competitive for top-tier programs worldwide.' :
+                 detEst >= 115 ? 'Strong result — meets most university requirements.' :
+                 detEst >= 100 ? 'Good foundation — keep practicing all four skills.' :
+                                 'Keep going — focus on vocabulary and reading fluency first.';
+
+    document.getElementById('resultTitle').textContent = detEst >= 120 ? 'Strong Result!' : 'Your Result';
+    document.getElementById('resultSub').textContent   = `${band} · ${msg}`;
+    document.getElementById('barLabel').textContent    = `Estimated DET Score: ${detEst} / 160`;
+    setTimeout(() => {
+        document.getElementById('levelBar').style.width = Math.round(pct * 100) + '%';
+    }, 200);
+}
+
+function retryExam() {
+    Object.keys(userAnswers).forEach(k => delete userAnswers[k]);
+    Object.keys(sectionChecked).forEach(k => sectionChecked[k] = false);
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected','correct-ans','wrong-ans'));
+    document.querySelectorAll('.word-card').forEach(c => c.classList.remove('selected','correct-ans','wrong-ans'));
+    document.querySelectorAll('.question-block').forEach(b => b.classList.remove('answered','correct','incorrect'));
+    document.querySelectorAll('.feedback-box').forEach(f => { f.className = 'feedback-box'; f.innerHTML = ''; });
+    document.querySelectorAll('.rubric-box').forEach(r => r.style.display = 'none');
+    document.querySelectorAll('textarea').forEach(t => t.value = '');
+    document.querySelectorAll('.word-count').forEach(w => w.textContent = '0 words');
+    document.getElementById('liveScore').style.display = 'none';
+    document.getElementById('levelBar').style.width = '0%';
+    showSection('intro');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png">
+    <title>FAST PM3 – Mock Exam 2 | Grade 9–10 ELA</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(10px);
+            padding: 14px 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            flex-shrink: 0;
+        }
+
+        .header-left h1 {
+            color: #1a365d;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-left p {
+            color: #4a5568;
+            font-size: 0.95rem;
+            margin-top: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .score-display {
+            background: #1a365d;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .header-image {
+            width: 100px;
+            height: 60px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 88px);
+            overflow: hidden;
+        }
+
+        /* NAV */
+        .navigation {
+            width: 240px;
+            background: rgba(26,54,93,0.97);
+            padding: 25px 15px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .nav-section-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 10px 8px 4px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.92rem;
+            line-height: 1.3;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(49,130,206,0.4);
+        }
+
+        .nav-item .nav-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: rgba(255,255,255,0.2);
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-bottom: 3px;
+        }
+
+        /* CONTENT */
+        .content {
+            flex: 1;
+            overflow: hidden;
+            background: #f7fafc;
+        }
+
+        .section { display: none; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+
+        /* INSTRUCTIONS */
+        .instructions-panel {
+            padding: 50px 60px;
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exam-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 60px;
+            max-width: 720px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .exam-badge {
+            display: inline-block;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .exam-card h2 {
+            font-size: 2rem;
+            color: #1a365d;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .exam-card .subtitle {
+            color: #718096;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 16px 20px;
+            border-left: 4px solid #3182ce;
+        }
+
+        .info-box .label { color: #718096; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-box .value { color: #1a365d; font-size: 1.1rem; font-weight: 600; margin-top: 4px; }
+
+        .directions-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .directions-list li {
+            padding: 8px 0;
+            padding-left: 24px;
+            color: #4a5568;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .directions-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #3182ce;
+            font-weight: 600;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(49,130,206,0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(49,130,206,0.4);
+        }
+
+        /* EXAM LAYOUT: split passage | questions */
+        .exam-layout {
+            display: flex;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .passage-panel {
+            width: 48%;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto;
+            padding: 30px 35px;
+            background: #fff;
+        }
+
+        .passage-label {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .passage-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a365d;
+            margin-bottom: 4px;
+        }
+
+        .passage-author {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .passage-text {
+            color: #2d3748;
+            font-size: 1rem;
+            line-height: 1.85;
+        }
+
+        .passage-text p {
+            margin-bottom: 14px;
+            text-indent: 1.5em;
+        }
+
+        .passage-text p:first-child { text-indent: 0; }
+
+        /* QUESTIONS PANEL */
+        .questions-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 30px;
+            background: #f7fafc;
+        }
+
+        .questions-header {
+            margin-bottom: 20px;
+        }
+
+        .questions-header h3 {
+            font-size: 1.1rem;
+            color: #1a365d;
+            font-weight: 700;
+        }
+
+        .questions-header p {
+            color: #718096;
+            font-size: 0.85rem;
+            margin-top: 3px;
+        }
+
+        .question-block {
+            background: white;
+            border-radius: 14px;
+            padding: 22px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .question-block.answered { border-color: #bee3f8; }
+        .question-block.correct { border-color: #9ae6b4; background: #f0fff4; }
+        .question-block.incorrect { border-color: #feb2b2; background: #fff5f5; }
+
+        .q-number {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #3182ce;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .q-text {
+            font-size: 0.97rem;
+            color: #2d3748;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+
+        .q-type-tag {
+            font-size: 0.7rem;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 8px; }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .option:hover { border-color: #90cdf4; background: #ebf8ff; }
+        .option.selected { border-color: #3182ce; background: #ebf8ff; }
+        .option.correct-ans { border-color: #38a169; background: #f0fff4; }
+        .option.wrong-ans { border-color: #e53e3e; background: #fff5f5; }
+
+        .option-letter {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-letter { background: #3182ce; color: white; }
+        .option.correct-ans .option-letter { background: #38a169; color: white; }
+        .option.wrong-ans .option-letter { background: #e53e3e; color: white; }
+
+        .option-text { font-size: 0.9rem; color: #2d3748; line-height: 1.45; padding-top: 3px; }
+
+        .feedback-box {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .feedback-box.correct { background: #c6f6d5; color: #22543d; display: block; }
+        .feedback-box.incorrect { background: #fed7d7; color: #742a2a; display: block; }
+
+        .multi-select-note {
+            font-size: 0.8rem;
+            color: #e53e3e;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* NAV buttons at bottom of questions */
+        .section-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 10px;
+            border-top: 2px solid #e2e8f0;
+            margin-top: 10px;
+        }
+
+        .section-nav button {
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-check {
+            background: #3182ce;
+            color: white;
+            box-shadow: 0 4px 12px rgba(49,130,206,0.3);
+        }
+
+        .btn-check:hover { background: #2b6cb0; transform: translateY(-1px); }
+
+        .btn-next {
+            background: #1a365d;
+            color: white;
+            box-shadow: 0 4px 12px rgba(26,54,93,0.3);
+        }
+
+        .btn-next:hover { background: #153159; transform: translateY(-1px); }
+        .btn-next:disabled { background: #cbd5e0; box-shadow: none; cursor: not-allowed; transform: none; }
+
+        .progress-text { color: #718096; font-size: 0.85rem; }
+
+        /* RESULTS */
+        .results-panel {
+            padding: 50px;
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 24px;
+            padding: 50px 60px;
+            max-width: 680px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 8px 30px rgba(49,130,206,0.35);
+        }
+
+        .score-circle .big-num { font-size: 2.8rem; font-weight: 700; line-height: 1; }
+        .score-circle .score-label { font-size: 0.8rem; opacity: 0.85; margin-top: 4px; }
+
+        .results-card h2 { font-size: 1.8rem; color: #1a365d; margin-bottom: 10px; }
+        .results-card .result-sub { color: #718096; font-size: 1rem; margin-bottom: 30px; }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .breakdown-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .breakdown-item .b-num { font-size: 1.6rem; font-weight: 700; color: #1a365d; }
+        .breakdown-item .b-label { font-size: 0.8rem; color: #718096; margin-top: 3px; }
+
+        .level-bar-wrap { margin-bottom: 30px; text-align: left; }
+        .level-bar-label { font-size: 0.85rem; color: #4a5568; margin-bottom: 8px; font-weight: 500; }
+        .level-bar-bg { background: #e2e8f0; border-radius: 10px; height: 12px; }
+        .level-bar-fill { height: 12px; border-radius: 10px; background: linear-gradient(90deg, #3182ce, #2b6cb0); transition: width 1s ease; }
+
+        .retry-btn {
+            background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(49,130,206,0.3);
+            margin-right: 12px;
+        }
+
+        .retry-btn:hover { transform: translateY(-2px); }
+
+        .review-btn {
+            background: white;
+            color: #1a365d;
+            border: 2px solid #1a365d;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .review-btn:hover { background: #ebf8ff; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <h1>FAST PM3 – Mock Exam 2</h1>
+        <p>Grade 9–10 ELA Reading &nbsp;|&nbsp; Florida B.E.S.T. Standards</p>
+    </div>
+    <div class="header-right">
+        <div class="score-display" id="liveScore">Score: 0 / 0</div>
+        <img class="header-image"
+             src="https://static.wixstatic.com/media/593d03_21d7db92a5cc4b1c9633f867764de873~mv2.png"
+             alt="MIM Language Services">
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- NAV -->
+    <nav class="navigation">
+        <div class="nav-section-label">Exam Sections</div>
+        <div class="nav-item active" onclick="showSection('intro')">📋 Instructions</div>
+
+        <div class="nav-section-label">Part 1 – Literary</div>
+        <div class="nav-item" onclick="showSection('lit-passage')">
+            <span class="nav-tag">PASSAGE</span><br>The Cartographer's Daughter
+        </div>
+        <div class="nav-item" onclick="showSection('lit-questions')">
+            <span class="nav-tag">Q 1–8</span><br>Literary Questions
+        </div>
+
+        <div class="nav-section-label">Part 2 – Informational</div>
+        <div class="nav-item" onclick="showSection('info-passage')">
+            <span class="nav-tag">PASSAGE</span><br>The Hidden Forest
+        </div>
+        <div class="nav-item" onclick="showSection('info-questions')">
+            <span class="nav-tag">Q 9–16</span><br>Informational Questions
+        </div>
+
+        <div class="nav-section-label">Part 3 – Paired</div>
+        <div class="nav-item" onclick="showSection('paired-passage')">
+            <span class="nav-tag">PASSAGES</span><br>Light and Darkness: Two Views
+        </div>
+        <div class="nav-item" onclick="showSection('paired-questions')">
+            <span class="nav-tag">Q 17–22</span><br>Paired Questions
+        </div>
+
+        <div class="nav-section-label">Results</div>
+        <div class="nav-item" onclick="showResults()">🏆 View Score</div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- INTRO -->
+        <div class="section active" id="section-intro">
+            <div class="instructions-panel">
+                <div class="exam-card">
+                    <div class="exam-badge">FAST PM3 · Grade 9–10 ELA · Reading</div>
+                    <h2>Mock Exam 2</h2>
+                    <p class="subtitle">Practice test aligned to Florida B.E.S.T. ELA Standards. Covers literary analysis, informational reading, and paired-passage comparison.</p>
+
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <div class="label">Total Questions</div>
+                            <div class="value">22 Questions</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Sections</div>
+                            <div class="value">3 Sections</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Question Types</div>
+                            <div class="value">MC · Multi-Select · EBSR</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">Suggested Time</div>
+                            <div class="value">45–60 minutes</div>
+                        </div>
+                    </div>
+
+                    <ul class="directions-list">
+                        <li>Read each passage carefully before answering questions.</li>
+                        <li>For multiple-choice questions, choose the <strong>best</strong> answer.</li>
+                        <li>For multi-select questions, select <strong>exactly two</strong> answers unless told otherwise.</li>
+                        <li>EBSR questions have <strong>Part A and Part B</strong> — answer both; Part B must support Part A.</li>
+                        <li>Use evidence from the text to support your answers.</li>
+                        <li>Click "Check Answers" at the end of each section to see your score.</li>
+                    </ul>
+
+                    <button class="start-btn" onclick="showSection('lit-passage')">Begin Exam →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 1: LITERARY PASSAGE -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-lit-passage">
+            <div class="exam-layout">
+                <div class="passage-panel">
+                    <div class="passage-label">Literary Text · Short Story</div>
+                    <div class="passage-title">The Cartographer's Daughter</div>
+                    <div class="passage-author">An original short story for FAST PM3 practice</div>
+
+                    <div class="passage-text">
+                        <p>Maya had always known her father by his hands — the way they moved over a map with the reverence most people reserved for scripture, tracing coastlines like a man reading a face. Now those hands were still, and the maps remained.</p>
+
+                        <p>She stood in the doorway of his study, which smelled of India ink and old paper and something else she could not name, something that simply meant him. Her mother had called it "clutter." The real estate agent had called it "opportunity." Maya called it the last room she was not ready to enter.</p>
+
+                        <p>"We need to decide by Friday," her mother said from the hallway, not unkindly. "The offer won't wait."</p>
+
+                        <p>Maya stepped inside. The drafting table still held his final project — a topographic map of a mountain range in the Andes that no one had commissioned, that her father had been drawing simply because, he said, some places deserved to exist on paper. Half-finished. The mountains rose in careful brown contour lines on the left side of the sheet; the right side was blank.</p>
+
+                        <p>She sat in his chair, which was worn to the shape of him. On the shelf above the table, rows of finished maps stood in rolled tubes, each labeled in his precise handwriting. Forty years of work. Places she had never been: river deltas, island chains, cities whose names she could not pronounce. He had told her once that a map was an act of love — that you couldn't draw a place carefully without coming to care for it.</p>
+
+                        <p>"You understand things by paying attention to them," he had said. She had been twelve, impatient, wanting to go outside. "The map isn't the place. But making it changes you."</p>
+
+                        <p>Maya picked up his drafting pencil. It was still sharp. She positioned it above the blank half of the Andes sheet and then did not move for a long time.</p>
+
+                        <p>Her phone buzzed. Her mother again. Maya set the phone face-down.</p>
+
+                        <p>She thought about the apartment — what selling it would mean. Freedom from the rent, her mother said. A fresh start. She thought about the real estate agent's smile, too wide, too certain. She thought about her father's voice: <em>some places deserve to exist on paper.</em></p>
+
+                        <p>And then, without deciding exactly when she had decided, she began to draw.</p>
+
+                        <p>The first line was uncertain, tentative — a ridge that barely committed to its own direction. But the second line was steadier. By the third, her hand remembered something it had not known it knew: the pressure of the pencil, the angle of the wrist, the way attention and care could become, over an hour, something that looked like knowing.</p>
+
+                        <p>When her mother appeared in the doorway again, Maya did not hear her at first.</p>
+
+                        <p>"Maya." Her mother's voice was different now — quieter, caught on something.</p>
+
+                        <p>Maya looked up. Her mother was looking at the map, at the lines Maya had drawn, and her expression held something that was not grief exactly, and not pride exactly, but lived somewhere between the two, the way some territories resist being named.</p>
+
+                        <p>"We don't have to decide today," her mother said.</p>
+                    </div>
+                </div>
+
+                <div class="questions-panel">
+                    <div class="questions-header">
+                        <h3>Part 1: Literary Questions</h3>
+                        <p>Questions 1–8 &nbsp;·&nbsp; The Cartographer's Daughter</p>
+                    </div>
+
+                    <p style="font-size:0.85rem;color:#718096;margin-bottom:16px;">Read the passage on the left, then answer the questions below. Click <strong>Check Answers</strong> when you finish this section.</p>
+
+                    <!-- Q1 -->
+                    <div class="question-block" id="qb1">
+                        <div class="q-number">Question 1</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Which statement best expresses the <strong>central theme</strong> of the story?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q1','A')"><div class="option-letter">A</div><div class="option-text">Daughters must sacrifice their own ambitions to preserve a parent's legacy.</div></div>
+                            <div class="option" onclick="selectOption(this,'q1','B')"><div class="option-letter">B</div><div class="option-text">Financial decisions should always come before emotional ones.</div></div>
+                            <div class="option" onclick="selectOption(this,'q1','C')"><div class="option-letter">C</div><div class="option-text">We come to understand those we love through engaging with the work they devoted themselves to.</div></div>
+                            <div class="option" onclick="selectOption(this,'q1','D')"><div class="option-letter">D</div><div class="option-text">Grief is best overcome by making a clean break from the past.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb1"></div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="question-block" id="qb2">
+                        <div class="q-number">Question 2</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Read this sentence from the story:<br><br><em>"the way they moved over a map with the reverence most people reserved for scripture."</em><br><br>What does this comparison reveal about Maya's father?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q2','A')"><div class="option-letter">A</div><div class="option-text">He was deeply religious and compared his cartography to prayer.</div></div>
+                            <div class="option" onclick="selectOption(this,'q2','B')"><div class="option-letter">B</div><div class="option-text">He approached mapmaking with the same devoted, sacred attention that others give to religious texts.</div></div>
+                            <div class="option" onclick="selectOption(this,'q2','C')"><div class="option-letter">C</div><div class="option-text">He believed his maps were historically more important than any religious document.</div></div>
+                            <div class="option" onclick="selectOption(this,'q2','D')"><div class="option-letter">D</div><div class="option-text">He was secretive about his work and rarely allowed others to see it.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb2"></div>
+                    </div>
+
+                    <!-- Q3 EBSR -->
+                    <div class="question-block" id="qb3">
+                        <div class="q-number">Question 3 – Part A</div>
+                        <div class="q-type-tag">EBSR – Evidence-Based Selected Response</div>
+                        <div class="q-text">What <strong>primarily motivates</strong> Maya to pick up the drafting pencil and begin drawing?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q3a','A')"><div class="option-letter">A</div><div class="option-text">She decides that finishing the map will increase its value before the apartment is sold.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3a','B')"><div class="option-letter">B</div><div class="option-text">Her mother pressures her into continuing her father's project.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3a','C')"><div class="option-letter">C</div><div class="option-text">Her father's belief that paying careful attention to something changes you inspires her to act.</div></div>
+                            <div class="option" onclick="selectOption(this,'q3a','D')"><div class="option-letter">D</div><div class="option-text">She wants to prove to herself that she inherited her father's artistic talent.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb3a"></div>
+                    </div>
+
+                    <div class="question-block" id="qb3b">
+                        <div class="q-number">Question 3 – Part B</div>
+                        <div class="q-type-tag">EBSR – Select the best evidence</div>
+                        <div class="q-text">Which detail from the text <strong>best supports</strong> your answer to Part A?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q3b','A')"><div class="option-letter">A</div><div class="option-text">"Her mother had called it 'clutter.' The real estate agent had called it 'opportunity.'"</div></div>
+                            <div class="option" onclick="selectOption(this,'q3b','B')"><div class="option-letter">B</div><div class="option-text">"We need to decide by Friday," her mother said from the hallway."</div></div>
+                            <div class="option" onclick="selectOption(this,'q3b','C')"><div class="option-letter">C</div><div class="option-text">"You understand things by paying attention to them…The map isn't the place. But making it changes you."</div></div>
+                            <div class="option" onclick="selectOption(this,'q3b','D')"><div class="option-letter">D</div><div class="option-text">"her hand remembered something it had not known it knew"</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb3b"></div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="question-block" id="qb4">
+                        <div class="q-number">Question 4</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">The half-finished Andes map — with contour lines on one side and a blank space on the other — primarily functions as a symbol of:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q4','A')"><div class="option-letter">A</div><div class="option-text">Maya's unfulfilled wish to travel the world like her father.</div></div>
+                            <div class="option" onclick="selectOption(this,'q4','B')"><div class="option-letter">B</div><div class="option-text">The futility of her father's career as an unpaid cartographer.</div></div>
+                            <div class="option" onclick="selectOption(this,'q4','C')"><div class="option-letter">C</div><div class="option-text">An incomplete legacy that Maya must choose whether to continue or abandon.</div></div>
+                            <div class="option" onclick="selectOption(this,'q4','D')"><div class="option-letter">D</div><div class="option-text">The family's financial problems caused by her father's impractical hobby.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb4"></div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="question-block" id="qb5">
+                        <div class="q-number">Question 5</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">At the end of the story, the narrator says Maya's mother's expression "lived somewhere between the two, <strong>the way some territories resist being named</strong>." What does this phrase suggest about her mother's expression?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q5','A')"><div class="option-letter">A</div><div class="option-text">Her mother is refusing to speak and is deliberately hiding her feelings from Maya.</div></div>
+                            <div class="option" onclick="selectOption(this,'q5','B')"><div class="option-letter">B</div><div class="option-text">Her expression was so complex that it could not be captured by a single emotion or word.</div></div>
+                            <div class="option" onclick="selectOption(this,'q5','C')"><div class="option-letter">C</div><div class="option-text">Maya does not know her mother well enough to understand what she is feeling.</div></div>
+                            <div class="option" onclick="selectOption(this,'q5','D')"><div class="option-letter">D</div><div class="option-text">The mother is angry and struggling to control her reaction.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb5"></div>
+                    </div>
+
+                    <!-- Q6 Multi-select -->
+                    <div class="question-block" id="qb6">
+                        <div class="q-number">Question 6</div>
+                        <div class="q-type-tag">Multi-Select</div>
+                        <div class="q-text">Select <strong>TWO</strong> details that best show Maya's <strong>internal conflict</strong> about whether to sell the apartment.</div>
+                        <div class="multi-select-note">★ Select exactly 2 answers</div>
+                        <div class="options">
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">A</div><div class="option-text">The real estate agent had called the study "opportunity."</div></div>
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">B</div><div class="option-text">Maya set her phone face-down when her mother called again.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">C</div><div class="option-text">She positioned the pencil above the blank sheet and then did not move for a long time.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">D</div><div class="option-text">Her father's study smelled of India ink and old paper.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q6')"><div class="option-letter">E</div><div class="option-text">Forty years of rolled map tubes lined the shelf above the drafting table.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb6"></div>
+                    </div>
+
+                    <!-- Q7 -->
+                    <div class="question-block" id="qb7">
+                        <div class="q-number">Question 7</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">How does the author use Maya's father's direct speech ("You understand things by paying attention to them…") in relation to the story's plot?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q7','A')"><div class="option-letter">A</div><div class="option-text">To show that Maya resented her father's lectures when she was young.</div></div>
+                            <div class="option" onclick="selectOption(this,'q7','B')"><div class="option-letter">B</div><div class="option-text">To contrast the father's idealism with the mother's practical concern about money.</div></div>
+                            <div class="option" onclick="selectOption(this,'q7','C')"><div class="option-letter">C</div><div class="option-text">To reveal the values her father passed on, which ultimately guide Maya's decision to draw.</div></div>
+                            <div class="option" onclick="selectOption(this,'q7','D')"><div class="option-letter">D</div><div class="option-text">To show that Maya never understood her father's passion while he was alive.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb7"></div>
+                    </div>
+
+                    <!-- Q8 -->
+                    <div class="question-block" id="qb8">
+                        <div class="q-number">Question 8</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Read this sentence: <em>"And then, without deciding exactly when she had decided, she began to draw."</em> What does this sentence most strongly suggest about how decisions are made?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q8','A')"><div class="option-letter">A</div><div class="option-text">Maya is acting impulsively, without thinking through the consequences of her choice.</div></div>
+                            <div class="option" onclick="selectOption(this,'q8','B')"><div class="option-letter">B</div><div class="option-text">Some decisions emerge gradually from feeling and experience, rather than from a single conscious moment of choice.</div></div>
+                            <div class="option" onclick="selectOption(this,'q8','C')"><div class="option-letter">C</div><div class="option-text">Maya has been planning to finish the map ever since her father died.</div></div>
+                            <div class="option" onclick="selectOption(this,'q8','D')"><div class="option-letter">D</div><div class="option-text">The author creates suspense by leaving the reader uncertain about what Maya will do next.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb8"></div>
+                    </div>
+
+                    <div class="section-nav">
+                        <div class="progress-text">Questions 1–8 of 22</div>
+                        <div style="display:flex;gap:12px;">
+                            <button class="btn-check" onclick="checkSection('lit')">Check Answers</button>
+                            <button class="btn-next" onclick="showSection('info-passage')">Next Section →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 2: INFORMATIONAL PASSAGE -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-info-passage">
+            <div class="exam-layout">
+                <div class="passage-panel">
+                    <div class="passage-label">Informational Text · Science Article</div>
+                    <div class="passage-title">The Hidden Forest</div>
+                    <div class="passage-author">Adapted from environmental science reporting · FAST PM3 practice</div>
+
+                    <div class="passage-text">
+                        <p>For most of human history, forests appeared to be collections of individual organisms competing for sunlight, water, and soil nutrients. Trees that grew taller survived; those that did not were shaded out and died. This was the story scientists told, and for a long time, it seemed to explain what was visible above ground. What it failed to explain was what was happening underground.</p>
+
+                        <p>In the 1990s, forest ecologist Suzanne Simard began publishing research that would upend decades of conventional thinking about how forests function. Working in the old-growth forests of British Columbia, Simard and her colleagues discovered that the roots of trees are interconnected through vast networks of fungi called mycorrhizae — organisms that form symbiotic relationships with plant roots and can extend for miles through the soil. Through these networks, trees do not simply coexist. They share resources and, in some cases, actively support one another.</p>
+
+                        <p>Simard's experiments demonstrated that larger, older trees — which she termed "mother trees" — transferred carbon, nitrogen, and water to younger seedlings growing in their shade. When a mother tree was cut down, the seedlings nearby showed measurably reduced growth rates and higher mortality. The fungi connecting them did not simply transport nutrients randomly; they appeared to prioritize flows toward plants under stress.</p>
+
+                        <p>This discovery challenged the foundational assumption of competitive individualism in plant science. "We used to think the forest was a marketplace," Simard has said. "Now we know it's more like a family." Critics of this framing argue that attributing family-like behavior to fungi and trees is a form of anthropomorphism — projecting human social structures onto biological processes that are simply chemical signals and resource gradients. The debate continues, but few scientists dispute the underlying data: the mycorrhizal network exists, it transfers resources, and it responds dynamically to stress.</p>
+
+                        <p>The practical implications of this research extend into forestry policy. For decades, the standard practice in commercial forestry was to clear-cut an area and replant a single species — often chosen for fast growth and market value. This approach, researchers now argue, destroys the underground fungal networks that take generations to develop. A newly planted monoculture forest, however dense, lacks the mycorrhizal infrastructure that enables older forests to withstand drought, disease, and insect infestation.</p>
+
+                        <p>Conservation biologists have used Simard's findings to argue for what they call "network-aware forestry" — harvest practices that preserve old-growth anchor trees and maintain mycorrhizal continuity across logged areas. Some commercial forestry companies have begun piloting these approaches, though widespread adoption has been slow. The economics of old-growth preservation remain in tension with short-term timber profits.</p>
+
+                        <p>What Simard's work has made increasingly difficult to ignore is a question that sits at the edge of science and philosophy: what do we mean by an individual? If a forest shares resources, responds collectively to stress, and maintains its health through cooperative underground exchange, the boundary between one organism and another becomes harder to draw than the trees above ground make it appear.</p>
+                    </div>
+                </div>
+
+                <div class="questions-panel">
+                    <div class="questions-header">
+                        <h3>Part 2: Informational Questions</h3>
+                        <p>Questions 9–16 &nbsp;·&nbsp; The Hidden Forest</p>
+                    </div>
+
+                    <!-- Q9 -->
+                    <div class="question-block" id="qb9">
+                        <div class="q-number">Question 9</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">What is the <strong>central idea</strong> of this article?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q9','A')"><div class="option-letter">A</div><div class="option-text">Trees secretly compete underground with even more intensity than they compete above ground.</div></div>
+                            <div class="option" onclick="selectOption(this,'q9','B')"><div class="option-letter">B</div><div class="option-text">Mycorrhizal networks enable forests to share resources cooperatively, challenging the assumption that nature is purely competitive and carrying significant implications for forestry practice.</div></div>
+                            <div class="option" onclick="selectOption(this,'q9','C')"><div class="option-letter">C</div><div class="option-text">Suzanne Simard proved that trees have emotional bonds similar to those of human families.</div></div>
+                            <div class="option" onclick="selectOption(this,'q9','D')"><div class="option-letter">D</div><div class="option-text">Commercial logging is the single greatest threat to biodiversity on Earth.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb9"></div>
+                    </div>
+
+                    <!-- Q10 -->
+                    <div class="question-block" id="qb10">
+                        <div class="q-number">Question 10</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Why does the author include the criticism that Simard's "family" framing is <em>anthropomorphism</em>?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q10','A')"><div class="option-letter">A</div><div class="option-text">To suggest that Simard's research is unreliable and her conclusions should be dismissed.</div></div>
+                            <div class="option" onclick="selectOption(this,'q10','B')"><div class="option-letter">B</div><div class="option-text">To argue that trees do not actually communicate or cooperate in any meaningful way.</div></div>
+                            <div class="option" onclick="selectOption(this,'q10','C')"><div class="option-letter">C</div><div class="option-text">To present a balanced view of the scientific debate while affirming the strength of the underlying experimental data.</div></div>
+                            <div class="option" onclick="selectOption(this,'q10','D')"><div class="option-letter">D</div><div class="option-text">To show that most scientists have rejected the concept of mycorrhizal networks.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb10"></div>
+                    </div>
+
+                    <!-- Q11 EBSR -->
+                    <div class="question-block" id="qb11">
+                        <div class="q-number">Question 11 – Part A</div>
+                        <div class="q-type-tag">EBSR – Part A</div>
+                        <div class="q-text">What was the <strong>primary evidence</strong> Simard used to demonstrate that mother trees support younger seedlings?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q11a','A')"><div class="option-letter">A</div><div class="option-text">She observed mother trees physically shielding seedlings from wind and excess sunlight.</div></div>
+                            <div class="option" onclick="selectOption(this,'q11a','B')"><div class="option-letter">B</div><div class="option-text">She measured reduced growth and higher mortality in seedlings after nearby mother trees were cut down.</div></div>
+                            <div class="option" onclick="selectOption(this,'q11a','C')"><div class="option-letter">C</div><div class="option-text">She analyzed commercial timber records showing lower yields in clear-cut forests over decades.</div></div>
+                            <div class="option" onclick="selectOption(this,'q11a','D')"><div class="option-letter">D</div><div class="option-text">She documented the physical migration of mycorrhizal fungi from old trees to new seedlings.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb11a"></div>
+                    </div>
+
+                    <div class="question-block" id="qb11b">
+                        <div class="q-number">Question 11 – Part B</div>
+                        <div class="q-type-tag">EBSR – Part B: Best Evidence</div>
+                        <div class="q-text">Which sentence from the article <strong>best supports</strong> your answer to Part A?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q11b','A')"><div class="option-letter">A</div><div class="option-text">"Simard and her colleagues discovered that the roots of trees are interconnected through vast networks of fungi called mycorrhizae."</div></div>
+                            <div class="option" onclick="selectOption(this,'q11b','B')"><div class="option-letter">B</div><div class="option-text">"When a mother tree was cut down, the seedlings nearby showed measurably reduced growth rates and higher mortality."</div></div>
+                            <div class="option" onclick="selectOption(this,'q11b','C')"><div class="option-letter">C</div><div class="option-text">"The fungi connecting them did not simply transport nutrients randomly; they appeared to prioritize flows toward plants under stress."</div></div>
+                            <div class="option" onclick="selectOption(this,'q11b','D')"><div class="option-letter">D</div><div class="option-text">"We used to think the forest was a marketplace," Simard has said."</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb11b"></div>
+                    </div>
+
+                    <!-- Q12 -->
+                    <div class="question-block" id="qb12">
+                        <div class="q-number">Question 12</div>
+                        <div class="q-type-tag">Multiple Choice – Vocabulary in Context</div>
+                        <div class="q-text">As used in paragraph 4, the word <strong>"anthropomorphism"</strong> most nearly means:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q12','A')"><div class="option-letter">A</div><div class="option-text">The scientific study of animal behavior in natural settings.</div></div>
+                            <div class="option" onclick="selectOption(this,'q12','B')"><div class="option-letter">B</div><div class="option-text">The belief that humans are more important than other species.</div></div>
+                            <div class="option" onclick="selectOption(this,'q12','C')"><div class="option-letter">C</div><div class="option-text">Attributing human characteristics or social structures to non-human entities.</div></div>
+                            <div class="option" onclick="selectOption(this,'q12','D')"><div class="option-letter">D</div><div class="option-text">A scientific method for measuring chemical communication between organisms.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb12"></div>
+                    </div>
+
+                    <!-- Q13 -->
+                    <div class="question-block" id="qb13">
+                        <div class="q-number">Question 13</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">What is the author most likely suggesting in the final paragraph, when asking: <em>"what do we mean by an individual?"</em></div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q13','A')"><div class="option-letter">A</div><div class="option-text">Scientists should stop using traditional definitions of living organisms.</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','B')"><div class="option-letter">B</div><div class="option-text">Mycorrhizal research forces us to reconsider fundamental assumptions about individuality and separateness in nature.</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','C')"><div class="option-letter">C</div><div class="option-text">Trees and fungi are biologically indistinguishable from one another.</div></div>
+                            <div class="option" onclick="selectOption(this,'q13','D')"><div class="option-letter">D</div><div class="option-text">Above-ground observation of forests is no longer useful for scientific research.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb13"></div>
+                    </div>
+
+                    <!-- Q14 Multi-select -->
+                    <div class="question-block" id="qb14">
+                        <div class="q-number">Question 14</div>
+                        <div class="q-type-tag">Multi-Select</div>
+                        <div class="q-text">Select <strong>TWO</strong> problems with clear-cut forestry practices that are identified in the article.</div>
+                        <div class="multi-select-note">★ Select exactly 2 answers</div>
+                        <div class="options">
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">A</div><div class="option-text">Clear-cutting produces timber that is lower in quality than old-growth wood.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">B</div><div class="option-text">Clear-cutting destroys mycorrhizal networks that take generations to develop.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">C</div><div class="option-text">Replanted monoculture forests lack the infrastructure to withstand drought, disease, and insect infestation.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">D</div><div class="option-text">Clear-cutting is illegal in most countries under international environmental law.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q14')"><div class="option-letter">E</div><div class="option-text">Clear-cut forests attract invasive fungi that replace native mycorrhizal species.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb14"></div>
+                    </div>
+
+                    <!-- Q15 -->
+                    <div class="question-block" id="qb15">
+                        <div class="q-number">Question 15</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">What does Simard mean when she says the forest is <em>"more like a family"</em> than a <em>"marketplace"</em>?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q15','A')"><div class="option-letter">A</div><div class="option-text">Trees form emotional bonds and mourn when other members of the forest die.</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','B')"><div class="option-letter">B</div><div class="option-text">Forests operate through mutual support and resource sharing rather than pure competition for survival.</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','C')"><div class="option-letter">C</div><div class="option-text">Younger trees are always dependent on older trees and can never grow independently.</div></div>
+                            <div class="option" onclick="selectOption(this,'q15','D')"><div class="option-letter">D</div><div class="option-text">Scientists should model the forest using the same economic principles that govern human families.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb15"></div>
+                    </div>
+
+                    <!-- Q16 -->
+                    <div class="question-block" id="qb16">
+                        <div class="q-number">Question 16</div>
+                        <div class="q-type-tag">Multiple Choice – Text Structure</div>
+                        <div class="q-text">How is this article primarily organized?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q16','A')"><div class="option-letter">A</div><div class="option-text">Compare and contrast: two competing views of forest ecosystems are weighed equally throughout.</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','B')"><div class="option-letter">B</div><div class="option-text">Biography: the article focuses primarily on Suzanne Simard's life and career.</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','C')"><div class="option-letter">C</div><div class="option-text">Scientific discovery, evidence and debate, and broader implications: the article builds from a finding to its controversy to its philosophical and practical consequences.</div></div>
+                            <div class="option" onclick="selectOption(this,'q16','D')"><div class="option-letter">D</div><div class="option-text">Problem and solution: one clear problem is identified and one proven solution is proposed.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb16"></div>
+                    </div>
+
+                    <div class="section-nav">
+                        <div class="progress-text">Questions 9–16 of 22</div>
+                        <div style="display:flex;gap:12px;">
+                            <button class="btn-check" onclick="checkSection('info')">Check Answers</button>
+                            <button class="btn-next" onclick="showSection('paired-passage')">Next Section →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SECTION 3: PAIRED PASSAGES -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-paired-passage">
+            <div class="exam-layout">
+                <div class="passage-panel">
+                    <div class="passage-label">Paired Passages · Informational + Literary</div>
+                    <div class="passage-title">Light and Darkness: Two Views</div>
+                    <div class="passage-author">FAST PM3 practice · Paired texts</div>
+
+                    <div class="passage-text">
+                        <p style="font-weight:700;color:#1a365d;text-indent:0;margin-bottom:4px;">Passage 1 — "The Vanishing Sky" (Informational)</p>
+                        <p style="color:#718096;font-size:0.85rem;text-indent:0;margin-bottom:14px;">Adapted from science and environment reporting</p>
+
+                        <p>A century ago, the Milky Way was visible to nearly everyone on Earth on a clear night. Today, roughly one-third of the global population — including eighty percent of Americans — cannot see it from where they live. The cause is light pollution: the excess artificial light that fills the night sky, washing out the stars that humans have used for navigation, storytelling, and orientation since the beginning of recorded history.</p>
+
+                        <p>Light pollution is not merely an aesthetic problem. Biologists have documented significant effects on species whose behavior depends on natural light cycles. Sea turtle hatchlings, which instinctively move toward the brightest horizon (historically the moon's reflection on the water), now frequently crawl inland toward streetlights and die before reaching the ocean. Migratory birds navigate by stars and become disoriented by brightly lit skyscrapers, leading to fatal collisions; researchers estimate that one billion birds die annually from building strikes in the United States, with nighttime light a major contributing factor.</p>
+
+                        <p>The effects on humans are increasingly well-documented as well. Exposure to artificial light at night suppresses the production of melatonin, a hormone that regulates sleep and has been linked to immune function and the prevention of certain cancers. Studies of nurses working night shifts have found elevated rates of breast cancer, a connection researchers attribute in part to chronic melatonin disruption.</p>
+
+                        <p>Solutions exist and are relatively inexpensive. Shielded light fixtures that direct illumination downward rather than into the sky reduce light pollution dramatically without reducing visibility on the ground. Replacing high-intensity white LEDs with warmer, lower-intensity alternatives mitigates biological harm while cutting energy costs. Dark-sky preserves — zones where outdoor lighting is strictly regulated — have been established in ecologically and astronomically significant areas, and many have documented measurable recoveries in nocturnal wildlife populations within years of implementation.</p>
+
+                        <p>The International Dark-Sky Association estimates that thirty percent of outdoor lighting in the United States is wasted — directed upward or sideways rather than at its intended target. The energy cost of this waste is approximately $3.3 billion annually. In other words, light pollution is not only damaging ecosystems and human health; it is, quite literally, money thrown at the sky.</p>
+                    </div>
+
+                    <div class="passage-text" style="margin-top:28px;">
+                        <p style="font-weight:700;color:#1a365d;text-indent:0;margin-bottom:4px;">Passage 2 — "What We Buried" (Literary · Poem)</p>
+                        <p style="color:#718096;font-size:0.85rem;text-indent:0;margin-bottom:14px;">An original poem for FAST PM3 practice</p>
+
+                        <p style="text-indent:0;line-height:2.1;">
+                            Before the lights, my grandmother<br>
+                            could find her way home by Orion's belt —<br>
+                            three stars she called her compass,<br>
+                            her roof when she was lost.<br><br>
+
+                            Now I drive home under orange cloud,<br>
+                            the kind that isn't weather,<br>
+                            and the children I teach<br>
+                            have never seen the Milky Way<br>
+                            except in photographs.<br><br>
+
+                            They think of it the way they think of whales —<br>
+                            something enormous and elsewhere,<br>
+                            something you watch on a screen.<br><br>
+
+                            Last summer we drove four hours<br>
+                            to a place where the sky still worked.<br>
+                            My daughter said: <em>is that real?</em><br>
+                            And I didn't know whether to laugh<br>
+                            or to understand, finally,<br>
+                            what it is we have buried<br>
+                            under all this borrowed light —<br><br>
+
+                            not just the stars,<br>
+                            but the particular dark<br>
+                            that teaches you your own smallness,<br>
+                            and how to bear it.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="questions-panel">
+                    <div class="questions-header">
+                        <h3>Part 3: Paired Passage Questions</h3>
+                        <p>Questions 17–22 &nbsp;·&nbsp; Light and Darkness: Two Views</p>
+                    </div>
+
+                    <!-- Q17 -->
+                    <div class="question-block" id="qb17">
+                        <div class="q-number">Question 17</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Both passages share the idea that light pollution has caused:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q17','A')"><div class="option-letter">A</div><div class="option-text">A crisis so severe that it is now beyond the point of recovery.</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','B')"><div class="option-letter">B</div><div class="option-text">The loss of something significant that people once relied on — stars that guided both animals and humans.</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','C')"><div class="option-letter">C</div><div class="option-text">Immediate government action and new international laws restricting outdoor lighting.</div></div>
+                            <div class="option" onclick="selectOption(this,'q17','D')"><div class="option-letter">D</div><div class="option-text">A generational conflict between people who value the natural sky and those who prefer urban life.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb17"></div>
+                    </div>
+
+                    <!-- Q18 -->
+                    <div class="question-block" id="qb18">
+                        <div class="q-number">Question 18</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">How does the poem <strong>extend</strong> the idea presented in Passage 1 beyond its scientific scope?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q18','A')"><div class="option-letter">A</div><div class="option-text">By providing additional statistics about the economic cost of wasted outdoor lighting.</div></div>
+                            <div class="option" onclick="selectOption(this,'q18','B')"><div class="option-letter">B</div><div class="option-text">By arguing that light pollution legislation should be passed at the international level.</div></div>
+                            <div class="option" onclick="selectOption(this,'q18','C')"><div class="option-letter">C</div><div class="option-text">By connecting the loss of dark skies to the loss of a human experience — the capacity to feel small and oriented within something vast — that cannot be measured in data.</div></div>
+                            <div class="option" onclick="selectOption(this,'q18','D')"><div class="option-letter">D</div><div class="option-text">By contradicting Passage 1's claim that solutions to light pollution are affordable.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb18"></div>
+                    </div>
+
+                    <!-- Q19 -->
+                    <div class="question-block" id="qb19">
+                        <div class="q-number">Question 19</div>
+                        <div class="q-type-tag">Multiple Choice – Vocabulary in Context</div>
+                        <div class="q-text">In Passage 1, paragraph 4, the word <strong>"mitigates"</strong> most nearly means:</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q19','A')"><div class="option-letter">A</div><div class="option-text">Eliminates completely.</div></div>
+                            <div class="option" onclick="selectOption(this,'q19','B')"><div class="option-letter">B</div><div class="option-text">Makes worse or intensifies.</div></div>
+                            <div class="option" onclick="selectOption(this,'q19','C')"><div class="option-letter">C</div><div class="option-text">Reduces or lessens the severity of.</div></div>
+                            <div class="option" onclick="selectOption(this,'q19','D')"><div class="option-letter">D</div><div class="option-text">Transfers to a different location.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb19"></div>
+                    </div>
+
+                    <!-- Q20 -->
+                    <div class="question-block" id="qb20">
+                        <div class="q-number">Question 20</div>
+                        <div class="q-type-tag">Multiple Choice</div>
+                        <div class="q-text">Read the final lines of the poem:<br><br><em>"not just the stars, / but the particular dark / that teaches you your own smallness, / and how to bear it."</em><br><br>What does the speaker most likely suggest that we have lost along with the stars?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q20','A')"><div class="option-letter">A</div><div class="option-text">The ability to navigate without electronic devices such as GPS.</div></div>
+                            <div class="option" onclick="selectOption(this,'q20','B')"><div class="option-letter">B</div><div class="option-text">A psychological experience of humility and perspective that natural darkness once provided.</div></div>
+                            <div class="option" onclick="selectOption(this,'q20','C')"><div class="option-letter">C</div><div class="option-text">The speaker believes modern people are arrogant and have entirely lost their connection to nature.</div></div>
+                            <div class="option" onclick="selectOption(this,'q20','D')"><div class="option-letter">D</div><div class="option-text">Children today are unable to manage difficult emotions because of constant screen exposure.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb20"></div>
+                    </div>
+
+                    <!-- Q21 Multi-select -->
+                    <div class="question-block" id="qb21">
+                        <div class="q-number">Question 21</div>
+                        <div class="q-type-tag">Multi-Select</div>
+                        <div class="q-text">Select <strong>TWO</strong> ways the two passages <em>differ</em> in their approach to the subject of light pollution.</div>
+                        <div class="multi-select-note">★ Select exactly 2 answers</div>
+                        <div class="options">
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">A</div><div class="option-text">Passage 1 uses quantifiable data and scientific research; the poem uses personal memory and imagery to convey its meaning.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">B</div><div class="option-text">Passage 1 argues that light pollution is completely harmless; the poem argues it is catastrophic.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">C</div><div class="option-text">Passage 1 addresses ecological and health effects in an objective tone; the poem explores emotional and cultural loss through a subjective, first-person voice.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">D</div><div class="option-text">Passage 1 focuses only on the economic cost of light pollution; the poem focuses only on wildlife.</div></div>
+                            <div class="option" onclick="selectMulti(this,'q21')"><div class="option-letter">E</div><div class="option-text">Both passages rely entirely on emotional appeals and cite no specific facts or evidence.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb21"></div>
+                    </div>
+
+                    <!-- Q22 -->
+                    <div class="question-block" id="qb22">
+                        <div class="q-number">Question 22</div>
+                        <div class="q-type-tag">Multiple Choice – Synthesis</div>
+                        <div class="q-text">A student wants to write an essay arguing that light pollution causes harm that is both <em>measurable</em> and <em>immeasurable</em>. Which combination of evidence would <strong>best</strong> support this claim?</div>
+                        <div class="options">
+                            <div class="option" onclick="selectOption(this,'q22','A')"><div class="option-letter">A</div><div class="option-text">The statistics about bird deaths from Passage 1, and the speaker's memory of her grandmother navigating by Orion's belt from the poem.</div></div>
+                            <div class="option" onclick="selectOption(this,'q22','B')"><div class="option-letter">B</div><div class="option-text">Only the estimate about $3.3 billion in wasted energy from Passage 1.</div></div>
+                            <div class="option" onclick="selectOption(this,'q22','C')"><div class="option-letter">C</div><div class="option-text">Only the poem's final lines about the "particular dark that teaches you your own smallness."</div></div>
+                            <div class="option" onclick="selectOption(this,'q22','D')"><div class="option-letter">D</div><div class="option-text">The description of shielded light fixtures from Passage 1, and the poem's reference to driving four hours to see the sky.</div></div>
+                        </div>
+                        <div class="feedback-box" id="fb22"></div>
+                    </div>
+
+                    <div class="section-nav">
+                        <div class="progress-text">Questions 17–22 of 22</div>
+                        <div style="display:flex;gap:12px;">
+                            <button class="btn-check" onclick="checkSection('paired')">Check Answers</button>
+                            <button class="btn-next" onclick="showResults()">View Final Score →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- RESULTS -->
+        <!-- ============================================================ -->
+        <div class="section" id="section-results">
+            <div class="results-panel">
+                <div class="results-card">
+                    <div class="score-circle">
+                        <div class="big-num" id="finalNum">–</div>
+                        <div class="score-label">out of 22</div>
+                    </div>
+                    <h2 id="resultTitle">Your Results</h2>
+                    <p class="result-sub" id="resultSub">Complete all sections to see your score breakdown.</p>
+
+                    <div class="breakdown-grid">
+                        <div class="breakdown-item">
+                            <div class="b-num" id="litScore">–</div>
+                            <div class="b-label">Literary<br>(Q 1–8)</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="b-num" id="infoScore">–</div>
+                            <div class="b-label">Informational<br>(Q 9–16)</div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="b-num" id="pairedScore">–</div>
+                            <div class="b-label">Paired<br>(Q 17–22)</div>
+                        </div>
+                    </div>
+
+                    <div class="level-bar-wrap">
+                        <div class="level-bar-label" id="barLabel">Score</div>
+                        <div class="level-bar-bg">
+                            <div class="level-bar-fill" id="levelBar" style="width:0%"></div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+                        <button class="retry-btn" onclick="retryExam()">Retry Exam</button>
+                        <button class="review-btn" onclick="showSection('lit-questions')">Review Answers</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</div><!-- /container -->
+
+<script>
+// ── Answer Key ──────────────────────────────────────────────────
+const answers = {
+    q1:  { correct: 'C', feedback: 'The story shows that Maya begins to understand her father — and herself — only when she engages with his work. The act of drawing the map bridges the distance between them.' },
+    q2:  { correct: 'B', feedback: 'The comparison to scripture shows that her father approached mapmaking with devoted, almost sacred attention — not that he was literally religious.' },
+    q3a: { correct: 'C', feedback: 'It is her father\'s remembered words — "The map isn\'t the place. But making it changes you" — that move Maya from hesitation to action. No one forces her; the idea inspires her.' },
+    q3b: { correct: 'C', feedback: 'This is the direct quotation from the father that contains his philosophy. It is the clearest textual support for why Maya picks up the pencil.' },
+    q4:  { correct: 'C', feedback: 'The left side (finished) represents her father\'s completed life; the blank right side represents what he left unfinished. Maya\'s choice is whether to carry that forward.' },
+    q5:  { correct: 'B', feedback: 'The cartographic metaphor ("territories resist being named") reflects that her mother\'s expression blended grief and pride in a way that could not be reduced to a single word.' },
+    q6:  { correct: ['B','C'], feedback: 'Setting the phone face-down (avoiding the decision) and holding the pencil motionless over the page (caught between action and inaction) both show Maya\'s internal struggle. The other details are setting or backstory, not conflict.' },
+    q7:  { correct: 'C', feedback: 'The father\'s words about attention and change are the philosophical engine of the story — they resurface in Maya\'s mind just before she draws, making clear that his values guide her decision.' },
+    q8:  { correct: 'B', feedback: 'The phrase "without deciding exactly when she had decided" captures how the choice emerged organically from her experience in the room — not as a single deliberate moment but as a gradual coming-to-knowing.' },
+
+    q9:  { correct: 'B', feedback: 'The article traces the discovery of mycorrhizal networks, examines the scientific debate, and argues that understanding cooperative forest ecology should reshape forestry practice.' },
+    q10: { correct: 'C', feedback: 'By including the criticism, the author shows intellectual fairness — acknowledging the debate — while making clear that the data itself is not in serious dispute.' },
+    q11a:{ correct: 'B', feedback: 'Simard\'s key experimental finding was that removing mother trees led to measurably worse outcomes for nearby seedlings — a controlled comparison that supported the network hypothesis.' },
+    q11b:{ correct: 'B', feedback: 'This sentence directly states the cause-and-effect relationship between removing mother trees and reduced seedling survival, making it the clearest evidence for Part A.' },
+    q12: { correct: 'C', feedback: 'Anthropomorphism means projecting human traits onto non-human things. The critics argue that calling the fungal network a "family" does exactly this.' },
+    q13: { correct: 'B', feedback: 'The final question — "what do we mean by an individual?" — pushes the reader to reconsider a basic assumption about separateness in nature, which is the philosophical implication the article builds toward.' },
+    q14: { correct: ['B','C'], feedback: 'The article explicitly states that clear-cutting destroys mycorrhizal networks (paragraph 5) and that replanted monocultures lack the resilience to withstand environmental stress (paragraph 5). The other options are not supported by the text.' },
+    q15: { correct: 'B', feedback: 'Simard\'s metaphor contrasts a competitive "marketplace" (winner-takes-all) with a "family" (mutual support and shared resources). This is her shorthand for the cooperative nature of forest ecology.' },
+    q16: { correct: 'C', feedback: 'The article moves from a scientific discovery (mycorrhizal networks) → evidence and debate (the "family" controversy) → implications (forestry policy and philosophical questions about individuality). This three-part arc best describes its structure.' },
+
+    q17: { correct: 'B', feedback: 'Both texts focus on the loss of the night sky — stars that once guided sea turtles, migratory birds, and the speaker\'s grandmother. Both treat this as a significant, concrete loss.' },
+    q18: { correct: 'C', feedback: 'Passage 1 documents scientific and economic harm. The poem goes further, exploring what the loss of darkness costs us psychologically: the "particular dark / that teaches you your own smallness, and how to bear it."' },
+    q19: { correct: 'C', feedback: '"Mitigates" means to reduce or lessen. In context, using warmer LEDs reduces (mitigates) the biological harm — it does not eliminate it entirely.' },
+    q20: { correct: 'B', feedback: 'The poem argues that the dark sky offered a psychological gift: an experience of human smallness within something vast. Artificial light has buried this along with the stars themselves.' },
+    q21: { correct: ['A','C'], feedback: 'A and C are both correct: Passage 1 is data-driven and objective; the poem is personal and emotionally resonant. They use different modes (evidence vs. imagery) and different tones (informational vs. subjective).' },
+    q22: { correct: 'A', feedback: 'The bird death statistics show measurable, quantifiable harm. The grandmother\'s use of Orion\'s belt shows what cannot be measured — the human cultural and navigational relationship with the stars. Together they support both parts of the claim.' }
+};
+
+// ── State ────────────────────────────────────────────────────────
+const userAnswers = {};
+const sectionChecked = { lit: false, info: false, paired: false };
+
+// ── Navigation ───────────────────────────────────────────────────
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+        if (n.getAttribute('onclick') === `showSection('${name}')`) n.classList.add('active');
+    });
+}
+
+function showResults() {
+    calcResults();
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('section-results').classList.add('active');
+}
+
+// ── Option selection ─────────────────────────────────────────────
+function selectOption(el, qid, letter) {
+    const block = el.closest('.question-block');
+    if (block.classList.contains('correct') || block.classList.contains('incorrect')) return;
+    block.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    userAnswers[qid] = letter;
+    block.classList.add('answered');
+}
+
+function selectMulti(el, qid) {
+    const block = el.closest('.question-block');
+    if (block.classList.contains('correct') || block.classList.contains('incorrect')) return;
+    el.classList.toggle('selected');
+    const selected = [...block.querySelectorAll('.option.selected')];
+    if (!userAnswers[qid]) userAnswers[qid] = [];
+    userAnswers[qid] = selected.map(o => o.querySelector('.option-letter').textContent);
+    if (userAnswers[qid].length > 0) block.classList.add('answered');
+}
+
+// ── Check answers for a section ──────────────────────────────────
+function checkSection(sec) {
+    const qmap = {
+        lit:    ['q1','q2','q3a','q3b','q4','q5','q6','q7','q8'],
+        info:   ['q9','q10','q11a','q11b','q12','q13','q14','q15','q16'],
+        paired: ['q17','q18','q19','q20','q21','q22']
+    };
+    sectionChecked[sec] = true;
+    qmap[sec].forEach(qid => gradeQuestion(qid));
+    updateLiveScore();
+}
+
+function gradeQuestion(qid) {
+    const ans = answers[qid];
+    if (!ans) return;
+    const ua = userAnswers[qid];
+    const block = document.getElementById('qb' + qid.replace('q','').replace('a','').replace('b','b'));
+    const correctArr = Array.isArray(ans.correct) ? ans.correct : [ans.correct];
+    const userArr = Array.isArray(ua) ? ua : (ua ? [ua] : []);
+
+    const isCorrect = correctArr.length === userArr.length &&
+                      correctArr.every(c => userArr.includes(c));
+
+    if (!block) return;
+
+    block.querySelectorAll('.option').forEach(opt => {
+        const letter = opt.querySelector('.option-letter').textContent;
+        if (correctArr.includes(letter)) opt.classList.add('correct-ans');
+        else if (userArr.includes(letter) && !correctArr.includes(letter)) opt.classList.add('wrong-ans');
+    });
+
+    block.classList.remove('answered');
+    block.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+    const fb = block.querySelector('.feedback-box');
+    if (fb) {
+        fb.className = 'feedback-box ' + (isCorrect ? 'correct' : 'incorrect');
+        fb.innerHTML = (isCorrect ? '✓ Correct! ' : '✗ Incorrect. ') + ans.feedback;
+    }
+}
+
+// ── Score calculation ─────────────────────────────────────────────
+function countCorrect(qids) {
+    return qids.filter(qid => {
+        const ua = userAnswers[qid];
+        const ans = answers[qid];
+        if (!ans) return false;
+        const correctArr = Array.isArray(ans.correct) ? ans.correct : [ans.correct];
+        const userArr = Array.isArray(ua) ? ua : (ua ? [ua] : []);
+        return correctArr.length === userArr.length && correctArr.every(c => userArr.includes(c));
+    }).length;
+}
+
+function updateLiveScore() {
+    const allQ = Object.keys(answers);
+    const total = countCorrect(allQ);
+    const el = document.getElementById('liveScore');
+    el.textContent = `Score: ${total} / ${allQ.length}`;
+    el.style.display = 'block';
+}
+
+function calcResults() {
+    const litQ    = ['q1','q2','q3a','q3b','q4','q5','q6','q7','q8'];
+    const infoQ   = ['q9','q10','q11a','q11b','q12','q13','q14','q15','q16'];
+    const pairedQ = ['q17','q18','q19','q20','q21','q22'];
+
+    const litC    = countCorrect(litQ);
+    const infoC   = countCorrect(infoQ);
+    const pairedC = countCorrect(pairedQ);
+    const total   = litC + infoC + pairedC;
+    const max     = litQ.length + infoQ.length + pairedQ.length;
+    const pct     = Math.round((total / max) * 100);
+
+    document.getElementById('finalNum').textContent = total;
+    document.getElementById('litScore').textContent  = litC + '/9';
+    document.getElementById('infoScore').textContent  = infoC + '/9';
+    document.getElementById('pairedScore').textContent = pairedC + '/6';
+
+    let label = pct >= 80 ? '🎉 Excellent — approaching mastery!' :
+                pct >= 65 ? '👍 Good — keep practicing targeted skills.' :
+                pct >= 50 ? '📖 Developing — review and retry.' :
+                            '🔁 Needs more practice — try again after reviewing.';
+
+    document.getElementById('resultTitle').textContent = pct >= 80 ? 'Great Work!' : 'Results';
+    document.getElementById('resultSub').textContent = `${pct}% — ${label}`;
+    document.getElementById('barLabel').textContent = `${pct}% Score`;
+    setTimeout(() => {
+        document.getElementById('levelBar').style.width = pct + '%';
+    }, 200);
+}
+
+function retryExam() {
+    Object.keys(userAnswers).forEach(k => delete userAnswers[k]);
+    Object.keys(sectionChecked).forEach(k => sectionChecked[k] = false);
+    document.querySelectorAll('.option').forEach(o => {
+        o.classList.remove('selected','correct-ans','wrong-ans');
+    });
+    document.querySelectorAll('.question-block').forEach(b => {
+        b.classList.remove('answered','correct','incorrect');
+    });
+    document.querySelectorAll('.feedback-box').forEach(f => {
+        f.className = 'feedback-box';
+        f.innerHTML = '';
+    });
+    document.getElementById('liveScore').style.display = 'none';
+    document.getElementById('levelBar').style.width = '0%';
+    showSection('intro');
+}
+</script>
+</body>
+</html>
