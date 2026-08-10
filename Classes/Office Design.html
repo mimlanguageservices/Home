@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>United Airlines: The Passenger Removal Incident - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">United Airlines</h1>
+        <p class="game-subtitle">Customer Service &amp; Viral PR Disasters</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>United Airlines: The Passenger Removal Incident</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">United Airlines</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Customer Service &amp; Viral PR Disasters</p>
+                                    <p style="font-size: 1.1rem; opacity: 0.6; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase;">Sequencing Events · Brand Reputation · Crisis Vocabulary</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <!-- Replace the YouTube video ID below with your preferred news report about the United Airlines passenger removal incident -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/VrDWY6C1178?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - What Happened? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What Happened?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>On April 9, 2017, United Airlines Flight 3411 was ready to leave Chicago for Louisville, Kentucky. The flight was full. The airline needed four seats for its own employees. They asked passengers to leave the plane voluntarily, but nobody wanted to go.</p>
+                                        <p>United then selected four passengers randomly. One of them, Dr. David Dao, refused to leave. He said he had patients to see the next morning. Security officers were called. They physically dragged him off the plane. He was injured — his face was bloody, and he lost two teeth.</p>
+                                        <p>Other passengers filmed the whole thing on their phones. The videos were posted online and went <span class="vocab-link" onclick="showPopup('viral', 'spreading very quickly to many people, especially on the internet')">viral</span> within hours. Millions of people around the world saw what happened, and they were shocked. United Airlines was suddenly in the middle of a very serious <span class="vocab-link" onclick="showPopup('crisis', 'an urgent and dangerous situation that needs immediate action')">crisis</span>.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>On April 9, 2017, United Express Flight 3411 was <span class="vocab-link" onclick="showPopup('overbooked', 'when more tickets are sold than there are seats available on a flight')">overbooked</span> at Chicago O'Hare International Airport. The airline needed to transport four of its own crew members to Louisville for another flight. After offering travel vouchers with no volunteers coming forward, United randomly selected four passengers to be removed.</p>
+                                        <p>One passenger, Dr. David Dao, a 69-year-old physician, refused to give up his seat, stating he had patients to attend to the following morning. Chicago Aviation Security officers were called and forcibly removed him from the aircraft. He was dragged down the aisle, sustaining a concussion, a broken nose, and two lost teeth.</p>
+                                        <p>Fellow passengers filmed the removal on their smartphones. The footage spread rapidly across social media, creating an immediate and catastrophic <span class="vocab-link" onclick="showPopup('backlash', 'a strong and widespread negative reaction from the public against a company or person')">backlash</span>. Within 24 hours, United Airlines found itself at the centre of a global <span class="vocab-link" onclick="showPopup('PR disaster', 'an event that causes severe and widespread damage to a company\'s public image')">PR disaster</span>.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The events of April 9, 2017 aboard United Express Flight 3411 exposed a series of systemic failures across multiple levels of the airline industry. The core incident — the forced removal of a ticketed, seated passenger — was technically permitted under United's Contract of Carriage and US Department of Transportation regulations governing involuntary denied boarding. However, the application of those rules, combined with the use of law enforcement to enforce a commercial staffing requirement, transformed a routine <span class="vocab-link" onclick="showPopup('overbooking', 'the practice of selling more reservations than available capacity, betting on no-shows')">overbooking</span> situation into a reputational catastrophe.</p>
+                                        <p>Dr. David Dao's forcible removal — captured on video by multiple passengers and immediately uploaded to social media — illustrated the profound shift in corporate accountability that smartphone cameras and social platforms have produced. What was previously a private incident between an airline and a single passenger became, within hours, a globally witnessed spectacle subject to immediate and intense public judgment.</p>
+                                        <p>The speed and scale of the resulting <span class="vocab-link" onclick="showPopup('backlash', 'a strong and widespread negative reaction from the public against a company or person')">backlash</span> outpaced every layer of United's institutional response capacity — legal, communications, and executive — creating a crisis whose initial trajectory was shaped entirely by citizen journalism rather than corporate narrative management.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800" alt="Airport terminal" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - United's Initial Response -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>United's Initial Response</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>After the video went viral, United Airlines CEO Oscar Munoz sent a letter to employees. In the letter, he called Dr. Dao "disruptive and belligerent." He did not apologize to Dr. Dao. He defended what the security officers had done. Many people were very angry with this response.</p>
+                                        <p>United's first public statement said they were sorry that passengers had to be "re-accommodated." Many people criticized this word — "re-accommodated" is a very formal, indirect way to say "forced off the plane." It did not sound sincere.</p>
+                                        <p>The company's <span class="vocab-link" onclick="showPopup('reputation', 'the opinion people have about how good or trustworthy a person or company is')">reputation</span> got worse every hour. Customers were angry. Journalists criticized the airline. United's stock price fell. Many people said they would never fly United again. The company had made the crisis much worse with its bad communication.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>United's crisis response unfolded in damaging stages. CEO Oscar Munoz's initial statement expressed regret only for "having to re-accommodate" passengers — a <span class="vocab-link" onclick="showPopup('euphemism', 'a mild or indirect word used in place of one that might seem too harsh or direct')">euphemism</span> that was instantly and widely mocked. He did not apologize to Dr. Dao, and his internal email to employees praised staff for following "established procedures" — a message that quickly leaked to the press.</p>
+                                        <p>The sequence of responses made things worse at every step. Munoz's first public statement defended the removal. His second statement, the following day, offered a limited apology. Only his third statement — issued after the story had dominated global news for 48 hours — was a genuine, unconditional apology.</p>
+                                        <p>The timing was critical. By the time a sincere apology arrived, United had already lost control of the narrative. The airline's <span class="vocab-link" onclick="showPopup('brand damage', 'harm caused to the public perception of a company\'s value and trustworthiness')">brand damage</span> compounded with each hour of delay, and each defensive statement was used as evidence of the company's indifference to its customers.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>United's initial crisis communications represent a textbook example of what crisis theorists classify as a "defensive" response strategy — one that prioritises institutional protection over victim welfare. Munoz's first statement deployed the passive voice ("Re-accommodation"), minimising language ("re-accommodated"), and procedural justification ("following established procedures") — all of which crisis communication research consistently identifies as markers that amplify rather than contain public anger.</p>
+                                        <p>The internal employee email — in which Munoz commended staff and described Dao as "disruptive and belligerent" — represented a catastrophic failure of communication discipline. Its rapid public disclosure transformed what might have been a containable internal communication into documentary proof of the company's true institutional posture, destroying the credibility of any subsequent apologetic statement.</p>
+                                        <p>Compounding the structural failures was a deeply incongruous piece of context: Munoz had been named <em>PRWeek</em>'s "Communicator of the Year" only weeks before the incident. The irony was seized upon gleefully by media outlets worldwide and became a recurring element of coverage, further intensifying the <span class="vocab-link" onclick="showPopup('reputational damage', 'harm to the perceived trustworthiness and character of an organization')">reputational damage</span>.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800" alt="Corporate press conference" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - The Viral Video Effect -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Viral Video Effect</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The videos filmed by passengers on Flight 3411 changed everything. Before the internet and smartphones, this kind of incident might never have become public. But in 2017, anyone with a phone can record a video and share it with millions of people in seconds.</p>
+                                        <p>The footage was shocking to watch. People shared it on Twitter, Facebook, and other social media platforms. Within 24 hours, the video had been seen millions of times. By the next day, it was on the news in every country.</p>
+                                        <p>United Airlines' stock fell by $1.4 billion in value in just one day. The hashtag "#BoycottUnited" was used hundreds of thousands of times on Twitter. This shows how quickly a <span class="vocab-link" onclick="showPopup('viral', 'spreading very quickly to many people, especially on the internet')">viral</span> video can destroy a company's <span class="vocab-link" onclick="showPopup('reputation', 'the opinion people have about how good or trustworthy a person or company is')">reputation</span>.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The passenger removal video illustrated the power of <span class="vocab-link" onclick="showPopup('social media amplification', 'the rapid spread and intensification of content through online sharing and audience engagement')">social media amplification</span> in the modern era. What previously might have been resolved quietly between an airline and a passenger became — within hours — a globally shared emotional experience that tens of millions of people reacted to in real time.</p>
+                                        <p>The footage spread faster than United's communications team could respond. By the time the company issued its first statement, the public narrative was already fully formed: United had physically assaulted a paying customer. Every subsequent corporate statement was evaluated against that pre-existing frame.</p>
+                                        <p>The financial consequences were immediate. United Airlines' stock dropped by approximately $1.4 billion in market capitalisation in a single trading day. The hashtag "#BoycottUnited" trended globally. Chinese social media was particularly active — Dr. Dao was of Vietnamese-Chinese heritage — and the story generated enormous <span class="vocab-link" onclick="showPopup('backlash', 'a strong and widespread negative reaction from the public against a company or person')">backlash</span> in an important market for the airline.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The United Airlines incident is a defining case study in the mechanics of viral crisis escalation. The footage simultaneously fulfilled several conditions that crisis communication researchers identify as predictors of maximum viral spread: it was emotionally visceral, easily comprehensible without context, visually unambiguous in its moral implications, and shareable across multiple platforms in its original form.</p>
+                                        <p>Critically, the viral spread created what scholars term a "narrative lock" — a situation in which the dominant public interpretation of events becomes so firmly established so quickly that subsequent corporate communications are structurally unable to alter it. United's defensive first statements did not merely fail to change the narrative; they actively confirmed it, providing new content that the media cycle could absorb and amplify.</p>
+                                        <p>The incident also demonstrated the cross-border dimensions of contemporary viral crises. Because Dr. Dao was of Asian heritage, the story generated disproportionate engagement on Chinese social media platforms — including Weibo and WeChat — where it framed the incident in terms of racial treatment of Asian passengers. This dimension added a layer of <span class="vocab-link" onclick="showPopup('reputational damage', 'harm to the perceived trustworthiness and character of an organization')">reputational damage</span> in a market of strategic importance to United.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800" alt="Smartphone social media" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Describing Sequences of Events -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Describing Sequences of Events</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>When we tell a story or describe what happened, we use <strong>sequence words</strong> to make the order clear. Here are the most useful ones:</p>
+                                        <ul>
+                                            <li><strong>First / To begin with:</strong> "First, the airline asked passengers to leave voluntarily."</li>
+                                            <li><strong>Then / Next / After that:</strong> "Then, they selected passengers randomly."</li>
+                                            <li><strong>When / After:</strong> "After Dr. Dao refused, security was called."</li>
+                                            <li><strong>As a result / So:</strong> "As a result, millions of people saw the video."</li>
+                                            <li><strong>Finally / Eventually / In the end:</strong> "Finally, the CEO gave a full apology."</li>
+                                        </ul>
+                                        <p>Practice: Use these words to describe the <span class="vocab-link" onclick="showPopup('sequence', 'a series of events or actions that happen in a connected order')">sequence</span> of events on Flight 3411. Try to tell the whole story in five sentences, using one sequence word in each sentence.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>In professional and academic English, sequencing events precisely is essential for clear analysis and reporting. The United Airlines crisis offers an ideal <span class="vocab-link" onclick="showPopup('sequence', 'a series of events or actions that happen in a connected order')">sequence</span> to practice with:</p>
+                                        <ul>
+                                            <li><strong>Prior to / Before:</strong> "Prior to the removal, the airline had asked for volunteers twice."</li>
+                                            <li><strong>Following / After:</strong> "Following the forced removal, passengers immediately began filming."</li>
+                                            <li><strong>Subsequently / Shortly afterwards:</strong> "The footage was subsequently shared on social media within minutes."</li>
+                                            <li><strong>As a consequence / As a result:</strong> "As a consequence, United's stock fell $1.4 billion in a single day."</li>
+                                            <li><strong>Eventually / Ultimately / In the aftermath:</strong> "Ultimately, Munoz issued a full and unconditional apology."</li>
+                                        </ul>
+                                        <p>Note: Stronger connectors like <em>consequently</em> and <em>as a result</em> imply a clear <strong>cause-and-effect</strong> relationship — use them only when one event directly caused the next. Weaker connectors like <em>then</em> simply indicate time order.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Sophisticated sequencing in professional discourse goes beyond simple time-order connectors to encode cause, consequence, and evaluation simultaneously. Consider the difference in these descriptions of the United crisis:</p>
+                                        <ul>
+                                            <li><strong>Temporal only:</strong> "The video was posted. Then the stock fell." — indicates order, no causation.</li>
+                                            <li><strong>Causal:</strong> "The viral dissemination of the footage <em>precipitated</em> an immediate collapse in United's market capitalisation." — implies direct causation.</li>
+                                            <li><strong>Concessive:</strong> "<em>Despite</em> United's initial defensive response, public pressure <em>ultimately</em> compelled a full apology." — acknowledges contrast before the expected outcome.</li>
+                                            <li><strong>Conditional retrospective:</strong> "<em>Had</em> United's initial statement been apologetic, the subsequent escalation <em>might have</em> been averted." — counterfactual sequence.</li>
+                                        </ul>
+                                        <p>In crisis post-mortems and business case analyses, the choice of sequencing language signals whether the writer is narrating, analysing, or evaluating. Choosing the appropriate register and connector type is a key marker of advanced professional writing — and of genuine <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for your actions and explain them to others')">accountability</span> in corporate communication.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800" alt="Business analysis" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Discussing Brand Reputation -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Discussing Brand Reputation</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>A <span class="vocab-link" onclick="showPopup('reputation', 'the opinion people have about how good or trustworthy a person or company is')">reputation</span> is what people think about a company. A good reputation is built slowly. It can be destroyed very quickly. Here are some phrases for talking about brand reputation:</p>
+                                        <ul>
+                                            <li><strong>"This damaged the company's reputation because..."</strong></li>
+                                            <li><strong>"Customers lost trust in the brand when..."</strong></li>
+                                            <li><strong>"The company's image suffered after..."</strong></li>
+                                            <li><strong>"They were able to rebuild trust by..."</strong></li>
+                                            <li><strong>"I think this company is/is not trustworthy because..."</strong></li>
+                                        </ul>
+                                        <p>Discussion: Use these phrases to talk about United Airlines. Do you think they were able to rebuild their reputation after 2017? What would you do differently if you were the CEO?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>In business English, discussing <span class="vocab-link" onclick="showPopup('brand damage', 'harm caused to the public perception of a company\'s value and trustworthiness')">brand damage</span> and recovery requires a specific set of evaluative phrases. Here are the most useful categories:</p>
+                                        <ul>
+                                            <li><strong>Describing harm:</strong> "The incident significantly undermined consumer confidence." / "United's brand image took a severe hit." / "The airline's reputation suffered irreparably in the short term."</li>
+                                            <li><strong>Describing cause:</strong> "The damage was compounded by the CEO's failure to apologize immediately." / "The defensive response accelerated the crisis rather than containing it."</li>
+                                            <li><strong>Describing recovery:</strong> "United attempted to rebuild trust through policy reform." / "The airline introduced new procedures to demonstrate its commitment to passengers."</li>
+                                            <li><strong>Evaluating outcome:</strong> "Whether United's reputation fully recovered is still debated." / "The long-term <span class="vocab-link" onclick="showPopup('brand damage', 'harm caused to the public perception of a company\'s value and trustworthiness')">brand damage</span> is difficult to quantify."</li>
+                                        </ul>
+                                        <p>Key language note: Use the passive voice to describe reputation damage when the focus is on the company, not the cause: "United's reputation <em>was damaged</em>." Use active voice when assigning responsibility: "United's defensive statements <em>worsened</em> the crisis."</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Analytical discourse about <span class="vocab-link" onclick="showPopup('brand equity', 'the commercial value and consumer trust associated with a brand name, built through positive reputation')">brand equity</span> and reputational risk operates at the intersection of marketing, finance, and crisis communication theory. Key analytical constructs include:</p>
+                                        <ul>
+                                            <li><strong>Reputational capital:</strong> The accumulated trust and goodwill a brand holds — United's was substantial but failed to act as a buffer because the incident was so visceral.</li>
+                                            <li><strong>Trust repair:</strong> Research distinguishes between <em>cognitive</em> trust (belief in competence) and <em>affective</em> trust (emotional confidence). United damaged both simultaneously — competence trust through the operational failure; affective trust through its communications.</li>
+                                            <li><strong>Narrative ownership:</strong> In the social media era, companies rarely control the dominant narrative of a crisis. Language choices that acknowledge this reality — "we understand why our response fell short of what you deserved" — signal self-awareness and tend to perform better with audiences than language that attempts to redirect or reframe.</li>
+                                        </ul>
+                                        <p>Discussion: Compare United's crisis to Johnson &amp; Johnson's 1982 Tylenol response. Both companies faced situations largely outside their control. What structural differences explain the divergence in their <span class="vocab-link" onclick="showPopup('reputational damage', 'harm to the perceived trustworthiness and character of an organization')">reputational damage</span>?</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800" alt="Business professional" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - The Apology & Policy Changes -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Apology &amp; Policy Changes</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Two days after the incident, CEO Oscar Munoz finally gave a real <span class="vocab-link" onclick="showPopup('apology', 'an expression of regret and genuine acceptance of responsibility for harm caused')">apology</span>. He said: "I deeply apologize to Dr. Dao and to all the customers aboard. No one should ever be mistreated this way." This was the first time he said sorry directly to Dr. Dao by name.</p>
+                                        <p>United Airlines also changed its rules. The airline said it would no longer use police to remove passengers from overbooked flights. It increased the maximum <span class="vocab-link" onclick="showPopup('compensation', 'money or something else given to make up for a loss or harm')">compensation</span> offered to passengers who voluntarily give up their seats — up to $10,000. Dr. Dao settled his legal case with United for an undisclosed amount.</p>
+                                        <p>The US Congress also held hearings about <span class="vocab-link" onclick="showPopup('passenger rights', 'the legal protections and entitlements that travelers have when using transportation services')">passenger rights</span>. Airlines were required to clearly explain passenger rights at check-in and at the gate. The incident changed the rules for all airlines in the United States.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Munoz's final statement, issued April 11, 2017, marked a clear shift in tone: "I deeply apologize to Dr. Dao and to all the customers aboard. No one should ever be mistreated this way. I want you to know that we take full <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for your actions and explain them to others')">accountability</span> and will work to make it right." This was the first statement to use Dr. Dao's name and to take unambiguous personal responsibility.</p>
+                                        <p>United subsequently implemented a series of policy reforms: law enforcement would no longer be used to remove boarded, seated passengers on overbooked flights; maximum voluntary bump compensation was raised to $10,000; and crew re-accommodation planning would be completed before passengers boarded. Dr. Dao reached a confidential financial settlement with the airline.</p>
+                                        <p>At the Congressional level, the incident prompted hearings on airline industry practices and resulted in the FAA Reauthorization Act of 2018, which strengthened <span class="vocab-link" onclick="showPopup('passenger rights', 'the legal protections and entitlements that travelers have when using transportation services')">passenger rights</span> disclosures and tightened the rules around involuntary denied boarding across the US airline industry.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The evolution of Munoz's public statements over 48 hours offers a compelling case study in the rhetoric of corporate contrition under pressure. The progression from euphemistic deflection ("re-accommodate") to procedural justification ("established procedures") to unconditional apology mirrors a pattern crisis communication scholars term "escalating accommodation" — a response trajectory driven by external pressure rather than internal ethical commitment, and therefore perceived by audiences as reactive rather than genuine.</p>
+                                        <p>The policy reforms United announced were substantive and genuinely consequential: banning law enforcement use for commercial overbooking, raising voluntary bump compensation to $10,000, and restructuring crew scheduling to avoid last-minute displacement of boarded passengers. However, because these reforms arrived after the reputational damage was severe, they functioned primarily as damage-limitation measures rather than trust-rebuilding instruments.</p>
+                                        <p>The broader regulatory response — embedded in the FAA Reauthorization Act of 2018 — established clearer <span class="vocab-link" onclick="showPopup('passenger rights', 'the legal protections and entitlements that travelers have when using transportation services')">passenger rights</span> requirements across the industry. Unlike J&amp;J's proactive engagement with regulators in 1982, United's engagement with Congressional oversight was reactive — another structural difference that crisis communication theory would predict as correlating with diminished long-term <span class="vocab-link" onclick="showPopup('brand equity', 'the commercial value and consumer trust associated with a brand name, built through positive reputation')">brand equity</span> recovery.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=800" alt="Person speaking at podium" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Lessons for Business -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Lessons for Business</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The United Airlines incident teaches companies some very important lessons:</p>
+                                        <ul>
+                                            <li><strong>Apologize quickly.</strong> Every hour without a real apology made things worse. A sincere "sorry" on the first day could have saved the company from much of the damage.</li>
+                                            <li><strong>Put customers first.</strong> United defended its rules instead of its customer. This was the biggest mistake.</li>
+                                            <li><strong>Think about your language.</strong> Calling the removal "re-accommodation" made people angrier. Use honest, clear words.</li>
+                                            <li><strong>Be careful what you write in emails.</strong> Munoz's letter to employees was leaked. Everything a CEO writes can become public.</li>
+                                            <li><strong>Your customers have cameras.</strong> In 2017, every passenger is also a journalist. Any incident can become a <span class="vocab-link" onclick="showPopup('viral', 'spreading very quickly to many people, especially on the internet')">viral</span> video instantly.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The United Airlines crisis generated several durable lessons for corporate communications and customer service strategy:</p>
+                                        <ul>
+                                            <li><strong>Speed of apology matters enormously.</strong> Research shows that the first 24 hours of a viral crisis are decisive. United's delayed, defensive first response established a damaging narrative that was extremely difficult to reverse.</li>
+                                            <li><strong>Internal communications can become public.</strong> Munoz's employee email was never intended for public consumption. Companies must assume that any written communication can be leaked and read by the public.</li>
+                                            <li><strong>Language signals values.</strong> "Re-accommodate" was heard as evasion. In a crisis, audiences are extremely sensitive to language that appears to minimize harm or avoid <span class="vocab-link" onclick="showPopup('accountability', 'the obligation to accept responsibility for your actions and explain them to others')">accountability</span>.</li>
+                                            <li><strong>Policy must match communication.</strong> An apology without policy change is unconvincing. United's credibility improved only when concrete reforms accompanied its words.</li>
+                                            <li><strong>The passenger is now the journalist.</strong> Crisis communication strategies must account for real-time video documentation by customers.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The United Airlines incident has become the canonical counter-example to J&amp;J's 1982 Tylenol response — the two cases now taught together as defining the boundaries of effective and ineffective <span class="vocab-link" onclick="showPopup('crisis communication', 'the strategic management of information during an emergency that threatens an organization\'s reputation')">crisis communication</span>. The structural contrast is analytically instructive:</p>
+                                        <ul>
+                                            <li><strong>Pre-existing values framework:</strong> J&amp;J had its Credo; United had no equivalent customer-first principle that constrained executive decision-making in the moment of crisis. The absence of a documented values hierarchy left United's communications team with no institutional authority to override legal caution with ethical clarity.</li>
+                                            <li><strong>Speed as trust signal:</strong> J&amp;J moved faster than required; United moved slower than public expectation demanded. In the social media era, the gap between incident and response is measured in minutes, not days.</li>
+                                            <li><strong>The impossibility of narrative management in the smartphone era:</strong> United's crisis underscores that companies can no longer control the initial framing of a crisis. The strategic implication is that companies must invest in pre-crisis reputation building — <span class="vocab-link" onclick="showPopup('brand equity', 'the commercial value and consumer trust associated with a brand name, built through positive reputation')">brand equity</span> that can buffer the inevitable gap between incident and institutional response.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800" alt="Newspaper headlines" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <ul>
+                                            <li><strong>The incident:</strong> On April 9, 2017, Dr. David Dao was physically dragged off a United Airlines flight to make room for crew members. Passengers filmed it and the video went viral.</li>
+                                            <li><strong>The bad response:</strong> CEO Oscar Munoz did not apologize immediately. He called Dr. Dao "disruptive." This made the crisis much worse.</li>
+                                            <li><strong>The real apology:</strong> Two days later, Munoz gave a sincere apology and named Dr. Dao directly. United changed its policies.</li>
+                                            <li><strong>The lesson:</strong> Apologize quickly, use honest language, and put customers first. Every customer is now a potential journalist with a camera.</li>
+                                            <li><strong>Language focus:</strong> Use sequence words (first, then, after that, as a result, finally) to tell a story clearly. Use phrases like "the company's <span class="vocab-link" onclick="showPopup('reputation', 'the opinion people have about how good or trustworthy a person or company is')">reputation</span> suffered because..." to discuss brand image.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <ul>
+                                            <li><strong>The crisis:</strong> A routine overbooking situation escalated into a global PR disaster when security officers forcibly removed a boarded passenger and other passengers filmed it.</li>
+                                            <li><strong>The communication failure:</strong> United's three-stage response — defensive, partially apologetic, then fully apologetic — was too slow. Each delay amplified the <span class="vocab-link" onclick="showPopup('backlash', 'a strong and widespread negative reaction from the public against a company or person')">backlash</span>.</li>
+                                            <li><strong>Sequencing language:</strong> Use connectors like <em>subsequently, as a consequence, prior to, in the aftermath</em> to describe events precisely. Strong connectors imply causation; weak connectors indicate time order only.</li>
+                                            <li><strong>Brand reputation language:</strong> "The incident significantly undermined consumer confidence" / "United's brand image took a severe hit" / "The airline attempted to rebuild trust through policy reform."</li>
+                                            <li><strong>Policy changes:</strong> United banned police use for overbooking, raised bump compensation to $10,000, and settled with Dr. Dao. Congress strengthened <span class="vocab-link" onclick="showPopup('passenger rights', 'the legal protections and entitlements that travelers have when using transportation services')">passenger rights</span> across the airline industry.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <ul>
+                                            <li><strong>Defensive crisis response:</strong> United's strategy — procedural justification followed by escalating apology under external pressure — produced the worst possible outcome: it appeared to confirm public suspicions of institutional indifference while sacrificing the credibility benefits of proactive accommodation.</li>
+                                            <li><strong>The smartphone era:</strong> The incident demonstrated that companies can no longer manage the initial narrative of a crisis. Pre-crisis <span class="vocab-link" onclick="showPopup('brand equity', 'the commercial value and consumer trust associated with a brand name, built through positive reputation')">brand equity</span> is now the primary buffer against catastrophic reputational damage.</li>
+                                            <li><strong>Sequencing in professional discourse:</strong> The choice of discourse connector encodes causation, evaluation, and stance. "Subsequently" narrates; "consequently" implies causation; "despite" signals concession. These distinctions are analytically and rhetorically significant.</li>
+                                            <li><strong>Contrast with J&amp;J 1982:</strong> The divergence between United's and J&amp;J's crisis responses illustrates the enabling role of pre-existing institutional values. Without a documented customer-first framework, United's crisis communications were structurally unable to signal authentic commitment to passenger welfare.</li>
+                                            <li><strong>Legacy:</strong> The FAA Reauthorization Act of 2018 and United's internal policy reforms produced lasting improvements in <span class="vocab-link" onclick="showPopup('passenger rights', 'the legal protections and entitlements that travelers have when using transportation services')">passenger rights</span> protections — though, unlike J&amp;J's proactive regulatory engagement, these were reactive rather than crisis-defining.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800" alt="Airport departure board" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Overbook</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To sell more tickets than there are seats available, expecting some people not to show up</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Viral</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Spreading very quickly to a large number of people, especially through the internet and social media</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Reputation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The opinion that people have about how good or trustworthy a person or company is</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Apologize</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To say that you are sorry and take responsibility for something that caused harm or upset</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Compensation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Money or something else given to a person to make up for a loss or harm they experienced</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Boycott</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To refuse to buy from or use a company as a form of protest against its actions</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Passenger</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person who travels in a vehicle such as a plane, bus, or train, but does not operate it</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Sequence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A series of events or actions that happen one after another in a connected order</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">PR Disaster</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An event that causes severe and widespread damage to a company's public image and consumer trust</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand Damage</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Harm caused to the public's perception of a company's value, trustworthiness, or quality</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Euphemism</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A mild or indirect expression used instead of one that might seem too harsh, blunt, or honest</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Backlash</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A strong and widespread negative reaction from the public against a company, person, or event</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accountability</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The obligation to accept responsibility for your actions and be prepared to explain them to others</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Passenger Rights</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The legal protections and entitlements that travelers have when using transportation services</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Overbooking</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The practice of selling more reservations than there is available capacity, expecting some no-shows</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Amplification</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The rapid spread and intensification of a message or event through online sharing and audience engagement</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Crisis Communication</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The strategic management of information and messaging during an emergency that threatens an organization's reputation</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand Equity</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The commercial value and consumer trust associated with a brand name, built through positive reputation over time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Reputational Damage</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Harm to the perceived trustworthiness, character, and credibility of a person or organization</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Narrative Lock</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A situation in which the dominant public interpretation of events becomes so firmly established that subsequent communications cannot change it</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Accommodative Response</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A crisis strategy in which an organisation accepts full responsibility and prioritises those affected, rather than defending itself</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Stakeholder</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Any person or group with an interest in or affected by a company's actions, decisions, and outcomes</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Deontic Modality</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Language expressing obligation, duty, or moral expectation — as in "should have" — implying a standard against which actions are judged</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Citizen Journalism</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The practice of ordinary members of the public collecting and sharing news and information, typically via smartphones and social media</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>In April 2017, United Airlines CEO Oscar Munoz issued a statement defending the airline after a passenger was forcibly removed from an overbooked flight. The video had already been seen by millions of people worldwide. Imagine you are United Airlines' Head of Communications, advising the CEO on the morning after the incident. Write an official public statement of approximately 200–250 words addressed to United's customers. Your statement should: (1) apologize sincerely and directly to Dr. Dao by name; (2) use sequence language to describe clearly what the airline is doing in response; and (3) include language about the company's commitment to rebuilding its reputation and customer trust. Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your public statement here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - United Airlines Incident - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Overbook", definition: "To sell more tickets than there are seats available, expecting some people not to show up", sentences: ["Airlines sometimes ___ their flights because they expect some passengers to miss the flight.", "The problem began when United chose to ___ Flight 3411, selling more tickets than there were seats.", "It is common for airlines to ___ their planes, but they must compensate passengers who are bumped."] },
+                { term: "Viral", definition: "Spreading very quickly to a large number of people, especially through the internet and social media", sentences: ["The video of the incident became ___ within hours of being posted online.", "A ___ video can reach millions of people before a company has time to respond.", "The footage went ___, and by the next morning, the whole world had seen it."] },
+                { term: "Reputation", definition: "The opinion that people have about how good or trustworthy a person or company is", sentences: ["The incident caused serious damage to United Airlines' ___ as a customer-friendly company.", "It can take years to rebuild a company's ___ after a major public relations disaster.", "United Airlines' ___ suffered enormously when the video spread across social media."] },
+                { term: "Apologize", definition: "To say that you are sorry and take responsibility for something that caused harm or upset", sentences: ["CEO Oscar Munoz did not ___ immediately — and this made the situation much worse.", "It is important to ___ quickly and sincerely when your company causes harm.", "Munoz eventually had to ___ publicly and promise to change the airline's policies."] },
+                { term: "Compensation", definition: "Money or something else given to a person to make up for a loss or harm they experienced", sentences: ["United Airlines offered Dr. Dao a financial ___ to settle the case privately.", "___ for bumped passengers was increased significantly after the incident.", "Passengers who are involuntarily removed from a flight are legally entitled to ___."] },
+                { term: "Boycott", definition: "To refuse to buy from or use a company as a form of protest against its actions", sentences: ["Many people called for a ___ of United Airlines after the video went viral.", "A customer ___ can cause millions of dollars in lost revenue for a company.", "The hashtag 'Boycott United' spread across social media within hours of the incident."] },
+                { term: "Passenger", definition: "A person who travels in a vehicle such as a plane, bus, or train, but does not operate it", sentences: ["Dr. David Dao was a ___ on United Airlines Flight 3411 from Chicago to Louisville.", "A ___ who refuses to give up their seat may be removed involuntarily.", "Every ___ on the plane watched in shock as the man was dragged down the aisle."] },
+                { term: "Sequence", definition: "A series of events or actions that happen one after another in a connected order", sentences: ["The ___ of events — overbooking, refusal, removal, viral video — unfolded very quickly.", "Understanding the ___ of United's public responses helps explain why the crisis grew worse.", "Use sequence words like 'first,' 'then,' and 'finally' to describe a ___ of events clearly."] }
+            ],
+            B2: [
+                { term: "PR Disaster", definition: "An event that causes severe and widespread damage to a company's public image and consumer trust", sentences: ["The United Airlines incident became one of the most famous ___ in modern business history.", "A ___ occurs when a company's actions cause widespread public anger and loss of trust.", "The airline's slow and defensive response turned a difficult situation into a full ___."] },
+                { term: "Brand Damage", definition: "Harm caused to the public's perception of a company's value, trustworthiness, or quality", sentences: ["The viral video caused immediate and lasting ___ to United Airlines' public image.", "Companies spend millions of dollars trying to repair ___ after a major crisis.", "The scale of the ___ was visible in United's stock price, which fell by over a billion dollars."] },
+                { term: "Euphemism", definition: "A mild or indirect expression used instead of one that might seem too harsh, blunt, or honest", sentences: ["United's use of 're-accommodate' as a ___ for forced removal was widely mocked and intensified public anger.", "The choice of ___ in corporate statements often signals an unwillingness to accept genuine accountability.", "Audiences are highly sensitive to corporate ___ and respond very negatively when they detect it."] },
+                { term: "Backlash", definition: "A strong and widespread negative reaction from the public against a company, person, or event", sentences: ["The ___ against United Airlines was immediate and severe, with millions sharing the video in protest.", "Companies often underestimate the speed and scale of a social media ___.", "The ___ grew worse when the CEO's initial response appeared to defend the airline rather than apologize."] },
+                { term: "Accountability", definition: "The obligation to accept responsibility for your actions and be prepared to explain them to others", sentences: ["CEO Munoz's early statements avoided ___ by using passive language and blaming the passenger.", "The public demanded ___ from United Airlines for the way security handled the situation.", "Genuine ___ means naming what went wrong and committing to specific change, not just expressing regret."] },
+                { term: "Passenger Rights", definition: "The legal protections and entitlements that travelers have when using transportation services", sentences: ["The incident raised national awareness about ___ and how often they are poorly understood.", "___ regarding involuntary removal were established by US law, but United was accused of violating their spirit.", "Congress held hearings about ___ in the weeks following the United Airlines incident."] },
+                { term: "Overbooking", definition: "The practice of selling more reservations than there is available capacity, expecting some no-shows", sentences: ["The crisis began with a routine airline practice: ___.", "___ is legal, but airlines are required to seek volunteers before removing passengers involuntarily.", "Following the incident, many airlines reviewed their ___ policies to avoid similar situations."] },
+                { term: "Amplification", definition: "The rapid spread and intensification of a message or event through online sharing and audience engagement", sentences: ["The social media ___ of the video turned a single incident into a global crisis within hours.", "___ means companies no longer have time to consult legal teams before the public forms its opinion.", "Understanding the mechanics of ___ is now a core competency in corporate crisis management."] }
+            ],
+            C1: [
+                { term: "Crisis Communication", definition: "The strategic management of information and messaging during an emergency that threatens an organization's reputation", sentences: ["United's failure in ___ — particularly its initial defensive statements — became a case study in what not to do.", "Effective ___ requires speed, transparency, and empathy — qualities absent from United's first responses.", "The airline's evolving ___ strategy, moving from defence to apology over several days, failed because each statement arrived too late."] },
+                { term: "Brand Equity", definition: "The commercial value and consumer trust associated with a brand name, built through positive reputation over time", sentences: ["The video caused an immediate and quantifiable erosion of United's ___, reflected in a $1.4 billion stock drop.", "Unlike J&J in 1982, United failed to deploy its ___ as a resource during the crisis.", "Rebuilding ___ after a viral PR disaster requires consistent, visible changes in policy and culture over time."] },
+                { term: "Reputational Damage", definition: "Harm to the perceived trustworthiness, character, and credibility of a person or organization", sentences: ["The ___ was compounded by United's initial decision to defend its employees rather than acknowledge the passenger's experience.", "Research consistently shows that defensive responses accelerate ___ rather than contain it.", "The long-term ___ to the United brand was mitigated only when Munoz issued a genuinely apologetic statement."] },
+                { term: "Narrative Lock", definition: "A situation in which the dominant public interpretation of events becomes so firmly established that subsequent communications cannot change it", sentences: ["United's defensive first statements did not merely fail to change the narrative — they produced a ___ that was essentially irreversible.", "Crisis managers now study this case as the defining example of how ___ develops in the first 24 hours of a viral incident.", "Companies can avoid ___ only by responding with speed and genuine empathy before the public narrative fully forms."] },
+                { term: "Accommodative Response", definition: "A crisis strategy in which an organisation accepts full responsibility and prioritises those affected, rather than defending itself", sentences: ["United's initially defensive posture was the structural opposite of an ___, and its effects were correspondingly damaging.", "Crisis communication theory predicts that an ___ produces superior long-term reputational outcomes compared to defensive strategies.", "Munoz's third statement finally adopted an ___ — but the delay meant it functioned as damage limitation rather than trust building."] },
+                { term: "Stakeholder", definition: "Any person or group with an interest in or affected by a company's actions, decisions, and outcomes", sentences: ["United's crisis response failed to address the concerns of its most important ___ group: its own passengers.", "Effective crisis communication must simultaneously manage the expectations of multiple ___ groups — customers, employees, investors, and regulators.", "Each ___ group interprets a crisis through a different lens, requiring tailored communication strategies."] },
+                { term: "Deontic Modality", definition: "Language expressing obligation, duty, or moral expectation — as in 'should have' — implying a standard against which actions are judged", sentences: ["The use of ___ in post-crisis analysis — 'United should have apologized immediately' — assigns responsibility by referencing an expected standard.", "Legal counsel carefully reviews public statements for ___ markers, as they can constitute admissions of duty and breach.", "Understanding ___ helps analysts distinguish between statements of obligation and statements of mere possibility."] },
+                { term: "Citizen Journalism", definition: "The practice of ordinary members of the public collecting and sharing news and information, typically via smartphones and social media", sentences: ["The United Airlines crisis was entirely initiated and shaped by ___ — not by professional media.", "___ has permanently changed the dynamics of corporate crisis management by removing companies' control over initial narrative framing.", "The incident demonstrated that in the era of ___, any private incident involving a customer can instantly become a global news event."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
