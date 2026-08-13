@@ -1195,6 +1195,7 @@
                     <span>&#128161;</span>
                     <span>What is the difference between "equality" and "equity"?</span>
                 </div>
+                </div>
             </div>
         </div>
 
@@ -1203,7 +1204,8 @@
             <div class="slide-label">Discussion</div>
             <div class="slide-logo mim-logo">MIM</div>
             <div class="slide-inner">
-                <div class="center-col" style="padding-top: 40px;">
+                <div class="fit-wrap">
+                <div class="center-col">
                     <p class="poll-question">Do you think companies that are more successful should have to pay higher compensation than smaller businesses like a family cafe?</p>
                     <p class="poll-subtext">You can select more than one answer</p>
 
@@ -1221,6 +1223,7 @@
                     </div>
                     <p class="why-text">Why?</p>
                 </div>
+                </div>
             </div>
         </div>
 
@@ -1229,10 +1232,12 @@
             <div class="slide-label">Discussion</div>
             <div class="slide-logo mim-logo">MIM</div>
             <div class="slide-inner">
-                <div class="center-col" style="padding-top: 40px;">
+                <div class="fit-wrap">
+                <div class="center-col">
                     <div class="q-item">Have you heard examples of medical <span class="vocab-link" onclick="showPopup('Malpractice', 'When a doctor does their job very badly and a patient gets sick.')">malpractice</span>?</div>
                     <div class="q-item">Is it common to sue doctors and hospitals where you live?</div>
                     <div class="q-item">Why do you think this case outcome occurred?</div>
+                </div>
                 </div>
             </div>
         </div>
@@ -1242,11 +1247,13 @@
             <div class="slide-label">Discussion</div>
             <div class="slide-logo mim-logo">MIM</div>
             <div class="slide-inner">
-                <div style="text-align:center; font-size: 4rem; margin: 40px 0 30px;">&#9749;&#128220;</div>
+                <div class="fit-wrap">
+                <div style="text-align:center; font-size: 4rem; margin: 0 0 30px;">&#9749;&#128220;</div>
                 <a class="discussion-prompt" href="https://en.wikipedia.org/wiki/Liebeck_v._McDonald%27s_Restaurants" target="_blank">
                     <span>&#128279;</span>
                     <span>Click the link if you are interested in reading the full story on Wikipedia.</span>
                 </a>
+                </div>
             </div>
         </div>
 
@@ -1301,6 +1308,28 @@
         var slideOrder = baseSlides.concat(readingSlidesB1, afterReading);
         var currentIndex = 0;
 
+        function fitSlide(el) {
+            if (!el) return;
+            var inner = el.querySelector('.slide-inner');
+            var wrap = el.querySelector('.fit-wrap');
+            if (!inner || !wrap) return;
+
+            wrap.style.transform = 'none';
+
+            var cs = window.getComputedStyle(inner);
+            var padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+            var padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+            var availW = inner.clientWidth - padX;
+            var availH = inner.clientHeight - padY;
+            var natW = wrap.scrollWidth;
+            var natH = wrap.scrollHeight;
+
+            if (natW === 0 || natH === 0) return;
+
+            var scale = Math.min(1, availW / natW, availH / natH);
+            wrap.style.transform = 'scale(' + scale + ')';
+        }
+
         function renderSlide() {
             document.querySelectorAll('.slide').forEach(function (s) { s.classList.remove('active'); });
             var el = document.getElementById(slideOrder[currentIndex]);
@@ -1310,10 +1339,20 @@
             document.getElementById('nextArrow').classList.toggle('hidden', currentIndex === slideOrder.length - 1);
             document.getElementById('slideCounter').textContent = (currentIndex + 1) + ' / ' + slideOrder.length;
 
-            window.scrollTo(0, 0);
-            var inner = el ? el.querySelector('.slide-inner') : null;
-            if (inner) inner.scrollTop = 0;
+            requestAnimationFrame(function () { fitSlide(el); });
+
+            var images = el ? el.querySelectorAll('img') : [];
+            images.forEach(function (img) {
+                if (!img.complete) {
+                    img.addEventListener('load', function () { fitSlide(el); }, { once: true });
+                }
+            });
         }
+
+        window.addEventListener('resize', function () {
+            var el = document.getElementById(slideOrder[currentIndex]);
+            fitSlide(el);
+        });
 
         function goToSlideId(id) {
             var idx = slideOrder.indexOf(id);
@@ -1396,6 +1435,11 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'ArrowRight') nextSlide();
             if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        window.addEventListener('load', function () {
+            var el = document.getElementById(slideOrder[currentIndex]);
+            fitSlide(el);
         });
 
         renderSlide();
