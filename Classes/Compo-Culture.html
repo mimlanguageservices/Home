@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compo Culture - ESL Lesson</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header .subtitle {
+            color: #4a5568;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .header .website {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .header .website a {
+            color: #4c51bf;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .header .website a:hover {
+            color: #553c9a;
+        }
+
+        .header-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+
+        .navigation {
+            width: 280px;
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            padding: 16px 24px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            display: none;
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.5px;
+        }
+
+        .section h3 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Card panels shared style */
+        .panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Intro Section */
+        .intro-image {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 25px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .intro-image img {
+            width: 100%;
+            display: block;
+        }
+
+        .poll-question {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .poll-subtext {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        .poll-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.25);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 1.05rem;
+            color: #2d3748;
+        }
+
+        .poll-option:hover {
+            background: rgba(102, 126, 234, 0.06);
+        }
+
+        .poll-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .poll-option.correct-reveal {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.12);
+        }
+
+        .poll-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid #a0aec0;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #ffffff;
+            transition: all 0.25s ease;
+        }
+
+        .poll-option.selected .poll-check,
+        .poll-option.correct-reveal .poll-check {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .poll-option.correct-reveal .poll-check {
+            background: #48bb78;
+            border-color: #48bb78;
+        }
+
+        .reveal-btn, .check-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .reveal-btn:hover, .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+        }
+
+        /* Vocabulary Section */
+        .vocab-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .flashcard {
+            background: transparent;
+            width: 100%;
+            height: 0;
+            padding-bottom: 130%;
+            position: relative;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .flashcard-front {
+            background: rgba(255, 255, 255, 0.95);
+            color: #2d3748;
+            padding: 16px;
+        }
+
+        .flashcard-front .def-text {
+            font-size: 0.95rem;
+            line-height: 1.35;
+            font-weight: 500;
+        }
+
+        .flashcard-front .pos-tag {
+            font-style: italic;
+            color: #718096;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+
+        .flashcard-front .card-img {
+            width: 100%;
+            height: 45%;
+            object-fit: cover;
+            border-radius: 0 0 14px 14px;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+            padding: 20px;
+            justify-content: center;
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        /* Case Study Section */
+        .case-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .case-hero {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .case-hero img {
+            width: 100%;
+            display: block;
+        }
+
+        .case-story p {
+            font-size: 1.05rem;
+            color: #2d3748;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .case-outcomes {
+            display: none;
+            max-width: 800px;
+            margin: 15px auto 0;
+        }
+
+        .case-outcomes.revealed {
+            display: block;
+        }
+
+        .case-outcome-item {
+            background: rgba(102, 126, 234, 0.08);
+            border-left: 4px solid #667eea;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-style: italic;
+            color: #2d3748;
+        }
+
+        .level-select {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .level-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .level-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: transform 0.25s ease;
+            border: 3px solid transparent;
+        }
+
+        .level-btn:hover .level-badge {
+            transform: translateY(-4px);
+        }
+
+        .level-btn.active .level-badge {
+            border-color: #2d3748;
+        }
+
+        .level-badge.b1 { background: #4299e1; }
+        .level-badge.b2 { background: #48bb78; }
+        .level-badge.c1 { background: #ed8936; }
+
+        .level-label {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .level-content {
+            display: none;
+        }
+
+        .level-content.active {
+            display: block;
+        }
+
+        .placeholder-box {
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+            padding: 50px 30px;
+            border: 2px dashed rgba(102, 126, 234, 0.4);
+            border-radius: 16px;
+            color: #718096;
+            background: rgba(102, 126, 234, 0.04);
+        }
+
+        .placeholder-box .big-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .reading-text {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .reading-text p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .reading-text .quote-line {
+            margin-bottom: 6px;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .vocab-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.15rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .popup-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Discussion Section */
+        .discussion-block {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            text-align: center;
+        }
+
+        .discussion-image {
+            max-width: 550px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .discussion-image img {
+            width: 100%;
+            display: block;
+        }
+
+        .discussion-prompt {
+            background: #fdf3d8;
+            border-radius: 30px;
+            padding: 16px 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+
+        .discussion-questions {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .discussion-questions .q-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-left: 4px solid #667eea;
+            padding: 16px 22px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            font-size: 1.05rem;
+            color: #2d3748;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .wiki-link-box {
+            max-width: 500px;
+            margin: 30px auto 0;
+            text-align: center;
+        }
+
+        .wiki-link-box a.discussion-prompt {
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Feedback Section */
+        .feedback-hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .feedback-text h2 {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .feedback-text p {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .feedback-slider {
+            display: flex;
+            gap: 6px;
+            margin: 25px 0;
+        }
+
+        .feedback-emoji {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            border-radius: 12px;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .feedback-emoji:nth-child(1) { background: #fed7d7; }
+        .feedback-emoji:nth-child(2) { background: #feebc8; }
+        .feedback-emoji:nth-child(3) { background: #fefcbf; }
+        .feedback-emoji:nth-child(4) { background: #c6f6d5; }
+        .feedback-emoji:nth-child(5) { background: #9ae6b4; }
+
+        .feedback-emoji.selected {
+            transform: scale(1.15);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+        }
+
+        .feedback-socials {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-socials a {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+
+        .feedback-socials a:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .feedback-socials img {
+            width: 22px;
+            height: 22px;
+        }
+
+        .thanks-note {
+            display: none;
+            margin-top: 15px;
+            color: #48bb78;
+            font-weight: 600;
+        }
+
+        .thanks-note.show {
+            display: block;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header-image {
+                width: 80px;
+                height: 60px;
+                margin-top: 15px;
+            }
+
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .navigation {
+                width: 100%;
+                padding: 15px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .nav-item {
+                flex: 1;
+                min-width: 110px;
+                margin: 2px;
+                font-size: 0.9rem;
+                padding: 10px 12px;
+            }
+
+            .content {
+                height: auto;
+                overflow: visible;
+            }
+
+            .section {
+                padding: 20px 15px;
+                height: auto;
+            }
+
+            .vocab-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .flashcard {
+                padding-bottom: 130%;
+            }
+
+            .level-select {
+                gap: 15px;
+            }
+
+            .feedback-hero {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .vocab-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flashcard {
+                padding-bottom: 70%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closePopupOutside(event)">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup()">Close</button>
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>Compo Culture</h1>
+            <div class="subtitle">Lesson 29 &mdash; Grammar Classes &mdash; IDUN (B1)</div>
+            <div class="website">
+                <a href="https://www.mimlanguageservices.com/" target="_blank">mimlanguageservices.com</a>
+            </div>
+        </div>
+        <a href="https://www.mimlanguageservices.com/" target="_blank">
+            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Language Services" class="header-image">
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="navigation">
+            <div class="nav-item active" onclick="showSection('intro', this)">Intro</div>
+            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+            <div class="nav-item" onclick="showSection('casestudy', this)">Case Study</div>
+            <div class="nav-item" onclick="showSection('discussion', this)">Discussion</div>
+            <div class="nav-item" onclick="showSection('feedback', this)">Feedback</div>
+        </div>
+
+        <div class="content">
+
+            <!-- Intro Section -->
+            <div class="section active" id="intro">
+                <h2>Intro</h2>
+                <div class="panel" style="max-width: 800px; margin: 0 auto;">
+                    <div class="intro-image">
+                        <img src="https://static.wixstatic.com/media/593d03_placeholder-car-crash.jpg" alt="A car crashed into the side of a house" onerror="this.style.display='none'">
+                    </div>
+                    <p class="poll-question">Who do you think is responsible for repairing the broken window?</p>
+                    <p class="poll-subtext">You can select more than one answer</p>
+
+                    <div class="poll-option" data-correct="true" onclick="togglePollOption(this)">
+                        <div class="poll-check"></div>
+                        <div>The driver of the car</div>
+                    </div>
+                    <div class="poll-option" data-correct="true" onclick="togglePollOption(this)">
+                        <div class="poll-check"></div>
+                        <div>The owner of the house</div>
+                    </div>
+
+                    <button class="reveal-btn" onclick="revealPoll(this)">Check Answers</button>
+                </div>
+            </div>
+
+            <!-- Vocabulary Section -->
+            <div class="section" id="vocabulary">
+                <h2>Vocabulary</h2>
+                <div class="vocab-container">
+                    <div class="vocab-grid">
+
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="def-text">To give someone something (normally money) because you did something bad to them.</div>
+                                    <div class="pos-tag">(verb)</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="flashcard-term">Compensate</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="def-text">To solve a problem using a country's legal system.</div>
+                                    <div class="pos-tag">(verb)</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="flashcard-term">Sue</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="def-text">A person who represents you in a legal battle.</div>
+                                    <div class="pos-tag">(noun)</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="flashcard-term">Lawyer</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="def-text">A person who makes important legal decisions.</div>
+                                    <div class="pos-tag">(noun)</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="flashcard-term">Judge</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="def-text">To resolve a problem without a court.</div>
+                                    <div class="pos-tag">(verb)</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="flashcard-term">Out of court settlement</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="def-text">To get revenge on someone by hurting them as much as they hurt you.<br>"An ... for an ..."</div>
+                                    <div class="pos-tag">(expression)</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="flashcard-term">An eye for an eye</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="def-text">When a doctor does their job very badly and a patient gets sick.</div>
+                                    <div class="pos-tag">(noun)</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="flashcard-term">Malpractice</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="def-text">To invent false rumors about someone because you want to destroy their reputation.</div>
+                                    <div class="pos-tag">(noun) (verb)</div>
+                                </div>
+                                <div class="flashcard-back">
+                                    <div class="flashcard-term">Slander</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case Study Section -->
+            <div class="section" id="casestudy">
+                <div class="case-title">The Hot Coffee Victim</div>
+                <div class="case-hero">
+                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="A cup of hot coffee">
+                </div>
+
+                <div id="caseIntro">
+                    <div class="case-story">
+                        <p>In 1994, in the state of New Mexico, USA, a woman bought a cup of coffee at a restaurant. Outside of the restaurant, in a car, she had an accident &mdash; she dropped her coffee on herself. She burned herself.</p>
+                        <p>The woman went to court and sued the restaurant because the coffee was hot.</p>
+                        <p style="font-weight: 600;">What do you think happened next?</p>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <button class="reveal-btn" onclick="revealOutcomes()">Reveal What Happened</button>
+                    </div>
+
+                    <div class="case-outcomes" id="caseOutcomes">
+                        <div class="case-outcome-item">The judge decided that the restaurant had to pay her compensation.</div>
+                        <div class="case-outcome-item">The restaurant had to pay the woman USD $2,800,000.</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <h3 style="margin-top: 30px;">Choose a level of difficulty</h3>
+                    <div class="level-select">
+                        <button class="level-btn active" id="levelBtn-B1" onclick="showCaseLevel('B1', this)">
+                            <div class="level-badge b1">B1</div>
+                            <div class="level-label">B1</div>
+                        </button>
+                        <button class="level-btn" id="levelBtn-B2" onclick="showCaseLevel('B2', this)">
+                            <div class="level-badge b2">B2</div>
+                            <div class="level-label">B2</div>
+                        </button>
+                        <button class="level-btn" id="levelBtn-C1" onclick="showCaseLevel('C1', this)">
+                            <div class="level-badge c1">C1</div>
+                            <div class="level-label">C1</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- B1 Reading -->
+                <div class="level-content active" id="level-B1">
+                    <p style="text-align: center; color: #718096; font-size: 0.9rem; margin-bottom: 15px;"><span class="vocab-link" style="cursor: default;">Blue words</span> have explanations &mdash; click them!</p>
+                    <div class="reading-text">
+                        <p>A woman has been <span class="vocab-link" onclick="showPopup('Awarded', 'Given as a legal decision, such as money after winning a court case.')">awarded</span> a total of almost 3 million dollars in damages, after <span class="vocab-link" onclick="showPopup('Claiming', 'Saying that something is true, especially when trying to prove it.')">claiming</span> that the coffee she was served at a US fast food restaurant and then <span class="vocab-link" onclick="showPopup('Spilled', 'Accidentally poured or knocked out of a container.')">spilled</span> on herself was too hot.</p>
+
+                        <p>The woman was in the passenger seat of her grandson's car when she was served a cup of coffee at the <span class="vocab-link" onclick="showPopup('Drive-through', 'A system where customers can buy food without leaving their car.')">drive-through</span> window of a local fast food outlet.</p>
+
+                        <p>According to reports, after receiving the food order, the grandson moved his car forward and stopped for a moment so that his grandmother could add cream and sugar to her coffee.</p>
+
+                        <p>She placed the cup <span class="vocab-link" onclick="showPopup('Between', 'In the space separating two things.')">between</span> her knees and tried to remove the plastic <span class="vocab-link" onclick="showPopup('Lid', 'A cover on a container that can be lifted up or removed.')">lid</span> from the cup.</p>
+
+                        <p>As she did so, the entire contents of the cup spilled onto her <span class="vocab-link" onclick="showPopup('Lap', 'The flat area formed by the top of your legs when you are sitting down.')">lap</span>, leaving her severely <span class="vocab-link" onclick="showPopup('Burned', 'Injured by contact with something very hot.')">burned</span> and needing hospital treatment.</p>
+
+                        <p>A <span class="vocab-link" onclick="showPopup('Company representative', 'A person who speaks on behalf of a business.')">company representative</span> explained that coffee is kept at a particular temperature because customers naturally want their coffee served hot.</p>
+
+                        <p>He said that customers buy coffee on their way to work or home, intending to consume it there, not while in the car.</p>
+
+                        <p>One <span class="vocab-link" onclick="showPopup('Commentator', 'Someone who gives their opinion about news or events, often publicly.')">commentator</span> couldn't believe the woman won her case.</p>
+
+                        <p class="quote-line">"The world has gone mad. If you can get $3 million for spilling hot coffee on yourself, then it's only a matter of time before we get the headlines:</p>
+                        <p class="quote-line" style="font-weight: 700;">WOMAN GETS PREGNANT AND SUES CONDOM COMPANY,</p>
+                        <p class="quote-line">or</p>
+                        <p class="quote-line" style="font-weight: 700;">MAN WITH BAD HAIRCUT SUES FOR EMOTIONAL DAMAGES."</p>
+
+                        <p>The woman suffered <span class="vocab-link" onclick="showPopup('Third degree burns', 'The most severe type of burn, damaging all layers of the skin.')">third degree burns</span> over 6% of her body in very sensitive areas.</p>
+
+                        <p>She was in hospital for eight days. She spilled the coffee while she was sitting in a parked car trying to remove the cup's lid.</p>
+
+                        <p>She was not driving the vehicle, nor was it moving.</p>
+
+                        <p>She tried to settle her case out of court for $20,000 but the restaurant chain refused.</p>
+
+                        <p>The restaurant knew of the problem. They had already received hundreds of complaints.</p>
+
+                        <p>They knew that drinks can burn at temperatures over 60 degrees, but they maintained a policy to keep their coffee at around 85&deg;C.</p>
+
+                        <p>The chain (McDonald's) makes over a million dollars a day in coffee sales.</p>
+                    </div>
+                </div>
+
+                <!-- B2 Reading Placeholder -->
+                <div class="level-content" id="level-B2">
+                    <div class="placeholder-box">
+                        <div class="big-icon">&#128221;</div>
+                        <p><strong>B2 reading coming soon.</strong></p>
+                        <p style="margin-top: 8px; font-size: 0.95rem;">This level is still being written &mdash; check back later.</p>
+                    </div>
+                </div>
+
+                <!-- C1 Reading Placeholder -->
+                <div class="level-content" id="level-C1">
+                    <div class="placeholder-box">
+                        <div class="big-icon">&#128221;</div>
+                        <p><strong>C1 reading coming soon.</strong></p>
+                        <p style="margin-top: 8px; font-size: 0.95rem;">This level is still being written &mdash; check back later.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discussion Section -->
+            <div class="section" id="discussion">
+                <h2>Discussion</h2>
+
+                <div class="discussion-block">
+                    <div class="discussion-image">
+                        <img src="https://static.wixstatic.com/media/593d03_placeholder-equality-equity.jpg" alt="Equality vs Equity illustration" onerror="this.style.display='none'">
+                    </div>
+                    <div class="discussion-prompt">
+                        <span>&#128161;</span>
+                        <span>What is the difference between "equality" and "equity"?</span>
+                    </div>
+                </div>
+
+                <div class="panel" style="max-width: 800px; margin: 0 auto 30px;">
+                    <p class="poll-question">Do you think companies that are more successful should have to pay higher compensation than smaller businesses like a family cafe?</p>
+                    <p class="poll-subtext">You can select more than one answer</p>
+
+                    <div class="poll-option" data-correct="true" onclick="togglePollOption(this)">
+                        <div class="poll-check"></div>
+                        <div>It should be equal</div>
+                    </div>
+                    <div class="poll-option" data-correct="true" onclick="togglePollOption(this)">
+                        <div class="poll-check"></div>
+                        <div>It should be equitable</div>
+                    </div>
+
+                    <button class="reveal-btn" onclick="revealPoll(this)">Check Answers</button>
+                    <p style="font-weight: 600; margin-top: 15px;">Why?</p>
+                </div>
+
+                <div class="discussion-questions">
+                    <div class="q-item">Have you heard examples of medical <span class="vocab-link" onclick="showPopup('Malpractice', 'When a doctor does their job very badly and a patient gets sick.')">malpractice</span>?</div>
+                    <div class="q-item">Is it common to sue doctors and hospitals where you live?</div>
+                    <div class="q-item">Why do you think this case outcome occurred?</div>
+                </div>
+
+                <div class="wiki-link-box">
+                    <a class="discussion-prompt" href="https://en.wikipedia.org/wiki/Liebeck_v._McDonald%27s_Restaurants" target="_blank">
+                        <span>&#128279;</span>
+                        <span>Click the link if you are interested in reading the full story on Wikipedia.</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="section" id="feedback">
+                <div class="feedback-hero">
+                    <div class="feedback-text">
+                        <h2 style="text-align: left;">Thank you for choosing mimlanguageservices.com</h2>
+                        <p>Let us know if you have any feedback!</p>
+
+                        <div class="feedback-slider">
+                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128542;</div>
+                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128577;</div>
+                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128528;</div>
+                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128578;</div>
+                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128512;</div>
+                        </div>
+                        <div class="thanks-note" id="thanksNote">Thanks for your feedback!</div>
+
+                        <p style="font-weight: 600; margin-top: 20px;">Please help us grow by following us on any of the following platforms!</p>
+
+                        <div class="feedback-socials">
+                            <a href="https://www.facebook.com/Mimlanguageservices" target="_blank" title="Facebook">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+                            </a>
+                            <a href="https://www.instagram.com/mimlanguageservices/" target="_blank" title="Instagram">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
+                            </a>
+                            <a href="https://www.tiktok.com/@mimlanguageservices?lang=en" target="_blank" title="TikTok">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok">
+                            </a>
+                            <a href="https://www.mimlanguageservices.com/" target="_blank" title="YouTube">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube">
+                            </a>
+                            <a href="https://www.mimlanguageservices.com/" target="_blank" title="LinkedIn">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Navigation
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            element.classList.add('active');
+        }
+
+        // Flashcards
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Vocabulary popups
+        function showPopup(word, definition) {
+            document.getElementById('popupWord').textContent = word;
+            document.getElementById('popupDefinition').textContent = definition;
+            document.getElementById('popupOverlay').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+
+        function closePopupOutside(event) {
+            if (event.target.id === 'popupOverlay') closePopup();
+        }
+
+        // Poll options (select-all discussion style)
+        function togglePollOption(option) {
+            option.classList.toggle('selected');
+        }
+
+        function revealPoll(button) {
+            const options = button.parentElement.querySelectorAll('.poll-option');
+            options.forEach(opt => {
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct-reveal');
+                }
+            });
+        }
+
+        // Case study intro reveal
+        function revealOutcomes() {
+            document.getElementById('caseOutcomes').classList.add('revealed');
+        }
+
+        // Case study level selector
+        function showCaseLevel(level, button) {
+            document.querySelectorAll('.level-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('level-' + level).classList.add('active');
+            button.classList.add('active');
+        }
+
+        // Feedback slider
+        function selectFeedback(emoji) {
+            document.querySelectorAll('.feedback-emoji').forEach(e => e.classList.remove('selected'));
+            emoji.classList.add('selected');
+            document.getElementById('thanksNote').classList.add('show');
+        }
+    </script>
+</body>
+</html>
