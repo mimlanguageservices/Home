@@ -354,7 +354,7 @@
 
         /* ===== Generic content slide styling ===== */
         .center-col {
-            max-width: 820px;
+            max-width: 1150px;
             margin: 0 auto;
         }
 
@@ -368,7 +368,7 @@
 
         .hero-illustration {
             width: 100%;
-            max-width: 560px;
+            max-width: 780px;
             margin: 0 auto 25px;
             display: block;
             border-radius: 14px;
@@ -1389,7 +1389,8 @@
 
             if (natW === 0 || natH === 0) return;
 
-            var scale = Math.min(1, availW / natW, availH / natH);
+            var scale = Math.min(availW / natW, availH / natH);
+            scale = Math.max(0.4, Math.min(2, scale));
             wrap.style.transform = 'scale(' + scale + ')';
         }
 
