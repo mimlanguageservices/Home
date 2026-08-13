@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compo Culture - ESL Lesson</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
         * {
             margin: 0;
@@ -13,665 +13,282 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            background: #1a202c;
         }
 
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        .mim-logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: transparent;
+            -webkit-text-stroke: 1.4px #f0a500;
+            display: inline-block;
         }
 
-        .header-left {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header h1 {
-            color: #2d3748;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: -0.5px;
-        }
-
-        .header .subtitle {
-            color: #4a5568;
-            font-size: 1rem;
-            font-weight: 500;
-            margin-top: 4px;
-        }
-
-        .header .website {
-            text-align: center;
-            margin-top: 8px;
-        }
-
-        .header .website a {
-            color: #4c51bf;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .header .website a:hover {
-            color: #553c9a;
-        }
-
-        .header-image {
-            width: 120px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: cover;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .container {
-            display: flex;
-            height: calc(100vh - 120px);
-        }
-
-        .navigation {
-            width: 280px;
-            background: rgba(45, 55, 72, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 30px 20px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-item {
-            padding: 16px 24px;
-            margin: 8px 0;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: #e2e8f0;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            font-weight: 500;
-            font-size: 1.1rem;
-            backdrop-filter: blur(5px);
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border-color: transparent;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-
-        .section {
-            display: none;
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            height: 100%;
-        }
-
-        .section.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .section h2 {
-            color: #2d3748;
-            margin-bottom: 30px;
-            font-size: 2.2rem;
-            font-weight: 700;
-            text-align: center;
-            letter-spacing: -0.5px;
-        }
-
-        .section h3 {
-            color: #2d3748;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        /* Card panels shared style */
-        .panel {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 35px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            backdrop-filter: blur(10px);
-        }
-
-        /* Intro Section */
-        .intro-image {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto 25px;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .intro-image img {
-            width: 100%;
-            display: block;
-        }
-
-        .poll-question {
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 5px;
-        }
-
-        .poll-subtext {
-            font-size: 0.9rem;
-            color: #718096;
-            margin-bottom: 20px;
-        }
-
-        .poll-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 20px;
-            border: 2px solid rgba(102, 126, 234, 0.25);
-            border-radius: 12px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            font-size: 1.05rem;
-            color: #2d3748;
-        }
-
-        .poll-option:hover {
-            background: rgba(102, 126, 234, 0.06);
-        }
-
-        .poll-option.selected {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .poll-option.correct-reveal {
-            border-color: #48bb78;
-            background: rgba(72, 187, 120, 0.12);
-        }
-
-        .poll-check {
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            border: 2px solid #a0aec0;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            color: #ffffff;
-            transition: all 0.25s ease;
-        }
-
-        .poll-option.selected .poll-check,
-        .poll-option.correct-reveal .poll-check {
-            background: #667eea;
-            border-color: #667eea;
-        }
-
-        .poll-option.correct-reveal .poll-check {
-            background: #48bb78;
-            border-color: #48bb78;
-        }
-
-        .reveal-btn, .check-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .reveal-btn:hover, .check-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
-        }
-
-        /* Vocabulary Section */
-        .vocab-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .vocab-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .flashcard {
-            background: transparent;
-            width: 100%;
-            height: 0;
-            padding-bottom: 130%;
+        /* Slideshow shell */
+        .slideshow {
             position: relative;
-            perspective: 1000px;
-            cursor: pointer;
-        }
-
-        .flashcard-inner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-
-        .flashcard.flipped .flashcard-inner {
-            transform: rotateY(180deg);
-        }
-
-        .flashcard-front, .flashcard-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-        }
-
-        .flashcard-front {
-            background: rgba(255, 255, 255, 0.95);
-            color: #2d3748;
-            padding: 16px;
-        }
-
-        .flashcard-front .def-text {
-            font-size: 0.95rem;
-            line-height: 1.35;
-            font-weight: 500;
-        }
-
-        .flashcard-front .pos-tag {
-            font-style: italic;
-            color: #718096;
-            font-size: 0.85rem;
-            margin: 8px 0;
-        }
-
-        .flashcard-front .card-img {
-            width: 100%;
-            height: 45%;
-            object-fit: cover;
-            border-radius: 0 0 14px 14px;
-        }
-
-        .flashcard-back {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            transform: rotateY(180deg);
-            padding: 20px;
-            justify-content: center;
-        }
-
-        .flashcard-term {
-            font-weight: 700;
-            font-size: 1.4rem;
-            text-align: center;
-        }
-
-        /* Case Study Section */
-        .case-title {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 15px;
-        }
-
-        .case-hero {
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto 20px;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .case-hero img {
-            width: 100%;
-            display: block;
-        }
-
-        .case-story p {
-            font-size: 1.05rem;
-            color: #2d3748;
-            line-height: 1.7;
-            margin-bottom: 15px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .case-outcomes {
-            display: none;
-            max-width: 800px;
-            margin: 15px auto 0;
-        }
-
-        .case-outcomes.revealed {
-            display: block;
-        }
-
-        .case-outcome-item {
-            background: rgba(102, 126, 234, 0.08);
-            border-left: 4px solid #667eea;
-            padding: 14px 18px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-style: italic;
-            color: #2d3748;
-        }
-
-        .level-select {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin: 30px 0;
-        }
-
-        .level-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
-
-        .level-badge {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            transition: transform 0.25s ease;
-            border: 3px solid transparent;
-        }
-
-        .level-btn:hover .level-badge {
-            transform: translateY(-4px);
-        }
-
-        .level-btn.active .level-badge {
-            border-color: #2d3748;
-        }
-
-        .level-badge.b1 { background: #4299e1; }
-        .level-badge.b2 { background: #48bb78; }
-        .level-badge.c1 { background: #ed8936; }
-
-        .level-label {
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        .level-content {
-            display: none;
-        }
-
-        .level-content.active {
-            display: block;
-        }
-
-        .placeholder-box {
-            max-width: 600px;
-            margin: 20px auto;
-            text-align: center;
-            padding: 50px 30px;
-            border: 2px dashed rgba(102, 126, 234, 0.4);
-            border-radius: 16px;
-            color: #718096;
-            background: rgba(102, 126, 234, 0.04);
-        }
-
-        .placeholder-box .big-icon {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-        }
-
-        .reading-text {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .reading-text p {
-            color: #2d3748;
-            line-height: 1.8;
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-
-        .reading-text .quote-line {
-            margin-bottom: 6px;
-        }
-
-        .vocab-link {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            padding: 2px 7px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .vocab-link:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .popup-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 35px;
-            max-width: 450px;
-            margin: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        .popup-word {
-            color: #2d3748;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 8px;
-        }
-
-        .popup-definition {
-            color: #4a5568;
-            line-height: 1.7;
-            margin-bottom: 25px;
-            font-size: 1.15rem;
-        }
-
-        .popup-close {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #ffffff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            float: right;
-            font-size: 1rem;
-            transition: transform 0.3s ease;
-        }
-
-        .popup-close:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Discussion Section */
-        .discussion-block {
-            max-width: 800px;
-            margin: 0 auto 40px;
-            text-align: center;
-        }
-
-        .discussion-image {
-            max-width: 550px;
-            margin: 0 auto 20px;
-            border-radius: 16px;
+            background: #ffffff;
             overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
         }
 
-        .discussion-image img {
+        .slide {
+            display: none;
             width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .slide.active {
             display: block;
         }
 
-        .discussion-prompt {
-            background: #fdf3d8;
-            border-radius: 30px;
-            padding: 16px 28px;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            color: #2d3748;
+        .slide-inner {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 70px 110px 90px;
+        }
+
+        .slide-label {
+            position: absolute;
+            top: 28px;
+            left: 40px;
+            font-weight: 700;
             font-size: 1.1rem;
+            color: #1a202c;
+            z-index: 5;
         }
 
-        .discussion-questions {
-            max-width: 800px;
-            margin: 0 auto;
+        .slide-logo {
+            position: absolute;
+            top: 24px;
+            right: 40px;
+            font-size: 1.6rem;
+            z-index: 5;
         }
 
-        .discussion-questions .q-item {
-            background: rgba(255, 255, 255, 0.9);
-            border-left: 4px solid #667eea;
-            padding: 16px 22px;
-            border-radius: 10px;
-            margin-bottom: 14px;
-            font-size: 1.05rem;
-            color: #2d3748;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-        }
-
-        .wiki-link-box {
-            max-width: 500px;
-            margin: 30px auto 0;
-            text-align: center;
-        }
-
-        .wiki-link-box a.discussion-prompt {
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        /* Feedback Section */
-        .feedback-hero {
+        /* Nav arrows */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(26, 32, 44, 0.85);
+            color: #ffffff;
+            border: none;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 30px;
-            max-width: 900px;
-            margin: 0 auto;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            z-index: 50;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
         }
 
-        .feedback-text h2 {
-            text-align: left;
-            margin-bottom: 15px;
+        .nav-arrow:hover {
+            background: #667eea;
+            transform: translateY(-50%) scale(1.08);
         }
 
-        .feedback-text p {
-            color: #4a5568;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
+        .nav-arrow.prev { left: 22px; }
+        .nav-arrow.next { right: 22px; }
+
+        .nav-arrow.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            color: #a0aec0;
+            font-weight: 500;
+            z-index: 50;
+            background: rgba(255,255,255,0.85);
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+
+        /* ===== Title & Feedback (diagonal) slides ===== */
+        .cover-slide {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cover-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 46%;
+            height: 100%;
+            background: linear-gradient(160deg, #4aa3e0 0%, #2f7fd4 100%);
+            clip-path: polygon(18% 0, 100% 0, 100% 100%, 0% 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 60px 60px 90px;
+            color: #ffffff;
+        }
+
+        .cover-panel .mim-logo {
+            font-size: 2.3rem;
+            -webkit-text-stroke: 1.8px #ffce54;
+            margin-bottom: 25px;
+        }
+
+        .cover-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 22px;
+        }
+
+        .cover-meta {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.95;
+        }
+
+        .cover-buttons {
+            display: flex;
+            gap: 16px;
+            margin: 30px 0 25px;
+        }
+
+        .cover-btn {
+            width: 78px;
+            height: 78px;
+            border-radius: 50%;
+            background: rgba(45, 55, 72, 0.8);
+            border: 2px solid #ffce54;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            line-height: 1.2;
+            padding: 4px;
+        }
+
+        .cover-btn:hover {
+            background: rgba(102, 126, 234, 0.9);
+        }
+
+        .cover-socials {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .cover-socials a {
+            color: #ffffff;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .cover-website {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Feedback cover mirrored */
+        .cover-panel-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 52%;
+            height: 100%;
+            background: linear-gradient(160deg, #4aa3e0 0%, #2f7fd4 100%);
+            clip-path: polygon(0 0, 82% 0, 64% 100%, 0% 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 90px 60px 70px;
+            color: #ffffff;
+        }
+
+        .fb-heading {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .fb-sub {
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .cover-right-content {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 55%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 70px;
+        }
+
+        .avatar-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c53030, #2b6cb0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            color: #ffffff;
+            margin-left: auto;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
         .feedback-slider {
             display: flex;
-            gap: 6px;
-            margin: 25px 0;
+            gap: 8px;
+            margin-bottom: 25px;
         }
 
         .feedback-emoji {
             flex: 1;
             text-align: center;
-            padding: 14px 0;
+            padding: 16px 0;
             border-radius: 12px;
-            font-size: 1.6rem;
+            font-size: 1.7rem;
             cursor: pointer;
             transition: all 0.25s ease;
         }
@@ -687,128 +304,493 @@
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
         }
 
+        .thanks-note {
+            display: none;
+            margin-bottom: 15px;
+            color: #48bb78;
+            font-weight: 600;
+        }
+
+        .thanks-note.show { display: block; }
+
+        .fb-follow-text {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 14px;
+        }
+
         .feedback-socials {
             display: flex;
-            gap: 16px;
-            margin-top: 20px;
+            gap: 14px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
         .feedback-socials a {
-            width: 46px;
-            height: 46px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             background: rgba(102, 126, 234, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.25s ease;
         }
 
-        .feedback-socials a:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateY(-3px);
+        .feedback-socials img { width: 20px; height: 20px; }
+
+        .fb-website {
+            color: #4a5568;
+            font-size: 0.9rem;
         }
 
-        .feedback-socials img {
+        /* ===== Generic content slide styling ===== */
+        .center-col {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .slide-heading {
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 25px;
+        }
+
+        .hero-illustration {
+            width: 100%;
+            max-width: 560px;
+            margin: 0 auto 25px;
+            display: block;
+            border-radius: 14px;
+        }
+
+        /* Poll */
+        .poll-question {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 4px;
+        }
+
+        .poll-subtext {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 18px;
+        }
+
+        .poll-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.02rem;
+            color: #2d3748;
+        }
+
+        .poll-item:hover { background: #f7fafc; }
+
+        .poll-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #cbd5e0;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: transparent;
+        }
+
+        .poll-item.selected .poll-icon,
+        .poll-item.correct-reveal .poll-icon {
+            color: #ffffff;
+        }
+
+        .poll-item.selected .poll-icon { background: #667eea; border-color: #667eea; }
+        .poll-item.correct-reveal .poll-icon { background: #48bb78; border-color: #48bb78; }
+        .poll-item.correct-reveal { border-color: #9ae6b4; background: #f0fff4; }
+
+        .poll-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 14px;
+        }
+
+        .send-btn {
+            background: #4a5568;
+            color: #ffffff;
+            border: none;
+            padding: 10px 26px;
+            border-radius: 22px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .send-btn:hover { background: #667eea; }
+
+        .why-text {
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a202c;
+            margin-top: 22px;
+        }
+
+        /* Case study */
+        .case-heading {
+            text-align: center;
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 20px;
+        }
+
+        .case-story p {
+            font-size: 1.05rem;
+            color: #2d3748;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+
+        .spoiler {
+            background: #edf2f7;
+            border-left: 4px solid #cbd5e0;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .spoiler-icon {
             width: 22px;
             height: 22px;
+            border-radius: 50%;
+            border: 2px solid #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
         }
 
-        .thanks-note {
-            display: none;
-            margin-top: 15px;
-            color: #48bb78;
-            font-weight: 600;
+        .spoiler-text {
+            font-style: italic;
+            color: #2d3748;
+            filter: blur(5px);
+            opacity: 0.55;
+            transition: all 0.3s ease;
         }
 
-        .thanks-note.show {
+        .spoiler.revealed {
+            background: #f0fff4;
+            border-left-color: #48bb78;
+        }
+
+        .spoiler.revealed .spoiler-text {
+            filter: none;
+            opacity: 1;
+        }
+
+        .spoiler.revealed .spoiler-icon {
+            background: #48bb78;
+            border-color: #48bb78;
+            color: #fff;
+        }
+
+        .level-select {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 25px 0 10px;
+        }
+
+        .level-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .level-badge {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            transition: transform 0.25s ease;
+            border: 3px solid transparent;
+        }
+
+        .level-btn:hover .level-badge { transform: translateY(-4px); }
+        .level-btn.active .level-badge { border-color: #1a202c; }
+
+        .level-badge.b1 { background: #4299e1; }
+        .level-badge.b2 { background: #48bb78; }
+        .level-badge.c1 { background: #ed8936; }
+
+        .level-label { font-weight: 600; color: #2d3748; font-size: 0.9rem; }
+
+        .reading-note {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .reading-text p {
+            color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 18px;
+            font-size: 1.05rem;
+        }
+
+        .vocab-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .vocab-link:hover { transform: translateY(-1px); }
+
+        .placeholder-box {
+            max-width: 560px;
+            margin: 30px auto;
+            text-align: center;
+            padding: 55px 30px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 16px;
+            color: #a0aec0;
+            background: #f7fafc;
+        }
+
+        .placeholder-box .big-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+        .next-btn-center {
             display: block;
+            margin: 25px auto 0;
+            background: #1a202c;
+            color: #ffffff;
+            border: none;
+            padding: 12px 34px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            body {
-                overflow-y: auto;
-                height: auto;
-            }
+        .next-btn-center:hover { background: #667eea; }
 
-            .header {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px 15px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .header-image {
-                width: 80px;
-                height: 60px;
-                margin-top: 15px;
-            }
-
-            .container {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .navigation {
-                width: 100%;
-                padding: 15px;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-                justify-content: center;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            }
-
-            .nav-item {
-                flex: 1;
-                min-width: 110px;
-                margin: 2px;
-                font-size: 0.9rem;
-                padding: 10px 12px;
-            }
-
-            .content {
-                height: auto;
-                overflow: visible;
-            }
-
-            .section {
-                padding: 20px 15px;
-                height: auto;
-            }
-
-            .vocab-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .flashcard {
-                padding-bottom: 130%;
-            }
-
-            .level-select {
-                gap: 15px;
-            }
-
-            .feedback-hero {
-                flex-direction: column;
-                text-align: center;
-            }
+        /* Vocabulary cards */
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+            margin-top: 10px;
         }
 
-        @media (max-width: 480px) {
-            .vocab-grid {
-                grid-template-columns: 1fr;
-            }
+        .flashcard {
+            width: 100%;
+            height: 0;
+            padding-bottom: 130%;
+            position: relative;
+            perspective: 1000px;
+            cursor: pointer;
+        }
 
-            .flashcard {
-                padding-bottom: 70%;
-            }
+        .flashcard-inner {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flashcard-front { background: #ffffff; }
+
+        .card-def {
+            padding: 12px 10px 4px;
+            text-align: center;
+        }
+
+        .card-def .def-text { font-size: 0.8rem; color: #2d3748; line-height: 1.3; }
+        .card-def .pos-tag { font-style: italic; color: #a0aec0; font-size: 0.72rem; margin-top: 5px; }
+
+        .card-image-area {
+            flex: 1;
+            background: #f2f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            position: relative;
+        }
+
+        .flip-icon {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: rgba(26,32,44,0.6);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .flashcard-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            transform: rotateY(180deg);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .flashcard-term {
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-align: center;
+        }
+
+        /* Discussion */
+        .discussion-illustration {
+            max-width: 480px;
+            margin: 0 auto 25px;
+        }
+
+        .discussion-prompt {
+            background: #fdf3d8;
+            border-radius: 30px;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #1a202c;
+            font-size: 1.05rem;
+            max-width: 560px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        a.discussion-prompt { text-decoration: none; cursor: pointer; }
+
+        .q-item {
+            background: #ffffff;
+            border-left: 4px solid #667eea;
+            padding: 16px 22px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            font-size: 1.03rem;
+            color: #2d3748;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 450px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-word {
+            color: #1a202c;
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .popup-definition {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        .popup-close {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            float: right;
+        }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .slide-inner { padding: 60px 24px 80px; }
+            .cover-panel { width: 100%; clip-path: none; padding: 40px 30px; position: relative; height: 100%; }
+            .cover-image { display: none; }
+            .cover-panel-left { width: 100%; clip-path: none; padding: 40px 25px; }
+            .cover-right-content { position: relative; width: 100%; padding: 20px 25px; }
+            .vocab-grid { grid-template-columns: 1fr 1fr; }
+            .flashcard { padding-bottom: 130%; }
+            .cover-title { font-size: 2rem; }
+            .case-heading { font-size: 1.6rem; }
+        }
+
+        @media (max-width: 500px) {
+            .vocab-grid { grid-template-columns: 1fr; }
+            .flashcard { padding-bottom: 70%; }
         }
     </style>
 </head>
@@ -822,355 +804,529 @@
         </div>
     </div>
 
-    <div class="header">
-        <div class="header-left">
-            <h1>Compo Culture</h1>
-            <div class="subtitle">Lesson 29 &mdash; Grammar Classes &mdash; IDUN (B1)</div>
-            <div class="website">
-                <a href="https://www.mimlanguageservices.com/" target="_blank">mimlanguageservices.com</a>
+    <button class="nav-arrow prev" id="prevArrow" onclick="prevSlide()">&#8249;</button>
+    <button class="nav-arrow next" id="nextArrow" onclick="nextSlide()">&#8250;</button>
+    <div class="slide-counter" id="slideCounter"></div>
+
+    <div class="slideshow">
+
+        <!-- TITLE SLIDE -->
+        <div class="slide active" id="slide-title">
+            <div class="cover-slide">
+                <img class="cover-image" src="https://images.unsplash.com/photo-1589994965851-a8f479c573a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Scales of justice">
+                <div class="cover-panel">
+                    <div class="mim-logo">MIM</div>
+                    <div class="cover-title">COMPO<br>CULTURE</div>
+                    <div class="cover-meta">LESSON 29</div>
+                    <div class="cover-meta">GRAMMAR CLASSES</div>
+                    <div class="cover-meta">IDUN (B1)</div>
+                    <div class="cover-buttons">
+                        <div class="cover-btn">INTERACTIVE<br>MODE</div>
+                        <div class="cover-btn" onclick="nextSlide()">NEXT<br>PAGE</div>
+                    </div>
+                    <div class="cover-socials">
+                        <a href="https://www.tiktok.com/@mimlanguageservices?lang=en" target="_blank">&#9836;</a>
+                        <a href="https://www.facebook.com/Mimlanguageservices" target="_blank">f</a>
+                        <a href="https://www.instagram.com/mimlanguageservices/" target="_blank">&#9679;</a>
+                        <a href="https://www.mimlanguageservices.com/" target="_blank">in</a>
+                    </div>
+                    <div class="cover-website">www.mimlanguageservices.com</div>
+                </div>
             </div>
         </div>
-        <a href="https://www.mimlanguageservices.com/" target="_blank">
-            <img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Language Services" class="header-image">
-        </a>
-    </div>
 
-    <div class="container">
-        <div class="navigation">
-            <div class="nav-item active" onclick="showSection('intro', this)">Intro</div>
-            <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
-            <div class="nav-item" onclick="showSection('casestudy', this)">Case Study</div>
-            <div class="nav-item" onclick="showSection('discussion', this)">Discussion</div>
-            <div class="nav-item" onclick="showSection('feedback', this)">Feedback</div>
-        </div>
-
-        <div class="content">
-
-            <!-- Intro Section -->
-            <div class="section active" id="intro">
-                <h2>Intro</h2>
-                <div class="panel" style="max-width: 800px; margin: 0 auto;">
-                    <div class="intro-image">
-                        <img src="https://static.wixstatic.com/media/593d03_placeholder-car-crash.jpg" alt="A car crashed into the side of a house" onerror="this.style.display='none'">
-                    </div>
+        <!-- INTRO -->
+        <div class="slide" id="slide-intro">
+            <div class="slide-label">Intro</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div class="center-col" style="padding-top: 20px;">
+                    <svg class="hero-illustration" viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="30" y="30" width="340" height="160" fill="#e2c9a0" rx="4"/>
+                        <rect x="30" y="30" width="340" height="160" fill="none" stroke="#8a6d3b" stroke-width="4" rx="4"/>
+                        <rect x="60" y="60" width="70" height="90" fill="#7a5c34" stroke="#4a3820" stroke-width="3"/>
+                        <rect x="150" y="60" width="70" height="90" fill="#fff" stroke="#4a3820" stroke-width="3"/>
+                        <line x1="150" y1="60" x2="220" y2="150" stroke="#4a3820" stroke-width="2"/>
+                        <line x1="220" y1="60" x2="150" y2="150" stroke="#4a3820" stroke-width="2"/>
+                        <g>
+                            <rect x="230" y="95" width="120" height="55" rx="8" fill="#c0392b"/>
+                            <rect x="330" y="105" width="35" height="30" rx="4" fill="#c0392b"/>
+                            <circle cx="255" cy="150" r="12" fill="#2d3748"/>
+                            <circle cx="330" cy="150" r="12" fill="#2d3748"/>
+                        </g>
+                    </svg>
                     <p class="poll-question">Who do you think is responsible for repairing the broken window?</p>
                     <p class="poll-subtext">You can select more than one answer</p>
 
-                    <div class="poll-option" data-correct="true" onclick="togglePollOption(this)">
-                        <div class="poll-check"></div>
+                    <div class="poll-item" data-correct="true" onclick="togglePollOption(this)">
+                        <div class="poll-icon">&#10003;</div>
                         <div>The driver of the car</div>
                     </div>
-                    <div class="poll-option" data-correct="true" onclick="togglePollOption(this)">
-                        <div class="poll-check"></div>
+                    <div class="poll-item" data-correct="true" onclick="togglePollOption(this)">
+                        <div class="poll-icon">&#10003;</div>
                         <div>The owner of the house</div>
                     </div>
 
-                    <button class="reveal-btn" onclick="revealPoll(this)">Check Answers</button>
+                    <div class="poll-footer">
+                        <button class="send-btn" onclick="revealPoll(this)">Send</button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Vocabulary Section -->
-            <div class="section" id="vocabulary">
-                <h2>Vocabulary</h2>
-                <div class="vocab-container">
+        <!-- VOCABULARY PAGE 1 -->
+        <div class="slide" id="slide-vocab1">
+            <div class="slide-label">Vocabulary</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div style="max-width: 1000px; margin: 40px auto 0;">
                     <div class="vocab-grid">
 
                         <div class="flashcard" onclick="flipCard(this)">
                             <div class="flashcard-inner">
                                 <div class="flashcard-front">
-                                    <div class="def-text">To give someone something (normally money) because you did something bad to them.</div>
-                                    <div class="pos-tag">(verb)</div>
+                                    <div class="card-def">
+                                        <div class="def-text">To give someone something (normally money) because you did something bad to them.</div>
+                                        <div class="pos-tag">(verb)</div>
+                                    </div>
+                                    <div class="card-image-area">&#128181;<div class="flip-icon">&#8635;</div></div>
                                 </div>
-                                <div class="flashcard-back">
-                                    <div class="flashcard-term">Compensate</div>
-                                </div>
+                                <div class="flashcard-back"><div class="flashcard-term">Compensate</div></div>
                             </div>
                         </div>
 
                         <div class="flashcard" onclick="flipCard(this)">
                             <div class="flashcard-inner">
                                 <div class="flashcard-front">
-                                    <div class="def-text">To solve a problem using a country's legal system.</div>
-                                    <div class="pos-tag">(verb)</div>
+                                    <div class="card-def">
+                                        <div class="def-text">To solve a problem using a country's legal system.</div>
+                                        <div class="pos-tag">(verb)</div>
+                                    </div>
+                                    <div class="card-image-area">&#9878;&#65039;<div class="flip-icon">&#8635;</div></div>
                                 </div>
-                                <div class="flashcard-back">
-                                    <div class="flashcard-term">Sue</div>
-                                </div>
+                                <div class="flashcard-back"><div class="flashcard-term">Sue</div></div>
                             </div>
                         </div>
 
                         <div class="flashcard" onclick="flipCard(this)">
                             <div class="flashcard-inner">
                                 <div class="flashcard-front">
-                                    <div class="def-text">A person who represents you in a legal battle.</div>
-                                    <div class="pos-tag">(noun)</div>
+                                    <div class="card-def">
+                                        <div class="def-text">A person who represents you in a legal battle.</div>
+                                        <div class="pos-tag">(noun)</div>
+                                    </div>
+                                    <div class="card-image-area">&#128100;&#128100;<div class="flip-icon">&#8635;</div></div>
                                 </div>
-                                <div class="flashcard-back">
-                                    <div class="flashcard-term">Lawyer</div>
-                                </div>
+                                <div class="flashcard-back"><div class="flashcard-term">Lawyer</div></div>
                             </div>
                         </div>
 
                         <div class="flashcard" onclick="flipCard(this)">
                             <div class="flashcard-inner">
                                 <div class="flashcard-front">
-                                    <div class="def-text">A person who makes important legal decisions.</div>
-                                    <div class="pos-tag">(noun)</div>
+                                    <div class="card-def">
+                                        <div class="def-text">A person who makes important legal decisions.</div>
+                                        <div class="pos-tag">(noun)</div>
+                                    </div>
+                                    <div class="card-image-area">&#128100;&#8205;&#9878;&#65039;<div class="flip-icon">&#8635;</div></div>
                                 </div>
-                                <div class="flashcard-back">
-                                    <div class="flashcard-term">Judge</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flashcard" onclick="flipCard(this)">
-                            <div class="flashcard-inner">
-                                <div class="flashcard-front">
-                                    <div class="def-text">To resolve a problem without a court.</div>
-                                    <div class="pos-tag">(verb)</div>
-                                </div>
-                                <div class="flashcard-back">
-                                    <div class="flashcard-term">Out of court settlement</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flashcard" onclick="flipCard(this)">
-                            <div class="flashcard-inner">
-                                <div class="flashcard-front">
-                                    <div class="def-text">To get revenge on someone by hurting them as much as they hurt you.<br>"An ... for an ..."</div>
-                                    <div class="pos-tag">(expression)</div>
-                                </div>
-                                <div class="flashcard-back">
-                                    <div class="flashcard-term">An eye for an eye</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flashcard" onclick="flipCard(this)">
-                            <div class="flashcard-inner">
-                                <div class="flashcard-front">
-                                    <div class="def-text">When a doctor does their job very badly and a patient gets sick.</div>
-                                    <div class="pos-tag">(noun)</div>
-                                </div>
-                                <div class="flashcard-back">
-                                    <div class="flashcard-term">Malpractice</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flashcard" onclick="flipCard(this)">
-                            <div class="flashcard-inner">
-                                <div class="flashcard-front">
-                                    <div class="def-text">To invent false rumors about someone because you want to destroy their reputation.</div>
-                                    <div class="pos-tag">(noun) (verb)</div>
-                                </div>
-                                <div class="flashcard-back">
-                                    <div class="flashcard-term">Slander</div>
-                                </div>
+                                <div class="flashcard-back"><div class="flashcard-term">Judge</div></div>
                             </div>
                         </div>
 
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Case Study Section -->
-            <div class="section" id="casestudy">
-                <div class="case-title">The Hot Coffee Victim</div>
-                <div class="case-hero">
-                    <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="A cup of hot coffee">
-                </div>
+        <!-- VOCABULARY PAGE 2 -->
+        <div class="slide" id="slide-vocab2">
+            <div class="slide-label">Vocabulary</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div style="max-width: 1000px; margin: 40px auto 0;">
+                    <div class="vocab-grid">
 
-                <div id="caseIntro">
-                    <div class="case-story">
-                        <p>In 1994, in the state of New Mexico, USA, a woman bought a cup of coffee at a restaurant. Outside of the restaurant, in a car, she had an accident &mdash; she dropped her coffee on herself. She burned herself.</p>
-                        <p>The woman went to court and sued the restaurant because the coffee was hot.</p>
-                        <p style="font-weight: 600;">What do you think happened next?</p>
-                    </div>
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="card-def">
+                                        <div class="def-text">To resolve a problem without a court.</div>
+                                        <div class="pos-tag">(verb)</div>
+                                    </div>
+                                    <div class="card-image-area">&#129309;<div class="flip-icon">&#8635;</div></div>
+                                </div>
+                                <div class="flashcard-back"><div class="flashcard-term">Out of court settlement</div></div>
+                            </div>
+                        </div>
 
-                    <div style="text-align: center;">
-                        <button class="reveal-btn" onclick="revealOutcomes()">Reveal What Happened</button>
-                    </div>
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="card-def">
+                                        <div class="def-text">To get revenge on someone by hurting them as much as they hurt you.<br>"An ... for an ..."</div>
+                                        <div class="pos-tag">(expression)</div>
+                                    </div>
+                                    <div class="card-image-area">&#128065;&#65039;<div class="flip-icon">&#8635;</div></div>
+                                </div>
+                                <div class="flashcard-back"><div class="flashcard-term">An eye for an eye</div></div>
+                            </div>
+                        </div>
 
-                    <div class="case-outcomes" id="caseOutcomes">
-                        <div class="case-outcome-item">The judge decided that the restaurant had to pay her compensation.</div>
-                        <div class="case-outcome-item">The restaurant had to pay the woman USD $2,800,000.</div>
-                    </div>
-                </div>
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="card-def">
+                                        <div class="def-text">When a doctor does their job very badly and a patient gets sick.</div>
+                                        <div class="pos-tag">(noun)</div>
+                                    </div>
+                                    <div class="card-image-area">&#129502;<div class="flip-icon">&#8635;</div></div>
+                                </div>
+                                <div class="flashcard-back"><div class="flashcard-term">Malpractice</div></div>
+                            </div>
+                        </div>
 
-                <div style="text-align: center;">
-                    <h3 style="margin-top: 30px;">Choose a level of difficulty</h3>
-                    <div class="level-select">
-                        <button class="level-btn active" id="levelBtn-B1" onclick="showCaseLevel('B1', this)">
-                            <div class="level-badge b1">B1</div>
-                            <div class="level-label">B1</div>
-                        </button>
-                        <button class="level-btn" id="levelBtn-B2" onclick="showCaseLevel('B2', this)">
-                            <div class="level-badge b2">B2</div>
-                            <div class="level-label">B2</div>
-                        </button>
-                        <button class="level-btn" id="levelBtn-C1" onclick="showCaseLevel('C1', this)">
-                            <div class="level-badge c1">C1</div>
-                            <div class="level-label">C1</div>
-                        </button>
-                    </div>
-                </div>
+                        <div class="flashcard" onclick="flipCard(this)">
+                            <div class="flashcard-inner">
+                                <div class="flashcard-front">
+                                    <div class="card-def">
+                                        <div class="def-text">To invent false rumors about someone because you want to destroy their reputation.</div>
+                                        <div class="pos-tag">(noun) (verb)</div>
+                                    </div>
+                                    <div class="card-image-area">&#128072;<div class="flip-icon">&#8635;</div></div>
+                                </div>
+                                <div class="flashcard-back"><div class="flashcard-term">Slander</div></div>
+                            </div>
+                        </div>
 
-                <!-- B1 Reading -->
-                <div class="level-content active" id="level-B1">
-                    <p style="text-align: center; color: #718096; font-size: 0.9rem; margin-bottom: 15px;"><span class="vocab-link" style="cursor: default;">Blue words</span> have explanations &mdash; click them!</p>
-                    <div class="reading-text">
-                        <p>A woman has been <span class="vocab-link" onclick="showPopup('Awarded', 'Given as a legal decision, such as money after winning a court case.')">awarded</span> a total of almost 3 million dollars in damages, after <span class="vocab-link" onclick="showPopup('Claiming', 'Saying that something is true, especially when trying to prove it.')">claiming</span> that the coffee she was served at a US fast food restaurant and then <span class="vocab-link" onclick="showPopup('Spilled', 'Accidentally poured or knocked out of a container.')">spilled</span> on herself was too hot.</p>
-
-                        <p>The woman was in the passenger seat of her grandson's car when she was served a cup of coffee at the <span class="vocab-link" onclick="showPopup('Drive-through', 'A system where customers can buy food without leaving their car.')">drive-through</span> window of a local fast food outlet.</p>
-
-                        <p>According to reports, after receiving the food order, the grandson moved his car forward and stopped for a moment so that his grandmother could add cream and sugar to her coffee.</p>
-
-                        <p>She placed the cup <span class="vocab-link" onclick="showPopup('Between', 'In the space separating two things.')">between</span> her knees and tried to remove the plastic <span class="vocab-link" onclick="showPopup('Lid', 'A cover on a container that can be lifted up or removed.')">lid</span> from the cup.</p>
-
-                        <p>As she did so, the entire contents of the cup spilled onto her <span class="vocab-link" onclick="showPopup('Lap', 'The flat area formed by the top of your legs when you are sitting down.')">lap</span>, leaving her severely <span class="vocab-link" onclick="showPopup('Burned', 'Injured by contact with something very hot.')">burned</span> and needing hospital treatment.</p>
-
-                        <p>A <span class="vocab-link" onclick="showPopup('Company representative', 'A person who speaks on behalf of a business.')">company representative</span> explained that coffee is kept at a particular temperature because customers naturally want their coffee served hot.</p>
-
-                        <p>He said that customers buy coffee on their way to work or home, intending to consume it there, not while in the car.</p>
-
-                        <p>One <span class="vocab-link" onclick="showPopup('Commentator', 'Someone who gives their opinion about news or events, often publicly.')">commentator</span> couldn't believe the woman won her case.</p>
-
-                        <p class="quote-line">"The world has gone mad. If you can get $3 million for spilling hot coffee on yourself, then it's only a matter of time before we get the headlines:</p>
-                        <p class="quote-line" style="font-weight: 700;">WOMAN GETS PREGNANT AND SUES CONDOM COMPANY,</p>
-                        <p class="quote-line">or</p>
-                        <p class="quote-line" style="font-weight: 700;">MAN WITH BAD HAIRCUT SUES FOR EMOTIONAL DAMAGES."</p>
-
-                        <p>The woman suffered <span class="vocab-link" onclick="showPopup('Third degree burns', 'The most severe type of burn, damaging all layers of the skin.')">third degree burns</span> over 6% of her body in very sensitive areas.</p>
-
-                        <p>She was in hospital for eight days. She spilled the coffee while she was sitting in a parked car trying to remove the cup's lid.</p>
-
-                        <p>She was not driving the vehicle, nor was it moving.</p>
-
-                        <p>She tried to settle her case out of court for $20,000 but the restaurant chain refused.</p>
-
-                        <p>The restaurant knew of the problem. They had already received hundreds of complaints.</p>
-
-                        <p>They knew that drinks can burn at temperatures over 60 degrees, but they maintained a policy to keep their coffee at around 85&deg;C.</p>
-
-                        <p>The chain (McDonald's) makes over a million dollars a day in coffee sales.</p>
-                    </div>
-                </div>
-
-                <!-- B2 Reading Placeholder -->
-                <div class="level-content" id="level-B2">
-                    <div class="placeholder-box">
-                        <div class="big-icon">&#128221;</div>
-                        <p><strong>B2 reading coming soon.</strong></p>
-                        <p style="margin-top: 8px; font-size: 0.95rem;">This level is still being written &mdash; check back later.</p>
-                    </div>
-                </div>
-
-                <!-- C1 Reading Placeholder -->
-                <div class="level-content" id="level-C1">
-                    <div class="placeholder-box">
-                        <div class="big-icon">&#128221;</div>
-                        <p><strong>C1 reading coming soon.</strong></p>
-                        <p style="margin-top: 8px; font-size: 0.95rem;">This level is still being written &mdash; check back later.</p>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Discussion Section -->
-            <div class="section" id="discussion">
-                <h2>Discussion</h2>
+        <!-- CASE STUDY INTRO -->
+        <div class="slide" id="slide-case-intro">
+            <div class="slide-label">Case Study</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div class="case-heading">The Hot Coffee Victim</div>
+                <img class="hero-illustration" style="max-width:600px;" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="A cup of hot coffee">
+                <div class="center-col case-story">
+                    <p>In 1994, in the state of New Mexico, USA, a woman bought a cup of coffee at a restaurant. Outside of the restaurant, in a car, she had an accident &mdash; she dropped her coffee on herself. She burned herself.</p>
+                    <p>The woman went to court and sued the restaurant because the coffee was hot.</p>
+                    <p style="font-weight: 700;">What do you think happened next?</p>
 
-                <div class="discussion-block">
-                    <div class="discussion-image">
-                        <img src="https://static.wixstatic.com/media/593d03_placeholder-equality-equity.jpg" alt="Equality vs Equity illustration" onerror="this.style.display='none'">
+                    <div class="spoiler" onclick="this.classList.toggle('revealed')">
+                        <div class="spoiler-icon">&#9679;</div>
+                        <div class="spoiler-text">The judge decided that the restaurant had to pay her compensation.</div>
                     </div>
-                    <div class="discussion-prompt">
-                        <span>&#128161;</span>
-                        <span>What is the difference between "equality" and "equity"?</span>
+                    <div class="spoiler" onclick="this.classList.toggle('revealed')">
+                        <div class="spoiler-icon">&#9679;</div>
+                        <div class="spoiler-text">The restaurant had to pay the woman USD $2,800,000.</div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div class="panel" style="max-width: 800px; margin: 0 auto 30px;">
+        <!-- LEVEL SELECT -->
+        <div class="slide" id="slide-level-select">
+            <div class="slide-label">Case Study</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div class="case-heading">The Hot Coffee Victim</div>
+                <img class="hero-illustration" style="max-width:600px;" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="A cup of hot coffee">
+                <h3 style="text-align:center; font-weight:700; color:#1a202c; margin-top: 10px;">Choose a level of difficulty</h3>
+                <div class="level-select">
+                    <button class="level-btn active" id="levelBtn-B1" onclick="chooseLevel('B1', this)">
+                        <div class="level-badge b1">B1</div>
+                        <div class="level-label">B1</div>
+                    </button>
+                    <button class="level-btn" id="levelBtn-B2" onclick="chooseLevel('B2', this)">
+                        <div class="level-badge b2">B2</div>
+                        <div class="level-label">B2</div>
+                    </button>
+                    <button class="level-btn" id="levelBtn-C1" onclick="chooseLevel('C1', this)">
+                        <div class="level-badge c1">C1</div>
+                        <div class="level-label">C1</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- B1 PART 1 -->
+        <div class="slide" id="slide-b1-part1">
+            <div class="slide-label">B1 Reading (Part 1)</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <p class="reading-note"><span class="vocab-link" style="cursor:default;">Blue words</span> have explanations &mdash; click them!</p>
+                <div class="center-col reading-text">
+                    <p>A woman has been <span class="vocab-link" onclick="showPopup('Awarded', 'Given as a legal decision, such as money after winning a court case.')">awarded</span> a total of almost 3 million dollars in damages, after <span class="vocab-link" onclick="showPopup('Claiming', 'Saying that something is true, especially when trying to prove it.')">claiming</span> that the coffee she was served at a US fast food restaurant and then <span class="vocab-link" onclick="showPopup('Spilled', 'Accidentally poured or knocked out of a container.')">spilled</span> on herself was too hot.</p>
+                    <p>The woman was in the passenger seat of her grandson's car when she was served a cup of coffee at the <span class="vocab-link" onclick="showPopup('Drive-through', 'A system where customers can buy food without leaving their car.')">drive-through</span> window of a local fast food outlet.</p>
+                    <p>According to reports, after receiving the food order, the grandson moved his car forward and stopped for a moment so that his grandmother could add cream and sugar to her coffee.</p>
+                    <p>She placed the cup <span class="vocab-link" onclick="showPopup('Between', 'In the space separating two things.')">between</span> her knees and tried to remove the plastic <span class="vocab-link" onclick="showPopup('Lid', 'A cover on a container that can be lifted up or removed.')">lid</span> from the cup.</p>
+                    <p>As she did so, the entire contents of the cup spilled onto her <span class="vocab-link" onclick="showPopup('Lap', 'The flat area formed by the top of your legs when you are sitting down.')">lap</span>, leaving her severely <span class="vocab-link" onclick="showPopup('Burned', 'Injured by contact with something very hot.')">burned</span> and needing hospital treatment.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- B1 PART 2 -->
+        <div class="slide" id="slide-b1-part2">
+            <div class="slide-label">B1 Reading (Part 2)</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <p class="reading-note"><span class="vocab-link" style="cursor:default;">Blue words</span> have explanations &mdash; click them!</p>
+                <div class="center-col reading-text">
+                    <p>A <span class="vocab-link" onclick="showPopup('Company representative', 'A person who speaks on behalf of a business.')">company representative</span> explained that coffee is kept at a particular temperature because customers naturally want their coffee served hot.</p>
+                    <p>He said that customers buy coffee on their way to work or home, intending to consume it there, not while in the car.</p>
+                    <p>One <span class="vocab-link" onclick="showPopup('Commentator', 'Someone who gives their opinion about news or events, often publicly.')">commentator</span> couldn't believe the woman won her case.</p>
+                    <p>"The world has gone mad. If you can get $3 million for spilling hot coffee on yourself, then it's only a matter of time before we get the headlines:</p>
+                    <p style="font-weight: 700;">WOMAN GETS PREGNANT AND SUES CONDOM COMPANY,</p>
+                    <p>or</p>
+                    <p style="font-weight: 700;">MAN WITH BAD HAIRCUT SUES FOR EMOTIONAL DAMAGES."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- B1 PART 3 -->
+        <div class="slide" id="slide-b1-part3">
+            <div class="slide-label">B1 Reading (Part 3)</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <p class="reading-note"><span class="vocab-link" style="cursor:default;">Blue words</span> have explanations &mdash; click them!</p>
+                <div class="center-col reading-text">
+                    <p>The woman suffered <span class="vocab-link" onclick="showPopup('Third degree burns', 'The most severe type of burn, damaging all layers of the skin.')">third degree burns</span> over 6% of her body in very sensitive areas.</p>
+                    <p>She was in hospital for eight days. She spilled the coffee while she was sitting in a parked car trying to remove the cup's lid.</p>
+                    <p>She was not driving the vehicle, nor was it moving.</p>
+                    <p>She tried to settle her case out of court for $20,000 but the restaurant chain refused.</p>
+                    <p>The restaurant knew of the problem. They had already received hundreds of complaints.</p>
+                    <p>They knew that drinks can burn at temperatures over 60 degrees, but they maintained a policy to keep their coffee at around 85&deg;C.</p>
+                    <p>The chain (McDonald's) makes over a million dollars a day in coffee sales.</p>
+                </div>
+                <button class="next-btn-center" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- LEVEL PLACEHOLDER (B2/C1) -->
+        <div class="slide" id="slide-level-placeholder">
+            <div class="slide-label" id="placeholderLabel">Case Study</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div class="case-heading">The Hot Coffee Victim</div>
+                <div class="placeholder-box">
+                    <div class="big-icon">&#128221;</div>
+                    <p><strong><span id="placeholderLevel">B2</span> reading coming soon.</strong></p>
+                    <p style="margin-top: 8px; font-size: 0.95rem;">This level is still being written &mdash; check back later.</p>
+                </div>
+                <button class="next-btn-center" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
+
+        <!-- DISCUSSION: EQUALITY -->
+        <div class="slide" id="slide-disc-equality">
+            <div class="slide-label">Discussion</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div class="discussion-illustration">
+                    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
+                        <rect x="0" y="0" width="480" height="220" fill="#a9d6b8"/>
+                        <rect x="0" y="0" width="240" height="220" fill="#9fd0af"/>
+                        <line x1="240" y1="0" x2="240" y2="220" stroke="#333" stroke-width="2"/>
+                        <!-- fence -->
+                        <g stroke="#6b4a2b" stroke-width="6">
+                            <line x1="20" y1="90" x2="20" y2="220"/>
+                            <line x1="60" y1="90" x2="60" y2="220"/>
+                            <line x1="100" y1="90" x2="100" y2="220"/>
+                            <line x1="140" y1="90" x2="140" y2="220"/>
+                            <line x1="180" y1="90" x2="180" y2="220"/>
+                            <line x1="220" y1="90" x2="220" y2="220"/>
+                            <line x1="260" y1="90" x2="260" y2="220"/>
+                            <line x1="300" y1="90" x2="300" y2="220"/>
+                            <line x1="340" y1="90" x2="340" y2="220"/>
+                            <line x1="380" y1="90" x2="380" y2="220"/>
+                            <line x1="420" y1="90" x2="420" y2="220"/>
+                            <line x1="460" y1="90" x2="460" y2="220"/>
+                        </g>
+                        <!-- equality: 3 same boxes -->
+                        <rect x="35" y="165" width="30" height="20" fill="#c08a4e"/>
+                        <rect x="80" y="165" width="30" height="20" fill="#c08a4e"/>
+                        <rect x="125" y="165" width="30" height="20" fill="#c08a4e"/>
+                        <circle cx="50" cy="130" r="14" fill="#2d3748"/>
+                        <circle cx="95" cy="140" r="12" fill="#2d3748"/>
+                        <circle cx="140" cy="150" r="10" fill="#2d3748"/>
+                        <!-- equity: stacked boxes for shorter figures -->
+                        <rect x="275" y="165" width="30" height="20" fill="#c08a4e"/>
+                        <rect x="320" y="145" width="30" height="20" fill="#c08a4e"/>
+                        <rect x="320" y="165" width="30" height="20" fill="#c08a4e"/>
+                        <rect x="365" y="125" width="30" height="20" fill="#c08a4e"/>
+                        <rect x="365" y="145" width="30" height="20" fill="#c08a4e"/>
+                        <rect x="365" y="165" width="30" height="20" fill="#c08a4e"/>
+                        <circle cx="290" cy="130" r="14" fill="#2d3748"/>
+                        <circle cx="335" cy="120" r="12" fill="#2d3748"/>
+                        <circle cx="380" cy="105" r="10" fill="#2d3748"/>
+                        <text x="120" y="215" text-anchor="middle" font-size="16" font-weight="700" fill="#1a202c">EQUALITY</text>
+                        <text x="360" y="215" text-anchor="middle" font-size="16" font-weight="700" fill="#1a202c">EQUITY</text>
+                    </svg>
+                </div>
+                <div class="discussion-prompt">
+                    <span>&#128161;</span>
+                    <span>What is the difference between "equality" and "equity"?</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DISCUSSION: POLL -->
+        <div class="slide" id="slide-disc-poll">
+            <div class="slide-label">Discussion</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div class="center-col" style="padding-top: 40px;">
                     <p class="poll-question">Do you think companies that are more successful should have to pay higher compensation than smaller businesses like a family cafe?</p>
                     <p class="poll-subtext">You can select more than one answer</p>
 
-                    <div class="poll-option" data-correct="true" onclick="togglePollOption(this)">
-                        <div class="poll-check"></div>
+                    <div class="poll-item" data-correct="true" onclick="togglePollOption(this)">
+                        <div class="poll-icon">&#10003;</div>
                         <div>It should be equal</div>
                     </div>
-                    <div class="poll-option" data-correct="true" onclick="togglePollOption(this)">
-                        <div class="poll-check"></div>
+                    <div class="poll-item" data-correct="true" onclick="togglePollOption(this)">
+                        <div class="poll-icon">&#10003;</div>
                         <div>It should be equitable</div>
                     </div>
 
-                    <button class="reveal-btn" onclick="revealPoll(this)">Check Answers</button>
-                    <p style="font-weight: 600; margin-top: 15px;">Why?</p>
+                    <div class="poll-footer">
+                        <button class="send-btn" onclick="revealPoll(this)">Send</button>
+                    </div>
+                    <p class="why-text">Why?</p>
                 </div>
+            </div>
+        </div>
 
-                <div class="discussion-questions">
+        <!-- DISCUSSION: EXTRA QUESTIONS -->
+        <div class="slide" id="slide-disc-extra">
+            <div class="slide-label">Discussion</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div class="center-col" style="padding-top: 40px;">
                     <div class="q-item">Have you heard examples of medical <span class="vocab-link" onclick="showPopup('Malpractice', 'When a doctor does their job very badly and a patient gets sick.')">malpractice</span>?</div>
                     <div class="q-item">Is it common to sue doctors and hospitals where you live?</div>
                     <div class="q-item">Why do you think this case outcome occurred?</div>
                 </div>
-
-                <div class="wiki-link-box">
-                    <a class="discussion-prompt" href="https://en.wikipedia.org/wiki/Liebeck_v._McDonald%27s_Restaurants" target="_blank">
-                        <span>&#128279;</span>
-                        <span>Click the link if you are interested in reading the full story on Wikipedia.</span>
-                    </a>
-                </div>
             </div>
-
-            <!-- Feedback Section -->
-            <div class="section" id="feedback">
-                <div class="feedback-hero">
-                    <div class="feedback-text">
-                        <h2 style="text-align: left;">Thank you for choosing mimlanguageservices.com</h2>
-                        <p>Let us know if you have any feedback!</p>
-
-                        <div class="feedback-slider">
-                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128542;</div>
-                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128577;</div>
-                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128528;</div>
-                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128578;</div>
-                            <div class="feedback-emoji" onclick="selectFeedback(this)">&#128512;</div>
-                        </div>
-                        <div class="thanks-note" id="thanksNote">Thanks for your feedback!</div>
-
-                        <p style="font-weight: 600; margin-top: 20px;">Please help us grow by following us on any of the following platforms!</p>
-
-                        <div class="feedback-socials">
-                            <a href="https://www.facebook.com/Mimlanguageservices" target="_blank" title="Facebook">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
-                            </a>
-                            <a href="https://www.instagram.com/mimlanguageservices/" target="_blank" title="Instagram">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
-                            </a>
-                            <a href="https://www.tiktok.com/@mimlanguageservices?lang=en" target="_blank" title="TikTok">
-                                <img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok">
-                            </a>
-                            <a href="https://www.mimlanguageservices.com/" target="_blank" title="YouTube">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube">
-                            </a>
-                            <a href="https://www.mimlanguageservices.com/" target="_blank" title="LinkedIn">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
+
+        <!-- DISCUSSION: WIKI LINK -->
+        <div class="slide" id="slide-disc-wiki">
+            <div class="slide-label">Discussion</div>
+            <div class="slide-logo mim-logo">MIM</div>
+            <div class="slide-inner">
+                <div style="text-align:center; font-size: 4rem; margin: 40px 0 30px;">&#9749;&#128220;</div>
+                <a class="discussion-prompt" href="https://en.wikipedia.org/wiki/Liebeck_v._McDonald%27s_Restaurants" target="_blank">
+                    <span>&#128279;</span>
+                    <span>Click the link if you are interested in reading the full story on Wikipedia.</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- FEEDBACK / CLOSING -->
+        <div class="slide" id="slide-feedback">
+            <div class="cover-slide">
+                <div class="cover-panel-left">
+                    <div class="fb-heading">THANK YOU FOR CHOOSING<br>mimlanguageservices.com</div>
+                    <div class="fb-sub">Let us know if you have any feedback!</div>
+                </div>
+                <div class="cover-right-content">
+                    <div class="avatar-circle">&#128100;</div>
+                    <div class="feedback-slider">
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128542;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128577;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128528;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128578;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128512;</div>
+                    </div>
+                    <div class="thanks-note" id="thanksNote">Thanks for your feedback!</div>
+                    <div class="fb-follow-text">Please help us grow by following us on any of the following platforms!</div>
+                    <div class="feedback-socials">
+                        <a href="https://www.facebook.com/Mimlanguageservices" target="_blank" title="Facebook">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+                        </a>
+                        <a href="https://www.instagram.com/mimlanguageservices/" target="_blank" title="Instagram">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
+                        </a>
+                        <a href="https://www.tiktok.com/@mimlanguageservices?lang=en" target="_blank" title="TikTok">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok">
+                        </a>
+                        <a href="https://www.mimlanguageservices.com/" target="_blank" title="YouTube">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube">
+                        </a>
+                        <a href="https://www.mimlanguageservices.com/" target="_blank" title="LinkedIn">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn">
+                        </a>
+                    </div>
+                    <div class="fb-website">www.mimlanguageservices.com</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // Navigation
-        function showSection(sectionId, element) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-            element.classList.add('active');
+        var readingSlidesB1 = ['slide-b1-part1', 'slide-b1-part2', 'slide-b1-part3'];
+        var readingSlidesPlaceholder = ['slide-level-placeholder'];
+        var afterReading = ['slide-disc-equality', 'slide-disc-poll', 'slide-disc-extra', 'slide-disc-wiki', 'slide-feedback'];
+        var baseSlides = ['slide-title', 'slide-intro', 'slide-vocab1', 'slide-vocab2', 'slide-case-intro', 'slide-level-select'];
+
+        var slideOrder = baseSlides.concat(readingSlidesB1, afterReading);
+        var currentIndex = 0;
+
+        function renderSlide() {
+            document.querySelectorAll('.slide').forEach(function (s) { s.classList.remove('active'); });
+            var el = document.getElementById(slideOrder[currentIndex]);
+            if (el) el.classList.add('active');
+
+            document.getElementById('prevArrow').classList.toggle('hidden', currentIndex === 0);
+            document.getElementById('nextArrow').classList.toggle('hidden', currentIndex === slideOrder.length - 1);
+            document.getElementById('slideCounter').textContent = (currentIndex + 1) + ' / ' + slideOrder.length;
+
+            window.scrollTo(0, 0);
+            var inner = el ? el.querySelector('.slide-inner') : null;
+            if (inner) inner.scrollTop = 0;
+        }
+
+        function goToSlideId(id) {
+            var idx = slideOrder.indexOf(id);
+            if (idx !== -1) {
+                currentIndex = idx;
+                renderSlide();
+            }
+        }
+
+        function nextSlide() {
+            if (currentIndex < slideOrder.length - 1) {
+                currentIndex++;
+                renderSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderSlide();
+            }
+        }
+
+        function chooseLevel(level, button) {
+            document.querySelectorAll('.level-btn').forEach(function (b) { b.classList.remove('active'); });
+            button.classList.add('active');
+
+            var readingSlides;
+            if (level === 'B1') {
+                readingSlides = readingSlidesB1;
+            } else {
+                document.getElementById('placeholderLevel').textContent = level;
+                readingSlides = readingSlidesPlaceholder;
+            }
+
+            slideOrder = baseSlides.concat(readingSlides, afterReading);
+            goToSlideId(readingSlides[0]);
         }
 
         // Flashcards
@@ -1193,39 +1349,32 @@
             if (event.target.id === 'popupOverlay') closePopup();
         }
 
-        // Poll options (select-all discussion style)
+        // Poll options
         function togglePollOption(option) {
             option.classList.toggle('selected');
         }
 
         function revealPoll(button) {
-            const options = button.parentElement.querySelectorAll('.poll-option');
-            options.forEach(opt => {
-                if (opt.dataset.correct === 'true') {
-                    opt.classList.add('correct-reveal');
-                }
+            var options = button.closest('.center-col').querySelectorAll('.poll-item');
+            options.forEach(function (opt) {
+                if (opt.dataset.correct === 'true') opt.classList.add('correct-reveal');
             });
-        }
-
-        // Case study intro reveal
-        function revealOutcomes() {
-            document.getElementById('caseOutcomes').classList.add('revealed');
-        }
-
-        // Case study level selector
-        function showCaseLevel(level, button) {
-            document.querySelectorAll('.level-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('level-' + level).classList.add('active');
-            button.classList.add('active');
         }
 
         // Feedback slider
         function selectFeedback(emoji) {
-            document.querySelectorAll('.feedback-emoji').forEach(e => e.classList.remove('selected'));
+            document.querySelectorAll('.feedback-emoji').forEach(function (e) { e.classList.remove('selected'); });
             emoji.classList.add('selected');
             document.getElementById('thanksNote').classList.add('show');
         }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        renderSlide();
     </script>
 </body>
 </html>
