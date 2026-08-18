@@ -83,6 +83,18 @@
         .slide-text-section-left li { font-size: 1.25rem; line-height: 1.55; color: #4a5568; margin-bottom: 10px; }
         .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
         .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+
+        .hot-topic-slide { padding: 0 !important; }
+        .hot-topic-question { position: absolute; top: 50px; left: 50px; max-width: 45%; font-size: 2.4rem; font-weight: 700; color: #2d3748; line-height: 1.35; z-index: 2; }
+        .hot-topic-image-wrap { position: absolute; top: 0; right: 0; width: 50%; height: 100%; overflow: hidden; }
+        .hot-topic-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .hot-topic-disclaimer { position: absolute; bottom: 50px; left: 50px; max-width: 45%; font-size: 1.15rem; color: #718096; font-style: italic; line-height: 1.7; z-index: 2; }
+        .hot-topic-disclaimer strong { display: block; font-style: normal; font-weight: 700; color: #4a5568; margin-bottom: 8px; font-size: 1.3rem; }
+        @media (max-width: 768px) {
+            .hot-topic-question { position: static; max-width: 100%; font-size: 1.5rem; padding: 20px 15px 0; }
+            .hot-topic-image-wrap { position: static; width: 100%; height: 200px; }
+            .hot-topic-disclaimer { position: static; max-width: 100%; padding: 15px; }
+        }
         .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
         .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
         .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
@@ -571,7 +583,17 @@
                                 </div>
                             </div>
 
-                            <!-- Slide 11 - Lesson Complete -->
+                            <!-- Slide 11 - Hot Topic Slide -->
+                            <div class="discussion-slide hot-topic-slide">
+                                <div class="hot-topic-question">Have you ever fired a gun before?</div>
+                                <div class="hot-topic-image-wrap">
+                                    <!-- Placeholder image — swap this src on every Hot-Topic-Slide once a real image is ready -->
+                                    <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='600'%20height='800'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%23cbd5e0'/%3E%3Ctext%20x='50%25'%20y='50%25'%20font-family='Arial,%20sans-serif'%20font-size='36'%20fill='%234a5568'%20text-anchor='middle'%20dominant-baseline='middle'%3EImage%20Placeholder%3C/text%3E%3C/svg%3E" alt="Hot topic placeholder image">
+                                </div>
+                                <div class="hot-topic-disclaimer"><strong>Remember&hellip;</strong>There are no bad opinions,<br>there is only bad English.</div>
+                            </div>
+
+                            <!-- Slide 12 - Lesson Complete -->
                             <div class="discussion-slide lesson-complete-slide">
                                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
                                     <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
@@ -609,6 +631,7 @@
                             <div class="indicator-dot" onclick="goToSlide(9)"></div>
                             <div class="indicator-dot" onclick="goToSlide(10)"></div>
                             <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(12)"></div>
                         </div>
                     </div>
                 </div>
@@ -703,7 +726,7 @@
     <script>
         let currentDifficulty = 'B2';
         let currentSlide = 1;
-        const totalSlides = 11;
+        const totalSlides = 12;
 
         function startGame(level) {
             currentDifficulty = level;
