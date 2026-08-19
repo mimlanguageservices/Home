@@ -139,16 +139,19 @@
         .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
         .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
-        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; overflow-y: auto; max-height: 100%; }
-        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-container { display: flex; gap: 30px; width: 100%; max-width: 1600px; height: 100%; margin: 0 auto; }
+        .writing-prompt-col { flex: 1; max-width: 45%; overflow-y: auto; }
+        .writing-form-col { flex: 1; max-width: 55%; height: 100%; overflow-y: auto; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; border-left: 4px solid #667eea; height: 100%; }
         .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
         .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
-        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; height: 100%; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
         .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
-        .form-group textarea { min-height: 200px; resize: vertical; }
+        .form-group:has(textarea) { flex: 1; }
+        .form-group textarea { flex: 1; min-height: 150px; resize: vertical; }
         .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
         .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
         .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
@@ -186,6 +189,11 @@
             .slide-content-wrapper { height: 100%; overflow: hidden; }
             .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; height: 100%; max-height: 100%; }
             .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .writing-container { flex-direction: column; height: auto; }
+            .writing-prompt-col, .writing-form-col { max-width: 100%; height: auto; overflow-y: visible; }
+            .writing-prompt { height: auto; }
+            .writing-form { height: auto; }
+            .form-group textarea { min-height: 150px; }
             .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
             .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
             .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
@@ -552,16 +560,20 @@
                 <div class="section" id="writing">
                     <h2>Writing Practice</h2>
                     <div class="writing-container">
-                        <div class="writing-prompt">
-                            <h3>Writing Task</h3>
-                            <p>Discuss the concept of enshittification and its impact on digital platforms and society. In your response, explain the three stages of platform decline, give specific examples of platforms that have undergone this process, and analyse why network effects and switching costs make it difficult for users to leave degraded platforms. Consider also what solutions — regulatory, technological, or social — might prevent or reverse enshittification. Use vocabulary from the lesson in your response.</p>
+                        <div class="writing-prompt-col">
+                            <div class="writing-prompt">
+                                <h3>Writing Task</h3>
+                                <p>Discuss the concept of enshittification and its impact on digital platforms and society. In your response, explain the three stages of platform decline, give specific examples of platforms that have undergone this process, and analyse why network effects and switching costs make it difficult for users to leave degraded platforms. Consider also what solutions — regulatory, technological, or social — might prevent or reverse enshittification. Use vocabulary from the lesson in your response.</p>
+                            </div>
                         </div>
-                        <form id="writingForm" class="writing-form">
-                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
-                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
-                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
-                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
-                        </form>
+                        <div class="writing-form-col">
+                            <form id="writingForm" class="writing-form">
+                                <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                                <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                                <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
+                                <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
