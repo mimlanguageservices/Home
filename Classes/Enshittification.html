@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Enshittification - MIM Language Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
         .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
@@ -66,8 +68,8 @@
         .section.active { display: flex; flex-direction: column; }
         .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
         #discussion { padding: 0; background: white; }
-        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
-        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 20px 70px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1600px; height: 100%; }
         .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
         .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
@@ -77,10 +79,10 @@
         .slide-text-section-left::-webkit-scrollbar { width: 8px; }
         .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
         .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
-        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
-        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left h3 { font-size: 2.1rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.3rem; line-height: 1.7; color: #4a5568; margin-bottom: 18px; }
         .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
-        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-text-section-left li { font-size: 1.25rem; line-height: 1.55; color: #4a5568; margin-bottom: 10px; }
         .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
         .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
         .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
@@ -137,10 +139,16 @@
         .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
         .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
-        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; overflow-y: auto; max-height: calc(100vh - 220px); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
         .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
         .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
         .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
         .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
         .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
         .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
@@ -148,13 +156,17 @@
         .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
         .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
         @media (max-width: 768px) {
+            /* Performance test: strip the most expensive GPU effects on mobile */
+            .loading-screen, .header, .navigation, .content, .level-card, .flashcard-front, .flashcard-back, .quiz-question, .popup-overlay, #vocabPopup { backdrop-filter: none !important; }
+            .game-title { animation: none !important; }
+            .level-card { animation: none !important; }
             body { overflow-x: hidden; touch-action: pan-y; }
             .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
             .app-container { padding-top: 60px; }
             .loading-screen { padding: 20px; }
             .game-title { font-size: 2rem; padding: 0 10px; }
             .game-subtitle { font-size: 1rem; display: block; }
-            .level-cards { flex-direction: column; gap: 15px; }
+            .level-cards { flex-direction: column; gap: 15px; margin-bottom: 20px; }
             .level-card { width: 220px; height: 150px; }
             .level-icon { font-size: 2rem; margin-bottom: 8px; }
             .level-name { font-size: 1.8rem; }
@@ -172,7 +184,7 @@
             .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
             .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
             .slide-content-wrapper { height: 100%; overflow: hidden; }
-            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; height: 100%; max-height: 100%; }
             .slide-horizontal { flex-direction: column !important; gap: 10px; }
             .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
             .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
@@ -197,9 +209,9 @@
     </style>
 </head>
 <body>
-    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
-    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
-    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+    <audio id="flipSound" preload="none"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="none"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="none"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
 
     <!-- LOADING SCREEN -->
     <div class="loading-screen" id="loadingScreen">
@@ -283,7 +295,7 @@
                                     <p><strong>4. Regulation and Solutions:</strong> Should governments regulate how digital platforms operate? What role should competition, user education, or alternative platforms play in preventing the enshittification of digital services?</p>
                                 </div>
                                 <div class="slide-image-section-right">
-                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Digital Platform Decline" style="width:100%;height:100%;object-fit:cover;">
+                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Digital Platform Decline" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
                                 </div>
                             </div>
 
@@ -318,7 +330,7 @@
                                     </div>
                                 </div>
                                 <div class="slide-image-section-right">
-                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Platform Decline" style="width:100%;height:100%;object-fit:cover;">
+                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Platform Decline" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
                                 </div>
                             </div>
 
@@ -352,7 +364,7 @@
                                     </div>
                                 </div>
                                 <div class="slide-image-section-right">
-                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Platform Stages" style="width:100%;height:100%;object-fit:cover;">
+                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Platform Stages" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
                                 </div>
                             </div>
 
@@ -380,7 +392,7 @@
                                     </div>
                                 </div>
                                 <div class="slide-image-section-right">
-                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Platform Examples" style="width:100%;height:100%;object-fit:cover;">
+                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Platform Examples" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
                                 </div>
                             </div>
 
@@ -408,7 +420,7 @@
                                     </div>
                                 </div>
                                 <div class="slide-image-section-right">
-                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Society and Technology" style="width:100%;height:100%;object-fit:cover;">
+                                    <img src="https://static.wixstatic.com/media/593d03_c35d12dab93048409a1a141e88b35fa6~mv2.jpg" alt="Society and Technology" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
                                 </div>
                             </div>
 
@@ -544,10 +556,12 @@
                             <h3>Writing Task</h3>
                             <p>Discuss the concept of enshittification and its impact on digital platforms and society. In your response, explain the three stages of platform decline, give specific examples of platforms that have undergone this process, and analyse why network effects and switching costs make it difficult for users to leave degraded platforms. Consider also what solutions — regulatory, technological, or social — might prevent or reverse enshittification. Use vocabulary from the lesson in your response.</p>
                         </div>
-                        <div style="text-align:center;margin-top:30px;">
-                            <p style="color:#4a5568;margin-bottom:20px;font-size:1.1rem;">Click the button below to open the writing submission form.</p>
-                            <button class="check-button" onclick="openWritingForm()">Open Writing Form</button>
-                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
                     </div>
                 </div>
 
@@ -608,8 +622,14 @@
             toggleNav();
         }
 
-        function openWritingForm() {
-            window.open('https://docs.google.com/forms/d/e/1FAIpQLSdeZRNbdsfcdnjVyc9U6GCJTjmiU6aPOwagAqDykKN5b_PA5w/viewform?usp=header', '_blank');
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Enshittification - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
         }
 
         function changeSlide(direction) {
@@ -622,6 +642,22 @@
             if (currentSlide < 1) currentSlide = totalSlides;
             slides[currentSlide - 1].classList.add('active');
             dots[currentSlide - 1].classList.add('active');
+        }
+
+        let touchStartX = 0, touchStartY = 0;
+        const slideshowEl = document.querySelector('.slideshow-container');
+        if (slideshowEl) {
+            slideshowEl.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+            slideshowEl.addEventListener('touchend', function(e) {
+                const deltaX = e.changedTouches[0].screenX - touchStartX;
+                const deltaY = e.changedTouches[0].screenY - touchStartY;
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                    changeSlide(deltaX < 0 ? 1 : -1);
+                }
+            }, { passive: true });
         }
 
         function goToSlide(slideNum) {
