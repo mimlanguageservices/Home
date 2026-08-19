@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Gun Control - MIM Language Services (Performance Test)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://upload.wikimedia.org/wikipedia/commons/a/ac/March_on_Washington_for_Gun_Control_032.JPG'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 20px 70px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1600px; height: 100%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 2.1rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.3rem; line-height: 1.7; color: #4a5568; margin-bottom: 18px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.25rem; line-height: 1.55; color: #4a5568; margin-bottom: 10px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+
+        .hot-topic-slide { padding: 0 !important; }
+        .hot-topic-header { position: absolute; top: 50px; left: 50px; max-width: 45%; z-index: 2; }
+        .hot-topic-question { font-size: 2.4rem; font-weight: 700; color: #2d3748; line-height: 1.35; margin-bottom: 22px; }
+        .hot-topic-bullets { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+        .hot-topic-bullets li { position: relative; padding-left: 26px; font-size: 1.15rem; color: #4a5568; line-height: 1.5; }
+        .hot-topic-bullets li::before { content: ''; position: absolute; left: 0; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .hot-topic-image-wrap { position: absolute; top: 0; right: 0; bottom: 70px; width: 50%; overflow: hidden; border-radius: 16px 0 16px 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .hot-topic-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .hot-topic-disclaimer { position: absolute; bottom: 50px; left: 50px; max-width: 45%; font-size: 1.15rem; color: #718096; font-style: italic; line-height: 1.7; z-index: 2; }
+        .hot-topic-disclaimer strong { display: block; font-style: normal; font-weight: 700; color: #4a5568; margin-bottom: 8px; font-size: 1.3rem; }
+        @media (max-width: 768px) {
+            .hot-topic-header { position: static; max-width: 100%; padding: 20px 15px 0; }
+            .hot-topic-question { font-size: 1.5rem; }
+            .hot-topic-bullets li { font-size: 0.95rem; }
+            .hot-topic-image-wrap { position: static; width: 100%; height: 200px; }
+            .hot-topic-disclaimer { position: static; max-width: 100%; padding: 15px; }
+        }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; height: 100%; max-height: 100%; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="none"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="none"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="none"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">Gun Control</h1>
+        <p class="game-subtitle">Rights, Risks & Regulations</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>Gun Control</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title Image -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://upload.wikimedia.org/wikipedia/commons/a/ac/March_on_Washington_for_Gun_Control_032.JPG'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">Gun Control</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">Rights, Risks & Regulations</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Hot Topic Slide -->
+                            <div class="discussion-slide hot-topic-slide">
+                                <div class="hot-topic-header">
+                                    <div class="hot-topic-question">Have you ever fired a gun before?</div>
+                                    <ul class="hot-topic-bullets">
+                                        <li>If so, what type(s) of gun did you fire?</li>
+                                        <li>What was the occasion and how did it feel?</li>
+                                    </ul>
+                                </div>
+                                <div class="hot-topic-image-wrap">
+                                    <img src="https://media.tenor.com/-5lFpobNaN8AAAAM/recoil-impact.gif" alt="Hot topic placeholder image">
+                                </div>
+                                <div class="hot-topic-disclaimer"><strong>Remember&hellip;</strong>There are no bad opinions,<br>there is only bad English.</div>
+                            </div>
+
+                            <!-- Slide 3 - Hot Topic Slide -->
+                            <div class="discussion-slide hot-topic-slide">
+                                <div class="hot-topic-header">
+                                    <div class="hot-topic-question">Is it easy for civilians to own a gun in your country?</div>
+                                    <ul class="hot-topic-bullets">
+                                        <li>Are there any limits on who can obtain a weapon?</li>
+                                        <li>What are the restrictions on types of weapons for civilian use?</li>
+                                    </ul>
+                                </div>
+                                <div class="hot-topic-image-wrap">
+                                    <img src="https://i.imgur.com/bxTcr8e.gif" alt="Hot topic placeholder image">
+                                </div>
+                                <div class="hot-topic-disclaimer"><strong>Remember&hellip;</strong>There are no bad opinions,<br>there is only bad English.</div>
+                            </div>
+
+                            <!-- Slide 4 - Video -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/0rR9IaXH1M0?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - What is Gun Control? -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>What is Gun Control?</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p><span class="vocab-link" onclick="showPopup('gun control', 'laws and rules that limit who can buy, own, or use firearms')">Gun control</span> refers to laws and rules that decide who can own a <span class="vocab-link" onclick="showPopup('firearm', 'a weapon that uses an explosive charge to shoot bullets, such as a pistol or rifle')">firearm</span> and what kinds of weapons are allowed. It is one of the most argued topics in politics, especially in the United States.</p>
+                                        <p>Some people believe that stricter <span class="vocab-link" onclick="showPopup('restriction', 'a rule that limits or controls what people can do')">restrictions</span> make society safer. Others believe that every citizen has a right to own a gun and that <span class="vocab-link" onclick="showPopup('self-defense', 'the act of protecting yourself from harm or attack')">self-defense</span> is a fundamental right.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p><span class="vocab-link" onclick="showPopup('gun control', 'legal measures intended to restrict the purchase, ownership, or use of firearms by private citizens')">Gun control</span> encompasses a broad range of <span class="vocab-link" onclick="showPopup('legislation', 'laws made by a government')">legislation</span> intended to regulate the ownership, manufacture, and use of firearms. The debate is fundamentally a tension between individual liberty and collective security.</p>
+                                        <p>In the United States, the <span class="vocab-link" onclick="showPopup('Second Amendment', 'the part of the US Constitution that protects the right of citizens to keep and bear arms')">Second Amendment</span> to the Constitution guarantees the right to bear arms, making any attempt at <span class="vocab-link" onclick="showPopup('regulation', 'a rule or law that controls how something is done')">regulation</span> a deeply <span class="vocab-link" onclick="showPopup('contentious', 'causing or likely to cause disagreement or argument')">contentious</span> legal and political issue.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p><span class="vocab-link" onclick="showPopup('gun control', 'a contested domain of public policy addressing the legal frameworks governing civilian access to, and use of, firearms')">Gun control</span> represents one of the most <span class="vocab-link" onclick="showPopup('contentious', 'causing or likely to cause disagreement or argument')">contentious</span> domains of public policy, situated at the intersection of constitutional law, public health, criminology, and political philosophy. The debate resists simple resolution because it involves genuinely competing values.</p>
+                                        <p>The United States stands as a global outlier: with approximately 120 firearms per 100 residents — the highest rate in the world — and a unique constitutional framework, the American debate on <span class="vocab-link" onclick="showPopup('proliferation', 'the rapid spread or increase of something, especially dangerous things like weapons')">proliferation</span> of firearms cannot be straightforwardly mapped onto other nations' policy approaches.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Lady_Justice.JPG" alt="Law and Justice" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Anatomy of a Gun -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Anatomy of a Gun</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Every <span class="vocab-link" onclick="showPopup('firearm', 'a weapon that uses an explosive charge to shoot bullets')">firearm</span> has key parts. Learning these words will help you understand discussions about guns:</p>
+                                        <ul>
+                                            <li><strong>Barrel:</strong> The long metal tube through which the bullet travels when fired</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('trigger', 'the small lever you pull with your finger to fire a gun')">Trigger</span>:</strong> The lever you pull with your finger to fire the gun</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('magazine', 'a container that holds bullets and feeds them into a gun')">Magazine</span>:</strong> The container — sometimes called a "clip" — that holds the bullets</li>
+                                            <li><strong>Stock:</strong> The part you hold against your shoulder when shooting a rifle</li>
+                                            <li><strong>Safety:</strong> A small switch that prevents the gun from firing by accident</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('ammunition', 'the bullets or shells used as projectiles in a firearm')">Ammunition</span>:</strong> The bullets or cartridges loaded into a gun</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Understanding the mechanics of a firearm is essential when discussing <span class="vocab-link" onclick="showPopup('regulation', 'a rule or law that controls how something is done')">regulation</span>. Many laws target specific components:</p>
+                                        <ul>
+                                            <li><strong>Chamber:</strong> The part of the barrel that holds a single cartridge ready to be fired</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('magazine', 'a detachable container that holds cartridges and feeds them into the action of a firearm')">Magazine</span> capacity:</strong> High-capacity magazines (over 10 rounds) are banned in some states — a common point of debate</li>
+                                            <li><strong>Muzzle:</strong> The open front end of the barrel; a muzzle device called a <span class="vocab-link" onclick="showPopup('suppressor', 'a device attached to the barrel of a gun to reduce the sound of firing, also called a silencer')">suppressor</span> can reduce noise</li>
+                                            <li><strong>Action:</strong> The mechanical system that loads, fires, and ejects cartridges; determines whether a gun is <span class="vocab-link" onclick="showPopup('semiautomatic', 'a gun that fires one bullet per trigger pull and automatically reloads the chamber')">semiautomatic</span> or bolt-action</li>
+                                            <li><strong>Calibre:</strong> The diameter of the barrel and bullet — larger calibre generally means more stopping power and lethality</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Technical literacy about firearm components is central to evaluating gun policy, as legislative language is often highly specific — and deliberately exploitable:</p>
+                                        <ul>
+                                            <li><strong>Receiver:</strong> The core component legally defined as the "firearm" itself — serialised and regulated; <span class="vocab-link" onclick="showPopup('proliferation', 'the rapid spread or increase of something')">proliferation</span> of untraceable "ghost gun" receivers (3D-printed or unfinished) represents a growing regulatory challenge</li>
+                                            <li><strong>Bump stock:</strong> A device that harnesses recoil to allow a <span class="vocab-link" onclick="showPopup('semiautomatic', 'a gun that fires one bullet per trigger pull and automatically reloads the chamber')">semiautomatic</span> rifle to fire at near-automatic rates — used in the 2017 Las Vegas massacre, subsequently banned federally</li>
+                                            <li><strong>Suppressor:</strong> Regulated under the National Firearms Act (1934) yet <span class="vocab-link" onclick="showPopup('contentious', 'causing or likely to cause disagreement or argument')">contentious</span> — proponents argue for hearing protection; opponents cite tactical advantages in criminal use</li>
+                                            <li><strong>Short-barrelled rifle (SBR):</strong> A rifle with a barrel under 16 inches, heavily regulated federally; illustrates how minor modifications can change a weapon's legal classification entirely</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/20100106_AR15_Built.JPG" alt="Firearm Parts" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - Types of Firearms -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Types of Firearms</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>There are many different types of guns. Each one is designed for a different purpose. Here are the main categories:</p>
+                                        <ul>
+                                            <li><strong>Pistol / Handgun:</strong> A small gun held in one hand — common for personal <span class="vocab-link" onclick="showPopup('self-defense', 'the act of protecting yourself from harm or attack')">self-defense</span></li>
+                                            <li><strong>Revolver:</strong> A handgun with a rotating cylinder that holds bullets</li>
+                                            <li><strong>Rifle:</strong> A long gun with a grooved barrel, designed for accurate long-range shooting</li>
+                                            <li><strong>Shotgun:</strong> A long gun that fires multiple small pellets at once, typically used for hunting</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('assault rifle', 'a military-style rifle that can fire many rounds quickly; definitions vary in law and everyday speech')">Assault rifle</span>:</strong> A military-style <span class="vocab-link" onclick="showPopup('firearm', 'a weapon that uses an explosive charge to shoot bullets')">firearm</span> capable of rapid fire — one of the most debated weapons in gun control discussions</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The legal definitions of firearm types matter enormously in gun policy debates, as laws often target specific categories. The term "<span class="vocab-link" onclick="showPopup('assault rifle', 'technically, a selective-fire military rifle; in US law and public debate, often applied more broadly to semiautomatic rifles with military-style features')">assault rifle</span>" is particularly contested:</p>
+                                        <ul>
+                                            <li><strong>Semiautomatic:</strong> Fires one bullet per trigger pull and automatically chambers the next round — the most common type in civilian use</li>
+                                            <li><strong>Automatic:</strong> Fires continuously while the trigger is held — heavily regulated under the 1986 Hughes Amendment in the US; essentially banned for new civilian purchases</li>
+                                            <li><strong>Assault weapons:</strong> A legal term — not a technical one — used in bans to describe <span class="vocab-link" onclick="showPopup('semiautomatic', 'a gun that fires one bullet per trigger pull and automatically reloads the chamber')">semiautomatic</span> rifles with military features such as pistol grips, folding stocks, or detachable magazines</li>
+                                            <li><strong>Calibre and lethality:</strong> The AR-15, America's most popular rifle, fires a .223 calibre round at high velocity — its <span class="vocab-link" onclick="showPopup('mortality', 'the rate of deaths caused by a particular cause or in a particular population')">mortality</span> rate in mass shootings far exceeds that of handguns</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The taxonomy of firearms is itself a political battleground. <span class="vocab-link" onclick="showPopup('proliferation', 'the rapid spread or increase of something')">Proliferation</span> of legally ambiguous weapon configurations exploits definitional gaps in <span class="vocab-link" onclick="showPopup('legislation', 'laws made by a government')">legislation</span>:</p>
+                                        <ul>
+                                            <li><strong>The "assault weapons" definitional problem:</strong> Because the 1994 Federal Assault Weapons Ban focused on cosmetic features rather than mechanical function, manufacturers simply redesigned weapons to be functionally identical but legally compliant — illustrating the limits of feature-based <span class="vocab-link" onclick="showPopup('regulation', 'a rule or law that controls how something is done')">regulation</span></li>
+                                            <li><strong>Pistol braces:</strong> Designed for disabled shooters to stabilise handguns, these devices effectively convert pistols into short-barrelled rifles — a regulatory grey area repeatedly contested in federal courts</li>
+                                            <li><strong>The AR-15 as cultural symbol:</strong> Beyond its mechanical specifications, the AR-15 has become a <span class="vocab-link" onclick="showPopup('contentious', 'causing or likely to cause disagreement or argument')">contentious</span> symbol — for gun rights advocates, a representation of freedom; for control advocates, the weapon of choice in the nation's deadliest mass shootings</li>
+                                            <li><strong>Suppressors and the NFA:</strong> Regulated since 1934, suppressors require a $200 tax stamp and FBI background check — evidence that targeted regulation of specific components can be constitutionally sustained</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Handgun_collection.JPG" alt="Types of Firearms" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - The Case for Stricter Gun Control -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Case for Stricter Gun Control</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Many people believe the government should make stronger laws to <span class="vocab-link" onclick="showPopup('regulate', 'to control something using official rules or laws')">regulate</span> guns. Their main arguments are about safety:</p>
+                                        <ul>
+                                            <li><strong>Mass shootings:</strong> Countries with strict gun laws have far fewer mass shootings than the United States</li>
+                                            <li><strong>Suicide:</strong> Research shows that having a gun at home greatly increases the risk of suicide — guns are faster and more lethal than other methods</li>
+                                            <li><strong>Accidents:</strong> Thousands of people die each year from accidental gunshots, many of them children</li>
+                                            <li><strong>Other countries:</strong> Australia introduced strict gun laws after a 1996 mass shooting and has had almost no mass shootings since</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Public health researchers treat gun violence as an epidemic. The data supporting stricter <span class="vocab-link" onclick="showPopup('regulation', 'a rule or law that controls how something is done')">regulation</span> is compelling:</p>
+                                        <ul>
+                                            <li><strong>Mass shooting statistics:</strong> The US accounts for 31% of all mass shootings worldwide despite having only 4% of the global population — <span class="vocab-link" onclick="showPopup('assault rifle', 'a military-style rifle capable of rapid fire, frequently used in mass casualty events')">assault rifles</span> are the weapon of choice in the deadliest incidents</li>
+                                            <li><strong>Suicide and firearms:</strong> Approximately 54% of US gun deaths are suicides — access to firearms increases suicide attempt lethality from 5% to over 80%; <span class="vocab-link" onclick="showPopup('mortality', 'the rate of deaths caused by a particular cause or in a particular population')">mortality</span> rates drop when access is restricted</li>
+                                            <li><strong>The Australian model:</strong> After the 1996 Port Arthur massacre, Australia enacted a <span class="vocab-link" onclick="showPopup('buyback', 'a government programme that purchases guns from the public to reduce the number in circulation')">buyback</span> and strict licensing — mass shootings have effectively ceased</li>
+                                            <li><strong>Police response times:</strong> The average US police response time is 7–10 minutes — far too slow to prevent most shootings once they begin</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The public health case for firearm <span class="vocab-link" onclick="showPopup('regulation', 'a rule or law that controls how something is done')">regulation</span> is grounded in robust epidemiological evidence, yet faces systematic <span class="vocab-link" onclick="showPopup('legislative', 'relating to the process of making laws')">legislative</span> obstruction — partly a legacy of the 1996 Dickey Amendment, which effectively froze CDC gun violence research funding for two decades:</p>
+                                        <ul>
+                                            <li><strong>Suicide as the dominant harm:</strong> The framing of gun violence as primarily a homicide problem obscures the fact that suicides constitute the majority of firearm deaths — and that means restriction primarily prevents self-harm, not crime</li>
+                                            <li><strong>The lethality differential:</strong> Firearms are uniquely lethal in mass casualty events — the Las Vegas shooter fired over 1,000 rounds in 10 minutes using a bump stock, a rate of fire achievable only with near-automatic capability; restricting high-capacity <span class="vocab-link" onclick="showPopup('semiautomatic', 'a gun that fires one bullet per trigger pull and automatically reloads the chamber')">semiautomatic</span> weapons demonstrably reduces casualties</li>
+                                            <li><strong>Police response inadequacy:</strong> Mean response times of 7–10 minutes in urban areas, and 30+ minutes in rural areas, fundamentally undermine the argument that law enforcement can substitute for armed self-defence — yet simultaneously suggest that more guns will not compensate for structural response failures</li>
+                                            <li><strong>International comparisons:</strong> Per capita gun death rates in the US are 25 times higher than other high-income nations; the correlation with gun ownership rates is among the strongest in public health literature</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Second_Amendment_Rally_Against_Gun_Control_%2827273183568%29.jpg" alt="Second Amendment Rally" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - The Case Against Stricter Gun Control -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Case Against Stricter Gun Control</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Many people believe citizens should have the right to own guns and that stricter laws would not make society safer. Their main arguments include:</p>
+                                        <ul>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('self-defense', 'the act of protecting yourself from harm or attack')">Self-defense</span>:</strong> Guns allow ordinary people to protect themselves and their families, especially in rural areas where police may take a long time to arrive</li>
+                                            <li><strong>Police response times:</strong> The average response time for police in the US is 7–10 minutes — a gun can stop an attack in seconds</li>
+                                            <li><strong>Protection from <span class="vocab-link" onclick="showPopup('tyranny', 'cruel and unfair control by a government or ruler who has too much power')">tyranny</span>:</strong> Some people argue that an armed population is the last defence against a government that becomes dangerous or oppressive</li>
+                                            <li><strong>The right to bear arms:</strong> The Second <span class="vocab-link" onclick="showPopup('amendment', 'a change or addition to a law or constitution')">Amendment</span> of the US Constitution protects the right to own a gun</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Gun rights advocates argue that firearm ownership is not only a constitutional right but a practical necessity in a society where the state cannot guarantee safety:</p>
+                                        <ul>
+                                            <li><strong>Defensive gun use (DGU):</strong> Studies estimate Americans use guns defensively between 500,000 and 3 million times per year — often without firing a shot — making the visible crime statistics an incomplete picture</li>
+                                            <li><strong>Rural police response:</strong> In many rural US counties, police response times exceed 30 minutes — for residents in these areas, waiting is simply not an option</li>
+                                            <li><strong>Historical <span class="vocab-link" onclick="showPopup('tyranny', 'cruel and unfair control by a government or ruler who has too much power')">tyranny</span>:</strong> The 20th century saw multiple genocides and mass atrocities committed by governments against disarmed civilian populations — including in Nazi Germany, the Soviet Union, and Cambodia</li>
+                                            <li><strong>Criminals don't obey laws:</strong> Opponents of gun control argue that <span class="vocab-link" onclick="showPopup('restriction', 'a rule that limits what people are allowed to do or have')">restrictions</span> primarily disarm law-abiding citizens while leaving criminals unaffected</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The conservative and libertarian case against firearms <span class="vocab-link" onclick="showPopup('regulation', 'a rule or law that controls how something is done')">regulation</span> draws on constitutional theory, empirical criminology, and political philosophy in ways that deserve serious engagement:</p>
+                                        <ul>
+                                            <li><strong>The <em>Heller</em> doctrine:</strong> The 2008 Supreme Court ruling in <em>DC v. Heller</em> established an individual right to keep arms for <span class="vocab-link" onclick="showPopup('self-defense', 'the act of protecting yourself from harm or attack')">self-defense</span>, independent of militia service — fundamentally reshaping the constitutional landscape and placing the burden on legislators to justify any <span class="vocab-link" onclick="showPopup('infringement', 'a violation of a law or right')">infringement</span></li>
+                                            <li><strong>The state monopoly on violence:</strong> Political philosophers from Locke to Jefferson argued that the right to revolution — and the arms required to exercise it — is foundational to consent-based governance; an armed populace acts as a structural deterrent to <span class="vocab-link" onclick="showPopup('tyranny', 'cruel and unfair control by a government or ruler who has too much power')">tyranny</span></li>
+                                            <li><strong>Policing gaps and inequality:</strong> Response time disparities are starkest in low-income and minority communities — the same communities historically failed by the state; demanding <span class="vocab-link" onclick="showPopup('disarmament', 'the removal or reduction of weapons, especially from a population')">disarmament</span> of these populations without addressing structural policing failures is ethically fraught</li>
+                                            <li><strong>The substitution effect:</strong> Criminological research suggests that determined offenders substitute weapons when firearms are restricted — the UK, with very low gun ownership, has experienced rising knife violence, suggesting that restricting one weapon does not eliminate violent intent</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://lfwaaudio.s3.amazonaws.com/images/dreamstime_m_179621554_2023-07-10-101104.jpg" alt="American Flag" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Restrictions & Laws -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Restrictions & Laws</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Many countries have laws that control who can buy and own a gun. Here are some of the most common types of gun laws:</p>
+                                        <ul>
+                                            <li><strong>Age limits:</strong> In the US, you must be 18 to buy a rifle and 21 to buy a handgun from a licensed dealer</li>
+                                            <li><strong>Background check:</strong> Before buying a gun from a licensed <span class="vocab-link" onclick="showPopup('dealer', 'a person or company that buys and sells goods')">dealer</span>, the buyer's criminal history is checked</li>
+                                            <li><strong>Waiting period:</strong> Some states make buyers wait several days before they can collect their gun — this is designed to prevent impulsive acts of violence</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('ban', 'an official rule that says something is not allowed')">Ban</span>:</strong> Some weapons, like machine guns, are completely banned for ordinary citizens</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Gun laws in the US operate at both federal and state level, creating a patchwork of rules that vary widely depending on where you live. Key federal laws include:</p>
+                                        <ul>
+                                            <li><strong>The National Instant Criminal Background Check System (NICS):</strong> All licensed dealers must run a check before a sale — but this only applies to licensed dealers, not private sellers</li>
+                                            <li><strong>Red flag laws:</strong> Also called Extreme Risk Protection Orders — allow courts to temporarily remove guns from individuals deemed a danger to themselves or others; currently in effect in 21 states</li>
+                                            <li><strong>Concealed carry:</strong> The right to carry a hidden firearm in public — <span class="vocab-link" onclick="showPopup('jurisdiction', 'the area where a particular law or government has legal authority')">jurisdiction</span> varies enormously; some states require a permit, others require nothing</li>
+                                            <li><strong>Assault weapons bans:</strong> Several states ban <span class="vocab-link" onclick="showPopup('assault rifle', 'a military-style rifle capable of firing many rounds quickly')">assault-style</span> rifles; no federal ban currently exists after the 1994 law expired in 2004</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The US regulatory landscape is characterised by a deliberate tension between federal baseline standards and state-level <span class="vocab-link" onclick="showPopup('jurisdiction', 'the territorial range of authority or control of a court or government')">jurisdiction</span> — a tension that creates significant gaps and <span class="vocab-link" onclick="showPopup('proliferation', 'the rapid spread or increase of something')">proliferation</span> opportunities:</p>
+                                        <ul>
+                                            <li><strong>Preemption laws:</strong> Over 40 states have laws preventing cities from enacting gun regulations stricter than state law — meaning progressive urban <span class="vocab-link" onclick="showPopup('jurisdiction', 'the territorial range of authority or control of a court or government')">jurisdictions</span> cannot address local gun violence with local solutions</li>
+                                            <li><strong>Red flag law effectiveness:</strong> Research from California suggests ERPOs are associated with a 21% reduction in firearm suicide rates — yet constitutional challenges under <em>Bruen</em> (2022) may threaten their legal standing by requiring "historical tradition" justification for any firearms regulation</li>
+                                            <li><strong>The <em>Bruen</em> standard (2022):</strong> The Supreme Court's most recent Second Amendment ruling requires that any gun regulation be consistent with "the Nation's historical tradition of firearm regulation" — a test that potentially invalidates numerous modern laws including those targeting domestic abusers and persons with mental illness</li>
+                                            <li><strong>Interstate trafficking:</strong> Over 60% of guns recovered at crime scenes in strict-regulation states were originally purchased in states with weak laws — demonstrating that state-level regulation is fundamentally limited without federal harmonisation</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/United_States_Supreme_Court_Building.JPG" alt="Law and Courts" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Loopholes in Gun Laws -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Loopholes in Gun Laws</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>A <span class="vocab-link" onclick="showPopup('loophole', 'a gap or mistake in a law that allows people to avoid following it')">loophole</span> is a gap in a law that lets people avoid following it without technically breaking it. Gun laws have several well-known loopholes:</p>
+                                        <ul>
+                                            <li><strong>The gun show loophole:</strong> Private sellers at gun shows are not required to do a background check — only licensed dealers are. This means a criminal can buy a gun from a private seller at a gun show without any check</li>
+                                            <li><strong>Private sale loophole:</strong> In many states, any private citizen can sell a gun to another private citizen without a background check or paperwork</li>
+                                            <li><strong>Online sales:</strong> Guns sold online can be shipped to a local dealer, where the buyer may or may not need a check — rules vary by state</li>
+                                            <li><strong>Straw purchase:</strong> When someone buys a gun legally in order to give it to someone else — usually someone who couldn't pass a background check. This is illegal but hard to prove.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The effectiveness of gun <span class="vocab-link" onclick="showPopup('regulation', 'a rule or law that controls how something is done')">regulation</span> is significantly undermined by a series of well-documented <span class="vocab-link" onclick="showPopup('loophole', 'a gap in a law that allows someone to legally avoid its restrictions')">loopholes</span> that opponents argue should be closed and proponents argue cannot constitutionally be closed:</p>
+                                        <ul>
+                                            <li><strong>The "Charleston loophole":</strong> If a federal background check is not completed within three business days, the sale proceeds automatically — the 2015 Charleston church shooter obtained his weapon this way because his background check was delayed</li>
+                                            <li><strong>The boyfriend loophole:</strong> Federal law prohibits people convicted of domestic violence from owning guns — but historically this only applied to spouses, not unmarried partners; partially closed by the 2022 Bipartisan Safer Communities Act</li>
+                                            <li><strong>Ghost guns:</strong> Unregistered, untraceable firearms assembled from commercially available parts or printed with a 3D printer — not classified as <span class="vocab-link" onclick="showPopup('firearm', 'a weapon that uses an explosive charge to shoot bullets')">firearms</span> under federal law until a 2022 ATF rule change, since challenged in court</li>
+                                            <li><strong>Interstate trafficking:</strong> Buying guns legally in a weak-law state and transporting them to a strict-law state — a major source of crime guns in cities like Chicago and New York</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The persistence of gun law <span class="vocab-link" onclick="showPopup('loophole', 'a gap in a law that allows someone to legally circumvent its intent')">loopholes</span> reflects not merely legislative oversight but a structural political reality: any attempt to close them immediately encounters constitutional challenge, lobbying pressure, and ideological opposition. Key regulatory arbitrage vectors include:</p>
+                                        <ul>
+                                            <li><strong>The "dealer" definition problem:</strong> The Gun Control Act requires background checks only for those "engaged in the business" of selling firearms — a deliberately narrow definition that exempts the vast majority of private transactions; the ATF's 2024 rulemaking to broaden this definition was immediately challenged in federal court as executive overreach</li>
+                                            <li><strong>Regulatory preemption and federalism:</strong> The Firearm Owners Protection Act (1986) prevents ATF from creating a national gun registry — meaning even when background checks are required, the records cannot be retained or analysed, fundamentally limiting the utility of the check system</li>
+                                            <li><strong>The suppressor economy:</strong> While NFA suppressors are regulated, "solvent trap" kits — marketed as cleaning tools — are sold openly and converted into suppressors by buyers; the ATF estimates hundreds of thousands have been manufactured illegally this way, illustrating the limits of component-level regulation</li>
+                                            <li><strong>Terrorism watchlist gap:</strong> The US has no law preventing individuals on the FBI terrorist watchlist from purchasing firearms — over 1,000 watchlisted individuals attempted to buy guns in 2021; repeated legislative attempts to close this gap have failed</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Constitution_signatures.jpg" alt="Legal Documents" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 12 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Remember these important points from the lesson:</p>
+                                        <ul>
+                                            <li><strong>Gun control</strong> is about laws that <span class="vocab-link" onclick="showPopup('regulate', 'to control something using official rules or laws')">regulate</span> who can own a gun and what types of guns are allowed</li>
+                                            <li><strong>The Second <span class="vocab-link" onclick="showPopup('amendment', 'a change or addition to a law or constitution')">Amendment</span></strong> in the US gives citizens the right to own guns — this makes gun <span class="vocab-link" onclick="showPopup('restriction', 'a rule that limits what people are allowed to do or have')">restrictions</span> a very difficult political topic</li>
+                                            <li><strong>Arguments for stricter laws</strong> focus on mass shootings, suicide, and accidental deaths</li>
+                                            <li><strong>Arguments against stricter laws</strong> focus on <span class="vocab-link" onclick="showPopup('self-defense', 'the act of protecting yourself from harm or attack')">self-defense</span>, slow police response times, and protection from <span class="vocab-link" onclick="showPopup('tyranny', 'cruel and unfair control by a government or ruler who has too much power')">tyranny</span></li>
+                                            <li><strong>Loopholes</strong> allow people to get guns without background checks — many people on both sides agree these should be closed</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Essential takeaways from this lesson:</p>
+                                        <ul>
+                                            <li><strong>A complex balance:</strong> Gun control requires balancing the constitutional right to bear arms against public safety — there is no simple answer and both sides make important points</li>
+                                            <li><strong>The data problem:</strong> Both <span class="vocab-link" onclick="showPopup('mortality', 'the rate of deaths caused by a particular cause or in a particular population')">mortality</span> statistics and defensive gun use estimates are widely cited but frequently contested — the debate is partly a fight over which data counts</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('loophole', 'a gap in a law that allows someone to legally avoid its restrictions')">Loopholes</span> undermine regulation:</strong> Even well-designed laws can be circumvented — closing the private sale and gun show loopholes has broad public support even among gun owners</li>
+                                            <li><strong><span class="vocab-link" onclick="showPopup('jurisdiction', 'the area where a particular law or government has legal authority')">Jurisdiction</span> matters:</strong> State-level variation in gun laws creates a patchwork system with major gaps — strict state laws are easily undermined by neighbouring weak-law states</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Salient conclusions from the lesson:</p>
+                                        <ul>
+                                            <li><strong>Ideological impasse:</strong> The gun control debate in the US is less about evidence than about foundational values — the weight placed on individual liberty versus collective safety, and on constitutional originalism versus evolving social needs; neither side is simply "ignoring the facts"</li>
+                                            <li><strong>Regulatory fragility:</strong> The post-<em>Bruen</em> (2022) constitutional standard threatens to strike down decades of firearms <span class="vocab-link" onclick="showPopup('legislation', 'laws made by a government')">legislation</span>, fundamentally reshaping what regulation is legally possible in the US regardless of democratic will</li>
+                                            <li><strong>The <span class="vocab-link" onclick="showPopup('proliferation', 'the rapid spread or increase of something')">proliferation</span> challenge:</strong> With an estimated 400 million firearms already in civilian circulation, even comprehensive new laws face an intractable stock problem — unlike Australia, the US cannot realistically conduct a large-scale <span class="vocab-link" onclick="showPopup('buyback', 'a government programme purchasing guns from the public to reduce circulation')">buyback</span></li>
+                                            <li><strong>The violence-governance nexus:</strong> Ultimately, gun violence — whether by mass shooters, domestic abusers, or <span class="vocab-link" onclick="showPopup('tyranny', 'cruel and unfair control by a government or ruler who has too much power')">tyrannical</span> states — is inseparable from broader questions of social trust, institutional legitimacy, and the state's capacity to protect its citizens</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/Lady_Justice.JPG" alt="Justice and Balance" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 13 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(12)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(13)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Firearm</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A weapon that uses an explosive charge to shoot bullets, such as a pistol or rifle</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Trigger</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The small lever you pull with your finger to fire a gun</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Magazine</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A container that holds bullets and feeds them into a gun</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Ammunition</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The bullets or cartridges loaded into and fired from a gun</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Self-defense</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The act of using force to protect yourself from harm or attack</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Amendment</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A change or addition made to a law or constitution</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Restriction</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An official rule that limits what people are allowed to do or have</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Regulate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">To control something using official rules or laws</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Background check</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An investigation into a person's criminal history before allowing them to buy a gun</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Loophole</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A gap in a law that allows people to legally avoid following its restrictions</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Assault rifle</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A military-style rifle capable of firing many rounds rapidly; definitions vary in law</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Jurisdiction</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The area or territory where a particular law or authority has power</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Semiautomatic</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A gun that fires one bullet per trigger pull and automatically reloads the next round</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Tyranny</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Cruel and unjust control exercised by a government or ruler with unlimited power</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Legislation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A set of laws passed or proposed by a government</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Mortality</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The rate of deaths caused by a particular cause or in a particular population</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Proliferation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The rapid spread or increase of something, especially dangerous things like weapons</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Infringement</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">An action that violates a right or law; an encroachment on something protected</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Red flag law</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A law allowing courts to temporarily remove firearms from someone deemed a danger to themselves or others</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Militia</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A group of ordinary citizens trained and armed to defend their community, distinct from a professional army</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Due process</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The legal requirement that the government must respect all legal rights of a person before depriving them of life, liberty, or property</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Deterrence</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The prevention of harmful behaviour by making its consequences seem too costly or risky</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Preemption</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">When a higher level of law (e.g. state law) overrides regulations made at a lower level (e.g. city ordinances)</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Disarmament</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The removal or reduction of weapons, especially from a civilian population or armed force</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>Should governments have the right to restrict gun ownership? Write an essay exploring both sides of the gun control debate. Consider arguments related to public safety, self-defence, the role of government, and the rights of citizens. You may also discuss mass shootings, suicide, police response times, or the risk of tyranny. What policies do you think would be most effective, and why? Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your response here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 13;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - Gun Control - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        let touchStartX = 0, touchStartY = 0;
+        const slideshowEl = document.querySelector('.slideshow-container');
+        if (slideshowEl) {
+            slideshowEl.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+            slideshowEl.addEventListener('touchend', function(e) {
+                const deltaX = e.changedTouches[0].screenX - touchStartX;
+                const deltaY = e.changedTouches[0].screenY - touchStartY;
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                    changeSlide(deltaX < 0 ? 1 : -1);
+                }
+            }, { passive: true });
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Firearm", definition: "A weapon that shoots bullets, like a gun or rifle", sentences: ["He kept a ___ in his home for protection.", "A ___ must be stored safely to prevent accidents.", "The police confiscated the illegal ___."] },
+                { term: "Trigger", definition: "The lever you pull to fire a gun", sentences: ["He pulled the ___ and fired the shot.", "The safety prevents the ___ from being pulled accidentally.", "A light ___ pull can make a gun more dangerous."] },
+                { term: "Magazine", definition: "The container that holds bullets inside a gun", sentences: ["He loaded the ___ before going to the shooting range.", "The new law limits ___ capacity to ten rounds.", "She removed the ___ and checked it was empty."] },
+                { term: "Ammunition", definition: "The bullets loaded into and fired from a gun", sentences: ["He bought a box of ___ at the gun store.", "The police found hundreds of rounds of ___ in the car.", "Some states restrict the purchase of certain types of ___."] },
+                { term: "Self-defense", definition: "Using force to protect yourself from attack", sentences: ["She bought a gun for ___ after the break-in.", "The man claimed he shot the intruder in ___.", "Many gun owners say ___ is their main reason for owning a firearm."] },
+                { term: "Amendment", definition: "A change or addition to a law or constitution", sentences: ["The Second ___ gives Americans the right to bear arms.", "Congress passed an ___ to strengthen the background check system.", "The First ___ protects freedom of speech."] },
+                { term: "Restriction", definition: "An official rule that limits what you can do or have", sentences: ["There are strict ___ on who can own a gun.", "Some states have tighter ___ on assault-style weapons.", "The new law introduced age ___ on firearm purchases."] },
+                { term: "Regulate", definition: "To control something using official rules or laws", sentences: ["The government wants to ___ the sale of assault rifles.", "It is difficult to ___ private sales between individuals.", "Most people agree the government should ___ dangerous weapons."] }
+            ],
+            B2: [
+                { term: "Background check", definition: "An investigation into someone's criminal history before selling them a gun", sentences: ["All licensed dealers must run a ___ before a sale.", "His criminal record meant he failed the ___.", "Many experts want to extend ___ requirements to private sales."] },
+                { term: "Loophole", definition: "A gap in a law that allows people to legally avoid its restrictions", sentences: ["The gun show ___ allows sales without a background check.", "Critics argue the private sale ___ must be closed.", "Lawmakers are trying to eliminate the ___ that lets criminals buy guns."] },
+                { term: "Assault rifle", definition: "A military-style rifle capable of firing many rounds rapidly", sentences: ["The shooter used an ___ in the attack.", "Several states have banned civilian ownership of ___.", "Defining the term '___ ' is one of the most contested issues in gun law."] },
+                { term: "Jurisdiction", definition: "The area where a particular law or authority has legal power", sentences: ["Gun laws vary greatly depending on the ___.", "In some ___, you need a permit to carry a concealed weapon.", "Strict gun laws in one ___ are undermined when guns cross state lines."] },
+                { term: "Semiautomatic", definition: "A gun that fires one bullet per trigger pull and auto-reloads", sentences: ["Most handguns sold in the US are ___.", "A ___ rifle can fire dozens of rounds per minute.", "The bill proposed banning ___ weapons with high-capacity magazines."] },
+                { term: "Tyranny", definition: "Cruel and unjust control by a government with too much power", sentences: ["Some people argue guns protect citizens against ___.", "History shows that ___ is more common when citizens are disarmed.", "The founders feared ___ and wrote the Second Amendment partly in response."] },
+                { term: "Legislation", definition: "A set of laws passed or proposed by a government", sentences: ["New ___ was introduced after the latest mass shooting.", "The ___ failed to pass the Senate by two votes.", "Opponents of gun control blocked the ___ in committee."] },
+                { term: "Mortality", definition: "The rate of deaths from a particular cause", sentences: ["Firearm ___ in the US is far higher than in other wealthy nations.", "Suicide accounts for more than half of gun ___.", "Researchers study ___ rates to understand the impact of gun laws."] }
+            ],
+            C1: [
+                { term: "Proliferation", definition: "The rapid spread or increase of something, especially weapons", sentences: ["The ___ of untraceable ghost guns has alarmed law enforcement.", "Arms ___ makes it harder to reduce gun violence.", "Any policy must address the ___ of firearms already in circulation."] },
+                { term: "Infringement", definition: "A violation of a law or a constitutionally protected right", sentences: ["Critics argue the new law is an ___ of the Second Amendment.", "The Supreme Court ruled the ban was an unconstitutional ___.", "Any firearm regulation must be justified without constituting an ___."] },
+                { term: "Red flag law", definition: "A law allowing courts to remove guns from someone deemed dangerous", sentences: ["The judge issued an order under the state's ___ after threats were made.", "Research suggests ___ reduce firearm suicide rates significantly.", "___ are being challenged in court under the Bruen standard."] },
+                { term: "Militia", definition: "A group of armed civilians organised to defend their community", sentences: ["The Second Amendment refers to a 'well-regulated ___'.", "Some argue the right to bear arms is only for organised ___ members.", "Armed ___ groups have become more visible in recent years."] },
+                { term: "Due process", definition: "The legal requirement to respect a person's rights before restricting them", sentences: ["Critics argue red flag laws violate ___ by removing guns before a hearing.", "The court found the seizure of firearms lacked ___.", "___ protections apply even when someone is considered a public danger."] },
+                { term: "Deterrence", definition: "Preventing harmful behaviour by making the consequences seem too costly", sentences: ["Some argue that armed citizens provide ___ against both crime and tyranny.", "Research on the ___ effect of gun ownership is deeply contested.", "Nuclear ___ theory has been applied, controversially, to civilian gun ownership."] },
+                { term: "Preemption", definition: "When higher-level law overrides lower-level regulations", sentences: ["State ___ laws prevent cities from passing stricter gun ordinances.", "___ has been used to block Chicago's attempts to regulate firearms locally.", "Opponents of gun control have championed ___ as a legislative strategy."] },
+                { term: "Disarmament", definition: "The removal of weapons from a population or armed force", sentences: ["Full civilian ___ is considered politically impossible in the United States.", "Critics warn that incremental restrictions could lead to eventual ___.", "Australia's partial ___ following Port Arthur reduced mass shootings dramatically."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
