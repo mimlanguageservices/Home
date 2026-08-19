@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>How Japan was Caffeinated - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1920'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; }
+        .level-card { width: 200px; height: 280px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.5s; } .level-card:nth-child(3) { animation-delay: 1s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); border-color: rgba(102, 126, 234, 0.8); box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4), 0 0 40px rgba(102, 126, 234, 0.2); }
+        .level-card.b1-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.b2-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .level-card.c1-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .b1-card .level-icon { color: #4ade80; } .b2-card .level-icon { color: #60a5fa; } .c1-card .level-icon { color: #f472b6; }
+        .level-name { font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.b1 { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.b2 { background: rgba(96, 165, 250, 0.2); color: #1e40af; }
+        .current-level-badge.c1 { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow: hidden; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        #discussion { padding: 0; background: white; }
+        .slideshow-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; padding: 40px 100px; }
+        .slide-content-wrapper { position: relative; width: 100%; max-width: 1200px; height: 95%; }
+        .discussion-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; opacity: 0; visibility: hidden; }
+        .discussion-slide.active { opacity: 1; visibility: visible; display: flex; flex-direction: column; animation: slideIn 0.5s ease-in-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .difficulty-content { display: none; }
+        .slide-horizontal { flex-direction: row !important; gap: 30px; }
+        .slide-text-section-left { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-right: 20px; max-width: 50%; max-height: 100%; overflow-y: auto; padding-top: 10px; padding-bottom: 10px; }
+        .slide-text-section-left::-webkit-scrollbar { width: 8px; }
+        .slide-text-section-left::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .slide-text-section-left::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+        .slide-text-section-left h3 { font-size: 1.8rem; color: #2d3748; margin-bottom: 20px; font-weight: 600; }
+        .slide-text-section-left p { font-size: 1.15rem; line-height: 1.8; color: #4a5568; margin-bottom: 20px; }
+        .slide-text-section-left ul { margin-top: 15px; padding-left: 25px; }
+        .slide-text-section-left li { font-size: 1.1rem; line-height: 1.7; color: #4a5568; margin-bottom: 12px; }
+        .slide-image-section-right { flex: 1; max-width: 45%; height: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); }
+        .slide-image-section-right img { width: 100%; height: 100%; object-fit: cover; }
+        .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: rgba(45, 55, 72, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .slide-arrow:hover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: translateY(-50%) scale(1.1); }
+        .slide-arrow.prev { left: -70px; } .slide-arrow.next { right: -70px; }
+        .slide-indicators { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; }
+        .indicator-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(45, 55, 72, 0.3); cursor: pointer; transition: all 0.3s ease; }
+        .indicator-dot.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transform: scale(1.2); }
+        .indicator-dot:hover { background: rgba(102, 126, 234, 0.6); }
+        .vocab-link { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 3px 8px; border-radius: 6px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.3s ease; }
+        .vocab-link:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .reading-container { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .vocab-page { display: none; flex: 1; overflow-y: auto; }
+        .vocab-page.active { display: block; }
+        .vocab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 20px 0; }
+        .flashcard { background: transparent; width: 100%; height: 220px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); padding: 25px; backdrop-filter: blur(10px); }
+        .flashcard-front { background: rgba(255, 255, 255, 0.9); color: #2d3748; }
+        .flashcard-back { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; transform: rotateY(180deg); }
+        .flashcard-term { font-weight: 700; font-size: 2rem; text-align: center; }
+        .flashcard-definition { font-weight: 500; line-height: 1.5; text-align: center; font-size: 1.5rem; }
+        .flashcard-hint { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; color: #a0aec0; opacity: 0.8; }
+        .quiz-container { display: flex; flex-direction: column; height: calc(100% - 120px); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .quiz-nav { display: flex; gap: 12px; }
+        .progress-container { flex: 1; margin: 0 30px; }
+        .progress-bar { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease; width: 0%; border-radius: 20px; }
+        .quiz-page { display: none; flex: 1; }
+        .quiz-page.active { display: flex; flex-direction: column; justify-content: center; }
+        .quiz-question { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 50px; text-align: center; max-width: 900px; margin: 0 auto; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .quiz-question h3 { color: #2d3748; margin-bottom: 35px; font-size: 2rem; font-weight: 600; }
+        .quiz-input { width: 100%; max-width: 450px; padding: 18px 25px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 25px; font-size: 1.6rem; text-align: center; margin: 25px auto; display: block; font-weight: 500; background: rgba(255, 255, 255, 0.8); transition: all 0.3s ease; }
+        .quiz-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.2); }
+        .quiz-input.correct { border-color: #48bb78; background: rgba(72, 187, 120, 0.1); }
+        .quiz-input.incorrect { border-color: #f56565; background: rgba(245, 101, 101, 0.1); }
+        #quiz-counter { text-align: center; margin-bottom: 10px; font-weight: 500; color: #4a5568; }
+        .check-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border: none; padding: 18px 35px; border-radius: 25px; cursor: pointer; font-size: 1.5rem; font-weight: 600; margin: 25px auto; display: block; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .check-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .nav-btn { padding: 12px 25px; background: rgba(45, 55, 72, 0.9); color: #ffffff; border: none; border-radius: 25px; cursor: pointer; font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease; }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.9); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .feedback { padding: 15px 25px; border-radius: 12px; margin-top: 20px; font-weight: 500; font-size: 1.2rem; }
+        .feedback.correct { background: rgba(72, 187, 120, 0.2); color: #276749; }
+        .feedback.incorrect { background: rgba(245, 101, 101, 0.2); color: #c53030; }
+        .results-summary { text-align: center; padding: 50px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); }
+        .results-summary h3 { font-size: 2.5rem; color: #2d3748; margin-bottom: 20px; }
+        .score { font-size: 5rem; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .popup-overlay, #vocabPopup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .popup-content { background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .popup-word { font-size: 2.5rem; font-weight: 700; color: #2d3748; margin-bottom: 15px; }
+        .popup-definition { font-size: 1.3rem; color: #4a5568; line-height: 1.6; margin-bottom: 25px; }
+        .popup-close { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .popup-close:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .writing-container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .writing-prompt { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 30px; border-radius: 16px; margin-bottom: 30px; border-left: 4px solid #667eea; }
+        .writing-prompt h3 { color: #2d3748; margin-bottom: 15px; font-size: 1.4rem; }
+        .writing-prompt p { color: #4a5568; line-height: 1.7; font-size: 1.1rem; }
+        .writing-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-group label { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .form-group input, .form-group textarea { padding: 15px 20px; border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; font-size: 1.1rem; transition: all 0.3s ease; font-family: inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 20px rgba(102, 126, 234, 0.15); }
+        .form-group textarea { min-height: 200px; resize: vertical; }
+        .image-card:hover { transform: translateY(-10px) scale(1.05); border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .image-card:hover .image-card-bg { filter: grayscale(0%) !important; }
+        .image-card:hover .image-card-overlay { background: rgba(0,0,0,0.1) !important; }
+        .vocab-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .quiz-card:hover { border-color: #60a5fa; box-shadow: 0 20px 60px rgba(96, 165, 250, 0.4); }
+        .writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.8rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; overflow-y: auto; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+            .slideshow-container { padding: 10px 8px; touch-action: pan-y pinch-zoom; height: calc(100vh - 130px); overflow: hidden; }
+            .slide-content-wrapper { height: 100%; overflow: hidden; }
+            .discussion-slide { padding: 15px 12px; border-radius: 12px; overflow: hidden; height: auto; max-height: none; }
+            .slide-horizontal { flex-direction: column !important; gap: 10px; }
+            .slide-text-section-left { max-width: 100%; padding-right: 0; max-height: none; overflow-y: visible; }
+            .slide-text-section-left h3 { font-size: 1.1rem; margin-bottom: 8px; }
+            .slide-text-section-left p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px; }
+            .slide-text-section-left li { font-size: 0.8rem; margin-bottom: 6px; }
+            .slide-image-section-right { max-width: 100%; height: 120px; flex-shrink: 0; }
+            .slide-arrow { display: none; }
+            .slide-indicators { bottom: 10px; gap: 6px; }
+            .indicator-dot { width: 8px; height: 8px; }
+            .vocab-grid { grid-template-columns: 1fr; gap: 15px; }
+            .flashcard { height: 160px; }
+            .flashcard-term { font-size: 1.5rem; }
+            .flashcard-definition { font-size: 1.1rem; }
+            .quiz-question { padding: 15px 12px; border-radius: 12px; }
+            .quiz-question h3 { font-size: 1rem; margin-bottom: 12px; }
+            .quiz-input { font-size: 1rem; padding: 10px 14px; max-width: 100%; margin: 12px auto; }
+            .check-button { font-size: 1rem; padding: 10px 20px; margin: 12px auto; }
+            .nav-btn { padding: 8px 14px; font-size: 0.85rem; }
+            .menu-card.image-card { width: 150px !important; height: 170px !important; }
+            .menu-card.image-card span { font-size: 1.4rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="flipSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_f6267363dcfb42e49efc4d6a65189d09.mp3" type="audio/mpeg"></audio>
+    <audio id="correctSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_4391e836785b44ddba85840f97312533.mp3" type="audio/mpeg"></audio>
+    <audio id="incorrectSound" preload="auto"><source src="https://static.wixstatic.com/mp3/593d03_c6e79e59849d42888e3648e90d034582.mp3" type="audio/mpeg"></audio>
+
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">How Japan was Caffeinated</h1>
+        <p class="game-subtitle">A Nestlé Case Study in Market Cultivation</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Select Your Level</p>
+            <div class="level-cards">
+                <div class="level-card b1-card" onclick="startGame('B1')">
+                    <div class="level-icon">&#9733;</div>
+                    <div class="level-name">B1</div>
+                    <div class="level-desc">Intermediate</div>
+                </div>
+                <div class="level-card b2-card" onclick="startGame('B2')">
+                    <div class="level-icon">&#9733;&#9733;</div>
+                    <div class="level-name">B2</div>
+                    <div class="level-desc">Upper-Intermediate</div>
+                </div>
+                <div class="level-card c1-card" onclick="startGame('C1')">
+                    <div class="level-icon">&#9733;&#9733;&#9733;</div>
+                    <div class="level-name">C1</div>
+                    <div class="level-desc">Advanced</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>How Japan was Caffeinated</h1>
+                    <div class="current-level-badge b2" id="levelBadge" onclick="showLoadingScreen()">
+                        <span>Level: </span><span id="currentLevelText">B2</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('discussion', this)">Lesson</div>
+                <div class="nav-item" onclick="showSection('vocabulary', this)">Vocabulary</div>
+                <div class="nav-item" onclick="showSection('quiz', this)">Interactive Quiz</div>
+                <div class="nav-item" onclick="showSection('writing', this)">Writing</div>
+            </div>
+
+            <div class="content">
+                <!-- Discussion Section -->
+                <div class="section active" id="discussion">
+                    <div class="slideshow-container">
+                        <div class="slide-content-wrapper">
+                            <button class="slide-arrow prev" onclick="changeSlide(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            <button class="slide-arrow next" onclick="changeSlide(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+
+                            <!-- Slide 1 - Title -->
+                            <div class="discussion-slide active" style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%), url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1920'); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center;">
+                                <div style="text-align: center; color: white;">
+                                    <h1 style="font-size: 4rem; margin-bottom: 20px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);">How Japan was Caffeinated</h1>
+                                    <p style="font-size: 1.5rem; opacity: 0.8;">A Nestlé Case Study in Market Cultivation</p>
+                                    <p style="font-size: 1.1rem; opacity: 0.6; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase;">Used to · Would · Past Habits · Business Vocabulary</p>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 - Video -->
+                            <!-- Replace the YouTube video ID below with your preferred documentary about Nestlé's entry into the Japanese coffee market -->
+                            <div class="discussion-slide" style="padding: 20px;">
+                                <div style="position: relative; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+                                    <iframe src="https://www.youtube.com/embed/VIDEO_ID_HERE?enablejsapi=1" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 - A Nation of Tea Drinkers -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>A Nation of Tea Drinkers</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>For hundreds of years, Japan was a country of tea. Green tea was part of daily life, business meetings, and even religious ceremonies. Coffee was almost unknown outside of a few big cities.</p>
+                                        <p>In the 1960s, the Swiss company Nestlé wanted to sell its instant coffee, Nescafé, in Japan. Nestlé already sold instant coffee successfully all over the world. The company believed Japan would be an easy new <span class="vocab-link" onclick="showPopup('market', 'a country or group of customers that a company wants to sell to')">market</span>.</p>
+                                        <p>But Nestlé was wrong. Japanese adults tried the coffee and did not like it. Most people did not buy it again. Nestlé had a serious problem: how do you sell a drink that people don't want?</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Prior to the mid-twentieth century, Japan's beverage culture was built almost entirely around green tea — deeply embedded in daily rituals, business etiquette, and formal ceremony. Coffee was a marginal, largely foreign curiosity confined to a handful of Western-style cafés in major cities.</p>
+                                        <p>When Nestlé entered the Japanese market in the 1960s with Nescafé, its flagship instant coffee brand, it expected the same success it had achieved in dozens of other countries. Nestlé's global strategy had long relied on introducing instant coffee to markets with an existing coffee-drinking culture and simply making it more <span class="vocab-link" onclick="showPopup('gateway product', 'a simple, appealing product used to introduce customers to something new')">convenient</span>.</p>
+                                        <p>Japan, however, had no such existing culture to build on. Adult consumers who sampled the product largely rejected it, and Nestlé's initial <span class="vocab-link" onclick="showPopup('taste preference', 'the flavors and tastes that a person likes or dislikes')">taste preference</span> research made clear that conventional advertising alone would not be enough to change a national habit.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Prior to Nestlé's entry, Japan's beverage economy was structured almost entirely around green tea, a product embedded not merely in individual taste but in ceremony, hospitality norms, and business protocol. Coffee existed at the margins — a novelty associated with a small, urban, Westernised elite.</p>
+                                        <p>Nestlé's 1960s expansion into Japan followed the same playbook that had proven successful across Europe and the Americas: introduce instant coffee into markets where brewed coffee already had cultural purchase, and compete primarily on convenience and price. This approach assumed a pre-existing demand curve that Nestlé's product merely needed to capture.</p>
+                                        <p>Japan represented a fundamentally different problem: a market with no latent demand to capture at all. Adult consumers, whose <span class="vocab-link" onclick="showPopup('taste acquisition', 'the gradual process by which a person learns to enjoy a flavor initially perceived as unpleasant')">taste acquisition</span> patterns had been set over a lifetime of green tea consumption, overwhelmingly rejected the bitterness of instant coffee on first exposure — a signal that Nestlé's standard market-entry model was structurally unsuited to this environment.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1545048702-79362596cdc9?w=800" alt="Japanese tea ceremony" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 4 - The Bitter Truth -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Bitter Truth: Why Adults Said No</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Why didn't Japanese adults like coffee? The answer is simple: it tasted too <span class="vocab-link" onclick="showPopup('bitter', 'having a sharp, unpleasant taste, like strong coffee without sugar')">bitter</span> to them. People who grow up drinking green tea are not used to strong, bitter flavors like coffee.</p>
+                                        <p>Adults also already had strong daily <span class="vocab-link" onclick="showPopup('habit', 'something you do often and automatically, without thinking')">habits</span>. They drank tea every day, at every meal and meeting. It is very difficult to change a habit that people have had for their whole lives.</p>
+                                        <p>Nestlé's managers realized something important: advertising alone could not fix this problem. You cannot simply tell adults to enjoy a taste they find unpleasant. The company needed a completely different plan.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Consumer research revealed that the core barrier was not price, availability, or awareness — it was pure sensory rejection. Japanese adults, whose <span class="vocab-link" onclick="showPopup('palate', 'a person\'s ability to taste and enjoy different flavors')">palates</span> had developed around the subtle, mild flavor of green tea, experienced coffee's bitterness as genuinely unpleasant rather than merely unfamiliar.</p>
+                                        <p>This was compounded by deep <span class="vocab-link" onclick="showPopup('cultural resistance', 'the reluctance of people to accept new products or ideas that conflict with existing customs')">cultural resistance</span>: tea was not simply a beverage choice but an ingrained daily ritual, tied to hospitality, business meetings, and family life. Asking adults to replace it required overcoming decades of established behavior.</p>
+                                        <p>Nestlé's marketing team concluded that no advertising campaign, however clever, could override an adult palate that had already been formed. If coffee was going to succeed in Japan, the company would need to change its approach entirely — and change who, exactly, it was trying to persuade.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Nestlé's post-mortem on its early Japanese sales data identified a barrier more fundamental than marketing reach or distribution: an essentially fixed adult palate. Sensory rejection of bitterness is not simply a matter of unfamiliarity — flavor preference, particularly for bitter compounds, is substantially shaped during childhood and becomes markedly resistant to change in adulthood.</p>
+                                        <p>This finding reframed the problem from a communications challenge into a <span class="vocab-link" onclick="showPopup('path dependency', 'the way in which past decisions and habits constrain and shape future choices and outcomes')">path dependency</span> problem: an entire population's beverage preferences had already been locked in by a lifetime of tea consumption, and no volume of advertising expenditure could plausibly reverse that trajectory among existing adults.</p>
+                                        <p>The strategic implication was significant. Rather than attempting to persuade a demographic whose preferences were essentially fixed, Nestlé would need to identify a demographic whose preferences were still forming — reframing the challenge from persuasion to <span class="vocab-link" onclick="showPopup('consumer socialization', 'the process by which individuals acquire the knowledge, skills, and attitudes relevant to their function as consumers')">consumer socialization</span>, a process that unfolds over years rather than an advertising cycle.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800" alt="Coffee cup close up" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 5 - The Insight -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Insight: Start with Children</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Nestlé's team had an important idea: adults don't easily change their taste, but children do. A child's taste is still growing and changing. If children could learn to enjoy the taste of coffee while they were young, they might keep drinking it for their whole lives.</p>
+                                        <p>This was a completely new <span class="vocab-link" onclick="showPopup('strategy', 'a plan for achieving a long-term goal')">strategy</span>. Instead of trying to sell coffee to adults right now, Nestlé decided to think about the future. The company wanted to create coffee drinkers for the next <span class="vocab-link" onclick="showPopup('generation', 'people born and living during the same time period')">generation</span>.</p>
+                                        <p>This meant Nestlé needed patience. The plan would not show fast results. It could take ten or twenty years to succeed. But if it worked, Nestlé would create millions of loyal customers.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Nestlé's breakthrough insight was behavioral rather than technical: while adult taste preferences are largely fixed, children's palates remain highly adaptable. If children could be introduced to coffee flavor early — and in a form they genuinely enjoyed — their adult taste preferences could be shaped well before green tea's cultural dominance became irreversible.</p>
+                                        <p>This reframed Nestlé's challenge entirely. Rather than pursuing immediate sales among a resistant adult population, the company committed to a <span class="vocab-link" onclick="showPopup('long-term strategy', 'a plan designed to succeed over years or decades rather than produce immediate results')">long-term strategy</span> targeting children as the foundation of a future market — accepting that meaningful commercial results might not materialize for a decade or more.</p>
+                                        <p>The approach required Nestlé to develop an entirely new category of product: something that introduced coffee's flavor to children gently, using sweetness and familiar formats to build positive associations rather than provoking the same rejection adults had shown.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>Nestlé's strategic pivot rested on a well-documented developmental principle: flavor preferences, particularly tolerance for bitterness, are substantially more plastic in childhood than in adulthood. This insight redirected the company's entire market-entry model away from persuasion economics and toward what might be termed <span class="vocab-link" onclick="showPopup('generational marketing', 'a strategy that targets a specific age cohort with the intention of shaping consumer behavior as that cohort matures')">generational marketing</span>: shaping the preferences of a cohort years before that cohort possesses independent purchasing power.</p>
+                                        <p>This represented a deliberate acceptance of what economists sometimes describe as <span class="vocab-link" onclick="showPopup('first-mover disadvantage', 'the risk faced by a company entering a market before consumer demand or infrastructure exists to support it')">first-mover disadvantage</span> — the near-total absence of near-term revenue — in exchange for the possibility of a self-sustaining, multi-decade demand base.</p>
+                                        <p>Nestlé's task was therefore no longer to sell an existing product to a resistant population, but to engineer, from the ground up, an entirely new product category and an entirely new generation of consumers prepared to sustain it — a strategy of <span class="vocab-link" onclick="showPopup('market cultivation', 'the deliberate, long-term process of building demand for a product in a market where it does not yet exist')">market cultivation</span> rather than conventional market entry.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800" alt="Children in Japan" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 6 - Grammar: Used to / Would -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Grammar Focus: "Used to" &amp; "Would" for Past Habits</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>We use <strong>"used to"</strong> and <strong>"would"</strong> to talk about repeated actions or habits in the past that are now different or finished.</p>
+                                        <ul>
+                                            <li><strong>"used to + verb"</strong> → a repeated past action or a past state, now changed<br><em>"Japanese consumers used to drink almost only green tea."</em></li>
+                                            <li><strong>"would + verb"</strong> → a repeated past action (not used for states like "have" or "be")<br><em>"Nestlé would give free chocolate-coffee candy to children in schools."</em></li>
+                                            <li>We do <strong>not</strong> use "would" for states: say <em>"Coffee used to be rare in Japan"</em> — not "would be rare."</li>
+                                        </ul>
+                                        <p>Practice: "Before the 1970s, most Japanese children _____ never tasted coffee."</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Both <strong>"used to"</strong> and <strong>"would"</strong> describe repeated past actions or habits that no longer happen, but they are not fully interchangeable:</p>
+                                        <ul>
+                                            <li><strong>"used to"</strong> can describe both repeated actions and past states.<br><em>"Japan used to have almost no coffee-drinking culture at all."</em></li>
+                                            <li><strong>"would"</strong> can only describe repeated actions, not states — it needs a clear past time context.<br><em>"Throughout the 1970s, Nestlé would distribute chocolate-flavored coffee candy to schoolchildren."</em></li>
+                                            <li>Combining both in a narrative creates a natural contrast between background state and repeated action: <em>"Children used to associate coffee only with adults; each week, they would receive a small sample designed to taste sweet rather than bitter."</em></li>
+                                        </ul>
+                                        <p>This structure is common in business case studies describing how a market or habit gradually changed over time.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The distinction between <strong>"used to"</strong> and <strong>"would"</strong> in narrating habitual past behaviour is a frequent feature of case-study and retrospective business writing, where authors often contrast a static prior condition with the iterative actions that changed it.</p>
+                                        <ul>
+                                            <li><strong>"used to"</strong> establishes a stative or habitual baseline, often the departure point of a change narrative.<br><em>"Japanese consumers used to regard coffee as a foreign curiosity rather than a daily beverage."</em></li>
+                                            <li><strong>"would"</strong> is reserved for dynamic, repeated actions once that baseline has been established, and is stylistically preferred in extended narrative sequences.<br><em>"Field representatives would visit primary schools, and children would receive a chocolate-flavored coffee treat as part of a broader familiarization campaign."</em></li>
+                                            <li>Using "would" without prior temporal or contextual anchoring is ambiguous with the conditional mood; competent writers therefore establish the past time frame with "used to," a simple past tense, or an explicit time marker before shifting into repeated "would" actions.</li>
+                                        </ul>
+                                        <p>This grammatical pairing allows analysts to narrate gradual cultural or behavioural change with precision — separating what was once generally true from the specific, repeated interventions that altered it.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800" alt="Notebook and writing" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 7 - The Strategy in Action -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Strategy in Action</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Nestlé created a clever <span class="vocab-link" onclick="showPopup('gateway product', 'a simple, appealing product used to introduce customers to something new')">gateway product</span>: chocolate-flavored coffee candy. The candy tasted sweet, like chocolate, but it had a small coffee flavor inside it. Children loved the sweet taste and didn't notice the bitterness.</p>
+                                        <p>Nestlé would give this candy to children in schools and at events all across Japan. Over time, children became used to the taste of coffee — without even trying real coffee yet.</p>
+                                        <p>As these children grew older, Nestlé also built coffee vending machines on streets and in train stations, selling sweet canned coffee drinks. By the time these children became adults, coffee no longer tasted strange to them — it tasted familiar.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Nestlé's core innovation was a <span class="vocab-link" onclick="showPopup('gateway product', 'a simple, appealing product used to introduce customers to something new')">gateway product</span>: chocolate-flavored candy containing a mild coffee taste, distributed widely to schoolchildren throughout the 1970s. The sweetness masked the bitterness that had caused adult rejection, allowing children to build a positive association with coffee flavor from an early age.</p>
+                                        <p>This was reinforced through <span class="vocab-link" onclick="showPopup('habit formation', 'the process by which a behavior becomes automatic through repetition')">habit formation</span> at scale: repeated, low-cost exposure across schools and public events normalized the flavor for an entire cohort of children, rather than relying on a single advertising push.</p>
+                                        <p>As this generation aged, Nestlé complemented the strategy with sweetened canned coffee sold through vending machines — by then a familiar fixture of Japanese urban life — creating a product pathway from childhood candy to adult beverage that carried consumers seamlessly from one life stage into the next.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The operational core of Nestlé's strategy was a purpose-built <span class="vocab-link" onclick="showPopup('gateway product', 'a simple, appealing product used to introduce customers to something new')">gateway product</span> — chocolate-flavored coffee candy — engineered to deliver a subtle, positively-framed exposure to coffee's flavor profile while circumventing the bitterness rejection observed in adults. Distribution was deliberately structured through schools and youth-oriented events, maximizing repeated exposure among a cohort still forming its taste preferences.</p>
+                                        <p>This constitutes a textbook instance of <span class="vocab-link" onclick="showPopup('behavioral conditioning', 'the process of shaping habits or preferences through repeated exposure and positive association')">behavioral conditioning</span> deployed at a societal scale: rather than a single campaign, Nestlé engineered years of low-stakes, positively-associated exposure designed to alter an entire generation's baseline flavor tolerance before adulthood fixed it.</p>
+                                        <p>The subsequent introduction of sweetened canned coffee through an expanding vending-machine infrastructure functioned as a bridging mechanism, converting the childhood association into an adult consumption habit at precisely the life stage when independent purchasing behaviour emerges — an example of <span class="vocab-link" onclick="showPopup('category creation', 'the strategic act of establishing an entirely new product category in a market where it did not previously exist')">category creation</span> executed across a multi-decade time horizon.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800" alt="Vending machines in Japan" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 8 - The Results -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>The Results: A Nation Transformed</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>Nestlé's patient strategy worked. The children who grew up eating chocolate-coffee candy became adults who enjoyed drinking coffee. Japan slowly changed from a nation that used to drink only tea into a nation that also loves coffee.</p>
+                                        <p>Today, Japan is one of the biggest coffee markets in the world. There are coffee shops, canned coffee in vending machines, and instant coffee in almost every home. Nescafé became one of the most popular coffee <span class="vocab-link" onclick="showPopup('brand loyalty', 'a customer\'s consistent preference for one company\'s products over competitors')">brands</span> in the country.</p>
+                                        <p>This story shows that a smart, patient plan — even a very slow one — can completely change how millions of people think, eat, and drink.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>Nestlé's decades-long strategy ultimately succeeded on a national scale. The generation raised on chocolate-flavored coffee candy grew into adults with a normalized, positive relationship to coffee flavor — something no advertising campaign aimed at their parents had achieved.</p>
+                                        <p>Japan gradually transformed from a market with essentially no coffee culture into one of the largest coffee markets in the world, supporting an extensive café industry, a nationwide canned-coffee vending infrastructure, and strong <span class="vocab-link" onclick="showPopup('brand loyalty', 'a customer\'s consistent preference for one company\'s products over competitors')">brand loyalty</span> toward Nescafé specifically, the brand that had cultivated the market from its earliest stages.</p>
+                                        <p>The transformation illustrates that market entry into a market with strong existing habits does not always require competing directly with those habits — it can instead mean cultivating an entirely new <span class="vocab-link" onclick="showPopup('niche market', 'a small, specific segment of a larger market with distinct needs or preferences')">niche market</span> that expands organically over time.</p>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The long-run outcome validated Nestlé's original behavioral hypothesis: the cohort exposed to chocolate-flavored coffee candy in childhood matured into adults for whom coffee consumption carried no cultural friction, converting what had been an essentially non-existent demand base into one of the largest coffee markets in the world.</p>
+                                        <p>Japan's coffee economy today encompasses an extensive specialty café sector, a dense nationwide canned-coffee vending infrastructure, and deep <span class="vocab-link" onclick="showPopup('brand loyalty', 'a customer\'s consistent preference for one company\'s products over competitors')">brand loyalty</span> toward Nescafé — a direct dividend of having defined the category during its formative decades rather than competing for share within an established one.</p>
+                                        <p>The case is frequently cited in behavioral economics literature as an example of how deliberately shaping the preference-formation environment of a future consumer cohort can prove more effective, over a sufficiently long time horizon, than attempting to alter the fixed preferences of an existing one.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800" alt="Modern Tokyo cafe culture" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 9 - Lessons in Market Cultivation -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Lessons in Market Cultivation</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <p>The story of Nestlé and Japan teaches useful lessons about entering a difficult new market:</p>
+                                        <ul>
+                                            <li><strong>Understand existing habits.</strong> Find out what people already do before you try to sell them something new.</li>
+                                            <li><strong>Adults are hard to change.</strong> Long habits are difficult to break — think about who is easier to reach.</li>
+                                            <li><strong>Think about the future.</strong> Sometimes the best customers are not today's customers, but tomorrow's.</li>
+                                            <li><strong>Be patient.</strong> Some of the best business strategies take many years to succeed.</li>
+                                            <li><strong>Start small and sweet.</strong> A gentle first product can open the door to bigger success later.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <p>The Nestlé Japan case offers a practical framework for entering markets with deeply established habits:</p>
+                                        <ul>
+                                            <li><strong>Diagnose the real barrier:</strong> Nestlé's early failure wasn't a marketing problem — it was a sensory and cultural one. Identifying the true barrier prevented years of wasted advertising spend.</li>
+                                            <li><strong>Target where preferences are still forming:</strong> When an existing population's habits are essentially fixed, the more effective strategy may be cultivating the next generation.</li>
+                                            <li><strong>Design a genuine gateway product:</strong> The chocolate-coffee candy worked because it was enjoyable in its own right, not simply a smaller version of the eventual product.</li>
+                                            <li><strong>Commit to a long time horizon:</strong> Market cultivation strategies require patience and sustained investment well before returns appear.</li>
+                                            <li><strong>Build supporting infrastructure:</strong> The vending-machine network ensured the habit, once formed, had somewhere to go as consumers reached adulthood.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <p>The Nestlé Japan case has become a paradigmatic example in strategy literature of <span class="vocab-link" onclick="showPopup('market cultivation', 'the deliberate, long-term process of building demand for a product in a market where it does not yet exist')">market cultivation</span> as an alternative to conventional market entry. Several strategic principles emerge:</p>
+                                        <ul>
+                                            <li><strong>Preference plasticity as a strategic variable:</strong> Recognizing that consumer preferences vary in malleability across the life course allowed Nestlé to identify a more tractable target than the ostensibly obvious one.</li>
+                                            <li><strong>Category creation over category competition:</strong> Rather than competing for existing tea-drinking occasions, Nestlé created an entirely new consumption occasion with no incumbent competitor.</li>
+                                            <li><strong>Multi-decade capital patience:</strong> The strategy required Nestlé's leadership to tolerate a sustained absence of near-term returns, a discipline uncommon in conventional market-entry planning cycles.</li>
+                                            <li><strong>Sequenced product architecture:</strong> The candy-to-canned-coffee product sequence demonstrates the value of designing a coherent pathway across a consumer's life stages, rather than a single static offering.</li>
+                                        </ul>
+                                        <p>The broader lesson is that markets with strong existing habits are not necessarily closed — but capturing them may require redefining who the customer is, and over what time horizon success should be measured.</p>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800" alt="Business strategy meeting" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 10 - Key Takeaways -->
+                            <div class="discussion-slide slide-horizontal">
+                                <div class="slide-text-section-left">
+                                    <h3>Key Takeaways</h3>
+                                    <div class="difficulty-content difficulty-B1">
+                                        <ul>
+                                            <li><strong>The challenge:</strong> Nestlé wanted to sell instant coffee in Japan, a country that used to drink almost only green tea. Adults found coffee too bitter and did not buy it.</li>
+                                            <li><strong>The insight:</strong> Adult tastes are hard to change, but children's tastes are still forming — so Nestlé decided to target children instead.</li>
+                                            <li><strong>The strategy:</strong> Nestlé created chocolate-flavored coffee candy for children, then later sold sweet canned coffee as those children grew into adults.</li>
+                                            <li><strong>Language focus:</strong> "Used to" describes a past habit or state that is now different. "Would" describes a repeated past action.</li>
+                                            <li><strong>The lesson:</strong> Patient, long-term strategies can change habits that seem impossible to change quickly.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-B2">
+                                        <ul>
+                                            <li><strong>Core challenge:</strong> Nestlé's instant coffee failed with Japanese adults because of deep cultural resistance and a strong existing tea-drinking habit, not a lack of advertising.</li>
+                                            <li><strong>Key insight:</strong> Since adult palates are largely fixed, Nestlé shifted its long-term strategy toward children, whose taste preferences were still forming.</li>
+                                            <li><strong>The strategy:</strong> A chocolate-flavored coffee candy gateway product, combined with later canned-coffee vending infrastructure, built a lifelong pathway from childhood exposure to adult consumption.</li>
+                                            <li><strong>Language focus:</strong> "Used to" sets up a habitual past state; "would" narrates repeated past actions once that state is established — both are essential for describing gradual cultural change.</li>
+                                            <li><strong>The lesson:</strong> Market cultivation — building demand for the next generation rather than persuading the current one — can succeed where conventional advertising cannot.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="difficulty-content difficulty-C1">
+                                        <ul>
+                                            <li><strong>Systemic barrier:</strong> Nestlé's early failure reflected fixed adult taste preferences and deep <span class="vocab-link" onclick="showPopup('cultural resistance', 'the reluctance of people to accept new products or ideas that conflict with existing customs')">cultural resistance</span>, not a communications deficiency.</li>
+                                            <li><strong>Strategic reframing:</strong> Recognizing preference plasticity as a strategic variable, Nestlé pursued generational marketing and market cultivation rather than conventional persuasion.</li>
+                                            <li><strong>Grammar focus:</strong> "Used to" establishes a stative or habitual baseline; "would" narrates the repeated, dynamic actions that altered it — a pairing essential to precise retrospective business narrative.</li>
+                                            <li><strong>Execution architecture:</strong> A sequenced gateway product and supporting vending infrastructure converted childhood behavioral conditioning into a self-sustaining adult consumption habit.</li>
+                                            <li><strong>Conceptual legacy:</strong> The case demonstrates that entrenched consumer habits are not necessarily permanent barriers to market entry — but overcoming them may require redefining the target consumer and the applicable time horizon entirely.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="slide-image-section-right">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800" alt="Business professional with coffee" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+
+                            <!-- Slide 11 - Lesson Complete -->
+                            <div class="discussion-slide lesson-complete-slide">
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 50%, rgba(15, 52, 96, 0.95) 100%); border-radius: 20px;">
+                                    <h2 style="font-size: 2.8rem; color: #fff; margin-bottom: 15px; font-weight: 700;">Lesson Complete!</h2>
+                                    <p style="font-size: 1.2rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Continue Your Learning</p>
+                                    <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: center;">
+                                        <div onclick="showSection('vocabulary', document.querySelectorAll('.nav-item')[1])" class="menu-card image-card vocab-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_475a37d701ba401daa02884abd2fff73~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Vocabulary</span></div>
+                                        </div>
+                                        <div onclick="showSection('quiz', document.querySelectorAll('.nav-item')[2])" class="menu-card image-card quiz-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_88c48297c2014a74aada5cab891c0af0~mv2.jpg'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Quiz</span></div>
+                                        </div>
+                                        <div onclick="showSection('writing', document.querySelectorAll('.nav-item')[3])" class="menu-card image-card writing-card" style="width: 200px; height: 220px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; cursor: pointer; transition: all 0.4s ease; position: relative; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                            <div class="image-card-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://static.wixstatic.com/media/593d03_eb945dbb69d54a21ba8d27cae6ed77a9~mv2.png'); background-size: 180%; background-position: center; filter: grayscale(100%); transition: filter 0.4s ease;"></div>
+                                            <div class="image-card-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); transition: background 0.4s ease;"></div>
+                                            <div style="position: relative; z-index: 1; width: 100%; padding: 15px 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%); text-align: center;"><span style="color: white; font-size: 2rem; font-weight: 700; letter-spacing: 1px;">Writing</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slide-indicators">
+                            <div class="indicator-dot active" onclick="goToSlide(1)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(2)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(3)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(4)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(5)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(6)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(7)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(8)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(9)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(10)"></div>
+                            <div class="indicator-dot" onclick="goToSlide(11)"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Section -->
+                <div class="section" id="vocabulary">
+                    <h2>Vocabulary Flashcards</h2>
+                    <div class="reading-container">
+                        <div class="vocab-page active" id="vocab-page-B1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Bitter</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Having a sharp, unpleasant taste, like strong coffee without sugar</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Habit</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Something you do often and automatically, without thinking</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Taste Preference</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The flavors that a person likes or dislikes</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Gateway Product</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A simple, appealing product that introduces people to something new</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Market</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A country or group of customers a company wants to sell to</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Loyalty</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Continued support for a brand or company over time</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Strategy</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A plan for achieving a long-term goal</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Generation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">People born and living during the same time period</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-B2">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Palate</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A person's ability to taste and enjoy different flavors</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Foothold</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A strong first position from which further success can grow</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Incremental</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">Happening gradually, in small steps, rather than all at once</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Brand Loyalty</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A customer's consistent preference for one company's products over competitors</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Cultural Resistance</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The reluctance of people to accept new products or ideas that conflict with existing customs</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Long-Term Strategy</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A plan designed to succeed over years or decades rather than produce immediate results</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Habit Formation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process by which a behavior becomes automatic through repetition</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Niche Market</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A small, specific segment of a larger market with distinct needs or preferences</div></div></div></div>
+                            </div>
+                        </div>
+                        <div class="vocab-page" id="vocab-page-C1">
+                            <div class="vocab-grid">
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Generational Marketing</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">A strategy that targets a specific age cohort with the intention of shaping consumer behavior as that cohort matures</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Taste Acquisition</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The gradual process by which a person learns to enjoy a flavor initially perceived as unpleasant</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Path Dependency</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The way in which past decisions and habits constrain and shape future choices and outcomes</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Market Cultivation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The deliberate, long-term process of building demand for a product in a market where it does not yet exist</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Behavioral Conditioning</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process of shaping habits or preferences through repeated exposure and positive association</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">First-Mover Disadvantage</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The risk faced by a company entering a market before consumer demand or infrastructure exists to support it</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Consumer Socialization</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The process by which individuals acquire the knowledge, skills, and attitudes relevant to their function as consumers</div></div></div></div>
+                                <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="flashcard-front"><div class="flashcard-term">Category Creation</div><div class="flashcard-hint">Click to see definition</div></div><div class="flashcard-back"><div class="flashcard-definition">The strategic act of establishing an entirely new product category in a market where it did not previously exist</div></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="section" id="quiz">
+                    <h2>Interactive Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-header" id="quiz-header">
+                            <div class="quiz-nav"><button class="nav-btn" onclick="prevQuizQuestion()" id="quiz-prev-btn" disabled>Previous</button></div>
+                            <div class="progress-container"><p id="quiz-counter">Question 1 of 8</p><div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div></div>
+                            <div class="quiz-nav"><button class="nav-btn" onclick="nextQuizQuestion()" id="quiz-next-btn">Next</button></div>
+                        </div>
+                        <div id="quiz-questions-container"></div>
+                        <div id="quiz-results-page" class="quiz-page" style="display: none;">
+                            <div class="results-summary">
+                                <h3>Quiz Complete!</h3>
+                                <div class="score" id="quiz-final-score">0/8</div>
+                                <p style="margin-top: 20px; color: #4a5568;">Great job completing the quiz!</p>
+                                <button class="check-button" onclick="initializeVocabQuiz()" style="margin-top: 30px;">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Writing Section -->
+                <div class="section" id="writing">
+                    <h2>Writing Practice</h2>
+                    <div class="writing-container">
+                        <div class="writing-prompt">
+                            <h3>Writing Task</h3>
+                            <p>It is 1970 and you are a young strategist on Nestlé's team in Japan. Adult sales of Nescafé have been disappointing, and management is considering giving up on the market entirely. Write an internal memo (approximately 200–250 words) recommending the new children-focused, long-term strategy. Your memo should: (1) describe what Japanese consumers used to do before Nescafé arrived, using "used to" and "would" to narrate past habits; (2) explain why the adult-focused approach failed; and (3) recommend the gateway-product strategy targeting children, explaining why patience will pay off. Use vocabulary from the lesson in your response.</p>
+                        </div>
+                        <form id="writingForm" class="writing-form">
+                            <div class="form-group"><label for="studentName">Student Name</label><input type="text" id="studentName" name="studentName" required></div>
+                            <div class="form-group"><label for="teacherEmail">Teacher's Email</label><input type="email" id="teacherEmail" name="teacherEmail" required></div>
+                            <div class="form-group"><label for="writingInput">Your Response</label><textarea id="writingInput" name="writingInput" placeholder="Write your strategic memo here..." required></textarea></div>
+                            <div class="button-container"><button type="button" class="check-button" onclick="openMailto()">Send Response</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closeVocabPopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="popupWord"></div><div class="popup-definition" id="popupDefinition"></div><button class="popup-close" onclick="closeVocabPopup()">Close</button></div></div>
+    <div id="vocabPopup" onclick="closePopup()"><div class="popup-content" onclick="event.stopPropagation()"><div class="popup-word" id="vocabPopupWord"></div><div class="popup-definition" id="vocabPopupDef"></div><button class="popup-close" onclick="closePopup()">Close</button></div></div>
+
+    <script>
+        let currentDifficulty = 'B2';
+        let currentSlide = 1;
+        const totalSlides = 11;
+
+        function startGame(level) {
+            currentDifficulty = level;
+            updateDifficultyDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            setDifficultyContent(level);
+            setVocabPage(level);
+            initializeVocabQuiz();
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function setDifficultyContent(level) {
+            document.querySelectorAll('.difficulty-content').forEach(el => { el.style.display = 'none'; });
+            document.querySelectorAll('.difficulty-' + level).forEach(el => { el.style.display = 'block'; });
+        }
+
+        function updateDifficultyDisplay() {
+            document.getElementById('levelBadge').className = 'current-level-badge ' + currentDifficulty.toLowerCase();
+            document.getElementById('currentLevelText').textContent = currentDifficulty;
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (sectionId === 'quiz') {
+                document.getElementById('quiz-results-page').style.display = 'none';
+                document.getElementById('quiz-questions-container').style.display = 'block';
+                document.getElementById('quiz-header').style.display = 'flex';
+                initializeVocabQuiz();
+            }
+            toggleNav();
+        }
+
+        function openMailto() {
+            const name = document.getElementById('studentName').value.trim();
+            const email = document.getElementById('teacherEmail').value.trim();
+            const response = document.getElementById('writingInput').value.trim();
+            if (!name || !email || !response) { alert('Please fill in all fields!'); return; }
+            const subject = encodeURIComponent('Writing Assignment - How Japan was Caffeinated - ' + name);
+            const body = encodeURIComponent('Student Name: ' + name + '\n\nResponse:\n' + response);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = totalSlides;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        function goToSlide(slideNum) {
+            const slides = document.querySelectorAll('.discussion-slide');
+            const dots = document.querySelectorAll('.indicator-dot');
+            slides[currentSlide - 1].classList.remove('active');
+            dots[currentSlide - 1].classList.remove('active');
+            currentSlide = slideNum;
+            slides[currentSlide - 1].classList.add('active');
+            dots[currentSlide - 1].classList.add('active');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('discussion').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') changeSlide(-1);
+                else if (e.key === 'ArrowRight') changeSlide(1);
+            }
+        });
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            const sound = document.getElementById('flipSound');
+            if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
+        }
+
+        function setVocabPage(level) {
+            document.querySelectorAll('.vocab-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('vocab-page-' + level);
+            if (page) page.classList.add('active');
+        }
+
+        function showPopup(word, definition) {
+            document.getElementById('vocabPopupWord').textContent = word.charAt(0).toUpperCase() + word.slice(1);
+            document.getElementById('vocabPopupDef').textContent = definition;
+            document.getElementById('vocabPopup').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('vocabPopup').style.display = 'none'; }
+        function closeVocabPopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+
+        const vocabularyByLevel = {
+            B1: [
+                { term: "Bitter", definition: "Having a sharp, unpleasant taste, like strong coffee without sugar", sentences: ["Japanese adults found the taste of coffee too ___ compared to green tea.", "A ___ flavor can be off-putting for people who are not used to it.", "The candy was sweet, which hid the ___ coffee taste inside."] },
+                { term: "Habit", definition: "Something you do often and automatically, without thinking", sentences: ["Drinking green tea every day was a lifelong ___ for most Japanese adults.", "It is very hard to change a ___ that people have had for their whole lives.", "Nestlé wanted to build a new coffee-drinking ___ among Japanese children."] },
+                { term: "Taste Preference", definition: "The flavors that a person likes or dislikes", sentences: ["A child's ___ is still developing, unlike an adult's.", "Nestlé studied Japanese ___ before changing its strategy.", "Sweet chocolate candy matched children's existing ___ perfectly."] },
+                { term: "Gateway Product", definition: "A simple, appealing product that introduces people to something new", sentences: ["The chocolate-coffee candy was a clever ___ for introducing coffee flavor.", "A good ___ should be enjoyable on its own, not just a smaller version of the real thing.", "Nestlé's ___ helped children get used to coffee long before they became adults."] },
+                { term: "Market", definition: "A country or group of customers a company wants to sell to", sentences: ["Nestlé saw Japan as a huge new ___ for instant coffee.", "The Japanese coffee ___ grew enormously over several decades.", "Understanding your ___ before you sell to it is essential for success."] },
+                { term: "Loyalty", definition: "Continued support for a brand or company over time", sentences: ["Nescafé built strong customer ___ among the generation raised on its candy.", "Brand ___ often begins with positive experiences early in life.", "Companies work hard to earn customer ___ over many years."] },
+                { term: "Strategy", definition: "A plan for achieving a long-term goal", sentences: ["Nestlé's new ___ focused on children instead of adults.", "A patient ___ can succeed even when it takes many years.", "The company needed a completely different ___ after its first plan failed."] },
+                { term: "Generation", definition: "People born and living during the same time period", sentences: ["Nestlé wanted to create coffee drinkers in the next ___.", "An entire ___ of Japanese children grew up eating chocolate-coffee candy.", "Each new ___ can have different tastes and habits from the one before it."] }
+            ],
+            B2: [
+                { term: "Palate", definition: "A person's ability to taste and enjoy different flavors", sentences: ["Adult ___s in Japan had been shaped by a lifetime of green tea.", "A child's ___ is far more adaptable than an adult's.", "Nestlé's strategy aimed to shape the ___ of an entire generation."] },
+                { term: "Foothold", definition: "A strong first position from which further success can grow", sentences: ["The chocolate-coffee candy gave Nestlé an early ___ with young consumers.", "Once the company had a ___ among children, expansion became far easier.", "Gaining a ___ in a resistant market often requires patience and creativity."] },
+                { term: "Incremental", definition: "Happening gradually, in small steps, rather than all at once", sentences: ["Nestlé's approach was ___, building the habit slowly over many years.", "___ change is often more sustainable than a sudden, aggressive push.", "The shift in Japanese taste happened through ___ exposure, not a single campaign."] },
+                { term: "Brand Loyalty", definition: "A customer's consistent preference for one company's products over competitors", sentences: ["Nescafé earned deep ___ from the generation that grew up with its candy.", "Strong ___ can take decades to build but is highly valuable once established.", "Early positive experiences with a brand often lead to lifelong ___."] },
+                { term: "Cultural Resistance", definition: "The reluctance of people to accept new products or ideas that conflict with existing customs", sentences: ["Nestlé faced significant ___ from adults attached to their tea-drinking traditions.", "Overcoming ___ required a completely different approach than simple advertising.", "___ is often stronger in adults than in children, whose habits are still forming."] },
+                { term: "Long-Term Strategy", definition: "A plan designed to succeed over years or decades rather than produce immediate results", sentences: ["Nestlé committed to a ___ that would not show results for many years.", "A ___ requires patience from company leadership and investors alike.", "Building an entirely new market often demands a genuine ___ rather than quick wins."] },
+                { term: "Habit Formation", definition: "The process by which a behavior becomes automatic through repetition", sentences: ["Repeated exposure to coffee candy supported ___ among Japanese children.", "___ takes time, but once complete, it can last a lifetime.", "Nestlé understood that ___ was the real goal of its children's strategy."] },
+                { term: "Niche Market", definition: "A small, specific segment of a larger market with distinct needs or preferences", sentences: ["Nestlé began by cultivating a small ___ of children rather than targeting all consumers.", "A ___ can eventually grow into a mainstream market with the right strategy.", "Focusing on a ___ allowed Nestlé to avoid direct competition with tea."] }
+            ],
+            C1: [
+                { term: "Generational Marketing", definition: "A strategy that targets a specific age cohort with the intention of shaping consumer behavior as that cohort matures", sentences: ["Nestlé's use of ___ meant investing in children years before they could buy coffee themselves.", "___ requires companies to think in decades rather than fiscal quarters.", "The success of Nescafé in Japan is often cited as a textbook case of effective ___."] },
+                { term: "Taste Acquisition", definition: "The gradual process by which a person learns to enjoy a flavor initially perceived as unpleasant", sentences: ["___ is significantly easier during childhood than adulthood.", "Nestlé's candy strategy was designed to accelerate ___ among young consumers.", "Understanding ___ helped Nestlé identify children as the more promising target audience."] },
+                { term: "Path Dependency", definition: "The way in which past decisions and habits constrain and shape future choices and outcomes", sentences: ["Japan's tea-drinking ___ made adult consumers highly resistant to coffee.", "___ explains why entrenched habits are so difficult to reverse through advertising alone.", "Recognizing ___ allowed Nestlé to redirect its strategy toward a more receptive audience."] },
+                { term: "Market Cultivation", definition: "The deliberate, long-term process of building demand for a product in a market where it does not yet exist", sentences: ["Nestlé's approach in Japan is a classic example of ___ rather than conventional market entry.", "___ requires far more patience than persuading consumers who already want a product.", "The company's decades-long investment in ___ eventually created one of the world's largest coffee markets."] },
+                { term: "Behavioral Conditioning", definition: "The process of shaping habits or preferences through repeated exposure and positive association", sentences: ["The chocolate-coffee candy relied on ___ to build positive associations with coffee flavor.", "___ at a national scale was central to Nestlé's long-term success in Japan.", "Repeated, low-stakes exposure is a key mechanism of effective ___."] },
+                { term: "First-Mover Disadvantage", definition: "The risk faced by a company entering a market before consumer demand or infrastructure exists to support it", sentences: ["Nestlé accepted significant ___ by investing in a market with no existing coffee culture.", "___ can be offset by a sufficiently long-term strategic time horizon.", "Companies that experience ___ often must create demand rather than simply capture it."] },
+                { term: "Consumer Socialization", definition: "The process by which individuals acquire the knowledge, skills, and attitudes relevant to their function as consumers", sentences: ["Nestlé's children's strategy was, at its core, an exercise in ___.", "___ often begins long before a person has independent purchasing power.", "Effective ___ campaigns can shape brand preferences that last a lifetime."] },
+                { term: "Category Creation", definition: "The strategic act of establishing an entirely new product category in a market where it did not previously exist", sentences: ["Nestlé's chocolate-coffee candy represented genuine ___ rather than competition within an existing category.", "___ carries higher risk but can also produce category-defining brand dominance.", "The canned-coffee vending machines were the natural next step in Nestlé's ___ strategy."] }
+            ]
+        };
+
+        let currentQuizQuestion = 1;
+        let totalQuizQuestions = 8;
+        let quizQuestions = [];
+        let userQuizAnswers = {};
+        let quizScore = 0;
+
+        function initializeVocabQuiz() {
+            currentQuizQuestion = 1;
+            userQuizAnswers = {};
+            quizScore = 0;
+            quizQuestions = [];
+            const levelVocab = vocabularyByLevel[currentDifficulty] || vocabularyByLevel.B2;
+            const shuffled = [...levelVocab].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < Math.min(totalQuizQuestions, shuffled.length); i++) {
+                const v = shuffled[i];
+                const sentence = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+                quizQuestions.push({ question: `Complete: "${sentence}"`, correctAnswer: v.term.toLowerCase(), correctTerm: v.term, hint: v.term.toLowerCase().substring(0, 2) + '...' });
+            }
+            generateQuizHTML();
+            showQuizQuestion(1);
+            updateQuizProgress();
+        }
+
+        function generateQuizHTML() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = '';
+            quizQuestions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-page' + (i === 0 ? ' active' : '');
+                div.id = `quiz-question-${i + 1}`;
+                div.innerHTML = `<div class="quiz-question"><h3>${q.question}</h3><input type="text" class="quiz-input" id="quiz-answer-${i + 1}" placeholder="${q.hint}" onkeypress="if(event.key==='Enter'){event.preventDefault();checkQuizAnswer(${i + 1});}"><button class="check-button" onclick="checkQuizAnswer(${i + 1})">Check Answer</button><div class="feedback" id="quiz-feedback-${i + 1}" style="display: none;"></div></div>`;
+                container.appendChild(div);
+            });
+        }
+
+        function checkQuizAnswer(num) {
+            const q = quizQuestions[num - 1];
+            const input = document.getElementById(`quiz-answer-${num}`);
+            const feedback = document.getElementById(`quiz-feedback-${num}`);
+            const btn = document.querySelector(`#quiz-question-${num} .check-button`);
+            const answer = input.value.trim().toLowerCase();
+            if (!answer) { alert('Please enter an answer!'); return; }
+            const correct = answer === q.correctAnswer;
+            if (correct) document.getElementById('correctSound').play().catch(e => {});
+            else document.getElementById('incorrectSound').play().catch(e => {});
+            input.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.style.display = 'block';
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.textContent = correct ? 'Correct!' : `Incorrect. Answer: ${q.correctTerm}`;
+            if (correct && !userQuizAnswers[num]) quizScore++;
+            userQuizAnswers[num] = correct;
+            btn.disabled = true;
+            updateQuizProgress();
+            setTimeout(() => { if (currentQuizQuestion < totalQuizQuestions) nextQuizQuestion(); else showQuizResults(); }, 1500);
+        }
+
+        function showQuizQuestion(num) {
+            document.querySelectorAll('.quiz-page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById(`quiz-question-${num}`);
+            if (page) page.classList.add('active');
+            document.getElementById('quiz-prev-btn').disabled = num === 1;
+            document.getElementById('quiz-next-btn').disabled = num === totalQuizQuestions;
+        }
+
+        function nextQuizQuestion() { if (currentQuizQuestion < totalQuizQuestions) { currentQuizQuestion++; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+        function prevQuizQuestion() { if (currentQuizQuestion > 1) { currentQuizQuestion--; showQuizQuestion(currentQuizQuestion); updateQuizProgress(); } }
+
+        function updateQuizProgress() {
+            document.getElementById('quiz-counter').textContent = `Question ${currentQuizQuestion} of ${totalQuizQuestions}`;
+            document.getElementById('quiz-progress').style.width = `${(Object.keys(userQuizAnswers).length / totalQuizQuestions) * 100}%`;
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-questions-container').style.display = 'none';
+            document.getElementById('quiz-header').style.display = 'none';
+            document.getElementById('quiz-results-page').style.display = 'flex';
+            document.getElementById('quiz-final-score').textContent = `${quizScore}/${totalQuizQuestions}`;
+        }
+    </script>
+</body>
+</html>
