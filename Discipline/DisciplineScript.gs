@@ -67,6 +67,9 @@ function doGet(e) {
     if (mode === 'record') {
       return recordAction(e);
     }
+    if (mode === 'reset') {
+      return resetActions(e);
+    }
     return getRoster();
   } catch (err) {
     return respond({ success: false, error: err.toString() });
@@ -131,30 +134,52 @@ function recordAction(e) {
   }
 
   const sheet = getSheet(ROSTER_SHEET_NAME);
+  const studentRow = findStudentRow(sheet, className, studentName);
+  if (studentRow === -1) {
+    return respond({ success: false, error: 'Student not found: ' + studentName });
+  }
+
+  sheet.getRange(studentRow, targetCol).setValue(true);
+  appendLog(className, studentName, action);
+
+  return respond({ success: true, class: className, name: studentName, action: action });
+}
+
+function resetActions(e) {
+  const className = (e.parameter.class || '').toString().trim();
+  const studentName = (e.parameter.name || '').toString().trim();
+
+  if (!studentName) {
+    return respond({ success: false, error: 'Missing name' });
+  }
+
+  const sheet = getSheet(ROSTER_SHEET_NAME);
+  const studentRow = findStudentRow(sheet, className, studentName);
+  if (studentRow === -1) {
+    return respond({ success: false, error: 'Student not found: ' + studentName });
+  }
+
+  sheet.getRange(studentRow, COL_WARNING).setValue(false);
+  sheet.getRange(studentRow, COL_MOVE_SEATS).setValue(false);
+  sheet.getRange(studentRow, COL_INCIDENT).setValue(false);
+  appendLog(className, studentName, 'Reset');
+
+  return respond({ success: true, class: className, name: studentName, action: 'Reset' });
+}
+
+function findStudentRow(sheet, className, studentName) {
   const lastRow = sheet.getLastRow();
   const rows = sheet.getRange(1, 1, lastRow, COL_NAME).getValues();
-
-  let studentRow = -1;
   for (let i = 0; i < rows.length; i++) {
     const rowName = (rows[i][COL_NAME - 1] || '').toString().trim().toLowerCase();
     const rowClass = (rows[i][COL_CLASS - 1] || '').toString().trim().toLowerCase();
     const nameMatches = rowName === studentName.toLowerCase();
     const classMatches = !className || rowClass === className.toLowerCase();
     if (nameMatches && classMatches) {
-      studentRow = i + 1; // 1-indexed
-      break;
+      return i + 1; // 1-indexed
     }
   }
-
-  if (studentRow === -1) {
-    return respond({ success: false, error: 'Student not found: ' + studentName });
-  }
-
-  sheet.getRange(studentRow, targetCol).setValue(true);
-
-  appendLog(className, studentName, action);
-
-  return respond({ success: true, class: className, name: studentName, action: action });
+  return -1;
 }
 
 function appendLog(className, studentName, action) {

@@ -87,6 +87,14 @@
   .action-btn:active{filter:brightness(.9);}
   .action-btn[disabled]{opacity:.5;}
 
+  .reset-btn{
+    border:1px solid var(--line); background:transparent; color:var(--muted);
+    width:100%; border-radius:14px; padding:16px 18px; font-size:15px; font-weight:600;
+    margin-top:18px;
+  }
+  .reset-btn:active{background:var(--card);}
+  .reset-btn.armed{border-color:var(--incident); color:var(--incident);}
+
   .profile{
     display:flex; align-items:center; gap:14px; margin-bottom:20px;
     background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px;
@@ -169,6 +177,13 @@ const ACTIONS = [
   { key:"Incident",   cls:"incident", desc:"Logged as a formal incident" }
 ];
 
+/* Confirmation sound played when an option is chosen. */
+const DING = new Audio("https://static.wixstatic.com/mp3/593d03_244b1a7fddcf4931957cde0d504d0354.mp3");
+DING.preload = "auto";
+function playDing(){
+  try{ DING.currentTime = 0; DING.play().catch(function(){}); }catch(_){}
+}
+
 const state = {
   screen: "class",     // class -> student -> actions
   students: [],
@@ -179,6 +194,7 @@ const state = {
   cacheTs: 0,
   error: null,
   pinError: null,
+  resetArmed: false,
   query: ""
 };
 
@@ -290,21 +306,44 @@ async function loadRoster(){
   render();
 }
 
+const FLAG_KEY = { "Warning":"warning", "Move Seats":"moveSeats", "Incident":"incident" };
+
 async function sendAction(action){
   const s = state.student;
+  const flag = FLAG_KEY[action];
+  const prev = s[flag];
+  // optimistic: show it straight away, revert if the server rejects
+  s[flag] = true;
+  writeCache(state.students);
+  render();
   try{
     const res = await fetch(apiUrl({
       mode:"record", class:s.class || state.className || "", name:s.name, action:action
     }));
     const data = await res.json();
-    if(data.unauthorized){ lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
+    if(data.unauthorized){ s[flag] = prev; writeCache(state.students); lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
     if(!data.success) throw new Error(data.error || "Failed to record");
-    // reflect locally
-    if(action==="Warning") s.warning = true;
-    if(action==="Move Seats") s.moveSeats = true;
-    if(action==="Incident") s.incident = true;
-    writeCache(state.students);
     toast(action + " recorded for " + firstName(s.name));
+  }catch(err){
+    s[flag] = prev;
+    writeCache(state.students);
+    toast("Couldn't save " + action + " — " + err.message, true);
+    render();
+  }
+}
+
+async function sendReset(){
+  const s = state.student;
+  try{
+    const res = await fetch(apiUrl({
+      mode:"reset", class:s.class || state.className || "", name:s.name
+    }));
+    const data = await res.json();
+    if(data.unauthorized){ lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
+    if(!data.success) throw new Error(data.error || "Failed to reset");
+    s.warning = false; s.moveSeats = false; s.incident = false;
+    writeCache(state.students);
+    toast("Cleared all flags for " + firstName(s.name));
     render();
   }catch(err){
     toast(err.message, true);
@@ -429,24 +468,46 @@ function renderActions(){
     '</div>' +
     '<div class="grid">' + ACTIONS.map(a => {
       const already = (a.key==="Warning"&&s.warning)||(a.key==="Move Seats"&&s.moveSeats)||(a.key==="Incident"&&s.incident);
-      return '<button class="action-btn ' + a.cls + '" onclick="confirmAction(\'' + a.key + '\')">' +
+      return '<button class="action-btn ' + a.cls + '" onclick="chooseAction(\'' + a.key + '\')">' +
                a.key +
                '<span class="desc">' + (already ? "Already on record — tap to log again" : a.desc) + '</span>' +
              '</button>';
-    }).join("") + '</div>';
+    }).join("") + '</div>' +
+    '<button class="reset-btn' + (state.resetArmed ? ' armed' : '') + '" onclick="resetTapped()">' +
+      (state.resetArmed ? "Tap again to clear all flags" : "Reset this student") +
+    '</button>';
 }
 
 /* ---------- actions ---------- */
 function pickClass(c){ state.className = c; state.query = ""; state.screen = "student"; render(); }
-function pickStudent(idx){ state.student = state.students[idx]; state.screen = "actions"; render(); }
+function pickStudent(idx){ state.student = state.students[idx]; state.resetArmed = false; state.screen = "actions"; render(); }
 function goBack(){
-  if(state.screen === "actions"){ state.screen = "student"; state.student = null; }
+  if(state.screen === "actions"){ state.screen = "student"; state.student = null; state.resetArmed = false; }
   else if(state.screen === "student"){ state.screen = "class"; state.className = null; }
   render();
 }
-function confirmAction(key){
-  const s = state.student;
-  if(confirm(key + " for " + s.name + "?")) sendAction(key);
+
+/* Tap an option: sound + record immediately, no confirmation dialog. */
+function chooseAction(key){
+  playDing();
+  state.resetArmed = false;
+  sendAction(key);
+}
+
+/* Reset needs two taps (no popup): first taps arms it for 3s. */
+let resetTimer;
+function resetTapped(){
+  if(!state.resetArmed){
+    state.resetArmed = true;
+    render();
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(() => { state.resetArmed = false; render(); }, 3000);
+    return;
+  }
+  clearTimeout(resetTimer);
+  state.resetArmed = false;
+  playDing();
+  sendReset();
 }
 
 /* ---------- helpers ---------- */
