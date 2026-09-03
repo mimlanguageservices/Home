@@ -70,6 +70,9 @@ function doGet(e) {
     if (mode === 'reset') {
       return resetActions(e);
     }
+    if (mode === 'resetclass') {
+      return resetClass(e);
+    }
     return getRoster();
   } catch (err) {
     return respond({ success: false, error: err.toString() });
@@ -165,6 +168,40 @@ function resetActions(e) {
   appendLog(className, studentName, 'Reset');
 
   return respond({ success: true, class: className, name: studentName, action: 'Reset' });
+}
+
+function resetClass(e) {
+  const className = (e.parameter.class || '').toString().trim();
+  if (!className) {
+    return respond({ success: false, error: 'Missing class' });
+  }
+
+  const sheet = getSheet(ROSTER_SHEET_NAME);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    return respond({ success: true, class: className, cleared: 0 });
+  }
+
+  // Read class column + the three flag columns in one go.
+  const numRows = lastRow - 1;
+  const classVals = sheet.getRange(2, COL_CLASS, numRows, 1).getValues();
+  const flagRange = sheet.getRange(2, COL_WARNING, numRows, 3);
+  const flagVals = flagRange.getValues();
+
+  let cleared = 0;
+  for (let i = 0; i < numRows; i++) {
+    if ((classVals[i][0] || '').toString().trim().toLowerCase() === className.toLowerCase()) {
+      flagVals[i][0] = false;
+      flagVals[i][1] = false;
+      flagVals[i][2] = false;
+      cleared++;
+    }
+  }
+
+  flagRange.setValues(flagVals);
+  appendLog(className, '(whole class)', 'Reset class');
+
+  return respond({ success: true, class: className, cleared: cleared });
 }
 
 function findStudentRow(sheet, className, studentName) {

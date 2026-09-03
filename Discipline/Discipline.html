@@ -195,6 +195,7 @@ const state = {
   error: null,
   pinError: null,
   resetArmed: false,
+  classResetArmed: false,
   query: ""
 };
 
@@ -350,6 +351,24 @@ async function sendReset(){
   }
 }
 
+async function sendClassReset(){
+  const cls = state.className;
+  try{
+    const res = await fetch(apiUrl({ mode:"resetclass", class:cls || "" }));
+    const data = await res.json();
+    if(data.unauthorized){ lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
+    if(!data.success) throw new Error(data.error || "Failed to reset class");
+    state.students.forEach(s => {
+      if(s.class === cls){ s.warning = false; s.moveSeats = false; s.incident = false; }
+    });
+    writeCache(state.students);
+    toast("Cleared all flags for " + (data.cleared != null ? data.cleared + " students in " : "") + cls);
+    render();
+  }catch(err){
+    toast(err.message, true);
+  }
+}
+
 /* ---------- screens ---------- */
 function classes(){
   const set = [];
@@ -442,14 +461,22 @@ function renderStudents(){
            '</button>';
   }).join("");
 
+  const classCount = state.students.filter(s => s.class === state.className).length;
   els.view.innerHTML =
     '<input class="search" id="q" placeholder="Search name…" value="' + esc(state.query) + '">' +
-    '<div class="grid">' + (rows || '<div class="msg">No matches.</div>') + '</div>';
+    '<div class="grid">' + (rows || '<div class="msg">No matches.</div>') + '</div>' +
+    '<button class="reset-btn' + (state.classResetArmed ? ' armed' : '') + '" onclick="classResetTapped()">' +
+      (state.classResetArmed
+        ? "Tap again to clear ALL " + classCount + " students in " + esc(state.className)
+        : "Reset entire class") +
+    '</button>';
 
   const q = document.getElementById("q");
   q.addEventListener("input", e => { state.query = e.target.value; renderStudents(); });
-  q.focus({preventScroll:true});
-  const len = q.value.length; q.setSelectionRange(len,len);
+  if(!state.classResetArmed){
+    q.focus({preventScroll:true});
+    const len = q.value.length; q.setSelectionRange(len,len);
+  }
 }
 
 function renderActions(){
@@ -479,11 +506,11 @@ function renderActions(){
 }
 
 /* ---------- actions ---------- */
-function pickClass(c){ state.className = c; state.query = ""; state.screen = "student"; render(); }
-function pickStudent(idx){ state.student = state.students[idx]; state.resetArmed = false; state.screen = "actions"; render(); }
+function pickClass(c){ state.className = c; state.query = ""; state.classResetArmed = false; state.screen = "student"; render(); }
+function pickStudent(idx){ state.student = state.students[idx]; state.resetArmed = false; state.classResetArmed = false; state.screen = "actions"; render(); }
 function goBack(){
   if(state.screen === "actions"){ state.screen = "student"; state.student = null; state.resetArmed = false; }
-  else if(state.screen === "student"){ state.screen = "class"; state.className = null; }
+  else if(state.screen === "student"){ state.screen = "class"; state.className = null; state.classResetArmed = false; }
   render();
 }
 
@@ -508,6 +535,22 @@ function resetTapped(){
   state.resetArmed = false;
   playDing();
   sendReset();
+}
+
+/* Same two-tap guard for wiping a whole class. */
+let classResetTimer;
+function classResetTapped(){
+  if(!state.classResetArmed){
+    state.classResetArmed = true;
+    render();
+    clearTimeout(classResetTimer);
+    classResetTimer = setTimeout(() => { state.classResetArmed = false; render(); }, 3000);
+    return;
+  }
+  clearTimeout(classResetTimer);
+  state.classResetArmed = false;
+  playDing();
+  sendClassReset();
 }
 
 /* ---------- helpers ---------- */
