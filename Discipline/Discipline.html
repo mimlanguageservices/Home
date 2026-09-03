@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1f2933">
+<title>Student Discipline</title>
+<style>
+  :root{
+    --bg:#111827; --card:#1f2937; --card-2:#273244;
+    --text:#f3f4f6; --muted:#9ca3af; --line:#374151;
+    --warning:#d97706; --move:#2563eb; --incident:#dc2626;
+    --ok:#059669;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:520px; margin:0 auto; padding:16px;}
+
+  header{
+    display:flex; align-items:center; gap:10px;
+    padding:6px 2px 14px;
+  }
+  header .back{
+    border:0; background:var(--card); color:var(--text);
+    width:38px; height:38px; border-radius:10px; font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  header .back[hidden]{display:none;}
+  header h1{font-size:17px; margin:0; font-weight:600; flex:1;}
+  header .gear{
+    border:0; background:transparent; color:var(--muted);
+    font-size:20px; width:38px; height:38px;
+  }
+  .crumb{color:var(--muted); font-size:13px; padding:0 2px 12px;}
+
+  .grid{display:flex; flex-direction:column; gap:12px;}
+
+  .tile{
+    border:0; text-align:left; width:100%;
+    background:var(--card); color:var(--text);
+    border-radius:14px; padding:18px 16px; font-size:18px; font-weight:600;
+    display:flex; align-items:center; gap:14px;
+    border:1px solid var(--line);
+  }
+  .tile:active{background:var(--card-2);}
+  .tile .sub{display:block; font-size:13px; font-weight:400; color:var(--muted); margin-top:2px;}
+
+  .student-row{
+    display:flex; align-items:center; gap:14px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:12px 14px; width:100%; text-align:left; color:var(--text);
+  }
+  .student-row:active{background:var(--card-2);}
+  .avatar{
+    width:44px; height:44px; border-radius:50%; object-fit:cover;
+    background:var(--card-2); flex:none;
+    display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--muted);
+  }
+  .student-row .name{flex:1; font-weight:600; font-size:16px;}
+  .flags{display:flex; gap:4px; flex:none;}
+  .flag{width:9px; height:9px; border-radius:50%; background:var(--line);}
+  .flag.warning{background:var(--warning);}
+  .flag.move{background:var(--move);}
+  .flag.incident{background:var(--incident);}
+
+  .search{
+    width:100%; border:1px solid var(--line); background:var(--card);
+    color:var(--text); border-radius:12px; padding:12px 14px; font-size:16px; margin-bottom:12px;
+  }
+  .search::placeholder{color:var(--muted);}
+
+  .action-btn{
+    border:0; width:100%; color:#fff;
+    border-radius:16px; padding:26px 18px; font-size:22px; font-weight:700;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .action-btn .desc{font-size:13px; font-weight:400; opacity:.9;}
+  .action-btn.warning{background:var(--warning);}
+  .action-btn.move{background:var(--move);}
+  .action-btn.incident{background:var(--incident);}
+  .action-btn:active{filter:brightness(.9);}
+  .action-btn[disabled]{opacity:.5;}
+
+  .profile{
+    display:flex; align-items:center; gap:14px; margin-bottom:20px;
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px;
+  }
+  .profile .avatar{width:56px; height:56px; font-size:20px;}
+  .profile .name{font-size:18px; font-weight:700;}
+  .profile .status{font-size:13px; color:var(--muted); margin-top:3px;}
+
+  .msg{
+    text-align:center; color:var(--muted); padding:40px 10px; font-size:15px;
+  }
+
+  /* toast */
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(120%);
+    background:var(--ok); color:#fff; padding:14px 22px; border-radius:12px;
+    font-weight:600; font-size:15px; transition:transform .25s ease; z-index:50;
+    max-width:90vw; text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--incident);}
+
+  /* settings sheet */
+  dialog{
+    border:0; border-radius:16px; padding:20px; width:calc(100% - 32px); max-width:460px;
+    background:var(--card); color:var(--text);
+  }
+  dialog::backdrop{background:rgba(0,0,0,.6);}
+  dialog h2{margin:0 0 6px; font-size:17px;}
+  dialog p{margin:0 0 14px; font-size:13px; color:var(--muted);}
+  dialog input{
+    width:100%; border:1px solid var(--line); background:var(--bg); color:var(--text);
+    border-radius:10px; padding:11px 12px; font-size:14px; margin-bottom:14px;
+  }
+  dialog .row{display:flex; gap:10px; justify-content:flex-end;}
+  dialog button{
+    border:0; border-radius:10px; padding:10px 16px; font-size:14px; font-weight:600;
+    background:var(--card-2); color:var(--text);
+  }
+  dialog button.primary{background:var(--move); color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="back" id="backBtn" hidden aria-label="Back">&#8592;</button>
+    <h1 id="title">Student Discipline</h1>
+    <button class="gear" id="gearBtn" aria-label="Settings">&#9881;</button>
+  </header>
+  <div class="crumb" id="crumb"></div>
+  <div id="view"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="settings">
+  <h2>Web App URL</h2>
+  <p>Paste the Google Apps Script Web App URL you got after deploying <b>DisciplineScript.gs</b>.</p>
+  <input id="urlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="row" style="justify-content:space-between;">
+    <button id="lockBtn">Lock app</button>
+    <span>
+      <button id="cancelSettings">Cancel</button>
+      <button class="primary" id="saveSettings">Save</button>
+    </span>
+  </div>
+</dialog>
+
+<script>
+/* ------------------------------------------------------------------
+   CONFIG
+   Paste your deployed Web App URL here, or leave blank and set it
+   in the app via the gear icon (it is saved on the device).
+------------------------------------------------------------------ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypVEbFCfSeu1ONvARs79N_9KhE46iOh3yPO7I4wJ_IK8b6G-495X3x6aM3rnERZHk2HA/exec";
+
+const ACTIONS = [
+  { key:"Warning",    cls:"warning",  desc:"Verbal warning given" },
+  { key:"Move Seats", cls:"move",     desc:"Student moved to another seat" },
+  { key:"Incident",   cls:"incident", desc:"Logged as a formal incident" }
+];
+
+const state = {
+  screen: "class",     // class -> student -> actions
+  students: [],
+  className: null,
+  student: null,
+  loading: false,
+  error: null,
+  pinError: null,
+  query: ""
+};
+
+const els = {
+  view: document.getElementById("view"),
+  title: document.getElementById("title"),
+  crumb: document.getElementById("crumb"),
+  back: document.getElementById("backBtn"),
+  gear: document.getElementById("gearBtn"),
+  toast: document.getElementById("toast"),
+  dialog: document.getElementById("settings"),
+  urlInput: document.getElementById("urlInput")
+};
+
+function getUrl(){
+  return (localStorage.getItem("disciplineUrl") || SCRIPT_URL || "").trim();
+}
+function getPin(){
+  return (localStorage.getItem("disciplinePin") || "").trim();
+}
+function lockApp(){
+  localStorage.removeItem("disciplinePin");
+  state.screen = "pin";
+  render();
+}
+
+/* Build a request URL with the shared params + PIN attached. */
+function apiUrl(paramObj){
+  const url = getUrl();
+  const params = new URLSearchParams(paramObj);
+  params.set("pin", getPin());
+  return url + (url.includes("?") ? "&" : "?") + params.toString();
+}
+
+/* ---------- data ---------- */
+async function loadRoster(){
+  const url = getUrl();
+  if(!url){ openSettings(); return; }
+  if(!getPin()){ state.screen = "pin"; render(); return; }
+  state.loading = true; state.error = null; render();
+  try{
+    const res = await fetch(apiUrl({ mode:"roster" }));
+    const raw = await res.text();
+    let data;
+    try{ data = JSON.parse(raw); }
+    catch(_){
+      throw new Error("Server did not return JSON (HTTP " + res.status + "). " +
+        "This usually means the Web App is asking for a Google login. " +
+        "First 120 chars: " + raw.slice(0,120));
+    }
+    if(data.unauthorized){
+      localStorage.removeItem("disciplinePin");
+      state.screen = "pin";
+      state.pinError = data.error || "Incorrect PIN.";
+      state.loading = false;
+      render();
+      return;
+    }
+    if(!data.success) throw new Error(data.error || "Could not load roster");
+    state.students = data.students || [];
+    if(!state.students.length){
+      state.error = "The script ran but returned 0 students. " +
+        "The tab it read is probably not the roster tab — check ROSTER_SHEET_NAME in DisciplineScript.gs.";
+    }
+  }catch(err){
+    state.error = err.message;
+    state.students = [];
+  }
+  state.loading = false;
+  render();
+}
+
+async function sendAction(action){
+  const s = state.student;
+  try{
+    const res = await fetch(apiUrl({
+      mode:"record", class:s.class || state.className || "", name:s.name, action:action
+    }));
+    const data = await res.json();
+    if(data.unauthorized){ lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
+    if(!data.success) throw new Error(data.error || "Failed to record");
+    // reflect locally
+    if(action==="Warning") s.warning = true;
+    if(action==="Move Seats") s.moveSeats = true;
+    if(action==="Incident") s.incident = true;
+    toast(action + " recorded for " + firstName(s.name));
+    render();
+  }catch(err){
+    toast(err.message, true);
+  }
+}
+
+/* ---------- screens ---------- */
+function classes(){
+  const set = [];
+  state.students.forEach(s => { if(s.class && !set.includes(s.class)) set.push(s.class); });
+  return set;
+}
+
+function render(){
+  const locked = state.screen === "pin";
+  els.back.hidden = locked || state.screen === "class";
+  els.gear.style.visibility = locked ? "hidden" : "visible";
+  els.crumb.textContent =
+    locked || state.screen === "class" ? "" :
+    state.screen === "student" ? "Class " + state.className :
+    "Class " + state.className + "  •  " + (state.student ? state.student.name : "");
+
+  if(locked) return renderPin();
+
+  if(state.loading){
+    els.title.textContent = "Loading…";
+    els.view.innerHTML = '<div class="msg">Fetching student list…</div>';
+    return;
+  }
+
+  if(state.screen === "class")   return renderClasses();
+  if(state.screen === "student") return renderStudents();
+  if(state.screen === "actions") return renderActions();
+}
+
+function renderPin(){
+  els.title.textContent = "Enter PIN";
+  els.view.innerHTML =
+    '<form id="pinForm" class="grid" style="margin-top:24px;">' +
+      '<input class="search" id="pinInput" type="password" inputmode="numeric" ' +
+        'autocomplete="off" placeholder="PIN" style="text-align:center; letter-spacing:6px; font-size:20px;">' +
+      (state.pinError ? '<div class="msg" style="color:var(--incident); padding:4px 0;">' + esc(state.pinError) + '</div>' : '') +
+      '<button class="action-btn move" type="submit">Unlock</button>' +
+    '</form>';
+  const input = document.getElementById("pinInput");
+  input.focus({preventScroll:true});
+  document.getElementById("pinForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = input.value.trim();
+    if(!v) return;
+    localStorage.setItem("disciplinePin", v);
+    state.pinError = null;
+    state.screen = "class";
+    loadRoster();
+  });
+}
+
+function renderClasses(){
+  els.title.textContent = "Choose a class";
+  const list = classes();
+  if(!list.length){
+    els.view.innerHTML =
+      '<div class="msg" style="text-align:left; word-break:break-word;">' +
+        (state.error ? esc(state.error) : "No students found.") +
+      '</div>' +
+      '<button class="tile" onclick="loadRoster()">↻&nbsp; Retry</button>';
+    return;
+  }
+  els.view.innerHTML = '<div class="grid">' + list.map(c => {
+    const n = state.students.filter(s => s.class === c).length;
+    return '<button class="tile" onclick="pickClass(\'' + esc(c) + '\')">' +
+             '<span>Class ' + esc(c) + '<span class="sub">' + n + ' students</span></span>' +
+           '</button>';
+  }).join("") + '</div>';
+}
+
+function renderStudents(){
+  els.title.textContent = "Choose a student";
+  const roster = state.students
+    .filter(s => s.class === state.className)
+    .filter(s => s.name.toLowerCase().includes(state.query.toLowerCase()))
+    .sort((a,b) => a.name.localeCompare(b.name));
+
+  const rows = roster.map((s,i) => {
+    const idx = state.students.indexOf(s);
+    return '<button class="student-row" onclick="pickStudent(' + idx + ')">' +
+             avatar(s) +
+             '<span class="name">' + esc(s.name) + '</span>' +
+             '<span class="flags">' +
+               '<span class="flag ' + (s.warning?"warning":"") + '"></span>' +
+               '<span class="flag ' + (s.moveSeats?"move":"") + '"></span>' +
+               '<span class="flag ' + (s.incident?"incident":"") + '"></span>' +
+             '</span>' +
+           '</button>';
+  }).join("");
+
+  els.view.innerHTML =
+    '<input class="search" id="q" placeholder="Search name…" value="' + esc(state.query) + '">' +
+    '<div class="grid">' + (rows || '<div class="msg">No matches.</div>') + '</div>';
+
+  const q = document.getElementById("q");
+  q.addEventListener("input", e => { state.query = e.target.value; renderStudents(); });
+  q.focus({preventScroll:true});
+  const len = q.value.length; q.setSelectionRange(len,len);
+}
+
+function renderActions(){
+  const s = state.student;
+  els.title.textContent = firstName(s.name);
+  const done = [];
+  if(s.warning) done.push("Warning");
+  if(s.moveSeats) done.push("Move Seats");
+  if(s.incident) done.push("Incident");
+
+  els.view.innerHTML =
+    '<div class="profile">' +
+      avatar(s, true) +
+      '<div><div class="name">' + esc(s.name) + '</div>' +
+      '<div class="status">' + (done.length ? "On record: " + done.join(", ") : "No prior actions on record") + '</div></div>' +
+    '</div>' +
+    '<div class="grid">' + ACTIONS.map(a => {
+      const already = (a.key==="Warning"&&s.warning)||(a.key==="Move Seats"&&s.moveSeats)||(a.key==="Incident"&&s.incident);
+      return '<button class="action-btn ' + a.cls + '" onclick="confirmAction(\'' + a.key + '\')">' +
+               a.key +
+               '<span class="desc">' + (already ? "Already on record — tap to log again" : a.desc) + '</span>' +
+             '</button>';
+    }).join("") + '</div>';
+}
+
+/* ---------- actions ---------- */
+function pickClass(c){ state.className = c; state.query = ""; state.screen = "student"; render(); }
+function pickStudent(idx){ state.student = state.students[idx]; state.screen = "actions"; render(); }
+function goBack(){
+  if(state.screen === "actions"){ state.screen = "student"; state.student = null; }
+  else if(state.screen === "student"){ state.screen = "class"; state.className = null; }
+  render();
+}
+function confirmAction(key){
+  const s = state.student;
+  if(confirm(key + " for " + s.name + "?")) sendAction(key);
+}
+
+/* ---------- helpers ---------- */
+function firstName(n){ return (n || "").split(" ")[0]; }
+function initials(n){ return (n||"?").split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase(); }
+function avatar(s, big){
+  if(s.image){
+    return '<img class="avatar" src="' + esc(s.image) + '" alt="" ' +
+      'onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'avatar\',textContent:\'' + initials(s.name) + '\'}))">';
+  }
+  return '<div class="avatar">' + initials(s.name) + '</div>';
+}
+function esc(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+let toastTimer;
+function toast(text, isErr){
+  els.toast.textContent = text;
+  els.toast.className = "toast show" + (isErr ? " err" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { els.toast.className = "toast" + (isErr ? " err" : ""); }, 2600);
+}
+
+/* ---------- settings ---------- */
+function openSettings(){
+  els.urlInput.value = getUrl();
+  els.dialog.showModal();
+}
+document.getElementById("gearBtn").addEventListener("click", openSettings);
+document.getElementById("cancelSettings").addEventListener("click", () => els.dialog.close());
+document.getElementById("lockBtn").addEventListener("click", () => {
+  els.dialog.close();
+  lockApp();
+});
+document.getElementById("saveSettings").addEventListener("click", () => {
+  const v = els.urlInput.value.trim();
+  if(v) localStorage.setItem("disciplineUrl", v);
+  els.dialog.close();
+  loadRoster();
+});
+els.back.addEventListener("click", goBack);
+
+/* ---------- go ---------- */
+if(getPin()){
+  loadRoster();
+}else{
+  state.screen = "pin";
+  render();
+}
+</script>
+</body>
+</html>
