@@ -57,12 +57,23 @@
     border-radius:14px; padding:12px 14px; width:100%; text-align:left; color:var(--text);
   }
   .student-row:active{background:var(--card-2);}
+  .student-row{border-left-width:4px;}
+  .student-row.lvl-warning{border-left-color:var(--warning);}
+  .student-row.lvl-move{border-left-color:var(--move);}
+  .student-row.lvl-incident{border-left-color:var(--incident);}
   .avatar{
     width:44px; height:44px; border-radius:50%; object-fit:cover;
     background:var(--card-2); flex:none;
     display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--muted);
   }
   .student-row .name{flex:1; font-weight:600; font-size:16px;}
+  .status-tag{
+    font-size:11px; font-weight:700; letter-spacing:.02em;
+    padding:3px 8px; border-radius:999px; color:#fff; flex:none; white-space:nowrap;
+  }
+  .status-tag.warning{background:var(--warning);}
+  .status-tag.move{background:var(--move);}
+  .status-tag.incident{background:var(--incident);}
   .flags{display:flex; gap:4px; flex:none;}
   .flag{width:9px; height:9px; border-radius:50%; background:var(--line);}
   .flag.warning{background:var(--warning);}
@@ -171,13 +182,7 @@
 ------------------------------------------------------------------ */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypVEbFCfSeu1ONvARs79N_9KhE46iOh3yPO7I4wJ_IK8b6G-495X3x6aM3rnERZHk2HA/exec";
 
-const ACTIONS = [
-  { key:"Warning",    cls:"warning",  desc:"Verbal warning given" },
-  { key:"Move Seats", cls:"move",     desc:"Student moved to another seat" },
-  { key:"Incident",   cls:"incident", desc:"Logged as a formal incident" }
-];
-
-/* Confirmation sound played when an option is chosen. */
+/* Confirmation sound played when a student is escalated. */
 const DING = new Audio("https://static.wixstatic.com/mp3/593d03_244b1a7fddcf4931957cde0d504d0354.mp3");
 DING.preload = "auto";
 function playDing(){
@@ -185,16 +190,14 @@ function playDing(){
 }
 
 const state = {
-  screen: "class",     // class -> student -> actions
+  screen: "class",     // class -> student
   students: [],
   className: null,
-  student: null,
   loading: false,
   refreshing: false,
   cacheTs: 0,
   error: null,
   pinError: null,
-  resetArmed: false,
   classResetArmed: false,
   query: ""
 };
@@ -285,11 +288,6 @@ async function loadRoster(){
       state.students = fresh;
       state.cacheTs = Date.now();
       writeCache(fresh);
-      // keep the open student pointing at the refreshed record
-      if(state.student){
-        const m = state.students.find(x => x.name === state.student.name && x.class === state.student.class);
-        if(m) state.student = m;
-      }
     }else if(!haveCache){
       state.error = "The script ran but returned 0 students. " +
         "The tab it read is probably not the roster tab — check ROSTER_SHEET_NAME in DisciplineScript.gs.";
@@ -309,8 +307,7 @@ async function loadRoster(){
 
 const FLAG_KEY = { "Warning":"warning", "Move Seats":"moveSeats", "Incident":"incident" };
 
-async function sendAction(action){
-  const s = state.student;
+async function sendAction(action, s){
   const flag = FLAG_KEY[action];
   const prev = s[flag];
   // optimistic: show it straight away, revert if the server rejects
@@ -324,7 +321,7 @@ async function sendAction(action){
     const data = await res.json();
     if(data.unauthorized){ s[flag] = prev; writeCache(state.students); lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
     if(!data.success) throw new Error(data.error || "Failed to record");
-    toast(action + " recorded for " + firstName(s.name));
+    toast(action + " — " + firstName(s.name));
   }catch(err){
     s[flag] = prev;
     writeCache(state.students);
@@ -333,21 +330,29 @@ async function sendAction(action){
   }
 }
 
-async function sendReset(){
-  const s = state.student;
+async function sendReset(s, opts){
+  opts = opts || {};
+  const prev = { warning:s.warning, moveSeats:s.moveSeats, incident:s.incident };
+  // optimistic clear
+  s.warning = false; s.moveSeats = false; s.incident = false;
+  writeCache(state.students);
+  render();
   try{
     const res = await fetch(apiUrl({
       mode:"reset", class:s.class || state.className || "", name:s.name
     }));
     const data = await res.json();
-    if(data.unauthorized){ lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
+    if(data.unauthorized){
+      Object.assign(s, prev); writeCache(state.students);
+      lockApp(); toast(data.error || "Incorrect PIN.", true); return;
+    }
     if(!data.success) throw new Error(data.error || "Failed to reset");
-    s.warning = false; s.moveSeats = false; s.incident = false;
-    writeCache(state.students);
-    toast("Cleared all flags for " + firstName(s.name));
-    render();
+    if(!opts.silent) toast("Cleared " + firstName(s.name));
   }catch(err){
-    toast(err.message, true);
+    Object.assign(s, prev);
+    writeCache(state.students);
+    toast("Couldn't clear " + firstName(s.name) + " — " + err.message, true);
+    render();
   }
 }
 
@@ -383,8 +388,7 @@ function render(){
   els.crumb.textContent =
     locked ? "" :
     state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
-    state.screen === "student" ? "Class " + state.className :
-    "Class " + state.className + "  •  " + (state.student ? state.student.name : "");
+    "Tap: Warning → Move Seats → Incident → clear" + (state.refreshing ? "   ·   updating…" : "");
 
   if(locked) return renderPin();
 
@@ -396,8 +400,7 @@ function render(){
   }
 
   if(state.screen === "class")   return renderClasses();
-  if(state.screen === "student") return renderStudents();
-  if(state.screen === "actions") return renderActions();
+  return renderStudents();
 }
 
 function renderPin(){
@@ -441,18 +444,35 @@ function renderClasses(){
   }).join("") + '</div>';
 }
 
+/* Escalation ladder: what the next tap on this student will do. */
+function nextStep(s){
+  if(!s.warning)   return "Warning";
+  if(!s.moveSeats) return "Move Seats";
+  if(!s.incident)  return "Incident";
+  return "Reset";
+}
+/* Highest level currently on the student, for the row's look. */
+function currentLevel(s){
+  if(s.incident)  return { cls:"incident", label:"Incident" };
+  if(s.moveSeats) return { cls:"move",     label:"Moved seats" };
+  if(s.warning)   return { cls:"warning",  label:"Warning" };
+  return { cls:"", label:"" };
+}
+
 function renderStudents(){
-  els.title.textContent = "Choose a student";
+  els.title.textContent = "Class " + state.className;
   const roster = state.students
     .filter(s => s.class === state.className)
     .filter(s => s.name.toLowerCase().includes(state.query.toLowerCase()))
     .sort((a,b) => a.name.localeCompare(b.name));
 
-  const rows = roster.map((s,i) => {
+  const rows = roster.map(s => {
     const idx = state.students.indexOf(s);
-    return '<button class="student-row" onclick="pickStudent(' + idx + ')">' +
+    const lvl = currentLevel(s);
+    return '<button class="student-row ' + (lvl.cls ? "lvl-" + lvl.cls : "") + '" onclick="cycleStudent(' + idx + ')">' +
              avatar(s) +
              '<span class="name">' + esc(s.name) + '</span>' +
+             (lvl.label ? '<span class="status-tag ' + lvl.cls + '">' + lvl.label + '</span>' : '') +
              '<span class="flags">' +
                '<span class="flag ' + (s.warning?"warning":"") + '"></span>' +
                '<span class="flag ' + (s.moveSeats?"move":"") + '"></span>' +
@@ -473,68 +493,36 @@ function renderStudents(){
 
   const q = document.getElementById("q");
   q.addEventListener("input", e => { state.query = e.target.value; renderStudents(); });
-  if(!state.classResetArmed){
+  if(!state.classResetArmed && !skipSearchFocus){
     q.focus({preventScroll:true});
     const len = q.value.length; q.setSelectionRange(len,len);
   }
-}
-
-function renderActions(){
-  const s = state.student;
-  els.title.textContent = firstName(s.name);
-  const done = [];
-  if(s.warning) done.push("Warning");
-  if(s.moveSeats) done.push("Move Seats");
-  if(s.incident) done.push("Incident");
-
-  els.view.innerHTML =
-    '<div class="profile">' +
-      avatar(s, true) +
-      '<div><div class="name">' + esc(s.name) + '</div>' +
-      '<div class="status">' + (done.length ? "On record: " + done.join(", ") : "No prior actions on record") + '</div></div>' +
-    '</div>' +
-    '<div class="grid">' + ACTIONS.map(a => {
-      const already = (a.key==="Warning"&&s.warning)||(a.key==="Move Seats"&&s.moveSeats)||(a.key==="Incident"&&s.incident);
-      return '<button class="action-btn ' + a.cls + '" onclick="chooseAction(\'' + a.key + '\')">' +
-               a.key +
-               '<span class="desc">' + (already ? "Already on record — tap to log again" : a.desc) + '</span>' +
-             '</button>';
-    }).join("") + '</div>' +
-    '<button class="reset-btn' + (state.resetArmed ? ' armed' : '') + '" onclick="resetTapped()">' +
-      (state.resetArmed ? "Tap again to clear all flags" : "Reset this student") +
-    '</button>';
+  skipSearchFocus = false;
 }
 
 /* ---------- actions ---------- */
 function pickClass(c){ state.className = c; state.query = ""; state.classResetArmed = false; state.screen = "student"; render(); }
-function pickStudent(idx){ state.student = state.students[idx]; state.resetArmed = false; state.classResetArmed = false; state.screen = "actions"; render(); }
 function goBack(){
-  if(state.screen === "actions"){ state.screen = "student"; state.student = null; state.resetArmed = false; }
-  else if(state.screen === "student"){ state.screen = "class"; state.className = null; state.classResetArmed = false; }
+  if(state.screen === "student"){ state.screen = "class"; state.className = null; state.classResetArmed = false; }
   render();
 }
 
-/* Tap an option: sound + record immediately, no confirmation dialog. */
-function chooseAction(key){
-  playDing();
-  state.resetArmed = false;
-  sendAction(key);
-}
+/* When true, the next student-list render won't grab the search box
+   (so tapping rows doesn't pop the phone keyboard open). */
+let skipSearchFocus = false;
 
-/* Reset needs two taps (no popup): first taps arms it for 3s. */
-let resetTimer;
-function resetTapped(){
-  if(!state.resetArmed){
-    state.resetArmed = true;
-    render();
-    clearTimeout(resetTimer);
-    resetTimer = setTimeout(() => { state.resetArmed = false; render(); }, 3000);
+/* Tap a student to move it one rung up the ladder:
+   none -> Warning -> Move Seats -> Incident -> (4th tap) silent reset. */
+function cycleStudent(idx){
+  skipSearchFocus = true;
+  const s = state.students[idx];
+  const step = nextStep(s);
+  if(step === "Reset"){
+    sendReset(s, { silent:true });   // 4th tap: no sound, no toast
     return;
   }
-  clearTimeout(resetTimer);
-  state.resetArmed = false;
   playDing();
-  sendReset();
+  sendAction(step, s);
 }
 
 /* Same two-tap guard for wiping a whole class. */
