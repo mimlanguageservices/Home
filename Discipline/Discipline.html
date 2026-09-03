@@ -254,6 +254,7 @@ async function loadRoster(){
   const haveCache = cached && Array.isArray(cached.students) && cached.students.length;
   if(haveCache){
     state.students = cached.students;
+    applyLocalFlags();
     state.cacheTs = cached.ts;
     state.loading = false;
     state.refreshing = true;
@@ -286,6 +287,7 @@ async function loadRoster(){
     const fresh = data.students || [];
     if(fresh.length){
       state.students = fresh;
+      applyLocalFlags();
       state.cacheTs = Date.now();
       writeCache(fresh);
     }else if(!haveCache){
@@ -305,73 +307,55 @@ async function loadRoster(){
   render();
 }
 
-const FLAG_KEY = { "Warning":"warning", "Move Seats":"moveSeats", "Incident":"incident" };
+/* ------------------------------------------------------------------
+   Discipline flags live ON THIS DEVICE only (localStorage). The
+   sheet's columns D/E/F are ignored entirely — the roster fetch is
+   used purely for names, classes and photos.
+   Shape: { "8A|Martin Angulo Toro": { w:true, m:false, i:false } }
+------------------------------------------------------------------ */
+const FLAGS_KEY = "disciplineFlags";
+function loadFlags(){
+  try{ return JSON.parse(localStorage.getItem(FLAGS_KEY) || "{}"); }catch(_){ return {}; }
+}
+function saveFlags(f){
+  try{ localStorage.setItem(FLAGS_KEY, JSON.stringify(f)); }catch(_){}
+}
+function flagId(s){ return (s.class || "") + "|" + s.name; }
 
-async function sendAction(action, s){
-  const flag = FLAG_KEY[action];
-  const prev = s[flag];
-  // optimistic: show it straight away, revert if the server rejects
-  s[flag] = true;
-  writeCache(state.students);
-  render();
-  try{
-    const res = await fetch(apiUrl({
-      mode:"record", class:s.class || state.className || "", name:s.name, action:action
-    }));
-    const data = await res.json();
-    if(data.unauthorized){ s[flag] = prev; writeCache(state.students); lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
-    if(!data.success) throw new Error(data.error || "Failed to record");
-    toast(action + " — " + firstName(s.name));
-  }catch(err){
-    s[flag] = prev;
-    writeCache(state.students);
-    toast("Couldn't save " + action + " — " + err.message, true);
-    render();
-  }
+/* Overlay this device's stored flags onto the roster. */
+function applyLocalFlags(){
+  const f = loadFlags();
+  state.students.forEach(s => {
+    const rec = f[flagId(s)] || {};
+    s.warning   = !!rec.w;
+    s.moveSeats = !!rec.m;
+    s.incident  = !!rec.i;
+  });
 }
 
-async function sendReset(s, opts){
-  opts = opts || {};
-  const prev = { warning:s.warning, moveSeats:s.moveSeats, incident:s.incident };
-  // optimistic clear
-  s.warning = false; s.moveSeats = false; s.incident = false;
-  writeCache(state.students);
-  render();
-  try{
-    const res = await fetch(apiUrl({
-      mode:"reset", class:s.class || state.className || "", name:s.name
-    }));
-    const data = await res.json();
-    if(data.unauthorized){
-      Object.assign(s, prev); writeCache(state.students);
-      lockApp(); toast(data.error || "Incorrect PIN.", true); return;
-    }
-    if(!data.success) throw new Error(data.error || "Failed to reset");
-    if(!opts.silent) toast("Cleared " + firstName(s.name));
-  }catch(err){
-    Object.assign(s, prev);
-    writeCache(state.students);
-    toast("Couldn't clear " + firstName(s.name) + " — " + err.message, true);
-    render();
-  }
+/* Persist one student's flags to the device. */
+function setFlags(s, w, m, i){
+  s.warning = w; s.moveSeats = m; s.incident = i;
+  const f = loadFlags();
+  const id = flagId(s);
+  if(!w && !m && !i) delete f[id];
+  else f[id] = { w: w, m: m, i: i };
+  saveFlags(f);
 }
 
-async function sendClassReset(){
+/* Clear every student in the current class. */
+function doClassReset(){
   const cls = state.className;
-  try{
-    const res = await fetch(apiUrl({ mode:"resetclass", class:cls || "" }));
-    const data = await res.json();
-    if(data.unauthorized){ lockApp(); toast(data.error || "Incorrect PIN.", true); return; }
-    if(!data.success) throw new Error(data.error || "Failed to reset class");
-    state.students.forEach(s => {
-      if(s.class === cls){ s.warning = false; s.moveSeats = false; s.incident = false; }
-    });
-    writeCache(state.students);
-    toast("Cleared all flags for " + (data.cleared != null ? data.cleared + " students in " : "") + cls);
-    render();
-  }catch(err){
-    toast(err.message, true);
-  }
+  const f = loadFlags();
+  state.students.forEach(s => {
+    if(s.class === cls){
+      s.warning = false; s.moveSeats = false; s.incident = false;
+      delete f[flagId(s)];
+    }
+  });
+  saveFlags(f);
+  toast("Cleared all flags in " + cls);
+  render();
 }
 
 /* ---------- screens ---------- */
@@ -444,13 +428,6 @@ function renderClasses(){
   }).join("") + '</div>';
 }
 
-/* Escalation ladder: what the next tap on this student will do. */
-function nextStep(s){
-  if(!s.warning)   return "Warning";
-  if(!s.moveSeats) return "Move Seats";
-  if(!s.incident)  return "Incident";
-  return "Reset";
-}
 /* Highest level currently on the student, for the row's look. */
 function currentLevel(s){
   if(s.incident)  return { cls:"incident", label:"Incident" };
@@ -512,17 +489,15 @@ function goBack(){
 let skipSearchFocus = false;
 
 /* Tap a student to move it one rung up the ladder:
-   none -> Warning -> Move Seats -> Incident -> (4th tap) silent reset. */
+   none -> Warning -> Move Seats -> Incident -> (4th tap) silent clear. */
 function cycleStudent(idx){
   skipSearchFocus = true;
   const s = state.students[idx];
-  const step = nextStep(s);
-  if(step === "Reset"){
-    sendReset(s, { silent:true });   // 4th tap: no sound, no toast
-    return;
-  }
-  playDing();
-  sendAction(step, s);
+  if(!s.warning){          playDing(); setFlags(s, true,  false, false); }
+  else if(!s.moveSeats){   playDing(); setFlags(s, true,  true,  false); }
+  else if(!s.incident){    playDing(); setFlags(s, true,  true,  true ); }
+  else {                               setFlags(s, false, false, false); }  // 4th tap: silent
+  render();
 }
 
 /* Same two-tap guard for wiping a whole class. */
@@ -538,7 +513,7 @@ function classResetTapped(){
   clearTimeout(classResetTimer);
   state.classResetArmed = false;
   playDing();
-  sendClassReset();
+  doClassReset();
 }
 
 /* ---------- helpers ---------- */
