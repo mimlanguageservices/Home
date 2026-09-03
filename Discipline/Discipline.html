@@ -175,6 +175,8 @@ const state = {
   className: null,
   student: null,
   loading: false,
+  refreshing: false,
+  cacheTs: 0,
   error: null,
   pinError: null,
   query: ""
@@ -211,12 +213,37 @@ function apiUrl(paramObj){
   return url + (url.includes("?") ? "&" : "?") + params.toString();
 }
 
+/* ---------- roster cache (instant load) ---------- */
+const CACHE_KEY = "disciplineRoster";
+function readCache(){
+  try{ return JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); }catch(_){ return null; }
+}
+function writeCache(students){
+  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), students: students })); }catch(_){}
+}
+
 /* ---------- data ---------- */
 async function loadRoster(){
   const url = getUrl();
   if(!url){ openSettings(); return; }
   if(!getPin()){ state.screen = "pin"; render(); return; }
-  state.loading = true; state.error = null; render();
+  state.error = null;
+
+  // 1. Paint immediately from the last saved list, if we have one.
+  const cached = readCache();
+  const haveCache = cached && Array.isArray(cached.students) && cached.students.length;
+  if(haveCache){
+    state.students = cached.students;
+    state.cacheTs = cached.ts;
+    state.loading = false;
+    state.refreshing = true;
+    if(state.screen === "pin") state.screen = "class";
+  }else{
+    state.loading = true;
+  }
+  render();
+
+  // 2. Refresh from the server in the background.
   try{
     const res = await fetch(apiUrl({ mode:"roster" }));
     const raw = await res.text();
@@ -231,21 +258,35 @@ async function loadRoster(){
       localStorage.removeItem("disciplinePin");
       state.screen = "pin";
       state.pinError = data.error || "Incorrect PIN.";
-      state.loading = false;
+      state.loading = false; state.refreshing = false;
       render();
       return;
     }
     if(!data.success) throw new Error(data.error || "Could not load roster");
-    state.students = data.students || [];
-    if(!state.students.length){
+    const fresh = data.students || [];
+    if(fresh.length){
+      state.students = fresh;
+      state.cacheTs = Date.now();
+      writeCache(fresh);
+      // keep the open student pointing at the refreshed record
+      if(state.student){
+        const m = state.students.find(x => x.name === state.student.name && x.class === state.student.class);
+        if(m) state.student = m;
+      }
+    }else if(!haveCache){
       state.error = "The script ran but returned 0 students. " +
         "The tab it read is probably not the roster tab — check ROSTER_SHEET_NAME in DisciplineScript.gs.";
     }
   }catch(err){
-    state.error = err.message;
-    state.students = [];
+    if(haveCache){
+      toast("Showing saved list — couldn't refresh", true);
+    }else{
+      state.error = err.message;
+      state.students = [];
+    }
   }
   state.loading = false;
+  state.refreshing = false;
   render();
 }
 
@@ -262,6 +303,7 @@ async function sendAction(action){
     if(action==="Warning") s.warning = true;
     if(action==="Move Seats") s.moveSeats = true;
     if(action==="Incident") s.incident = true;
+    writeCache(state.students);
     toast(action + " recorded for " + firstName(s.name));
     render();
   }catch(err){
@@ -281,7 +323,8 @@ function render(){
   els.back.hidden = locked || state.screen === "class";
   els.gear.style.visibility = locked ? "hidden" : "visible";
   els.crumb.textContent =
-    locked || state.screen === "class" ? "" :
+    locked ? "" :
+    state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
     state.screen === "student" ? "Class " + state.className :
     "Class " + state.className + "  •  " + (state.student ? state.student.name : "");
 
@@ -289,7 +332,8 @@ function render(){
 
   if(state.loading){
     els.title.textContent = "Loading…";
-    els.view.innerHTML = '<div class="msg">Fetching student list…</div>';
+    els.view.innerHTML = '<div class="msg">Fetching the student list for the first time…<br>' +
+      'After this it opens instantly.</div>';
     return;
   }
 
