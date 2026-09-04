@@ -35,6 +35,7 @@ const COL_IMAGE = 3; // C
 const COL_WARNING = 4; // D
 const COL_MOVE_SEATS = 5; // E
 const COL_INCIDENT = 6; // F
+const COL_GENDER = 9; // I
 
 // Maps the action name coming from the app to its column
 const ACTION_COLUMNS = {
@@ -104,7 +105,7 @@ function getRoster() {
     return respond({ success: true, students: [] });
   }
 
-  const values = sheet.getRange(2, 1, lastRow - 1, COL_INCIDENT).getValues();
+  const values = sheet.getRange(2, 1, lastRow - 1, COL_GENDER).getValues();
   const students = [];
 
   values.forEach(function (row) {
@@ -114,6 +115,7 @@ function getRoster() {
       class: (row[COL_CLASS - 1] || '').toString().trim(),
       name: name,
       image: (row[COL_IMAGE - 1] || '').toString().trim(),
+      gender: normalizeGender(row[COL_GENDER - 1]),
       warning: toBool(row[COL_WARNING - 1]),
       moveSeats: toBool(row[COL_MOVE_SEATS - 1]),
       incident: toBool(row[COL_INCIDENT - 1])
@@ -239,6 +241,13 @@ function getSheet(name) {
 function toBool(v) {
   if (v === true) return true;
   return v.toString().trim().toLowerCase() === 'true';
+}
+
+function normalizeGender(v) {
+  const g = (v || '').toString().trim().toLowerCase();
+  if (g === 'boy' || g === 'b' || g === 'male' || g === 'm') return 'boy';
+  if (g === 'girl' || g === 'g' || g === 'female' || g === 'f') return 'girl';
+  return '';
 }
 
 function respond(data) {

@@ -10,8 +10,11 @@
   :root{
     --bg:#111827; --card:#1f2937; --card-2:#273244;
     --text:#f3f4f6; --muted:#9ca3af; --line:#374151;
-    --warning:#d97706; --move:#2563eb; --incident:#dc2626;
+    --warning:#d97706; --move:#7c3aed; --incident:#dc2626;
     --ok:#059669;
+    --boy:#2563eb; --girl:#db2777;
+    --boy-bg:rgba(37,99,235,.14); --boy-bg-2:rgba(37,99,235,.26);
+    --girl-bg:rgba(219,39,119,.14); --girl-bg-2:rgba(219,39,119,.26);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0; padding:0;}
@@ -61,6 +64,12 @@
   .student-row.lvl-warning{border-left-color:var(--warning);}
   .student-row.lvl-move{border-left-color:var(--move);}
   .student-row.lvl-incident{border-left-color:var(--incident);}
+  .student-row.boy{background:var(--boy-bg);}
+  .student-row.girl{background:var(--girl-bg);}
+  .student-row.boy:active{background:var(--boy-bg-2);}
+  .student-row.girl:active{background:var(--girl-bg-2);}
+  .student-row.boy .avatar{box-shadow:0 0 0 2px var(--boy);}
+  .student-row.girl .avatar{box-shadow:0 0 0 2px var(--girl);}
   .avatar{
     width:44px; height:44px; border-radius:50%; object-fit:cover;
     background:var(--card-2); flex:none;
@@ -428,6 +437,9 @@ function renderClasses(){
   }).join("") + '</div>';
 }
 
+/* Sort order: boys first, then girls, then unspecified. */
+function genderRank(s){ return s.gender === "boy" ? 0 : s.gender === "girl" ? 1 : 2; }
+
 /* Highest level currently on the student, for the row's look. */
 function currentLevel(s){
   if(s.incident)  return { cls:"incident", label:"Incident" };
@@ -441,12 +453,13 @@ function renderStudents(){
   const roster = state.students
     .filter(s => s.class === state.className)
     .filter(s => s.name.toLowerCase().includes(state.query.toLowerCase()))
-    .sort((a,b) => a.name.localeCompare(b.name));
+    .sort((a,b) => (genderRank(a) - genderRank(b)) || a.name.localeCompare(b.name));
 
   const rows = roster.map(s => {
     const idx = state.students.indexOf(s);
     const lvl = currentLevel(s);
-    return '<button class="student-row ' + (lvl.cls ? "lvl-" + lvl.cls : "") + '" onclick="cycleStudent(' + idx + ')">' +
+    const g = s.gender === "boy" ? " boy" : s.gender === "girl" ? " girl" : "";
+    return '<button class="student-row' + g + (lvl.cls ? " lvl-" + lvl.cls : "") + '" onclick="cycleStudent(' + idx + ')">' +
              avatar(s) +
              '<span class="name">' + esc(s.name) + '</span>' +
              (lvl.label ? '<span class="status-tag ' + lvl.cls + '">' + lvl.label + '</span>' : '') +
