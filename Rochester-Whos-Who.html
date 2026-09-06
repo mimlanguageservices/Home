@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rochester Who's Who</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #334155;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.02em;
+    }
+
+    #sub-label {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Card ── */
+    .scene {
+      width: 320px;
+      height: 380px;
+      perspective: 1000px;
+      cursor: pointer;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .card.flipped { transform: rotateY(180deg); }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
+      padding: 1.2rem;
+      background: #ffffff;
+    }
+
+    .face.front img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 10px;
+      background: #e2e8f0;
+    }
+
+    .face.front .prompt {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .face.back {
+      background: #3b82f6;
+      transform: rotateY(180deg);
+    }
+
+    .face.back .name {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .face.back .class-tag {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #bfdbfe;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: rgba(255,255,255,0.15);
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #2563eb; }
+
+    #counter {
+      font-size: 0.9rem;
+      color: #64748b;
+      min-width: 90px;
+      text-align: center;
+    }
+
+    #hint {
+      margin-top: 1.2rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    #status {
+      color: #64748b;
+      font-size: 1rem;
+      margin-top: 4rem;
+      text-align: center;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Rochester Who's Who</h1>
+  <p id="sub-label">Loading…</p>
+
+  <div id="status">Loading students…</div>
+
+  <div class="scene" id="scene" style="display:none" onclick="flipCard()">
+    <div class="card" id="card">
+      <div class="face front">
+        <img id="card-img" src="" alt="Student photo" />
+        <div class="prompt">Who is this?</div>
+      </div>
+      <div class="face back">
+        <div class="class-tag" id="card-class"></div>
+        <div class="name" id="card-name"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls" id="controls" style="display:none">
+    <button class="btn" id="btn-next" onclick="nextCard()">Next &#8594;</button>
+    <span id="counter"></span>
+  </div>
+
+  <p id="hint" style="display:none">Click the card to reveal the name and class</p>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
+    const SHEET_ID = '1U37diEkPAAupol2Yg0ahOAOSGKN8DkI_av6LdhP-p7I';
+    // ============================================================
+
+    let students = [];
+    let deck = [];      // shuffled indices left to show this round
+    let seenCount = 0;  // how many shown so far this round
+
+    async function loadSheet() {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&cachebust=${Date.now()}`;
+
+      try {
+        const res  = await fetch(url);
+        if (!res.ok) throw new Error('bad response');
+        const text = await res.text();
+        parseCSV(text);
+      } catch (err) {
+        document.getElementById('status').textContent =
+          'Could not load the student sheet. Make sure it is shared as "Anyone with the link can view".';
+      }
+    }
+
+    // Proper CSV parser — handles quoted fields containing commas
+    function parseCSVRow(row) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < row.length; i++) {
+        const ch = row[i];
+        if (ch === '"') {
+          if (inQuotes && row[i + 1] === '"') { current += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    function parseCSV(text) {
+      const rows = text.trim().split('\n').map(parseCSVRow);
+
+      if (rows.length < 2) {
+        document.getElementById('status').textContent = 'No students found in the sheet yet.';
+        return;
+      }
+
+      // Column A = Class, Column B = Student Name, Column C = Student Image
+      students = rows.slice(1)
+        .map(r => ({ cls: r[0] || '', name: r[1] || '', img: r[2] || '' }))
+        .filter(s => s.name && s.img);
+
+      if (students.length === 0) {
+        document.getElementById('status').textContent = 'No students with both a name and photo were found.';
+        return;
+      }
+
+      document.getElementById('sub-label').textContent = `${students.length} students loaded`;
+      document.getElementById('status').style.display   = 'none';
+      document.getElementById('scene').style.display    = '';
+      document.getElementById('controls').style.display = '';
+      document.getElementById('hint').style.display      = '';
+
+      newRound();
+      showNext();
+    }
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function newRound() {
+      deck = shuffle(students.map((_, i) => i));
+      seenCount = 0;
+    }
+
+    function showNext() {
+      if (deck.length === 0) newRound();
+
+      const idx = deck.pop();
+      seenCount++;
+      const s = students[idx];
+
+      document.getElementById('card-name').textContent  = s.name;
+      document.getElementById('card-class').textContent = s.cls;
+
+      const img = document.getElementById('card-img');
+      img.onerror = () => { img.src = ''; };
+      img.src = s.img;
+
+      document.getElementById('card').classList.remove('flipped');
+      document.getElementById('counter').textContent = `${seenCount} / ${students.length}`;
+    }
+
+    function nextCard() {
+      showNext();
+    }
+
+    function flipCard() {
+      document.getElementById('card').classList.toggle('flipped');
+    }
+
+    loadSheet();
+  </script>
+</body>
+</html>
