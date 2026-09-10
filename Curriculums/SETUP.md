@@ -12,21 +12,22 @@
 
 **Row 1** — headers, exactly these columns (any order is fine, matching is by keyword):
 
-| Grade | Subject | Book | Lesson | Link | Assignment |
-|---|---|---|---|---|---|
+| Grade | Subject | Book | Lesson | Link | Assignment | Assignment Type |
+|---|---|---|---|---|---|---|
 
 **Row 2 and below** — one row per lesson, e.g.:
 
-| Grade | Subject | Book | Lesson | Link | Assignment |
-|---|---|---|---|---|---|
-| 8th Grade | Real World English | Impact 4 | 7.1 | https://docs.google.com/presentation/d/XXXX/edit | https://docs.google.com/document/d/AAAA/edit |
-| 8th Grade | Real World English | Impact 4 | 7.2 | https://docs.google.com/presentation/d/YYYY/edit | |
-| 8th Grade | Real World English | Impact 5 | 1.1 | https://docs.google.com/presentation/d/ZZZZ/edit | https://docs.google.com/document/d/BBBB/edit |
-| 9th Grade | Real World English | Impact 6 | 1.1 | https://docs.google.com/presentation/d/WWWW/edit | |
+| Grade | Subject | Book | Lesson | Link | Assignment | Assignment Type |
+|---|---|---|---|---|---|---|
+| 8th Grade | Real World English | Impact 4 | 7.1 | https://docs.google.com/presentation/d/XXXX/edit | https://docs.google.com/document/d/AAAA/edit | Vocabulary |
+| 8th Grade | Real World English | Impact 4 | 7.2 | https://docs.google.com/presentation/d/YYYY/edit | | |
+| 8th Grade | Real World English | Impact 5 | 1.1 | https://docs.google.com/presentation/d/ZZZZ/edit | https://docs.google.com/document/d/BBBB/edit | Grammar |
+| 9th Grade | Real World English | Impact 6 | 1.1 | https://docs.google.com/presentation/d/WWWW/edit | | |
 
 - `Lesson` numbers (e.g. `7.1`, `7.2`) are sorted numerically within each book automatically.
 - `Link` can be the normal "Share" link to the Google Slides file — it just opens in a new tab, no special publish/embed link needed.
 - `Assignment` is optional per lesson — any link works (Google Doc, Form, etc). Shows as a purple "Open Assignment" button next to "Open Slides". Leave blank if a lesson has no homework yet.
+- `Assignment Type` is optional free text (e.g. "Vocabulary", "Grammar", "Writing") — shown as a small tag next to the Assignment button. Only appears when `Assignment` also has a link.
 - Rows with an empty `Link` still show up, labeled "No slides yet".
 
 The site is already pointed at the sheet above — just keep adding rows there and the site updates automatically.
