@@ -26,8 +26,8 @@
 
 - `Lesson` numbers (e.g. `7.1`, `7.2`) are sorted numerically within each book automatically.
 - `Link` can be the normal "Share" link to the Google Slides file — it just opens in a new tab, no special publish/embed link needed.
-- `Assignment` is optional per lesson — any link works (Google Doc, Form, etc). Shows as a purple "Open Assignment" button next to "Open Slides". Leave blank if a lesson has no homework yet.
-- `Assignment Type` is optional free text (e.g. "Vocabulary", "Grammar", "Writing") — shown as a small tag next to the Assignment button. Only appears when `Assignment` also has a link.
+- `Assignment` is optional per lesson — any link works (Google Doc, Form, etc). Shows as a purple button next to "Open Slides". Leave blank if a lesson has no homework yet.
+- `Assignment Type` is optional free text (e.g. "Vocabulary", "Venn Diagram") — it's prepended to the assignment button's label, so it reads e.g. "Vocabulary Assignment" or "Venn Diagram Assignment". Leave blank and the button just reads "Open Assignment".
 - Rows with an empty `Link` still show up, labeled "No slides yet".
 
 The site is already pointed at the sheet above — just keep adding rows there and the site updates automatically.

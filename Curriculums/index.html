@@ -141,16 +141,6 @@
     }
     .btn-assignment:hover { background: #6d28d9; }
 
-    .assignment-type {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: #7c3aed;
-      background: #ede9fe;
-      border-radius: 999px;
-      padding: 0.3rem 0.7rem;
-      white-space: nowrap;
-    }
-
     .topics-list {
       display: flex;
       flex-direction: column;
@@ -374,19 +364,12 @@
         }
 
         if (l.assignment) {
-          if (l.assignmentType) {
-            const typeTag = document.createElement('span');
-            typeTag.className = 'assignment-type';
-            typeTag.textContent = l.assignmentType;
-            actions.appendChild(typeTag);
-          }
-
           const assignment = document.createElement('a');
           assignment.className = 'btn btn-assignment';
           assignment.href = l.assignment;
           assignment.target = '_blank';
           assignment.rel = 'noopener noreferrer';
-          assignment.textContent = 'Open Assignment ↗';
+          assignment.textContent = (l.assignmentType ? `${l.assignmentType} Assignment` : 'Open Assignment') + ' ↗';
           actions.appendChild(assignment);
         }
 
