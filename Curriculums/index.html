@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Curriculums</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      color: #334155;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    #subtitle {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 1.6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .breadcrumb .crumb {
+      cursor: pointer;
+      color: #3b82f6;
+      font-weight: 600;
+    }
+
+    .breadcrumb .crumb.current {
+      color: #334155;
+      cursor: default;
+      font-weight: 700;
+    }
+
+    .breadcrumb .sep { color: #cbd5e1; }
+
+    /* ── Grid of choice cards ── */
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .choice-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 1.4rem 1.8rem;
+      min-width: 160px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+      color: #1e293b;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: 2px solid transparent;
+    }
+
+    .choice-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      border-color: #3b82f6;
+    }
+
+    /* ── Lesson row (final level) ── */
+    .topic-row {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .topic-row .topic-name {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .topic-row .order-tag {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-left: 0.5rem;
+    }
+
+    .btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #2563eb; }
+
+    .topics-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    /* ── Loading / Error / Empty ── */
+    #status {
+      color: #64748b;
+      font-size: 1rem;
+      margin-top: 4rem;
+      text-align: center;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Curriculums</h1>
+  <p id="subtitle">Browse by grade, subject, book, and lesson</p>
+
+  <div class="breadcrumb" id="breadcrumb" style="display:none"></div>
+
+  <div id="status">Loading curriculum data…</div>
+
+  <div class="grid" id="grid" style="display:none"></div>
+  <div class="topics-list" id="topics-list" style="display:none"></div>
+
+  <script>
+    // ============================================================
+    // CONFIGURATION
+    // ============================================================
+    const SHEET_ID = '13vuBiyaM82zExzUjD4im2Zhoys_q3PjKt2Th3AiKFnE';
+    // ============================================================
+
+    // Sheet columns (header row, any order): Grade, Subject, Book, Lesson, Link
+    let entries = [];
+    let path = { grade: null, subject: null, book: null };
+
+    async function loadSheet() {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&cachebust=${Date.now()}`;
+      try {
+        const res  = await fetch(url);
+        if (!res.ok) throw new Error('fetch failed');
+        const text = await res.text();
+        parseCSV(text);
+      } catch (err) {
+        document.getElementById('status').textContent =
+          'Could not load curriculum sheet. Make sure it is shared as "Anyone with the link can view".';
+      }
+    }
+
+    function parseCSVRow(row) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < row.length; i++) {
+        const ch = row[i];
+        if (ch === '"') {
+          if (inQuotes && row[i + 1] === '"') { current += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    }
+
+    function parseCSV(text) {
+      const rows = text.trim().split('\n').map(parseCSVRow);
+      if (rows.length < 2) {
+        showStatus('No curriculum entries found in the sheet yet.');
+        return;
+      }
+
+      const header = rows[0].map(h => h.trim().toLowerCase());
+      const idx = {
+        grade:   header.findIndex(h => h.includes('grade')),
+        subject: header.findIndex(h => h.includes('subject')),
+        book:    header.findIndex(h => h.includes('book')),
+        lesson:  header.findIndex(h => h.includes('lesson')),
+        link:    header.findIndex(h => h.includes('link') || h.includes('url') || h.includes('slide')),
+      };
+
+      if (idx.grade === -1 || idx.subject === -1 || idx.book === -1 || idx.lesson === -1) {
+        showStatus('Sheet is missing one of the required columns: Grade, Subject, Book, Lesson.');
+        return;
+      }
+
+      entries = rows.slice(1)
+        .filter(r => r[idx.grade] && r[idx.subject] && r[idx.book] && r[idx.lesson])
+        .map(r => ({
+          grade:   r[idx.grade],
+          subject: r[idx.subject],
+          book:    r[idx.book],
+          lesson:  r[idx.lesson],
+          link:    idx.link !== -1 ? (r[idx.link] || '') : '',
+        }));
+
+      if (entries.length === 0) {
+        showStatus('No curriculum entries found in the sheet yet.');
+        return;
+      }
+
+      document.getElementById('status').style.display = 'none';
+      render();
+    }
+
+    function showStatus(msg) {
+      const el = document.getElementById('status');
+      el.style.display = '';
+      el.textContent = msg;
+    }
+
+    function uniqueSorted(values) {
+      return [...new Set(values)].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    }
+
+    // Lesson numbers look like "7.1", "7.2", "10.1" — sort numerically when possible
+    function sortLessons(a, b) {
+      const na = parseFloat(a.lesson);
+      const nb = parseFloat(b.lesson);
+      if (!isNaN(na) && !isNaN(nb) && na !== nb) return na - nb;
+      return a.lesson.localeCompare(b.lesson, undefined, { numeric: true });
+    }
+
+    function render() {
+      const grid = document.getElementById('grid');
+      const topicsList = document.getElementById('topics-list');
+      grid.innerHTML = '';
+      topicsList.innerHTML = '';
+      grid.style.display = 'none';
+      topicsList.style.display = 'none';
+
+      renderBreadcrumb();
+
+      if (!path.grade) {
+        const grades = uniqueSorted(entries.map(e => e.grade));
+        grades.forEach(g => {
+          const card = document.createElement('div');
+          card.className = 'choice-card';
+          card.textContent = g;
+          card.onclick = () => { path.grade = g; path.subject = null; path.book = null; render(); };
+          grid.appendChild(card);
+        });
+        grid.style.display = 'flex';
+        return;
+      }
+
+      if (!path.subject) {
+        const subjects = uniqueSorted(
+          entries.filter(e => e.grade === path.grade).map(e => e.subject)
+        );
+        subjects.forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'choice-card';
+          card.textContent = s;
+          card.onclick = () => { path.subject = s; path.book = null; render(); };
+          grid.appendChild(card);
+        });
+        grid.style.display = 'flex';
+        return;
+      }
+
+      if (!path.book) {
+        const books = uniqueSorted(
+          entries.filter(e => e.grade === path.grade && e.subject === path.subject).map(e => e.book)
+        );
+        books.forEach(b => {
+          const card = document.createElement('div');
+          card.className = 'choice-card';
+          card.textContent = b;
+          card.onclick = () => { path.book = b; render(); };
+          grid.appendChild(card);
+        });
+        grid.style.display = 'flex';
+        return;
+      }
+
+      // Final level: list lessons for grade + subject + book
+      let lessons = entries.filter(e =>
+        e.grade === path.grade && e.subject === path.subject && e.book === path.book
+      );
+      lessons.sort(sortLessons);
+
+      lessons.forEach(l => {
+        const row = document.createElement('div');
+        row.className = 'topic-row';
+
+        const name = document.createElement('span');
+        name.className = 'topic-name';
+        name.textContent = `Lesson ${l.lesson}`;
+        row.appendChild(name);
+
+        if (l.link) {
+          const link = document.createElement('a');
+          link.className = 'btn';
+          link.href = l.link;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = 'Open Slides ↗';
+          row.appendChild(link);
+        } else {
+          const missing = document.createElement('span');
+          missing.className = 'order-tag';
+          missing.textContent = 'No link yet';
+          row.appendChild(missing);
+        }
+
+        topicsList.appendChild(row);
+      });
+
+      topicsList.style.display = 'flex';
+    }
+
+    function renderBreadcrumb() {
+      const bc = document.getElementById('breadcrumb');
+      bc.innerHTML = '';
+      bc.style.display = 'flex';
+
+      const home = document.createElement('span');
+      home.className = 'crumb' + (path.grade ? '' : ' current');
+      home.textContent = 'All Grades';
+      home.onclick = () => { path.grade = null; path.subject = null; path.book = null; render(); };
+      bc.appendChild(home);
+
+      if (path.grade) {
+        bc.appendChild(sep());
+        const gradeCrumb = document.createElement('span');
+        gradeCrumb.className = 'crumb' + (path.subject ? '' : ' current');
+        gradeCrumb.textContent = path.grade;
+        gradeCrumb.onclick = () => { path.subject = null; path.book = null; render(); };
+        bc.appendChild(gradeCrumb);
+      }
+
+      if (path.subject) {
+        bc.appendChild(sep());
+        const subjectCrumb = document.createElement('span');
+        subjectCrumb.className = 'crumb' + (path.book ? '' : ' current');
+        subjectCrumb.textContent = path.subject;
+        subjectCrumb.onclick = () => { path.book = null; render(); };
+        bc.appendChild(subjectCrumb);
+      }
+
+      if (path.book) {
+        bc.appendChild(sep());
+        const bookCrumb = document.createElement('span');
+        bookCrumb.className = 'crumb current';
+        bookCrumb.textContent = path.book;
+        bc.appendChild(bookCrumb);
+      }
+    }
+
+    function sep() {
+      const s = document.createElement('span');
+      s.className = 'sep';
+      s.textContent = '›';
+      return s;
+    }
+
+    loadSheet();
+  </script>
+</body>
+</html>
