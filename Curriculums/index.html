@@ -98,7 +98,8 @@
       gap: 1rem;
       box-shadow: 0 4px 14px rgba(0,0,0,0.08);
       width: 100%;
-      max-width: 560px;
+      max-width: 640px;
+      flex-wrap: wrap;
     }
 
     .topic-row .topic-name {
@@ -110,6 +111,14 @@
       font-size: 0.75rem;
       color: #94a3b8;
       margin-left: 0.5rem;
+    }
+
+    .topic-row .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .btn {
@@ -126,6 +135,11 @@
       white-space: nowrap;
     }
     .btn:hover { background: #2563eb; }
+
+    .btn-assignment {
+      background: #7c3aed;
+    }
+    .btn-assignment:hover { background: #6d28d9; }
 
     .topics-list {
       display: flex;
@@ -215,6 +229,7 @@
         book:    header.findIndex(h => h.includes('book')),
         lesson:  header.findIndex(h => h.includes('lesson')),
         link:    header.findIndex(h => h.includes('link') || h.includes('url') || h.includes('slide')),
+        assignment: header.findIndex(h => h.includes('assignment') || h.includes('homework')),
       };
 
       if (idx.grade === -1 || idx.subject === -1 || idx.book === -1 || idx.lesson === -1) {
@@ -230,6 +245,7 @@
           book:    r[idx.book],
           lesson:  r[idx.lesson],
           link:    idx.link !== -1 ? (r[idx.link] || '') : '',
+          assignment: idx.assignment !== -1 ? (r[idx.assignment] || '') : '',
         }));
 
       if (entries.length === 0) {
@@ -327,6 +343,9 @@
         name.textContent = `Lesson ${l.lesson}`;
         row.appendChild(name);
 
+        const actions = document.createElement('div');
+        actions.className = 'row-actions';
+
         if (l.link) {
           const link = document.createElement('a');
           link.className = 'btn';
@@ -334,14 +353,25 @@
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
           link.textContent = 'Open Slides ↗';
-          row.appendChild(link);
+          actions.appendChild(link);
         } else {
           const missing = document.createElement('span');
           missing.className = 'order-tag';
-          missing.textContent = 'No link yet';
-          row.appendChild(missing);
+          missing.textContent = 'No slides yet';
+          actions.appendChild(missing);
         }
 
+        if (l.assignment) {
+          const assignment = document.createElement('a');
+          assignment.className = 'btn btn-assignment';
+          assignment.href = l.assignment;
+          assignment.target = '_blank';
+          assignment.rel = 'noopener noreferrer';
+          assignment.textContent = 'Open Assignment ↗';
+          actions.appendChild(assignment);
+        }
+
+        row.appendChild(actions);
         topicsList.appendChild(row);
       });
 
