@@ -296,6 +296,28 @@
       line-height: 1.4;
     }
 
+    .shuffle-btn {
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 50%;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, transform 0.15s;
+    }
+    .shuffle-btn svg { width: 16px; height: 16px; }
+    .shuffle-btn:hover {
+      background: #3b82f6;
+      color: #fff;
+      border-color: #3b82f6;
+    }
+    .shuffle-btn:active { transform: rotate(180deg); }
+
     /* ── Loading / Error / Empty ── */
     #status {
       color: #64748b;
@@ -548,11 +570,106 @@
 
       try {
         const items = await loadResourceTab(key);
-        renderResourceList(items, page);
+        if (key === 'circle-time') {
+          initCircleTime(items, page);
+        } else {
+          renderResourceList(items, page);
+        }
       } catch (err) {
         status.textContent =
           `Could not load the "${page.tab}" tab. Make sure it exists on the sheet and is shared as "Anyone with the link can view".`;
       }
+    }
+
+    // ── Circle Time: show 3 random questions, each individually re-shufflable ──
+    const CIRCLE_TIME_SLOT_COUNT = 3;
+    let circleQuestions = [];
+    let circleSlots = [];
+
+    // Fisher–Yates: pick `count` unique random indices from [0, poolSize)
+    function pickUniqueRandomIndices(poolSize, count) {
+      const indices = Array.from({ length: poolSize }, (_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      return indices.slice(0, count);
+    }
+
+    function initCircleTime(items, page) {
+      const status = document.getElementById('status');
+      circleQuestions = items;
+
+      if (circleQuestions.length === 0) {
+        status.style.display = '';
+        status.textContent = `No ${page.label} items added yet.`;
+        document.getElementById('resource-list').style.display = 'none';
+        return;
+      }
+
+      status.style.display = 'none';
+
+      const slotCount = Math.min(CIRCLE_TIME_SLOT_COUNT, circleQuestions.length);
+      circleSlots = pickUniqueRandomIndices(circleQuestions.length, slotCount);
+
+      renderCircleTime();
+    }
+
+    function shuffleCircleSlot(slotPos) {
+      const currentValue = circleSlots[slotPos];
+      const avoid = new Set(circleSlots);
+
+      let candidates = circleQuestions
+        .map((_, i) => i)
+        .filter(i => !avoid.has(i));
+
+      // Pool too small to find a fully unique replacement — just avoid this slot's own value.
+      if (candidates.length === 0) {
+        candidates = circleQuestions.map((_, i) => i).filter(i => i !== currentValue);
+      }
+
+      if (candidates.length === 0) return; // only one question exists in total
+
+      circleSlots[slotPos] = candidates[Math.floor(Math.random() * candidates.length)];
+      renderCircleTime();
+    }
+
+    function renderCircleTime() {
+      const list = document.getElementById('resource-list');
+      list.innerHTML = '';
+
+      circleSlots.forEach((qIndex, slotPos) => {
+        const card = document.createElement('div');
+        card.className = 'resource-card';
+
+        const text = document.createElement('div');
+        text.className = 'resource-text';
+        const title = document.createElement('div');
+        title.className = 'resource-title';
+        title.textContent = circleQuestions[qIndex].title;
+        text.appendChild(title);
+        card.appendChild(text);
+
+        const shuffleBtn = document.createElement('button');
+        shuffleBtn.className = 'shuffle-btn';
+        shuffleBtn.type = 'button';
+        shuffleBtn.setAttribute('aria-label', 'Shuffle this question');
+        shuffleBtn.title = 'Shuffle this question';
+        shuffleBtn.innerHTML =
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+          '<polyline points="16 3 21 3 21 8"></polyline>' +
+          '<line x1="4" y1="20" x2="21" y2="3"></line>' +
+          '<polyline points="21 16 21 21 16 21"></polyline>' +
+          '<line x1="15" y1="15" x2="21" y2="21"></line>' +
+          '<line x1="4" y1="4" x2="9" y2="9"></line>' +
+          '</svg>';
+        shuffleBtn.onclick = () => shuffleCircleSlot(slotPos);
+        card.appendChild(shuffleBtn);
+
+        list.appendChild(card);
+      });
+
+      list.style.display = 'flex';
     }
 
     function renderResourceList(items, page) {
