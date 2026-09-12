@@ -67,3 +67,34 @@ Students/teachers visiting the site:
 4. See the list of **Lessons** in that book (e.g. "Lesson 7.1"), each with an "Open Slides ↗" button that opens the Google Slides deck in a new tab
 
 A breadcrumb at the top (`All Grades › 8th Grade › Real World English › Impact 4`) lets them jump back up a level at any time.
+
+---
+
+## Sidebar — Silent Starter & Circle Time
+
+A thin strip on the left edge of the page pops out into a sidebar on hover, with links to:
+- **Browse Curriculum** — returns to the grade/subject/book/lesson browser above
+- **Silent Starter**
+- **Circle Time**
+
+It's visible on every screen, at every level of navigation.
+
+### Adding the two new tabs
+
+Each of these reads its **own tab** on the same Google Sheet (`13vuBiyaM82zExzUjD4im2Zhoys_q3PjKt2Th3AiKFnE`), by name — separate from the tab the curriculum grid reads from. To set them up:
+
+1. In the sheet, click **+** at the bottom to add a new tab
+2. Name it **exactly** `Silent Starter` (case and spacing matter)
+3. Row 1 — headers: `Title | Link | Description`
+4. Row 2 and below — one row per item, e.g.:
+
+   | Title | Link | Description |
+   |---|---|---|
+   | 5-Minute Freewrite | https://docs.google.com/document/d/XXXX/edit | Students write silently for 5 minutes on the board prompt |
+   | Vocabulary Match | https://docs.google.com/presentation/d/YYYY/edit | Quiet matching activity, good for early arrivals |
+
+5. Repeat with a second tab named exactly `Circle Time`
+
+Both tabs are shared automatically since they're part of the same sheet (already shared "Anyone with the link can view"). Same live-editing behavior as the Curriculum tab — add/edit rows and the site updates within seconds, no republish needed.
+
+If a tab is missing or empty, its sidebar page just shows "No [Silent Starter/Circle Time] items added yet."

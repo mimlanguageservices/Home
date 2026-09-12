@@ -14,7 +14,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 2rem 1rem 4rem;
+      padding: 2rem 1.5rem 4rem 2.5rem;
     }
 
     h1 {
@@ -29,6 +29,89 @@
       color: #64748b;
       margin-bottom: 2rem;
       text-align: center;
+    }
+
+    /* ── Hover-out sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 14px;
+      background: #ffffff;
+      border-right: 1px solid #e2e8f0;
+      overflow: hidden;
+      transition: width 0.18s ease, box-shadow 0.18s ease;
+      z-index: 40;
+      padding-top: 1.4rem;
+    }
+
+    .sidebar:hover,
+    .sidebar:focus-within {
+      width: 230px;
+      box-shadow: 6px 0 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .sidebar-handle {
+      position: absolute;
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 52px;
+      border-radius: 4px;
+      background: #cbd5e1;
+      transition: opacity 0.15s ease;
+    }
+
+    .sidebar:hover .sidebar-handle,
+    .sidebar:focus-within .sidebar-handle {
+      opacity: 0;
+    }
+
+    .sidebar-inner {
+      width: 230px;
+      padding: 0 0.9rem;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+    }
+
+    .sidebar:hover .sidebar-inner,
+    .sidebar:focus-within .sidebar-inner {
+      opacity: 1;
+    }
+
+    .sidebar-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      margin: 0.3rem 0 0.7rem 0.7rem;
+    }
+
+    .sidebar-link {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      font: inherit;
+      padding: 0.6rem 0.7rem;
+      border-radius: 8px;
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      white-space: nowrap;
+      margin-bottom: 0.25rem;
+    }
+
+    .sidebar-link:hover { background: #eef2ff; color: #3b82f6; }
+
+    .sidebar-link.active {
+      background: #3b82f6;
+      color: #fff;
     }
 
     /* ── Breadcrumb ── */
@@ -149,6 +232,41 @@
       max-width: 560px;
     }
 
+    /* ── Resource page (Silent Starter / Circle Time) ── */
+    .resource-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .resource-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1.1rem 1.4rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .resource-card .resource-text { min-width: 0; }
+
+    .resource-card .resource-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.2rem;
+    }
+
+    .resource-card .resource-desc {
+      font-size: 0.85rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
     /* ── Loading / Error / Empty ── */
     #status {
       color: #64748b;
@@ -161,7 +279,18 @@
 </head>
 <body>
 
-  <h1>Curriculums</h1>
+  <nav class="sidebar" id="sidebar" aria-label="More options">
+    <div class="sidebar-handle"></div>
+    <div class="sidebar-inner">
+      <p class="sidebar-label">Curriculums</p>
+      <button class="sidebar-link" id="nav-curriculum">Browse Curriculum</button>
+      <p class="sidebar-label">Classroom Routines</p>
+      <button class="sidebar-link" id="nav-silent-starter">Silent Starter</button>
+      <button class="sidebar-link" id="nav-circle-time">Circle Time</button>
+    </div>
+  </nav>
+
+  <h1 id="page-title">Curriculums</h1>
   <p id="subtitle">Browse by grade, subject, book, and lesson</p>
 
   <div class="breadcrumb" id="breadcrumb" style="display:none"></div>
@@ -170,17 +299,36 @@
 
   <div class="grid" id="grid" style="display:none"></div>
   <div class="topics-list" id="topics-list" style="display:none"></div>
+  <div class="resource-list" id="resource-list" style="display:none"></div>
 
   <script>
     // ============================================================
     // CONFIGURATION
     // ============================================================
     const SHEET_ID = '13vuBiyaM82zExzUjD4im2Zhoys_q3PjKt2Th3AiKFnE';
+
+    // Sidebar resource pages — each reads its own tab (by name) from the same sheet.
+    // Tab columns (any order): Title, Link, Description
+    const RESOURCE_PAGES = {
+      'silent-starter': {
+        label: 'Silent Starter',
+        tab: 'Silent Starter',
+        subtitle: 'Quiet warm-up routines to start any class',
+      },
+      'circle-time': {
+        label: 'Circle Time',
+        tab: 'Circle Time',
+        subtitle: 'Group discussion & circle activities',
+      },
+    };
     // ============================================================
 
     // Sheet columns (header row, any order): Grade, Subject, Book, Lesson, Link
     let entries = [];
     let path = { grade: null, subject: null, book: null };
+
+    let view = 'curriculum'; // 'curriculum' | 'silent-starter' | 'circle-time'
+    const resourceCache = {}; // key -> parsed resource rows
 
     async function loadSheet() {
       const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&cachebust=${Date.now()}`;
@@ -259,6 +407,41 @@
       render();
     }
 
+    async function loadResourceTab(key) {
+      if (resourceCache[key]) return resourceCache[key];
+
+      const page = RESOURCE_PAGES[key];
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(page.tab)}&cachebust=${Date.now()}`;
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('fetch failed');
+      const text = await res.text();
+      const rows = text.trim().split('\n').map(parseCSVRow);
+
+      if (rows.length < 2) {
+        resourceCache[key] = [];
+        return [];
+      }
+
+      const header = rows[0].map(h => h.trim().toLowerCase());
+      const idx = {
+        title: header.findIndex(h => h.includes('title') || h.includes('name')),
+        link:  header.findIndex(h => h.includes('link') || h.includes('url')),
+        desc:  header.findIndex(h => h.includes('desc')),
+      };
+
+      const items = rows.slice(1)
+        .filter(r => idx.title !== -1 && r[idx.title])
+        .map(r => ({
+          title: r[idx.title],
+          link:  idx.link !== -1 ? (r[idx.link] || '') : '',
+          desc:  idx.desc !== -1 ? (r[idx.desc] || '') : '',
+        }));
+
+      resourceCache[key] = items;
+      return items;
+    }
+
     function showStatus(msg) {
       const el = document.getElementById('status');
       el.style.display = '';
@@ -277,13 +460,99 @@
       return a.lesson.localeCompare(b.lesson, undefined, { numeric: true });
     }
 
+    function setActiveNav() {
+      document.getElementById('nav-curriculum').classList.toggle('active', view === 'curriculum');
+      document.getElementById('nav-silent-starter').classList.toggle('active', view === 'silent-starter');
+      document.getElementById('nav-circle-time').classList.toggle('active', view === 'circle-time');
+    }
+
+    function hideAllPanels() {
+      document.getElementById('breadcrumb').style.display = 'none';
+      document.getElementById('status').style.display = 'none';
+      document.getElementById('grid').style.display = 'none';
+      document.getElementById('topics-list').style.display = 'none';
+      document.getElementById('resource-list').style.display = 'none';
+    }
+
+    function goToCurriculum() {
+      view = 'curriculum';
+      setActiveNav();
+      document.getElementById('page-title').textContent = 'Curriculums';
+      document.getElementById('subtitle').textContent = 'Browse by grade, subject, book, and lesson';
+      render();
+    }
+
+    async function goToResourcePage(key) {
+      view = key;
+      setActiveNav();
+      const page = RESOURCE_PAGES[key];
+      document.getElementById('page-title').textContent = page.label;
+      document.getElementById('subtitle').textContent = page.subtitle;
+
+      hideAllPanels();
+      const status = document.getElementById('status');
+      status.style.display = '';
+      status.textContent = `Loading ${page.label}…`;
+
+      try {
+        const items = await loadResourceTab(key);
+        renderResourceList(items, page);
+      } catch (err) {
+        status.textContent =
+          `Could not load the "${page.tab}" tab. Make sure it exists on the sheet and is shared as "Anyone with the link can view".`;
+      }
+    }
+
+    function renderResourceList(items, page) {
+      const status = document.getElementById('status');
+      const list = document.getElementById('resource-list');
+      list.innerHTML = '';
+
+      if (items.length === 0) {
+        status.style.display = '';
+        status.textContent = `No ${page.label} items added yet.`;
+        list.style.display = 'none';
+        return;
+      }
+
+      status.style.display = 'none';
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'resource-card';
+
+        const text = document.createElement('div');
+        text.className = 'resource-text';
+        text.innerHTML = `<div class="resource-title"></div><div class="resource-desc"></div>`;
+        text.querySelector('.resource-title').textContent = item.title;
+        text.querySelector('.resource-desc').textContent = item.desc;
+        card.appendChild(text);
+
+        if (item.link) {
+          const link = document.createElement('a');
+          link.className = 'btn';
+          link.href = item.link;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = 'Open ↗';
+          card.appendChild(link);
+        }
+
+        list.appendChild(card);
+      });
+
+      list.style.display = 'flex';
+    }
+
     function render() {
+      if (view !== 'curriculum') return;
+
+      hideAllPanels();
+
       const grid = document.getElementById('grid');
       const topicsList = document.getElementById('topics-list');
       grid.innerHTML = '';
       topicsList.innerHTML = '';
-      grid.style.display = 'none';
-      topicsList.style.display = 'none';
 
       renderBreadcrumb();
 
@@ -425,6 +694,11 @@
       return s;
     }
 
+    document.getElementById('nav-curriculum').onclick = goToCurriculum;
+    document.getElementById('nav-silent-starter').onclick = () => goToResourcePage('silent-starter');
+    document.getElementById('nav-circle-time').onclick = () => goToResourcePage('circle-time');
+
+    setActiveNav();
     loadSheet();
   </script>
 </body>
