@@ -232,6 +232,35 @@
       max-width: 560px;
     }
 
+    /* ── Corner video (Silent Starter) ── */
+    .corner-video {
+      position: fixed;
+      top: 1.25rem;
+      right: 1.25rem;
+      width: 260px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .corner-video iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
+    }
+
+    @media (max-width: 720px) {
+      .corner-video {
+        position: static;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto 1.5rem;
+      }
+    }
+
     /* ── Resource page (Silent Starter / Circle Time) ── */
     .resource-list {
       display: flex;
@@ -290,6 +319,10 @@
     </div>
   </nav>
 
+  <div class="corner-video" id="corner-video" style="display:none">
+    <iframe src="" id="corner-video-frame" title="Silent Starter video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+
   <h1 id="page-title">Curriculums</h1>
   <p id="subtitle">Browse by grade, subject, book, and lesson</p>
 
@@ -314,6 +347,7 @@
         label: 'Silent Starter',
         tab: 'Silent Starter',
         subtitle: 'Quiet warm-up routines to start any class',
+        video: 'https://www.youtube.com/embed/fjkDiLu4UyI?start=3',
       },
       'circle-time': {
         label: 'Circle Time',
@@ -474,11 +508,24 @@
       document.getElementById('resource-list').style.display = 'none';
     }
 
+    function setCornerVideo(url) {
+      const wrap  = document.getElementById('corner-video');
+      const frame = document.getElementById('corner-video-frame');
+      if (url) {
+        frame.src = url;
+        wrap.style.display = '';
+      } else {
+        frame.src = '';
+        wrap.style.display = 'none';
+      }
+    }
+
     function goToCurriculum() {
       view = 'curriculum';
       setActiveNav();
       document.getElementById('page-title').textContent = 'Curriculums';
       document.getElementById('subtitle').textContent = 'Browse by grade, subject, book, and lesson';
+      setCornerVideo(null);
       render();
     }
 
@@ -488,6 +535,7 @@
       const page = RESOURCE_PAGES[key];
       document.getElementById('page-title').textContent = page.label;
       document.getElementById('subtitle').textContent = page.subtitle;
+      setCornerVideo(page.video || null);
 
       hideAllPanels();
       const status = document.getElementById('status');
