@@ -375,14 +375,16 @@
     const RESOURCE_PAGES = {
       'silent-starter': {
         label: 'Silent Starter',
-        tab: 'Silent Starter',
+        tab: 'Silent-Starters',
         subtitle: 'Quiet warm-up routines to start any class',
         video: 'https://www.youtube.com/embed/fjkDiLu4UyI?start=3',
+        slots: 1,
       },
       'circle-time': {
         label: 'Circle Time',
         tab: 'Circle-Time',
         subtitle: 'Group discussion & circle activities',
+        slots: 3,
       },
     };
     // ============================================================
@@ -578,8 +580,8 @@
 
       try {
         const items = await loadResourceTab(key);
-        if (key === 'circle-time') {
-          initCircleTime(items, page);
+        if (page.slots) {
+          initShuffleQuestions(items, page);
         } else {
           renderResourceList(items, page);
         }
@@ -589,10 +591,11 @@
       }
     }
 
-    // ── Circle Time: show 3 random questions, each individually re-shufflable ──
-    const CIRCLE_TIME_SLOT_COUNT = 3;
-    let circleQuestions = [];
-    let circleSlots = [];
+    // ── Shuffle-question pages (Silent Starter, Circle Time): show N random
+    //    questions, each individually re-shufflable ──
+    let shuffleQuestions = [];
+    let shuffleSlots = [];
+    let activeShufflePage = null;
 
     // Fisher–Yates: pick `count` unique random indices from [0, poolSize)
     function pickUniqueRandomIndices(poolSize, count) {
@@ -604,11 +607,12 @@
       return indices.slice(0, count);
     }
 
-    function initCircleTime(items, page) {
+    function initShuffleQuestions(items, page) {
       const status = document.getElementById('status');
-      circleQuestions = items;
+      shuffleQuestions = items;
+      activeShufflePage = page;
 
-      if (circleQuestions.length === 0) {
+      if (shuffleQuestions.length === 0) {
         status.style.display = '';
         status.textContent = `No ${page.label} items added yet.`;
         document.getElementById('resource-list').style.display = 'none';
@@ -617,36 +621,36 @@
 
       status.style.display = 'none';
 
-      const slotCount = Math.min(CIRCLE_TIME_SLOT_COUNT, circleQuestions.length);
-      circleSlots = pickUniqueRandomIndices(circleQuestions.length, slotCount);
+      const slotCount = Math.min(page.slots, shuffleQuestions.length);
+      shuffleSlots = pickUniqueRandomIndices(shuffleQuestions.length, slotCount);
 
-      renderCircleTime();
+      renderShuffleQuestions();
     }
 
-    function shuffleCircleSlot(slotPos) {
-      const currentValue = circleSlots[slotPos];
-      const avoid = new Set(circleSlots);
+    function shuffleQuestionSlot(slotPos) {
+      const currentValue = shuffleSlots[slotPos];
+      const avoid = new Set(shuffleSlots);
 
-      let candidates = circleQuestions
+      let candidates = shuffleQuestions
         .map((_, i) => i)
         .filter(i => !avoid.has(i));
 
       // Pool too small to find a fully unique replacement — just avoid this slot's own value.
       if (candidates.length === 0) {
-        candidates = circleQuestions.map((_, i) => i).filter(i => i !== currentValue);
+        candidates = shuffleQuestions.map((_, i) => i).filter(i => i !== currentValue);
       }
 
       if (candidates.length === 0) return; // only one question exists in total
 
-      circleSlots[slotPos] = candidates[Math.floor(Math.random() * candidates.length)];
-      renderCircleTime();
+      shuffleSlots[slotPos] = candidates[Math.floor(Math.random() * candidates.length)];
+      renderShuffleQuestions();
     }
 
-    function renderCircleTime() {
+    function renderShuffleQuestions() {
       const list = document.getElementById('resource-list');
       list.innerHTML = '';
 
-      circleSlots.forEach((qIndex, slotPos) => {
+      shuffleSlots.forEach((qIndex, slotPos) => {
         const card = document.createElement('div');
         card.className = 'resource-card has-shuffle';
 
@@ -654,7 +658,7 @@
         text.className = 'resource-text';
         const title = document.createElement('div');
         title.className = 'resource-title';
-        title.textContent = circleQuestions[qIndex].title;
+        title.textContent = shuffleQuestions[qIndex].title;
         text.appendChild(title);
         card.appendChild(text);
 
@@ -671,7 +675,7 @@
           '<line x1="15" y1="15" x2="21" y2="21"></line>' +
           '<line x1="4" y1="4" x2="9" y2="9"></line>' +
           '</svg>';
-        shuffleBtn.onclick = () => shuffleCircleSlot(slotPos);
+        shuffleBtn.onclick = () => shuffleQuestionSlot(slotPos);
         card.appendChild(shuffleBtn);
 
         list.appendChild(card);

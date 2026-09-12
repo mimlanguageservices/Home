@@ -79,22 +79,19 @@ A thin strip on the left edge of the page pops out into a sidebar on hover, with
 
 It's visible on every screen, at every level of navigation.
 
-### Adding the two new tabs
+### The two tabs
 
-Each of these reads its **own tab** on the same Google Sheet (`13vuBiyaM82zExzUjD4im2Zhoys_q3PjKt2Th3AiKFnE`), by name — separate from the tab the curriculum grid reads from. To set them up:
+Each reads its **own tab** on the same Google Sheet (`13vuBiyaM82zExzUjD4im2Zhoys_q3PjKt2Th3AiKFnE`), by exact name — separate from the tab the curriculum grid reads from:
 
-1. In the sheet, click **+** at the bottom to add a new tab
-2. Name it **exactly** `Silent Starter` (case and spacing matter)
-3. Row 1 — headers: `Title | Link | Description`
-4. Row 2 and below — one row per item, e.g.:
+| Sidebar page | Tab name | Shown at once |
+|---|---|---|
+| Silent Starter | `Silent-Starters` | 1 question |
+| Circle Time | `Circle-Time` | 3 questions |
 
-   | Title | Link | Description |
-   |---|---|---|
-   | 5-Minute Freewrite | https://docs.google.com/document/d/XXXX/edit | Students write silently for 5 minutes on the board prompt |
-   | Vocabulary Match | https://docs.google.com/presentation/d/YYYY/edit | Quiet matching activity, good for early arrivals |
+Both tabs are just a single column of questions — **no header row of column names needed**, just put each question in its own row in column A (row 1 can be a title like "Circle Time" or the first question itself, either works). Both tabs are shared automatically since they're part of the same sheet (already shared "Anyone with the link can view"). Same live-editing behavior as the Curriculum tab — add/edit rows and the site updates within seconds, no republish needed.
 
-5. Repeat with a second tab named exactly `Circle Time`
+### Shuffle behavior
 
-Both tabs are shared automatically since they're part of the same sheet (already shared "Anyone with the link can view"). Same live-editing behavior as the Curriculum tab — add/edit rows and the site updates within seconds, no republish needed.
+Instead of dumping the whole list on the page, each sidebar page randomly picks a handful of questions from its tab (1 for Silent Starter, 3 for Circle Time) and shows a shuffle (🔀) icon in the top-right corner of each question card. Clicking it swaps just that one question for a different random one from the tab — the other question(s) on screen stay put. If the tab only has a few questions total, it does its best to avoid repeating one already on screen, but will reuse one if there aren't enough unique options left.
 
 If a tab is missing or empty, its sidebar page just shows "No [Silent Starter/Circle Time] items added yet."
