@@ -17,6 +17,66 @@
       padding: 2rem 1.5rem 4rem 2.5rem;
     }
 
+    /* ── TV / big-screen display mode (Silent Starter, Circle Time) ── */
+    body.tv-mode {
+      height: 100vh;
+      min-height: 0;
+      padding: 1.4rem 2.5rem 1.8rem;
+      overflow: hidden;
+    }
+
+    body.tv-mode h1 {
+      font-size: clamp(1.3rem, 2.4vmin, 1.8rem);
+      margin-bottom: 0.15rem;
+    }
+
+    body.tv-mode #subtitle {
+      font-size: clamp(0.8rem, 1.4vmin, 1rem);
+      margin-bottom: 1rem;
+    }
+
+    body.tv-mode .resource-list {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      max-width: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    body.tv-mode .resource-card {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem 6rem;
+    }
+
+    body.tv-mode .resource-card .resource-text {
+      width: 100%;
+    }
+
+    body.tv-mode .resource-title {
+      font-size: clamp(1.8rem, 5.2vmin, 3.6rem);
+      line-height: 1.35;
+      text-wrap: balance;
+    }
+
+    body.tv-mode .shuffle-btn {
+      width: 3.4rem;
+      height: 3.4rem;
+      top: 1.4rem;
+      right: 1.6rem;
+    }
+
+    body.tv-mode .shuffle-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
     h1 {
       font-size: 1.6rem;
       color: #334155;
@@ -559,6 +619,7 @@
     function goToCurriculum() {
       view = 'curriculum';
       setActiveNav();
+      document.body.classList.remove('tv-mode');
       document.getElementById('page-title').textContent = 'Curriculums';
       document.getElementById('subtitle').textContent = 'Browse by grade, subject, book, and lesson';
       setCornerVideo(null);
@@ -569,6 +630,7 @@
       view = key;
       setActiveNav();
       const page = RESOURCE_PAGES[key];
+      document.body.classList.toggle('tv-mode', !!page.slots);
       document.getElementById('page-title').textContent = page.label;
       document.getElementById('subtitle').textContent = page.subtitle;
       setCornerVideo(page.video || null);
