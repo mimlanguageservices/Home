@@ -351,7 +351,7 @@
       },
       'circle-time': {
         label: 'Circle Time',
-        tab: 'Circle Time',
+        tab: 'Circle-Time',
         subtitle: 'Group discussion & circle activities',
       },
     };
@@ -459,10 +459,14 @@
 
       const header = rows[0].map(h => h.trim().toLowerCase());
       const idx = {
-        title: header.findIndex(h => h.includes('title') || h.includes('name')),
+        title: header.findIndex(h => h.includes('title') || h.includes('name') || h.includes('question')),
         link:  header.findIndex(h => h.includes('link') || h.includes('url')),
         desc:  header.findIndex(h => h.includes('desc')),
       };
+
+      // Sheets with just a single column of text (e.g. one question per row) —
+      // treat column A as the title since there's no dedicated header to match.
+      if (idx.title === -1 && header.length === 1) idx.title = 0;
 
       const items = rows.slice(1)
         .filter(r => idx.title !== -1 && r[idx.title])
