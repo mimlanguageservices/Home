@@ -70,16 +70,17 @@ A breadcrumb at the top (`All Grades › 8th Grade › Real World English › Im
 
 ---
 
-## Sidebar — Silent Starter & Circle Time
+## Sidebar — Silent Starter, Circle Time & Processing
 
 A thin strip on the left edge of the page pops out into a sidebar on hover, with links to:
 - **Browse Curriculum** — returns to the grade/subject/book/lesson browser above
 - **Silent Starter**
 - **Circle Time**
+- **Processing**
 
 It's visible on every screen, at every level of navigation.
 
-### The two tabs
+### Silent Starter & Circle Time tabs
 
 Each reads its **own tab** on the same Google Sheet (`13vuBiyaM82zExzUjD4im2Zhoys_q3PjKt2Th3AiKFnE`), by exact name — separate from the tab the curriculum grid reads from:
 
@@ -92,6 +93,35 @@ Both tabs are just a single column of questions — **no header row of column na
 
 ### Shuffle behavior
 
-Instead of dumping the whole list on the page, each sidebar page randomly picks a handful of questions from its tab (1 for Silent Starter, 3 for Circle Time) and shows a shuffle (🔀) icon in the top-right corner of each question card. Clicking it swaps just that one question for a different random one from the tab — the other question(s) on screen stay put. If the tab only has a few questions total, it does its best to avoid repeating one already on screen, but will reuse one if there aren't enough unique options left.
+Instead of dumping the whole list on the page, each sidebar page randomly picks a handful of questions from its tab (1 for Silent Starter, 3 for Circle Time) and shows a shuffle (🔀) icon in the top-left corner of each question card (kept to the left so it doesn't collide with Silent Starter's video in the top-right). Clicking it swaps just that one question for a different random one from the tab — the other question(s) on screen stay put. If the tab only has a few questions total, it does its best to avoid repeating one already on screen, but will reuse one if there aren't enough unique options left.
+
+---
+
+## Processing tab
+
+**Tab name:** `Processing` (exact match, case-sensitive)
+
+Clicking **Processing** in the sidebar shows the word **SHICKEL** as large floating letters. Clicking a letter opens a page for that letter's category with 3 random, individually shufflable questions — same shuffle mechanic as Circle Time. A breadcrumb (`Processing › Category Name`) lets you jump back to the letters.
+
+**Structure — no header row, 3 columns:**
+
+| Column | Contents |
+|---|---|
+| A | Single letter (e.g. `S`, `H`, `I`, `C`, `K`, `E`, `L`) |
+| B | Category name for that letter (e.g. "Systems & Global Citizenship") |
+| C | One reflection question per row |
+
+Example:
+
+| A | B | C |
+|---|---|---|
+| S | Systems & Global Citizenship | How did your choices today help make our classroom a better place? |
+| S | Systems & Global Citizenship | How did you contribute to our classroom community today? |
+| H | Integral Health | What did you do today that helped you take care of yourself? |
+
+- Every row with the same letter in column A is grouped into that letter's question pool — add as many rows per letter as you like.
+- The category name (column B) only needs to be filled in once per letter, but it's fine to repeat it on every row (the site just uses the first one it sees).
+- Letters appear as floating buttons in the order they first appear in the sheet (S, H, I, C, K, E, L — spelling SHICKEL). Rows don't need to be grouped together, but keeping them grouped makes the sheet easier to manage.
+- Blank separator rows between letter groups (like in the screenshot) are ignored automatically.
 
 If a tab is missing or empty, its sidebar page just shows "No [Silent Starter/Circle Time] items added yet."

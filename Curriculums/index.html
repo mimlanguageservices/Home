@@ -77,6 +77,51 @@
       height: 24px;
     }
 
+    body.tv-mode .letter-stage {
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Processing: floating SHICKEL letters ── */
+    .letter-stage {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: clamp(0.6rem, 2.4vw, 1.8rem);
+    }
+
+    .letter-btn {
+      font-family: inherit;
+      font-weight: 800;
+      font-size: clamp(2.6rem, 10vmin, 6.5rem);
+      color: #3b82f6;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.2rem 0.4rem;
+      line-height: 1;
+      animation: letter-float 3.4s ease-in-out infinite;
+      transition: color 0.15s ease, transform 0.15s ease;
+    }
+
+    .letter-btn:hover,
+    .letter-btn:focus-visible {
+      color: #1d4ed8;
+      transform: scale(1.1);
+      animation-play-state: paused;
+    }
+
+    @keyframes letter-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-16px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .letter-btn { animation: none; }
+    }
+
     h1 {
       font-size: 1.6rem;
       color: #334155;
@@ -406,6 +451,7 @@
       <p class="sidebar-label">Classroom Routines</p>
       <button class="sidebar-link" id="nav-silent-starter">Silent Starter</button>
       <button class="sidebar-link" id="nav-circle-time">Circle Time</button>
+      <button class="sidebar-link" id="nav-processing">Processing</button>
     </div>
   </nav>
 
@@ -423,6 +469,7 @@
   <div class="grid" id="grid" style="display:none"></div>
   <div class="topics-list" id="topics-list" style="display:none"></div>
   <div class="resource-list" id="resource-list" style="display:none"></div>
+  <div class="letter-stage" id="letter-stage" style="display:none"></div>
 
   <script>
     // ============================================================
@@ -453,8 +500,11 @@
     let entries = [];
     let path = { grade: null, subject: null, book: null };
 
-    let view = 'curriculum'; // 'curriculum' | 'silent-starter' | 'circle-time'
+    let view = 'curriculum'; // 'curriculum' | 'silent-starter' | 'circle-time' | 'processing-letters' | 'processing-category'
     const resourceCache = {}; // key -> parsed resource rows
+
+    // Processing tab — no header row. Columns: Letter, Category, Question
+    let processingRows = [];
 
     async function loadSheet() {
       const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&cachebust=${Date.now()}`;
@@ -594,6 +644,7 @@
       document.getElementById('nav-curriculum').classList.toggle('active', view === 'curriculum');
       document.getElementById('nav-silent-starter').classList.toggle('active', view === 'silent-starter');
       document.getElementById('nav-circle-time').classList.toggle('active', view === 'circle-time');
+      document.getElementById('nav-processing').classList.toggle('active', view === 'processing-letters' || view === 'processing-category');
     }
 
     function hideAllPanels() {
@@ -602,6 +653,7 @@
       document.getElementById('grid').style.display = 'none';
       document.getElementById('topics-list').style.display = 'none';
       document.getElementById('resource-list').style.display = 'none';
+      document.getElementById('letter-stage').style.display = 'none';
     }
 
     function setCornerVideo(url) {
@@ -651,6 +703,121 @@
         status.textContent =
           `Could not load the "${page.tab}" tab. Make sure it exists on the sheet and is shared as "Anyone with the link can view".`;
       }
+    }
+
+    // ── Processing: SHICKEL letter picker → 3 shufflable questions per letter ──
+    async function loadProcessingTab() {
+      if (processingRows.length) return processingRows;
+
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Processing&cachebust=${Date.now()}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('fetch failed');
+      const text = await res.text();
+      const rows = text.trim().split('\n').map(parseCSVRow);
+
+      // No header row — columns are always Letter, Category, Question
+      processingRows = rows
+        .filter(r => r[0] && r[1] && r[2])
+        .map(r => ({ letter: r[0], category: r[1], question: r[2] }));
+
+      return processingRows;
+    }
+
+    function getProcessingLetters() {
+      const seen = new Map();
+      processingRows.forEach(r => {
+        if (!seen.has(r.letter)) seen.set(r.letter, r.category);
+      });
+      return [...seen.entries()].map(([letter, category]) => ({ letter, category }));
+    }
+
+    async function goToProcessing() {
+      view = 'processing-letters';
+      setActiveNav();
+      document.body.classList.add('tv-mode');
+      document.getElementById('page-title').textContent = 'Processing';
+      document.getElementById('subtitle').textContent = 'Pick a letter to reflect on';
+      setCornerVideo(null);
+
+      hideAllPanels();
+      const status = document.getElementById('status');
+      status.style.display = '';
+      status.textContent = 'Loading Processing…';
+
+      try {
+        await loadProcessingTab();
+        renderProcessingLetters();
+      } catch (err) {
+        status.textContent =
+          'Could not load the "Processing" tab. Make sure it exists on the sheet and is shared as "Anyone with the link can view".';
+      }
+    }
+
+    function renderProcessingLetters() {
+      const status = document.getElementById('status');
+      const letters = getProcessingLetters();
+
+      if (letters.length === 0) {
+        status.style.display = '';
+        status.textContent = 'No Processing letters added yet.';
+        return;
+      }
+
+      status.style.display = 'none';
+      document.getElementById('breadcrumb').style.display = 'none';
+
+      const stage = document.getElementById('letter-stage');
+      stage.innerHTML = '';
+
+      letters.forEach((item, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'letter-btn';
+        btn.type = 'button';
+        btn.textContent = item.letter;
+        btn.title = item.category;
+        btn.style.animationDelay = `${(i * 0.18).toFixed(2)}s`;
+        btn.onclick = () => goToProcessingCategory(item.letter, item.category);
+        stage.appendChild(btn);
+      });
+
+      stage.style.display = 'flex';
+    }
+
+    function renderProcessingBreadcrumb(category) {
+      const bc = document.getElementById('breadcrumb');
+      bc.innerHTML = '';
+      bc.style.display = 'flex';
+
+      const home = document.createElement('span');
+      home.className = 'crumb';
+      home.textContent = 'Processing';
+      home.onclick = () => goToProcessing();
+      bc.appendChild(home);
+
+      bc.appendChild(sep());
+
+      const current = document.createElement('span');
+      current.className = 'crumb current';
+      current.textContent = category;
+      bc.appendChild(current);
+    }
+
+    function goToProcessingCategory(letter, category) {
+      view = 'processing-category';
+      setActiveNav();
+      document.body.classList.add('tv-mode');
+      document.getElementById('page-title').textContent = category;
+      document.getElementById('subtitle').textContent = `Processing — ${letter}`;
+
+      hideAllPanels();
+      renderProcessingBreadcrumb(category);
+      document.getElementById('breadcrumb').style.display = 'flex';
+
+      const items = processingRows
+        .filter(r => r.letter === letter)
+        .map(r => ({ title: r.question }));
+
+      initShuffleQuestions(items, { label: category, slots: 3 });
     }
 
     // ── Shuffle-question pages (Silent Starter, Circle Time): show N random
@@ -940,6 +1107,7 @@
     document.getElementById('nav-curriculum').onclick = goToCurriculum;
     document.getElementById('nav-silent-starter').onclick = () => goToResourcePage('silent-starter');
     document.getElementById('nav-circle-time').onclick = () => goToResourcePage('circle-time');
+    document.getElementById('nav-processing').onclick = goToProcessing;
 
     setActiveNav();
     loadSheet();
