@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>It Takes a Village - Impact 4 Unit 2.2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a202c; }
+
+
+        /* ===== Slideshow shell (same engine as Compo-Culture) ===== */
+        .slideshow { position: relative; width: 100vw; height: 100vh; background: #ffffff; overflow: hidden; }
+        .slide { display: none; width: 100%; height: 100%; position: relative; }
+        .slide.active { display: block; }
+        .slide-inner { width: 100%; height: 100%; overflow: hidden; padding: 120px 88px 60px; display: flex; align-items: center; justify-content: center; }
+        .fit-wrap { width: 100%; transform-origin: center center; }
+
+        .slide-label { position: absolute; top: 62px; left: 40px; font-weight: 700; font-size: 1.35rem; color: #1a202c; z-index: 5; display: flex; align-items: center; gap: 12px; }
+        .seg-chip { font-size: 0.8rem; font-weight: 700; color: #fff; padding: 4px 12px; border-radius: 14px; text-transform: uppercase; letter-spacing: .5px; }
+        .seg-chip.starter { background: #6366f1; } .seg-chip.circle { background: #f59e0b; } .seg-chip.lesson { background: #0ea5e9; }
+        .seg-chip.pause { background: #10b981; } .seg-chip.process { background: #ec4899; }
+
+
+        /* ===== Lesson map bar: navigation menu across the top (hidden on the title slide) ===== */
+        .lesson-bar { position: fixed; top: 0; left: 0; right: 0; height: 48px; display: none; z-index: 45; background: #1a202c; box-shadow: 0 3px 12px rgba(0,0,0,.25); }
+        .lesson-bar.show { display: flex; }
+        .bar-seg { position: relative; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; border-right: 2px solid #1a202c; min-width: 0; padding: 0 6px 6px; font-family: inherit; font-weight: 700; font-size: .8rem; line-height: 1.05; color: #fff; text-align: center; cursor: pointer; opacity: .55; transition: opacity .25s ease, filter .25s ease; background: var(--c); }
+        .bar-seg:last-child { border-right: none; }
+        .bar-seg:hover { opacity: 1; filter: brightness(1.1); }
+        .bar-seg small { display: block; font-weight: 500; font-size: .68rem; opacity: .9; }
+        .bar-seg.done { opacity: .85; }
+        .bar-seg.done .tick { display: inline-flex; }
+        .bar-seg.current { opacity: 1; }
+        .bar-seg.current::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: #fff; }
+        .bar-seg .tick { display: none; align-items: center; justify-content: center; flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: #fff; color: #2f9e5f; font-size: .8rem; font-weight: 800; }
+        .bar-seg.current .tick { display: none; }
+        .bar-seg span.lbl { overflow: hidden; }
+        .lesson-clock { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: rgba(0,0,0,.45); pointer-events: none; z-index: 2; }
+        .lesson-clock i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ffe08a, #ffce54); box-shadow: 0 0 8px rgba(255,206,84,.8); transition: width 1s linear; }
+        .lesson-clock.over i { background: #fc8181; box-shadow: 0 0 8px rgba(252,129,129,.8); }
+        /* Nav */
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); width: 46px; height: 46px; border-radius: 50%; background: rgba(26,32,44,.85); color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.3rem; z-index: 50; transition: all .25s ease; box-shadow: 0 4px 15px rgba(0,0,0,.25); }
+        .nav-arrow:hover { background: #667eea; transform: translateY(-50%) scale(1.08); }
+        .nav-arrow.prev { left: 22px; } .nav-arrow.next { right: 22px; }
+        .nav-arrow.hidden { opacity: 0; pointer-events: none; }
+        .slide-counter { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); font-size: .85rem; color: #a0aec0; font-weight: 500; z-index: 50; background: rgba(255,255,255,.85); padding: 4px 14px; border-radius: 20px; }
+
+        /* Timer + notes toggle */
+        .toolbar { position: fixed; bottom: 14px; right: 24px; display: flex; gap: 10px; align-items: center; z-index: 60; }
+        .timer-pill { display: flex; align-items: center; gap: 10px; background: #1a202c; color: #fff; border-radius: 26px; padding: 6px 8px 6px 18px; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 4px 15px rgba(0,0,0,.25); }
+        .timer-pill .time { font-size: 1.15rem; min-width: 54px; }
+        .timer-pill.low .time { color: #fc8181; }
+        .timer-pill button, .tool-btn { border: none; background: #667eea; color: #fff; border-radius: 18px; padding: 6px 14px; font-weight: 600; font-size: .85rem; cursor: pointer; font-family: inherit; }
+        .tool-btn { background: #1a202c; padding: 10px 16px; border-radius: 22px; box-shadow: 0 4px 15px rgba(0,0,0,.25); }
+        .timer-pill button:hover, .tool-btn:hover { background: #4a5568; }
+
+
+        /* ===== Slide references + index panel ===== */
+        .slide-counter .ref { margin-left: 8px; padding-left: 8px; border-left: 1px solid #cbd5e0; color: #4a5568; font-weight: 600; cursor: pointer; }
+        .slide-counter .ref:hover { color: #667eea; }
+        .index-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 92vw); background: #fff; z-index: 900; box-shadow: -10px 0 40px rgba(0,0,0,.35); display: none; flex-direction: column; font-size: 1rem; }
+        .index-panel.show { display: flex; }
+        .index-head { padding: 18px 20px; background: #1a202c; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .index-head b { font-size: 1.15rem; flex: 1; }
+        .index-head button, .idx-copy { border: none; border-radius: 16px; padding: 6px 14px; font: 600 .85rem 'Inter', sans-serif; cursor: pointer; background: #667eea; color: #fff; }
+        .index-head button:hover, .idx-copy:hover { background: #4a5568; }
+        .index-hint { padding: 10px 20px; font-size: .85rem; color: #718096; background: #f7fafc; border-bottom: 1px solid #e2e8f0; }
+        .index-list { overflow: auto; flex: 1; }
+        .idx-row { display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid #edf2f7; cursor: pointer; }
+        .idx-row:hover { background: #f0f3ff; }
+        .idx-row.current { background: #e0f2fe; }
+        .idx-n { width: 26px; text-align: right; font-weight: 700; color: #a0aec0; }
+        .idx-main { flex: 1; min-width: 0; }
+        .idx-title { font-weight: 600; color: #1a202c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .idx-ref { font: 600 .8rem ui-monospace, Consolas, monospace; color: #4a5568; }
+        .idx-copy { background: #edf2f7; color: #2d3748; }
+        /* Teacher notes drawer (hidden by default; press N) */
+        .notes { position: fixed; left: 0; right: 0; bottom: 0; max-height: 40vh; overflow: auto; background: #fffbea; border-top: 4px solid #f0a500; padding: 18px 90px 22px; z-index: 40; display: none; font-size: 1rem; line-height: 1.55; color: #5c4400; }
+        .notes.show { display: block; }
+        .notes b.h { display: block; text-transform: uppercase; font-size: .75rem; letter-spacing: 1.2px; margin-bottom: 4px; }
+        .notes .ct { margin-top: 8px; padding: 8px 12px; background: #fff; border-left: 4px solid #667eea; border-radius: 6px; color: #2d3748; }
+
+        /* ===== Cover slides ===== */
+        .cover-slide { width: 100%; height: 100%; position: relative; overflow: hidden; }
+        .cover-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        /* Faded colour gradient over the photo: clear on the left, deepening to the right where the text sits */
+        .cover-panel { position: absolute; top: 0; right: 0; width: 62%; height: 100%; background: linear-gradient(90deg, rgba(30,64,175,0) 0%, rgba(37,99,235,.55) 30%, rgba(79,70,229,.85) 62%, rgba(49,46,129,.95) 100%); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 60px 70px 60px 26%; color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.35); }
+        .cover-title { font-size: 2.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 22px; }
+        .cover-meta { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; opacity: .95; }
+        .cover-buttons { display: flex; gap: 16px; margin: 30px 0 25px; }
+        .cover-btn { width: 78px; height: 78px; border-radius: 50%; background: rgba(45,55,72,.8); border: 2px solid #ffce54; color: #fff; font-size: .75rem; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; cursor: pointer; line-height: 1.2; padding: 4px; }
+        .cover-btn:hover { background: rgba(102,126,234,.9); }
+        .cover-website { font-size: .9rem; opacity: .9; }
+        .school-logo { position: absolute; top: 4vh; right: 3vw; z-index: 6; background: #fff; border-radius: 22px; padding: 14px 18px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+        .school-logo img { display: block; height: clamp(100px, 24vh, 190px); width: auto; }
+
+        /* ===== START button (animations borrowed from What-Drives-Civilization: float, shine sweep, glow pulse, hover lift, fade-scale exit) ===== */
+        .cover-slide { transition: opacity .8s ease, transform .8s ease; }
+        .cover-slide.leaving { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .start-btn {
+            position: absolute; z-index: 6;
+            left: 77%; bottom: 9%;                 /* sits under the text on the gradient */
+            transform: translateX(-50%);
+            width: 300px; height: 84px;
+            border: 3px solid #ffce54; border-radius: 42px;
+            background: linear-gradient(145deg, rgba(26,32,44,.92) 0%, rgba(45,55,72,.92) 100%);
+            color: #fff; font-family: inherit; font-weight: 800; font-size: 1.9rem; letter-spacing: 6px;
+            cursor: pointer; overflow: hidden;
+            backdrop-filter: blur(10px);
+            animation: startFloat 3s ease-in-out infinite, startGlow 3s ease-in-out infinite;
+            transition: border-color .3s ease, background .3s ease;
+        }
+        .start-btn span { position: relative; z-index: 2; }
+        .start-btn::before {                      /* shine sweep, runs continuously */
+            content: ''; position: absolute; top: -50%; left: -60%; width: 40%; height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+            transform: rotate(25deg);
+            animation: startShine 3.2s ease-in-out infinite;
+        }
+        .start-btn:hover {
+            animation-play-state: paused;
+            transform: translateX(-50%) translateY(-12px) scale(1.07);
+            border-color: #4ade80;
+            background: linear-gradient(145deg, #2f7fd4 0%, #4aa3e0 100%);
+            box-shadow: 0 20px 60px rgba(74,222,128,.45), 0 0 40px rgba(74,222,128,.25);
+        }
+        .start-btn:active { transform: translateX(-50%) translateY(-4px) scale(.97); }
+        @keyframes startFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50%      { transform: translateX(-50%) translateY(-10px); }
+        }
+        @keyframes startGlow {
+            0%, 100% { box-shadow: 0 8px 30px rgba(255,206,84,.35), 0 0 0 0 rgba(255,206,84,.5); }
+            50%      { box-shadow: 0 18px 50px rgba(255,206,84,.6),  0 0 0 18px rgba(255,206,84,0); }
+        }
+        @keyframes startShine {
+            0%   { left: -60%; opacity: 1; }
+            45%, 100% { left: 130%; opacity: 0; }
+        }
+
+        .cover-panel-left { position: absolute; top: 0; left: 0; width: 52%; height: 100%; background: linear-gradient(160deg,#4aa3e0 0%,#2f7fd4 100%); clip-path: polygon(0 0,82% 0,64% 100%,0% 100%); display: flex; flex-direction: column; justify-content: center; padding: 60px 90px 60px 70px; color: #fff; }
+        .fb-heading { font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+        .fb-sub { font-size: 1.2rem; font-weight: 700; line-height: 1.4; }
+        .cover-right-content { position: absolute; top: 0; right: 0; width: 55%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 60px 70px; }
+        .feedback-slider { display: flex; gap: 8px; margin-bottom: 25px; }
+        .feedback-emoji { flex: 1; text-align: center; padding: 16px 0; border-radius: 12px; font-size: 1.7rem; cursor: pointer; transition: all .25s ease; }
+        .feedback-emoji:nth-child(1){background:#fed7d7}.feedback-emoji:nth-child(2){background:#feebc8}.feedback-emoji:nth-child(3){background:#fefcbf}.feedback-emoji:nth-child(4){background:#c6f6d5}.feedback-emoji:nth-child(5){background:#9ae6b4}
+        .feedback-emoji.selected { transform: scale(1.15); box-shadow: 0 6px 18px rgba(0,0,0,.2); }
+        .thanks-note { display: none; margin-bottom: 15px; color: #48bb78; font-weight: 600; }
+        .thanks-note.show { display: block; }
+
+        /* ===== Content ===== */
+        .center-col { max-width: 1150px; margin: 0 auto; }
+        .slide-heading { text-align: center; font-size: 2.2rem; font-weight: 800; color: #1a202c; margin-bottom: 26px; }
+        .poll-question { font-size: 1.7rem; font-weight: 600; color: #1a202c; margin-bottom: 8px; }
+        .poll-subtext { font-size: 1.1rem; color: #a0aec0; margin-bottom: 24px; }
+        .poll-item { display: flex; align-items: center; gap: 14px; padding: 18px 24px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 14px; cursor: pointer; transition: all .2s ease; font-size: 1.5rem; color: #2d3748; }
+        .poll-item:hover { background: #f7fafc; }
+        .poll-icon { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #cbd5e0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .75rem; color: transparent; }
+        .poll-item.selected .poll-icon { color: #fff; background: #667eea; border-color: #667eea; }
+        .poll-item.selected { border-color: #667eea; background: #f0f3ff; }
+        .why-text { text-align: center; font-weight: 700; font-size: 1.6rem; color: #1a202c; margin-top: 26px; }
+
+        .discussion-prompt { background: #fdf3d8; border-radius: 30px; padding: 22px 32px; display: flex; align-items: center; justify-content: center; gap: 14px; font-weight: 600; color: #1a202c; font-size: 1.55rem; max-width: 800px; margin: 0 auto; text-align: center; }
+        .q-item { background: #fff; border-left: 4px solid #667eea; padding: 20px 26px; border-radius: 10px; margin-bottom: 18px; font-size: 1.55rem; color: #2d3748; box-shadow: 0 4px 15px rgba(0,0,0,.06); }
+        .q-item .sub { display: block; font-size: 1.1rem; color: #a0aec0; margin-top: 6px; }
+        .big-quote { font-size: 2.6rem; font-weight: 800; color: #1a202c; line-height: 1.25; text-align: center; margin: 0 auto 14px; max-width: 980px; }
+        .quote-by { text-align: center; font-size: 1.4rem; color: #718096; margin-bottom: 30px; }
+        .split-layout { display: flex; align-items: center; gap: 60px; width: 100%; }
+        .split-text { flex: 1.1; min-width: 0; } .split-image { flex: .9; min-width: 0; }
+        .split-image img { width: 100%; display: block; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+        .split-text p, .split-text li { font-size: 1.6rem; color: #2d3748; line-height: 1.5; margin-bottom: 14px; }
+        .split-text ul, .split-text ol { padding-left: 30px; }
+        .img-caption { text-align: center; color: #a0aec0; font-size: 1rem; margin-top: 8px; }
+        .frames { background: #f7fafc; border-radius: 14px; padding: 18px 24px; margin-top: 18px; }
+        .frames p { font-size: 1.35rem !important; color: #2d3748; margin-bottom: 6px !important; }
+
+        .vocab-link { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: #fff; padding: 2px 10px; border-radius: 8px; font-weight: 500; cursor: pointer; }
+        .vocab-link:hover { transform: translateY(-1px); }
+        .next-btn-center { display: block; margin: 30px auto 0; background: #1a202c; color: #fff; border: none; padding: 14px 38px; border-radius: 25px; font-weight: 600; cursor: pointer; font-size: 1.2rem; }
+        .next-btn-center:hover { background: #667eea; }
+
+        /* Choice cards */
+        .choice-row { display: grid; gap: 22px; margin-top: 10px; }
+        .choice-row.c3 { grid-template-columns: repeat(3, 1fr); }
+        .choice-row.c4 { grid-template-columns: repeat(4, 1fr); }
+        .choice-row.c5 { grid-template-columns: repeat(5, 1fr); }
+        .choice-card { background: #fff; border: 2px solid #e2e8f0; border-radius: 16px; padding: 24px 22px; cursor: pointer; transition: all .2s ease; box-shadow: 0 6px 20px rgba(0,0,0,.06); text-align: center; }
+        .choice-card:hover { transform: translateY(-4px); border-color: #667eea; }
+        .choice-card.selected { border-color: #667eea; background: #f0f3ff; box-shadow: 0 8px 24px rgba(102,126,234,.3); }
+        .choice-card .emoji { font-size: 3rem; display: block; margin-bottom: 8px; }
+        .choice-card h4 { font-size: 1.4rem; color: #1a202c; margin-bottom: 8px; }
+        .choice-card p { font-size: 1.1rem; color: #4a5568; line-height: 1.4; }
+        .letter { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: #1a202c; color: #fff; font-weight: 800; margin-bottom: 8px; }
+
+        /* Silent starter task card */
+        .starter-q { font-size: 4.2rem; font-weight: 800; line-height: 1.2; color: #1a202c; text-align: center; margin: 10px auto 18px; max-width: 1100px; }
+        .starter-q span { display: block; margin-top: 22px; color: #6366f1; }
+        .starter-verb { display: block; font-size: 2.4rem; font-weight: 800; color: #6366f1; margin-bottom: 10px; }
+        .starter-sub { text-align: center; font-size: 1.8rem; color: #718096; font-weight: 500; }
+        .reading-note { font-size: 1.15rem; color: #a0aec0; margin-bottom: 14px; }
+        .book-step { display: flex; align-items: center; gap: 22px; background: #f7fafc; border-radius: 16px; padding: 22px 30px; margin-bottom: 20px; font-size: 2.4rem; font-weight: 700; color: #1a202c; }
+        .book-n { flex-shrink: 0; width: 60px; height: 60px; border-radius: 50%; background: #0284c7; color: #fff; font-size: 2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+        .quiz-bell { text-align: center; font-size: 5rem; line-height: 1; margin-bottom: 8px; display: block; animation: quizRing 2.4s ease-in-out infinite; transform-origin: 50% 10%; }
+        @keyframes quizRing { 0%, 60%, 100% { transform: rotate(0); } 10% { transform: rotate(14deg); } 20% { transform: rotate(-12deg); } 30% { transform: rotate(8deg); } 40% { transform: rotate(-6deg); } 50% { transform: rotate(3deg); } }
+        .quiz-details { max-width: 760px; margin: 0 auto 30px; }
+        .quiz-row { font-size: 2rem; color: #2d3748; background: #f7fafc; border-left: 6px solid #0284c7; border-radius: 12px; padding: 12px 24px; margin-bottom: 12px; }
+        .quiz-btn { display: block; width: fit-content; margin: 0 auto; background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; text-decoration: none; font-size: 2.4rem; font-weight: 800; padding: 22px 54px; border-radius: 50px; box-shadow: 0 12px 34px rgba(99,102,241,.45); transition: transform .2s ease, box-shadow .2s ease; animation: quizPulse 2.6s ease-in-out infinite; }
+        .quiz-btn:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 20px 50px rgba(99,102,241,.6); animation-play-state: paused; }
+        @keyframes quizPulse { 0%, 100% { box-shadow: 0 12px 34px rgba(99,102,241,.45), 0 0 0 0 rgba(14,165,233,.5); } 50% { box-shadow: 0 12px 34px rgba(99,102,241,.45), 0 0 0 20px rgba(14,165,233,0); } }
+        .quiz-url { text-align: center; margin-top: 16px; font-size: 1rem; color: #a0aec0; word-break: break-all; }
+        .reading-text p { font-size: 2.2rem; line-height: 1.6; color: #2d3748; margin-bottom: 20px; }
+        .vocab-list { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: column; grid-template-rows: repeat(8, auto); gap: 8px 36px; }
+        .vl-item { display: flex; gap: 12px; align-items: flex-start; background: #f7fafc; border-radius: 12px; padding: 8px 14px; }
+        .vl-n { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #0284c7; color: #fff; font-weight: 800; font-size: .9rem; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .vl-word { display: block; font-size: 1.45rem; font-weight: 800; color: #0369a1; line-height: 1.2; }
+        .vl-sent { display: block; font-size: 1.15rem; line-height: 1.3; color: #2d3748; }
+        .opener-quote { margin-top: 14px; font-size: 2rem; font-weight: 800; line-height: 1.3; color: #1a202c; }
+        .base-groups { text-align: center; font-size: 2.4rem; font-weight: 800; color: #1a202c; background: #e0f2fe; border-radius: 40px; padding: 10px 30px; margin: 0 auto 22px; width: fit-content; }
+        .opener-quote span { display: block; margin-top: 6px; font-size: 1.4rem; font-weight: 500; color: #718096; }
+        .opener-qs { padding-left: 40px; }
+        .opener-qs li { font-size: 1.85rem !important; line-height: 1.35; margin-bottom: 20px; color: #2d3748; }
+        .opener-qs li::marker { font-weight: 800; color: #0ea5e9; }
+        .inq { display: flex; flex-direction: column; gap: 6px; background: #f7fafc; border-radius: 16px; padding: 18px 30px; margin-bottom: 20px; }
+        .inq-tag { font-weight: 800; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        .inq-tag.factual { color: #2b6cb0; } .inq-tag.conceptual { color: #6b46c1; } .inq-tag.debatable { color: #c05621; }
+        .inq-text { font-size: 2.3rem; font-weight: 700; line-height: 1.3; color: #1a202c; }
+        .q-type { margin-bottom: 6px; font-weight: 800; font-size: 1.1rem; color: #b7791f; text-transform: uppercase; letter-spacing: 2px; }
+        .q-type span { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #f59e0b; color: #fff; margin-right: 12px; letter-spacing: 0; }
+        .circle-q { font-size: 2.1rem; font-weight: 800; line-height: 1.25; color: #1a202c; }
+        .circle-item { background: #fffbeb; border-left: 8px solid #f59e0b; border-radius: 14px; padding: 16px 28px; margin-bottom: 20px; }
+        .starter-video { position: absolute; left: 24px; bottom: 20px; width: 240px; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.3); background: #000; z-index: 6; }
+        .starter-video iframe { width: 100%; height: 100%; border: 0; display: block; }
+        .rule-strip { display: flex; justify-content: center; gap: 18px; margin-bottom: 26px; }
+        .rule { background: #edf2f7; border-radius: 30px; padding: 10px 24px; font-weight: 700; font-size: 1.2rem; color: #2d3748; }
+
+        /* Flashcards (vocab) */
+        .vocab-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 10px; }
+        .flashcard { width: 100%; height: 0; padding-bottom: 130%; position: relative; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: absolute; inset: 0; transition: transform .6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.08); display: flex; flex-direction: column; }
+        .flashcard-front { background: #fff; }
+        .card-def { padding: 12px 10px 4px; text-align: center; }
+        .card-def .def-text { font-size: 1.15rem; color: #2d3748; line-height: 1.32; }
+        .card-def .pos-tag { font-style: italic; color: #a0aec0; font-size: 1rem; margin-top: 8px; }
+        .card-image-area { flex: 1; background: #f2f4f8; display: flex; align-items: center; justify-content: center; font-size: 3.4rem; position: relative; }
+        .flip-icon { position: absolute; bottom: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(26,32,44,.6); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .75rem; }
+        .flashcard-back { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: #fff; transform: rotateY(180deg); align-items: center; justify-content: center; padding: 16px; }
+        .flashcard-term { font-weight: 700; font-size: 1.7rem; text-align: center; }
+
+        /* TEMPLATE placeholders: clearly visible until you fill them in */
+        .tbd { background: #fef3c7; border-bottom: 3px dashed #f59e0b; border-radius: 4px; padding: 0 6px; color: #92400e; }
+        body.hide-tbd .tbd { background: none; border-bottom: none; color: inherit; }
+        .placeholder-box { max-width: 700px; margin: 24px auto; text-align: center; padding: 40px 30px; border: 2px dashed #cbd5e0; border-radius: 16px; color: #a0aec0; background: #f7fafc; font-size: 1.3rem; }
+        .placeholder-box .big-icon { font-size: 3rem; margin-bottom: 12px; }
+
+        /* Popup */
+        .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .popup-content { background: rgba(255,255,255,.97); border-radius: 20px; padding: 56px 64px; max-width: min(1100px, 92vw); margin: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+        .popup-word { color: #1a202c; font-size: 3.6rem; font-weight: 700; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
+        .popup-definition { color: #4a5568; line-height: 1.45; margin-bottom: 25px; font-size: 2.8rem; }
+        .popup-close { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: #fff; border: none; padding: 16px 36px; font-size: 1.4rem; border-radius: 25px; cursor: pointer; font-weight: 500; float: right; }
+
+        @media (max-width: 900px) {
+            .slide-inner { padding: 120px 24px 60px; }
+            .cover-panel { width: 100%; padding: 40px 30px; background: linear-gradient(180deg, rgba(30,64,175,.2), rgba(49,46,129,.95)); }
+            .start-btn { left: 50%; }
+            .vocab-grid { grid-template-columns: repeat(2, 1fr); }
+            .split-layout { flex-direction: column; gap: 24px; }
+            .choice-row.c3, .choice-row.c4, .choice-row.c5 { grid-template-columns: 1fr 1fr; }
+            .notes { padding: 14px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closePopupOutside(event)">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup()">Close</button>
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+        </div>
+    </div>
+
+    <!-- Lesson map bar (also the navigation menu) -->
+    <div class="lesson-bar" id="lessonBar">
+        <button class="bar-seg" data-seg="starter" style="flex:7;--c:#6366f1" onclick="jumpToSeg('starter')"><span class="tick">&#10003;</span><span class="lbl">Silent Starter<small>7 min</small></span></button>
+        <button class="bar-seg" data-seg="circle"  style="flex:7;--c:#f59e0b" onclick="jumpToSeg('circle')"><span class="tick">&#10003;</span><span class="lbl">Circle Time<small>7 min</small></span></button>
+        <button class="bar-seg" data-seg="lessonA" style="flex:21;--c:#0ea5e9" onclick="jumpToSeg('lessonA')"><span class="tick">&#10003;</span><span class="lbl">Lesson A<small>21 min</small></span></button>
+        <button class="bar-seg" data-seg="pause"   style="flex:7;--c:#10b981" onclick="jumpToSeg('pause')"><span class="tick">&#10003;</span><span class="lbl">Active Pause<small>7 min</small></span></button>
+        <button class="bar-seg" data-seg="lessonB" style="flex:21;--c:#0284c7" onclick="jumpToSeg('lessonB')"><span class="tick">&#10003;</span><span class="lbl">Lesson B<small>21 min</small></span></button>
+        <button class="bar-seg" data-seg="process" style="flex:7;--c:#ec4899" onclick="jumpToSeg('process')"><span class="tick">&#10003;</span><span class="lbl">Processing<small>7 min</small></span></button>
+        <div class="lesson-clock" id="lessonClock" title="Lesson clock: not started"><i id="lessonClockFill"></i></div>
+    </div>
+
+    <button class="nav-arrow prev" id="prevArrow" onclick="prevSlide()">&#8249;</button>
+    <button class="nav-arrow next" id="nextArrow" onclick="nextSlide()">&#8250;</button>
+    <div class="slide-counter" id="slideCounter"></div>
+
+    <div class="toolbar">
+        <div class="timer-pill" id="timerPill" style="display:none;">
+            <span id="segLabel" style="font-weight:600;font-size:.8rem;opacity:.8;"></span>
+            <span class="time" id="timerTime">00:00</span>
+            <button onclick="toggleTimer()" id="timerBtn">Start</button>
+            <button onclick="resetTimer()" style="background:#4a5568;">&#8635;</button>
+        </div>
+        <button class="tool-btn" onclick="toggleIndex()">Slide index (I)</button>
+        <button class="tool-btn" onclick="toggleNotes()">Teacher notes (N)</button>
+    </div>
+
+    <!-- Slide index: every slide's reference code, click to jump, copy to reuse -->
+    <div class="index-panel" id="indexPanel">
+        <div class="index-head"><b>Slide index &middot; <span id="idxLesson"></span></b><button onclick="copyAllRefs()">Copy all</button><button onclick="toggleIndex()">Close</button></div>
+        <div class="index-hint">Click a slide to jump to it. Click <b>Copy</b> to copy its reference code (e.g. to tell Claude &ldquo;reuse slide U2.2/reading&rdquo;).</div>
+        <div class="index-list" id="indexList"></div>
+    </div>
+
+    <!-- Teacher notes content swaps per slide -->
+    <div class="notes" id="notesPanel"></div>
+
+    <div class="slideshow">
+
+        <!-- ============================================================
+             TEMPLATE GUIDE
+             - Yellow dashed text (.tbd) = to be filled in from the book. Press H to hide the highlighting.
+             - Each slide has data-seg (timer block) and data-notes (teacher notes, press N).
+             - Segments: starter 7 | circle 7 | lesson 21 | pause 7 | lesson 21 | process 7  = 70 min
+             ============================================================ -->
+
+        <!-- 1. TITLE -->
+        <div class="slide active" id="slide-title-slide" data-seg="none" data-notes="<b class='h'>Before class</b>(Lesson 2 / Unit 2.2) Set up the circle of chairs. Decide your talking piece (ball / marker). Press T on each section to start its timer. Press N to show/hide these notes, H to hide the yellow fill-in highlighting.<div class='ct'><b>Choice Theory:</b> Greet every student at the door by name - connection first (Love &amp; Belonging).</div>">
+            <div class="cover-slide">
+                <img class="cover-image" src="img/barn-raising-photo.png" alt="Amish barn raising in Ohio, US">
+                <div class="cover-panel">
+                    <div class="cover-title">IT TAKES<br>A VILLAGE</div>
+                    <div class="cover-meta">IMPACT 4 &middot; UNIT 2.2</div>
+                    <div class="cover-meta">8TH GRADE ESL</div>
+                    <div class="cover-meta">70 MINUTES</div>
+                    <div class="cover-meta tbd" contenteditable>[Lesson 2 topic / title]</div>
+                    <div class="cover-website" style="margin-top:22px;">Rochester &middot; Chía</div>
+                </div>
+                <div class="school-logo"><img src="img/rochester-logo.png" alt="Rochester School logo"></div>
+                <!-- START button, under the text on the gradient -->
+                <button class="start-btn" onclick="startLesson(this)"><span>START</span></button>
+            </div>
+        </div>
+
+        <!-- ============ SILENT STARTER (7 min) ============ -->
+        <div class="slide" id="slide-silent-starter" data-seg="starter" data-notes="<b class='h'>Silent starter &middot; 7 min</b>The small timer video (bottom left) starts by itself when this slide appears - click it if it doesn't. Students enter, sit and work silently and independently while you take attendance. They write a minimum of 4 sentences.<div class='ct'><b>Choice Theory:</b> A calm, identical routine every lesson = Survival (safety). Don't police - if someone isn't working, ask quietly: 'What do you want to do right now?'</div>">
+            <div class="slide-label">Silent Starter <span class="seg-chip starter">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="rule-strip"><div class="rule">&#128263; Voices off</div><div class="rule">&#9999;&#65039; Pencils sharp</div><div class="rule">&#128221; Minimum 4 sentences</div></div>
+                <div class="starter-q"><small class="starter-verb">Discuss.</small>What have you done to help someone in need?<span>Have you ever used technology to help someone else?</span></div>
+                <div class="starter-sub">(Teacher will take Attendance)</div>
+            </div></div></div>
+            <div class="starter-video"><iframe id="starterVideo" data-src="https://www.youtube.com/embed/xVVnXA8Qvlc?rel=0&autoplay=1" title="Timer video" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+        </div>
+
+        <!-- ============ CIRCLE TIME (7 min): 3 questions - define, connect, think ============ -->
+        <div class="slide" id="slide-circle-time" data-seg="circle" data-notes="<b class='h'>Circle time &middot; 7 min (about 2-2.5 min per question)</b>Chairs in a circle, one talking piece. You go first and model a short, honest answer. 'I pass' is always OK. After each speaker everyone says 'Thank you.' These questions prepare students for today's reading (p.28) without giving it away.<br><br><b>1 &middot; DEFINE</b> (identify, clarify or explain a concept - builds shared knowledge). Collect 2-3 definitions on the board and combine them into one class definition. The reading says digital humanitarians use apps to locate people who need help, monitor the situation and send money - hold that back until they read.<br><i>Prompts:</i> 'A digital humanitarian is ______.' / 'I think a digital humanitarian uses ______ to ______.'<br><br><b>2 &middot; CONNECT</b> (share own experiences, feelings and preferences - builds community, empathy and listening). Echoes the reading's opening line about asking a parent or friend for help. Listeners only listen: no comments, no fixing.<br><i>Prompts:</i> 'The problem was ______.' / '______ helped me by ______.' / 'I felt ______ because ______.'<br><br><b>3 &middot; THINK</b> (go beyond definitions and stories to predict, problem-solve and imagine). Give 20 seconds of silent thinking first. Accept every idea; ask 'What makes you think that?' Predicts the earthquake / typhoon example in paragraph 3.<br><i>Prompts:</i> 'I predict that ______.' / 'A smartphone could ______.' / 'One problem might be ______.'<div class='ct'><b>Choice Theory:</b> Love &amp; Belonging - the circle meets the need to be heard. Connecting habits: listening, supporting, encouraging, respecting. Passing is always allowed (Freedom); every answer counts (Power). Question 2 may touch on hard experiences: never press anyone to share.</div>">
+            <div class="slide-label">Circle Time <span class="seg-chip circle">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="circle-item"><div class="q-type"><span>1</span> Define it</div><div class="circle-q">What do you think a <u>digital humanitarian</u> is? Explain it in your own words.</div></div>
+                <div class="circle-item"><div class="q-type"><span>2</span> Connect to you</div><div class="circle-q">Think of a time you had a problem that felt too big. Who or what helped you, and how did it feel?</div></div>
+                <div class="circle-item"><div class="q-type"><span>3</span> Think about it</div><div class="circle-q">Imagine a crisis, like an earthquake, happens far away from you. How could a smartphone help the people there? What could go wrong?</div></div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ LESSON PART A (21 min): reading (5 slides, one paragraph each) ============ -->
+        <!-- Reference codes: U2.2/reading (part 1), U2.2/reading-2 ... U2.2/reading-5. Edit the text of any part in place. -->
+        <div class="slide" id="slide-reading" data-seg="lessonA" data-notes="<b class='h'>Reading &middot; part 1 of 5 &middot; Impact 4 p.28</b>Reference codes: <b>U2.2/reading, U2.2/reading-2, U2.2/reading-3, U2.2/reading-4, U2.2/reading-5</b>. Suggested flow: predict from the title and picture (1 min, pairs) - read or listen paragraph by paragraph for the main idea - detail questions - compare answers with a partner. Students read silently first; then volunteers read aloud. The 15 unit words are clickable purple words that open an example sentence.<div class='ct'><b>Choice Theory:</b> Freedom - students choose to read alone, with a partner, or listen to the audio. Power - they check their own answers first.</div>">
+            <div class="slide-label">Reading <span class="seg-chip lesson">Part 1 of 5</span></div>
+            <div class="slide-inner" style="padding:104px 88px 36px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
+                <div class="slide-heading" style="margin-bottom:18px;">Page 28 &ndash; It Takes a Village</div>
+                <div class="reading-note">Click the purple words to see an example sentence.</div>
+                <div class="reading-text"><p>What will you do the next time you're in a difficult situation? Maybe you will ask a parent or friend to help. But some problems are more <span class="vocab-link" onclick="vocabPopup('complex')">complex</span>. The problems are too big. In these situations, more and more people are using technology to help.</p></div>
+            </div></div></div>
+        </div>
+
+        <div class="slide" id="slide-reading-2" data-seg="lessonA" data-notes="<b class='h'>Reading &middot; part 2 of 5</b>Reference code: <b>U2.2/reading-2</b>. Ask one gist question per paragraph before moving on, e.g. 'What is this paragraph mostly about?'<div class='ct'><b>Choice Theory:</b> Power - students summarise in their own words; no one is called on without volunteering.</div>">
+            <div class="slide-label">Reading <span class="seg-chip lesson">Part 2 of 5</span></div>
+            <div class="slide-inner" style="padding:104px 88px 36px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
+                <div class="reading-note">Click the purple words to see an example sentence.</div>
+                <div class="reading-text"><p>Digital <span class="vocab-link" onclick="vocabPopup('humanitarian')">humanitarians</span> use a variety of apps to <span class="vocab-link" onclick="vocabPopup('locate')">locate</span> those who need help, <span class="vocab-link" onclick="vocabPopup('monitor')">monitor</span> updates on the situation, and even send money electronically. This means that anyone can help from anywhere. As these virtual communities <span class="vocab-link" onclick="vocabPopup('expand')">expand</span>, so does their impact.</p></div>
+            </div></div></div>
+        </div>
+
+        <div class="slide" id="slide-reading-3" data-seg="lessonA" data-notes="<b class='h'>Reading &middot; part 3 of 5</b>Reference code: <b>U2.2/reading-3</b>. Ask one gist question per paragraph before moving on, e.g. 'What is this paragraph mostly about?'<div class='ct'><b>Choice Theory:</b> Power - students summarise in their own words; no one is called on without volunteering.</div>">
+            <div class="slide-label">Reading <span class="seg-chip lesson">Part 3 of 5</span></div>
+            <div class="slide-inner" style="padding:104px 88px 36px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
+                <div class="reading-note">Click the purple words to see an example sentence.</div>
+                <div class="reading-text"><p>When there's a <span class="vocab-link" onclick="vocabPopup('crisis')">crisis</span>, such as an earthquake or a typhoon, technology can be used to <span class="vocab-link" onclick="vocabPopup('measure')">measure</span> the <span class="vocab-link" onclick="vocabPopup('scale')">scale</span> of the disaster. Those affected might communicate through messaging apps or <span class="vocab-link" onclick="vocabPopup('upload')">upload</span> images to social media. People access the huge <span class="vocab-link" onclick="vocabPopup('amount')">amount</span> of information that comes from this type of <span class="vocab-link" onclick="vocabPopup('crowdsourcing')">crowdsourcing</span>. They then organize and share it with rescue groups who can provide relief.</p></div>
+            </div></div></div>
+        </div>
+
+        <div class="slide" id="slide-reading-4" data-seg="lessonA" data-notes="<b class='h'>Reading &middot; part 4 of 5</b>Reference code: <b>U2.2/reading-4</b>. Ask one gist question per paragraph before moving on, e.g. 'What is this paragraph mostly about?'<div class='ct'><b>Choice Theory:</b> Power - students summarise in their own words; no one is called on without volunteering.</div>">
+            <div class="slide-label">Reading <span class="seg-chip lesson">Part 4 of 5</span></div>
+            <div class="slide-inner" style="padding:104px 88px 36px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
+                <div class="reading-note">Click the purple words to see an example sentence.</div>
+                <div class="reading-text"><p>Some communities face ongoing difficulties, such as threats from climate change or a lack of <span class="vocab-link" onclick="vocabPopup('resources')">resources</span>. YouthMappers is an international organization in which university students collect <span class="vocab-link" onclick="vocabPopup('data')">data</span> from satellites and create maps to help <span class="vocab-link" onclick="vocabPopup('address')">address</span> the needs of communities like this. For example, in Brazil, National Geographic Explorer Ana Luísa Teixeira leads the chapter of YouthMappers working to <span class="vocab-link" onclick="vocabPopup('document')">document</span> the culture and characteristics of Tefé, a municipality in the Amazon rainforest. Ana looks at the relationship between the Solimões river and the people who depend on it. She hopes mapping the region will support the people's rights to protect their water source.</p></div>
+            </div></div></div>
+        </div>
+
+        <div class="slide" id="slide-reading-5" data-seg="lessonA" data-notes="<b class='h'>Reading &middot; part 5 of 5</b>Reference code: <b>U2.2/reading-5</b>. Ask one gist question per paragraph before moving on, e.g. 'What is this paragraph mostly about?'<div class='ct'><b>Choice Theory:</b> Power - students summarise in their own words; no one is called on without volunteering.</div>">
+            <div class="slide-label">Reading <span class="seg-chip lesson">Part 5 of 5</span></div>
+            <div class="slide-inner" style="padding:104px 88px 36px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
+                <div class="reading-note">Click the purple words to see an example sentence.</div>
+                <div class="reading-text"><p>Around the world, young people like Ana are using the technology in their pockets to coordinate solutions to important issues: energy availability, education, and housing. Anyone can be a digital <span class="vocab-link" onclick="vocabPopup('humanitarian')">humanitarian</span>, because actions such as <span class="vocab-link" onclick="vocabPopup('data')">data</span> collection or payment transfers are often done with a smartphone. So, the next time an issue arises that matters to you, pull out your phone and use it as a tool for collaboration with others. With a few clicks, you can help make the world a better place.</p></div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ BOOK INSTRUCTIONS. Reference code: U2.2/book-instructions ============ -->
+        <div class="slide" id="slide-book-instructions" data-seg="lessonA" data-notes="<b class='h'>Book instructions &middot; Lesson A (after the reading)</b>Reference code: <b>U2.2/book-instructions</b>. Tell students exactly which page and exercise to open and how to work (alone, pairs, groups) before they start.<div class='ct'><b>Choice Theory:</b> Predictability = safety (Survival). Clear instructions give Power - students know what to do and can check their own progress. Where possible let them choose a partner (Freedom).</div>">
+            <div class="slide-label">Book Instructions <span class="seg-chip lesson">Part A</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="slide-heading">&#128214; Book Instructions</div>
+                <div class="book-step"><span class="book-n">1</span><span>Page 30, Complete exercise 5</span></div>
+                <div class="book-step"><span class="book-n">2</span><span>Page 30, Complete exercise 6</span></div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ ACTIVE PAUSE (7 min) ============ -->
+        <div class="slide" id="slide-active-pause" data-seg="pause" data-notes="<b class='h'>Active pause &middot; 7 min</b>Class votes A or B by show of hands; C is always open to anyone, no explanation needed. Finish with three slow breaths and back to seats.<div class='ct'><b>Choice Theory:</b> Fun &amp; Survival (the body needs to move). Cooperative games meet Belonging. Four Corners statements: 'Everyone should help their neighbours.' / 'Social media makes communities stronger.' / <span class='tbd'>[your own]</span></div>">
+            <div class="slide-label">Active Pause <span class="seg-chip pause">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="slide-heading">Get up and move!</div>
+                <div class="choice-row c3">
+                    <div class="choice-card" onclick="pickOne(this)"><span class="emoji">&#127959;&#65039;</span><span class="letter">A</span><h4>Barn-Raising Relay</h4><p>Teams of 5 pass "bricks" (paper balls) down a line to build a tower. Say a new word every pass!</p></div>
+                    <div class="choice-card" onclick="pickOne(this)"><span class="emoji">&#129517;</span><span class="letter">B</span><h4>Four Corners</h4><p>Listen to a statement. Walk to: <b>Strongly agree &middot; Agree &middot; Disagree &middot; Strongly disagree</b>.</p></div>
+                    <div class="choice-card" onclick="pickOne(this)"><span class="emoji">&#129496;</span><span class="letter">C</span><h4>Stretch &amp; Breathe</h4><p>5 stretches + 10 slow breaths. Calm and quiet.</p></div>
+                </div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ QUIZ ANNOUNCEMENT (Lesson B). Reference code: U2.2/quiz-announcement ============ -->
+        <div class="slide" id="slide-quiz-announcement" data-seg="lessonB" data-notes="<b class='h'>Quiz announcement &middot; Lesson B</b>Reference code: <b>U2.2/quiz-announcement</b>. Announce the quiz and click the button to open the document in a new tab.<div class='ct'><b>Choice Theory:</b> Predictability = safety (Survival). Knowing what is coming and how to prepare gives Power. Invite questions and let students say what would help them prepare (Freedom).</div>">
+            <div class="slide-label">Quiz Announcement <span class="seg-chip lesson">Part B</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="quiz-bell">&#128226;</div>
+                <div class="slide-heading" style="margin-bottom:10px;">Quiz Announcement</div>
+                <div class="quiz-details">
+                    <div class="quiz-row"><b>Quiz Title:</b> Impact Unit 2 Vocabulary</div>
+                    <div class="quiz-row"><b>Duration:</b> 20 minutes</div>
+                </div>
+                <a class="quiz-btn" href="https://docs.google.com/document/d/1u75KaLw-f2p7hjk1EXQgRyvbdOgtGwvJCcuIYzeUFiU/edit?usp=sharing" target="_blank" rel="noopener noreferrer">Open the quiz document &#8599;</a>
+                <div class="quiz-url">https://docs.google.com/document/d/1u75KaLw-f2p7hjk1EXQgRyvbdOgtGwvJCcuIYzeUFiU/edit?usp=sharing</div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ PROCESSING ACTIVITY (7 min) ============ -->
+        <div class="slide" id="slide-processing" data-seg="process" data-notes="<b class='h'>Processing activity &middot; 7 min</b>2 min individual jot, 3 min small-group share, 2 min whole class (volunteers). Keep it non-judgemental: ask 'What choices did you make?' not 'Why did you misbehave?'. Allow Spanish for the hardest ideas, then rephrase together in English.<div class='ct'><b>Choice Theory:</b> This is WDEP - Wants, Doing, Evaluation, Planning - the heart of reality therapy. Total behaviour: what did I DO, THINK and FEEL? Did it meet my needs, and did it help me?</div>">
+            <div class="slide-label">Processing Activity <span class="seg-chip process">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="slide-heading">How did it go?</div>
+                <div class="q-item"><b>W &middot; What did I want?</b> What was my goal today?</div>
+                <div class="q-item"><b>D &middot; What did I do?</b> What did I choose to do, think and feel?</div>
+                <div class="q-item"><b>E &middot; Did it help?</b> Did my choices help me, my group and my learning?</div>
+                <div class="q-item"><b>P &middot; What's my plan?</b> One thing I'll keep. One thing I'll change.</div>
+            </div></div></div>
+        </div>
+
+        <div class="slide" id="slide-exit-ticket" data-seg="process" data-notes="<b class='h'>Exit ticket &middot; last minutes</b>Slips or notebooks. Read them later: patterns in the needs and faces tell you who needs a one-to-one check-in. Homework: <span class='tbd'>[e.g. finish Your Choice task, workbook p.__]</span>.<div class='ct'><b>Choice Theory:</b> Power - the student judges their own progress (self-evaluation), not the teacher.</div>">
+            <div class="slide-label">Exit Ticket <span class="seg-chip process">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="slide-heading">Exit ticket</div>
+                <div class="q-item">One new word and a sentence about <b>you</b>.</div>
+                <div class="q-item">One choice I made today that helped me.</div>
+                <div class="q-item">How was today? <span style="font-size:1.8rem;">&#128542; &#128528; &#128578; &#128512;</span></div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ CLOSING ============ -->
+        <div class="slide" id="slide-end" data-seg="none" data-notes="<b class='h'>Close</b>Thank the class. Optionally leave this slide up while students leave and tap an emoji on the way out.<div class='ct'><b>Choice Theory:</b> End on connection - say goodbye by name.</div>">
+            <div class="cover-slide">
+                <div class="cover-panel-left">
+                    <div class="fb-heading">THANK YOU,<br>VILLAGE!</div>
+                    <div class="fb-sub">How was today's class?</div>
+                </div>
+                <div class="cover-right-content">
+                    <div class="feedback-slider">
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128542;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128577;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128528;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128578;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128512;</div>
+                    </div>
+                    <div class="thanks-note" id="thanksNote">Thanks for your feedback!</div>
+                    <div style="color:#4a5568;font-weight:600;">See you next class &mdash; Unit 2.3</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        var slideOrder = [
+            'slide-title-slide',
+            'slide-silent-starter',
+            'slide-circle-time',
+            'slide-reading', 'slide-reading-2', 'slide-reading-3', 'slide-reading-4', 'slide-reading-5', 'slide-book-instructions',
+            'slide-active-pause',
+            'slide-quiz-announcement',
+            'slide-processing', 'slide-exit-ticket', 'slide-end'
+        ];
+        var currentIndex = 0;
+
+        // Timer blocks (minutes). Lesson A and B are separate 21-minute blocks.
+        var SEGMENTS = {
+            circle:  { label: 'Circle Time',    min: 7 },
+            lessonA: { label: 'Lesson A',       min: 21 },
+            pause:   { label: 'Active Pause',   min: 7 },
+            lessonB: { label: 'Lesson B',       min: 21 },
+            process: { label: 'Processing',     min: 7 }
+        };
+        var activeSeg = null, remaining = 0, timerHandle = null;
+
+        function fitSlide(el) {
+            if (!el) return;
+            var inner = el.querySelector('.slide-inner');
+            var wrap = el.querySelector('.fit-wrap');
+            if (!inner || !wrap) return;
+            wrap.style.transform = 'none';
+            var cs = window.getComputedStyle(inner);
+            var availW = inner.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+            var availH = inner.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+            var natW = wrap.scrollWidth, natH = wrap.scrollHeight;
+            if (!natW || !natH) return;
+            var scale = Math.max(0.4, Math.min(2, Math.min(availW / natW, availH / natH)));
+            wrap.style.transform = 'scale(' + scale + ')';
+        }
+
+        function renderSlide() {
+            document.querySelectorAll('.slide').forEach(function (s) { s.classList.remove('active'); });
+            var el = document.getElementById(slideOrder[currentIndex]);
+            if (el) el.classList.add('active');
+            document.getElementById('prevArrow').classList.toggle('hidden', currentIndex === 0);
+            document.getElementById('nextArrow').classList.toggle('hidden', currentIndex === 0 || currentIndex === slideOrder.length - 1);
+            var sc = document.getElementById('slideCounter'); sc.textContent = (currentIndex + 1) + ' / ' + slideOrder.length + ' '; var rs = document.createElement('span'); rs.className = 'ref'; rs.title = 'Click to copy this slide reference'; rs.textContent = slideRef(slideOrder[currentIndex]); rs.onclick = function () { copyText(slideRef(slideOrder[currentIndex]), rs); }; sc.appendChild(rs);
+            requestAnimationFrame(function () { fitSlide(el); });
+            if (el) el.querySelectorAll('img').forEach(function (img) {
+                if (!img.complete) img.addEventListener('load', function () { fitSlide(el); }, { once: true });
+            });
+            document.getElementById('notesPanel').innerHTML = (el && el.dataset.notes) || '';
+            syncTimer(el ? el.dataset.seg : 'none');
+            updateBar(el);
+            var vid = document.getElementById('starterVideo');
+            var onStarter = el && el.id === 'slide-silent-starter';
+            if (onStarter && !vid.src) vid.src = vid.dataset.src;
+            if (!onStarter && vid.src) vid.removeAttribute('src');
+        }
+
+        window.addEventListener('resize', function () { fitSlide(document.getElementById(slideOrder[currentIndex])); });
+
+        function goToSlideId(id) { var i = slideOrder.indexOf(id); if (i !== -1) { currentIndex = i; renderSlide(); } }
+        function nextSlide(fromStart) { if (currentIndex === 0 && fromStart !== true) return;   // title slide: only START moves on
+            if (currentIndex < slideOrder.length - 1) { currentIndex++; renderSlide(); } }
+        function startLesson(btn) {
+            var cover = btn.closest('.cover-slide');
+            startLessonClock();
+            cover.classList.add('leaving');
+            setTimeout(function () { nextSlide(true); cover.classList.remove('leaving'); }, 700);
+        }
+        function prevSlide() { if (currentIndex > 0) { currentIndex--; renderSlide(); } }
+
+        // ----- Timer: resets when you move into a new block, keeps running within a block -----
+        function fmt(s) { s = Math.max(0, s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+        function paintTimer() {
+            document.getElementById('timerTime').textContent = fmt(remaining);
+            document.getElementById('timerPill').classList.toggle('low', remaining <= 60 && remaining > 0);
+        }
+        function stopTimer() { clearInterval(timerHandle); timerHandle = null; document.getElementById('timerBtn').textContent = 'Start'; }
+        function syncTimer(seg) {
+            var pill = document.getElementById('timerPill');
+            if (!SEGMENTS[seg]) { pill.style.display = 'none'; stopTimer(); activeSeg = null; return; }
+            pill.style.display = 'flex';
+            if (seg !== activeSeg) {
+                activeSeg = seg; stopTimer();
+                remaining = SEGMENTS[seg].min * 60;
+                document.getElementById('segLabel').textContent = SEGMENTS[seg].label;
+                paintTimer();
+                toggleTimer();   // auto-start when a new block opens
+            }
+        }
+        function toggleTimer() {
+            if (!activeSeg) return;
+            if (timerHandle) { stopTimer(); return; }
+            document.getElementById('timerBtn').textContent = 'Pause';
+            timerHandle = setInterval(function () {
+                remaining--; paintTimer();
+                if (remaining <= 0) { stopTimer(); beep(); }
+            }, 1000);
+        }
+        function resetTimer() { if (!activeSeg) return; stopTimer(); remaining = SEGMENTS[activeSeg].min * 60; paintTimer(); }
+        function beep() { try { var c = new (window.AudioContext || window.webkitAudioContext)(), o = c.createOscillator(); o.connect(c.destination); o.frequency.value = 660; o.start(); setTimeout(function () { o.stop(); }, 600); } catch (e) {} }
+
+        // ----- 70-minute lesson clock (starts when START is pressed on the title slide) -----
+        var LESSON_MS = 70 * 60 * 1000, lessonStart = null, lessonClockHandle = null;
+        function startLessonClock() {
+            if (lessonStart) return;
+            lessonStart = Date.now();
+            tickLessonClock();
+            lessonClockHandle = setInterval(tickLessonClock, 1000);
+        }
+        function tickLessonClock() {
+            var el = Date.now() - lessonStart;
+            var pct = Math.min(100, el / LESSON_MS * 100);
+            document.getElementById('lessonClockFill').style.width = pct + '%';
+            var clock = document.getElementById('lessonClock');
+            clock.classList.toggle('over', el >= LESSON_MS);
+            var m = Math.floor(el / 60000), s = Math.floor(el / 1000) % 60;
+            clock.title = 'Lesson clock: ' + m + ':' + String(s).padStart(2, '0') + ' of 70:00';
+            if (el >= LESSON_MS) { clearInterval(lessonClockHandle); }
+        }
+
+        // ----- Lesson map bar / navigation menu -----
+        var BAR_ORDER = ['starter', 'circle', 'lessonA', 'pause', 'lessonB', 'process'];
+        function jumpToSeg(seg) {
+            for (var i = 0; i < slideOrder.length; i++) {
+                if (document.getElementById(slideOrder[i]).dataset.seg === seg) { currentIndex = i; renderSlide(); return; }
+            }
+        }
+        function updateBar(el) {
+            var bar = document.getElementById('lessonBar');
+            var onTitle = !el || el.id === 'slide-title-slide';
+            bar.classList.toggle('show', !onTitle);
+            if (onTitle) return;
+            var seg = el.dataset.seg;
+            var cur = BAR_ORDER.indexOf(seg);
+            if (cur === -1) cur = BAR_ORDER.length;   // closing slide: everything is complete
+            bar.querySelectorAll('.bar-seg').forEach(function (b) {
+                var idx = BAR_ORDER.indexOf(b.dataset.seg);
+                b.classList.toggle('done', idx < cur);
+                b.classList.toggle('current', idx === cur);
+            });
+        }
+
+        // ----- Slide references: stable codes built from the lesson code + slide id -----
+        var LESSON_REF = 'U2.2';
+        function slideRef(id) { return LESSON_REF + '/' + id.replace(/^slide-/, ''); }
+        var SLIDE_NAMES = {
+            'slide-title-slide': 'Title Slide',
+            'slide-silent-starter': 'Silent Starter',
+            'slide-circle-time': 'Circle Time',
+            'slide-book-instructions': 'Book Instructions',
+            'slide-reading': 'Reading (Part 1 of 5)',
+            'slide-reading-2': 'Reading (Part 2 of 5)',
+            'slide-reading-3': 'Reading (Part 3 of 5)',
+            'slide-reading-4': 'Reading (Part 4 of 5)',
+            'slide-reading-5': 'Reading (Part 5 of 5)',
+            'slide-active-pause': 'Active Pause',
+            'slide-quiz-announcement': 'Quiz Announcement',
+            'slide-processing': 'Processing',
+            'slide-exit-ticket': 'Exit Ticket',
+            'slide-end': 'Closing Slide'
+        };
+        function slideTitle(el) { return SLIDE_NAMES[el.id] || el.id; }
+        function copyText(text, btn) {
+            function done() { if (btn) { var o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = o; }, 1200); } }
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+            function fallback() { var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} document.body.removeChild(ta); }
+        }
+        function copyAllRefs() {
+            var lines = slideOrder.map(function (id, i) { return (i + 1) + '. ' + slideRef(id) + ' - ' + slideTitle(document.getElementById(id)); });
+            copyText(lines.join('\n'), event && event.target);
+        }
+        function buildIndex() {
+            document.getElementById('idxLesson').textContent = LESSON_REF;
+            var list = document.getElementById('indexList'); list.innerHTML = '';
+            slideOrder.forEach(function (id, i) {
+                var row = document.createElement('div'); row.className = 'idx-row' + (i === currentIndex ? ' current' : '');
+                row.innerHTML = '<span class="idx-n">' + (i + 1) + '</span><div class="idx-main"><div class="idx-title"></div><div class="idx-ref"></div></div><button class="idx-copy">Copy</button>';
+                row.querySelector('.idx-title').textContent = slideTitle(document.getElementById(id));
+                row.querySelector('.idx-ref').textContent = slideRef(id);
+                row.querySelector('.idx-copy').onclick = function (e) { e.stopPropagation(); copyText(slideRef(id), e.target); };
+                row.onclick = function () { if (i === 0 && currentIndex !== 0) return; currentIndex = i; renderSlide(); toggleIndex(); };
+                list.appendChild(row);
+            });
+        }
+        function toggleIndex() {
+            var p = document.getElementById('indexPanel');
+            if (!p.classList.contains('show')) buildIndex();
+            p.classList.toggle('show');
+        }
+
+        // ----- Interactions -----
+        function toggleNotes() { document.getElementById('notesPanel').classList.toggle('show'); }
+        function flipCard(card) { card.classList.toggle('flipped'); }
+        function togglePollOption(o) { o.classList.toggle('selected'); }
+        function pickOne(card) {
+            var siblings = card.parentElement.children;
+            for (var i = 0; i < siblings.length; i++) if (siblings[i] !== card) siblings[i].classList.remove('selected');
+            card.classList.toggle('selected');
+        }
+        function selectFeedback(emoji) {
+            document.querySelectorAll('.feedback-emoji').forEach(function (e) { e.classList.remove('selected'); });
+            emoji.classList.add('selected');
+            document.getElementById('thanksNote').classList.add('show');
+        }
+        // ----- Vocabulary popups: word -> example sentence -----
+        var VOCAB = {
+          "address": "A lack of clean drinking water is a problem that we need to address immediately.",
+          "amount": "Workers gathered large amounts of food and water to help after the earthquake.",
+          "complex": "We are facing many complex environmental problems and we need creative solutions.",
+          "crisis": "During a crisis, it’s important to stay calm and find help.",
+          "crowdsourcing": "Crowdsourcing happens when a lot of people share information on a topic or event.",
+          "data": "Collecting and analyzing data is important for finding ways to help different communities in need.",
+          "document": "You can document what you see by writing it down or making a voice recording.",
+          "expand": "Technology expands our ability to respond to problems that happen far away.",
+          "humanitarian": "Humanitarians want to help people in need.",
+          "locate": "Rescuers used GPS information to locate the people needing help.",
+          "measure": "It can be difficult to measure the level of destruction of a large earthquake.",
+          "monitor": "Rescuers can use technology to monitor conditions after a disaster.",
+          "resources": "In the mountains, people don’t always have easy access to resources such as food or Internet services.",
+          "scale": "The scale of the hurricane’s impact was very large: people throughout the region were affected.",
+          "upload": "When you upload a photo to a social media site, your friends can see it."
+};
+        function vocabPopup(key) { showPopup(key, VOCAB[key]); }
+
+        function showPopup(word, def) {
+            document.getElementById('popupWord').textContent = word;
+            document.getElementById('popupDefinition').textContent = def;
+            document.getElementById('popupOverlay').style.display = 'flex';
+        }
+        function closePopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+        function closePopupOutside(e) { if (e.target.id === 'popupOverlay') closePopup(); }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.target && e.target.isContentEditable) return;
+            if (e.key === 'ArrowRight') nextSlide();
+            else if (e.key === 'ArrowLeft') prevSlide();
+            else if (e.key === 't' || e.key === 'T') toggleTimer();
+            else if (e.key === 'n' || e.key === 'N') toggleNotes();
+            else if (e.key === 'h' || e.key === 'H') document.body.classList.toggle('hide-tbd');
+            else if (e.key === 'i' || e.key === 'I') toggleIndex();
+            else if (e.key === 'Escape') { closePopup(); document.getElementById('indexPanel').classList.remove('show'); }
+        });
+
+        window.addEventListener('load', function () { fitSlide(document.getElementById(slideOrder[currentIndex])); });
+        renderSlide();
+    </script>
+</body>
+</html>
