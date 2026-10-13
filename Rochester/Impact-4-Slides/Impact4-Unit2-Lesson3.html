@@ -274,6 +274,30 @@
         .use-n { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--uc); color: #fff; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; margin-top: 4px; }
         .use-label { font-size: 1.7rem; font-weight: 800; color: #1a202c; line-height: 1.25; }
         .use-ex { font-size: 1.6rem; color: #2d3748; line-height: 1.35; margin-top: 4px; font-style: italic; }
+        .pause-layout { display: flex; align-items: center; gap: 44px; }
+        .wheel-col { flex: 0 0 470px; }
+        .wheel-wrap { position: relative; width: 470px; height: 470px; }
+        .wheel-svg { width: 100%; height: 100%; display: block; transition: transform 5.2s cubic-bezier(.12,.62,.08,1); filter: drop-shadow(0 10px 24px rgba(0,0,0,.28)); }
+        .wheel-pointer { position: absolute; left: 50%; top: -22px; width: 54px; height: 62px; margin-left: -27px; z-index: 3; filter: drop-shadow(0 3px 5px rgba(0,0,0,.35)); }
+        .spin-btn { position: absolute; left: 50%; top: 50%; width: 118px; height: 118px; margin: -59px 0 0 -59px; border-radius: 50%; border: 6px solid #1a202c; background: #fff; color: #1a202c; font: 800 1.7rem 'Inter', sans-serif; letter-spacing: 2px; cursor: pointer; z-index: 2; box-shadow: 0 6px 18px rgba(0,0,0,.35); transition: transform .15s ease, background .2s ease; animation: spinPulse 2.2s ease-in-out infinite; }
+        .spin-btn:hover { transform: scale(1.08); background: #fef3c7; }
+        .spin-btn:disabled { cursor: default; animation: none; opacity: .75; transform: none; background: #e5e7eb; }
+        @keyframes spinPulse { 0%, 100% { box-shadow: 0 6px 18px rgba(0,0,0,.35), 0 0 0 0 rgba(245,158,11,.55); } 50% { box-shadow: 0 6px 18px rgba(0,0,0,.35), 0 0 0 16px rgba(245,158,11,0); } }
+        .pause-result { flex: 1; min-width: 0; height: 470px; background: #f7fafc; border-radius: 24px; padding: 26px 32px; overflow: hidden; display: flex; flex-direction: column; border-top: 10px solid #10b981; }
+        .pr-idle { margin: auto; text-align: center; font-size: 2.2rem; font-weight: 700; color: #4a5568; line-height: 1.35; }
+        .pr-idle span { display: block; font-size: 4.5rem; margin-bottom: 12px; }
+        .pr-in { animation: prIn .45s ease both; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+        @keyframes prIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        .pr-num { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: #1a202c; color: #fff; font-weight: 800; font-size: 1.4rem; margin-right: 14px; flex-shrink: 0; }
+        .pr-title { display: flex; align-items: center; font-size: 2rem; font-weight: 800; color: #1a202c; line-height: 1.15; }
+        .pr-tag { align-self: flex-start; margin-top: 8px; background: #d1fae5; color: #047857; font-weight: 700; font-size: 1.05rem; padding: 4px 14px; border-radius: 20px; }
+        .pr-desc { font-size: 1.3rem; line-height: 1.35; color: #2d3748; margin-top: 10px; }
+        .pr-lt { font-size: 1.2rem; font-weight: 800; color: #4a5568; margin-top: 10px; }
+        .pr-list { margin: 6px 0 0 26px; padding: 0; columns: 2; column-gap: 28px; }
+        .pr-list li { font-size: 1.2rem; line-height: 1.25; color: #1a202c; margin-bottom: 4px; break-inside: avoid; }
+        .pr-note { font-size: 1.25rem; line-height: 1.35; color: #2d3748; margin-top: 8px; background: #fff; border-radius: 12px; padding: 8px 14px; }
+        .pr-best { margin-top: auto; padding-top: 8px; font-size: 1.2rem; color: #047857; font-weight: 700; }
+        .pr-best span { background: #d1fae5; border-radius: 20px; padding: 6px 16px; display: inline-block; }
         .reading-text p { font-size: 2.2rem; line-height: 1.6; color: #2d3748; margin-bottom: 20px; }
         .vocab-list { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: column; grid-template-rows: repeat(8, auto); gap: 8px 36px; }
         .vl-item { display: flex; gap: 12px; align-items: flex-start; background: #f7fafc; border-radius: 12px; padding: 8px 14px; }
@@ -752,15 +776,19 @@
             </div></div></div>
         </div>
 
-        <!-- ============ ACTIVE PAUSE (7 min) ============ -->
-        <div class="slide" id="slide-active-pause" data-seg="pause" data-notes="<b class='h'>Active pause &middot; 7 min</b>Class votes A or B by show of hands; C is always open to anyone, no explanation needed. Finish with three slow breaths and back to seats.<div class='ct'><b>Choice Theory:</b> Fun &amp; Survival (the body needs to move). Cooperative games meet Belonging. Four Corners statements: 'Everyone should help their neighbours.' / 'Social media makes communities stronger.' / <span class='tbd'>[your own]</span></div>">
+        <!-- ============ ACTIVE PAUSE (7 min): spin the wheel. Reference code: U2.3/active-pause ============ -->
+        <div class="slide" id="slide-active-pause" data-seg="pause" data-notes="<b class='h'>Active pause &middot; 7 min</b>Press <b>SPIN</b>: the wheel picks one of 10 activities at random and shows how to run it. Everyone stands. The 7-minute timer starts by itself when this slide opens - when it ends, three slow breaths and back to seats.<br><br><b>Choice</b> If the class really cannot do the activity (not enough space, too noisy), they may spin once more. Anyone may choose a low-impact version (step in place, raise the hands) or the calm option, with no explanation needed.<div class='ct'><b>Choice Theory:</b> Fun and Survival - the body needs to move. Freedom - students choose how big to move. Belonging - partner and group activities (Mirror Challenge, Rock-Paper-Scissors, Follow the Leader) build connection.</div>">
             <div class="slide-label">Active Pause <span class="seg-chip pause">7 min</span></div>
-            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
-                <div class="slide-heading">Get up and move!</div>
-                <div class="choice-row c3">
-                    <div class="choice-card" onclick="pickOne(this)"><span class="emoji">&#127959;&#65039;</span><span class="letter">A</span><h4>Barn-Raising Relay</h4><p>Teams of 5 pass "bricks" (paper balls) down a line to build a tower. Say a new word every pass!</p></div>
-                    <div class="choice-card" onclick="pickOne(this)"><span class="emoji">&#129517;</span><span class="letter">B</span><h4>Four Corners</h4><p>Listen to a statement. Walk to: <b>Strongly agree &middot; Agree &middot; Disagree &middot; Strongly disagree</b>.</p></div>
-                    <div class="choice-card" onclick="pickOne(this)"><span class="emoji">&#129496;</span><span class="letter">C</span><h4>Stretch &amp; Breathe</h4><p>5 stretches + 10 slow breaths. Calm and quiet.</p></div>
+            <div class="slide-inner" style="padding:100px 60px 84px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
+                <div class="pause-layout">
+                    <div class="wheel-col">
+                        <div class="wheel-wrap">
+                            <svg class="wheel-pointer" viewBox="0 0 60 70"><path d="M30 66 L6 8 Q30 -4 54 8 Z" fill="#1a202c" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>
+                            <svg id="wheelSvg" class="wheel-svg" viewBox="-250 -250 500 500"><g id="wheelGroup"></g><circle r="236" fill="none" stroke="#1a202c" stroke-width="8"/></svg>
+                            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN</button>
+                        </div>
+                    </div>
+                    <div class="pause-result" id="pauseResult"><div class="pr-idle"><span>&#127905;</span>Press <b>SPIN</b> to choose today's active pause!</div></div>
                 </div>
             </div></div></div>
         </div>
@@ -1028,6 +1056,166 @@
             var all = slide.querySelectorAll('.ans');
             var anyHidden = Array.prototype.some.call(all, function (a) { return !a.classList.contains('revealed'); });
             all.forEach(function (a) { a.classList.toggle('revealed', anyHidden); });
+        }
+
+        // ----- Active Pause: spin the wheel -----
+        var PAUSE_ACTIVITIES = [
+          {
+            "name": "The 7-Minute Fitness Challenge",
+            "short": "Fitness Challenge",
+            "tag": "Easy to organize",
+            "desc": "Students perform a series of exercises for 40 seconds, followed by 20 seconds to rest and change exercises.",
+            "list": [
+              "Jumping jacks",
+              "Squats",
+              "High knees",
+              "Mountain climbers (standing or on the floor)",
+              "Arm circles",
+              "Running in place",
+              "Stretching"
+            ],
+            "best": "A quick energy boost with no equipment."
+          },
+          {
+            "name": "Simon Says: Fitness Edition",
+            "short": "Simon Says",
+            "desc": "One student or the teacher gives instructions. Students move only when the instruction begins with “Simon says.”",
+            "listTitle": "Examples:",
+            "list": [
+              "Simon says, jump five times!",
+              "Simon says, touch your toes!",
+              "Simon says, balance on one foot!",
+              "Simon says, do three squats!",
+              "Turn around! (Don't move unless Simon says.)"
+            ],
+            "best": "Listening skills, concentration, and laughter."
+          },
+          {
+            "name": "Freeze Dance",
+            "short": "Freeze Dance",
+            "desc": "Play energetic music. Students dance or move around their own space. When the music stops, everyone freezes.",
+            "note": "Add challenges: freeze like a superhero, an athlete, a robot, or a statue.",
+            "best": "Releasing energy and improving mood."
+          },
+          {
+            "name": "Mirror Challenge",
+            "short": "Mirror Challenge",
+            "desc": "Students work in pairs. One student leads slow or energetic movements while the other copies them like a mirror. Switch leaders after one minute.",
+            "note": "Try arm movements, side steps, squats, knee raises, and balance poses.",
+            "best": "Cooperation, coordination, and focus."
+          },
+          {
+            "name": "Rock-Paper-Scissors Fitness Battle",
+            "short": "RPS Battle",
+            "desc": "Students find a partner and play rock-paper-scissors. The winner chooses a safe exercise for both students to perform.",
+            "note": "Examples: five jumping jacks, five squats, ten seconds of high knees, or five arm circles. Then they challenge another partner.",
+            "best": "Friendly competition and social interaction."
+          },
+          {
+            "name": "Follow the Leader Relay",
+            "short": "Follow the Leader",
+            "desc": "Divide the class into small groups. One student leads the group through movements for 30 seconds before passing leadership to another student.",
+            "note": "Leaders can choose side steps, arm swings, knee raises, or dance moves. Students can remain in place if the classroom is small.",
+            "best": "Leadership, collaboration, and student choice."
+          },
+          {
+            "name": "Stretch and Reset",
+            "short": "Stretch & Reset",
+            "desc": "A calmer active pause for students who need to reset after demanding academic work.",
+            "list": [
+              "Reach for the sky.",
+              "Stretch each arm across the body.",
+              "Roll the shoulders.",
+              "Gently twist from side to side.",
+              "Balance on one foot.",
+              "Take slow breaths."
+            ],
+            "best": "Reducing tension and returning to focused work."
+          },
+          {
+            "name": "Action Charades",
+            "short": "Action Charades",
+            "desc": "A student acts out an activity while classmates guess it. Students must use their bodies rather than speak.",
+            "note": "Ideas: swimming, skateboarding, climbing a mountain, boxing, surfing, playing basketball, or escaping a volcano.",
+            "best": "ESL vocabulary, creativity, and movement."
+          },
+          {
+            "name": "The 30-Second Movement Countdown",
+            "short": "30-Sec Countdown",
+            "desc": "Display or call out a different movement every 30 seconds. Students have to keep moving until the countdown ends.",
+            "note": "Try jumping jacks, fast feet, side steps, squats, imaginary jump rope, and speed skating without equipment.",
+            "best": "A predictable, high-energy routine."
+          },
+          {
+            "name": "Move If It Is True!",
+            "short": "Move If True",
+            "desc": "The teacher calls out a statement. Students perform a movement if it applies to them.",
+            "list": [
+              "“Move if you like soccer!”",
+              "“Jump if you have a pet!”",
+              "“Do three squats if you enjoy music!”",
+              "“Take three side steps if you like adventure!”",
+              "“Stretch your arms if you enjoy learning English!”"
+            ],
+            "note": "Students can choose low-impact alternatives, such as raising their hands or stepping in place."
+          }
+        ];
+        var WHEEL_COLORS = ['#ef4444', '#f59e0b', '#eab308', '#84cc16', '#10b981', '#06b6d4', '#3b82f6', '#6366f1', '#a855f7', '#ec4899'];
+        var wheelRotation = 0, wheelSpinning = false;
+        function initWheel() {
+            var g = document.getElementById('wheelGroup');
+            if (!g || g.childNodes.length) return;
+            var NS = 'http://www.w3.org/2000/svg', R = 236, n = PAUSE_ACTIVITIES.length, step = 360 / n;
+            PAUSE_ACTIVITIES.forEach(function (act, i) {
+                var a0 = (i * step - 90) * Math.PI / 180, a1 = ((i + 1) * step - 90) * Math.PI / 180;
+                var p = document.createElementNS(NS, 'path');
+                p.setAttribute('d', 'M0 0 L' + (R * Math.cos(a0)).toFixed(2) + ' ' + (R * Math.sin(a0)).toFixed(2) + ' A' + R + ' ' + R + ' 0 0 1 ' + (R * Math.cos(a1)).toFixed(2) + ' ' + (R * Math.sin(a1)).toFixed(2) + ' Z');
+                p.setAttribute('fill', WHEEL_COLORS[i % WHEEL_COLORS.length]);
+                p.setAttribute('stroke', '#fff'); p.setAttribute('stroke-width', '3');
+                g.appendChild(p);
+                var mid = i * step + step / 2 - 90;
+                var t = document.createElementNS(NS, 'g'); t.setAttribute('transform', 'rotate(' + mid + ')');
+                var label = document.createElementNS(NS, 'text');
+                label.setAttribute('x', '70'); label.setAttribute('y', '6');
+                label.setAttribute('font-size', '16'); label.setAttribute('font-weight', '800'); label.setAttribute('fill', '#fff');
+                label.setAttribute('stroke', 'rgba(0,0,0,.45)'); label.setAttribute('stroke-width', '3.5'); label.setAttribute('paint-order', 'stroke');
+                label.textContent = act.short;
+                var num = document.createElementNS(NS, 'text');
+                num.setAttribute('x', '224'); num.setAttribute('y', '8'); num.setAttribute('text-anchor', 'end');
+                num.setAttribute('font-size', '24'); num.setAttribute('font-weight', '800'); num.setAttribute('fill', '#fff');
+                num.setAttribute('stroke', 'rgba(0,0,0,.45)'); num.setAttribute('stroke-width', '4'); num.setAttribute('paint-order', 'stroke');
+                num.textContent = String(i + 1);
+                t.appendChild(label); t.appendChild(num); g.appendChild(t);
+            });
+        }
+        initWheel();
+        function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+        function showPauseResult(k) {
+            var act = PAUSE_ACTIVITIES[k], box = document.getElementById('pauseResult');
+            box.innerHTML = '';
+            var wrap = mk('div', 'pr-in');
+            var title = mk('div', 'pr-title'); title.appendChild(mk('span', 'pr-num', String(k + 1))); title.appendChild(mk('span', '', act.name)); wrap.appendChild(title);
+            if (act.tag) wrap.appendChild(mk('div', 'pr-tag', act.tag));
+            wrap.appendChild(mk('div', 'pr-desc', act.desc));
+            if (act.listTitle) wrap.appendChild(mk('div', 'pr-lt', act.listTitle));
+            if (act.list) { var ul = mk('ul', 'pr-list'); act.list.forEach(function (x) { ul.appendChild(mk('li', '', x)); }); wrap.appendChild(ul); }
+            if (act.note) wrap.appendChild(mk('div', 'pr-note', act.note));
+            if (act.best) { var b = mk('div', 'pr-best'); b.appendChild(mk('span', '', 'Best for: ' + act.best)); wrap.appendChild(b); }
+            box.appendChild(wrap);
+        }
+        function spinWheel() {
+            if (wheelSpinning) return;
+            wheelSpinning = true;
+            var btn = document.getElementById('spinBtn'); btn.disabled = true;
+            var n = PAUSE_ACTIVITIES.length, step = 360 / n;
+            var k = Math.floor(Math.random() * n);                       // the random winner
+            var jitter = (Math.random() - 0.5) * (step * 0.7);           // land anywhere inside the wedge, not always dead centre
+            var want = ((360 - (k * step + step / 2 + jitter)) % 360 + 360) % 360;
+            var cur = ((wheelRotation % 360) + 360) % 360;
+            wheelRotation += ((want - cur) + 360) % 360 + 360 * (5 + Math.floor(Math.random() * 3));
+            document.getElementById('pauseResult').innerHTML = '<div class="pr-idle"><span>&#127905;</span>Spinning&hellip;</div>';
+            document.getElementById('wheelSvg').style.transform = 'rotate(' + wheelRotation + 'deg)';
+            setTimeout(function () { showPauseResult(k); wheelSpinning = false; btn.disabled = false; btn.textContent = 'SPIN AGAIN'; btn.style.fontSize = '1.1rem'; }, 5400);
         }
 
         function flipCard(card) { card.classList.toggle('flipped'); }
