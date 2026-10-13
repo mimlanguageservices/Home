@@ -300,6 +300,11 @@
         .pr-note { font-size: 1.25rem; line-height: 1.35; color: #2d3748; margin-top: 8px; background: #fff; border-radius: 12px; padding: 8px 14px; }
         .pr-best { position: absolute; left: 0; right: 0; bottom: 0; font-size: 1.2rem; color: #047857; font-weight: 700; }
         .pr-best span { background: #d1fae5; border-radius: 20px; padding: 6px 16px; display: inline-block; }
+        .pause-video { display: flex; align-items: center; gap: 22px; margin-top: 16px; }
+        .pv-frame { width: 240px; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 6px 18px rgba(0,0,0,.3); flex-shrink: 0; }
+        .pv-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+        .pv-cap { font-size: 1.5rem; font-weight: 800; color: #1a202c; }
+        .pv-cap small { display: block; font-size: 1.05rem; font-weight: 500; color: #718096; margin-top: 4px; }
         .reading-text p { font-size: 2.2rem; line-height: 1.6; color: #2d3748; margin-bottom: 20px; }
         .vocab-list { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: column; grid-template-rows: repeat(8, auto); gap: 8px 36px; }
         .vl-item { display: flex; gap: 12px; align-items: flex-start; background: #f7fafc; border-radius: 12px; padding: 8px 14px; }
@@ -779,7 +784,7 @@
         </div>
 
         <!-- ============ ACTIVE PAUSE (7 min): spin the wheel. Reference code: U2.3/active-pause ============ -->
-        <div class="slide" id="slide-active-pause" data-seg="pause" data-notes="<b class='h'>Active pause &middot; 7 min</b>Press <b>SPIN</b>: the wheel picks one of 10 activities at random and shows how to run it. Everyone stands. The 7-minute timer starts by itself when this slide opens - when it ends, three slow breaths and back to seats.<br><br><b>Your choice of activity</b> Click any section of the wheel instead of the SPIN button: the wheel spins exactly as normal but lands on the section you clicked. There is no pointer or highlight on the wheel, so students will not notice.<br><br><b>Choice</b> If the class really cannot do the activity (not enough space, too noisy), they may spin once more. Anyone may choose a low-impact version (step in place, raise the hands) or the calm option, with no explanation needed.<div class='ct'><b>Choice Theory:</b> Fun and Survival - the body needs to move. Freedom - students choose how big to move. Belonging - partner and group activities (Mirror Challenge, Rock-Paper-Scissors, Follow the Leader) build connection.</div>">
+        <div class="slide" id="slide-active-pause" data-seg="pause" data-notes="<b class='h'>Active pause &middot; 7 min</b>Press <b>SPIN</b>: the wheel picks one of 10 activities at random and shows how to run it. Everyone stands. The 7-minute timer starts by itself when this slide opens - when it ends, three slow breaths and back to seats.<br><br><b>Music</b> Click the video at the bottom to play the music (it never starts by itself; it stops when you leave the slide).<br><br><b>Your choice of activity</b> Click any section of the wheel instead of the SPIN button: the wheel spins exactly as normal but lands on the section you clicked. There is no pointer or highlight on the wheel, so students will not notice.<br><br><b>Choice</b> If the class really cannot do the activity (not enough space, too noisy), they may spin once more. Anyone may choose a low-impact version (step in place, raise the hands) or the calm option, with no explanation needed.<div class='ct'><b>Choice Theory:</b> Fun and Survival - the body needs to move. Freedom - students choose how big to move. Belonging - partner and group activities (Mirror Challenge, Rock-Paper-Scissors, Follow the Leader) build connection.</div>">
             <div class="slide-label">Active Pause <span class="seg-chip pause">7 min</span></div>
             <div class="slide-inner" style="padding:100px 60px 84px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
                 <div class="pause-layout">
@@ -791,6 +796,10 @@
                         </div>
                     </div>
                     <div class="pause-result" id="pauseResult"><div class="pr-idle"><span>&#127905;</span>Press <b>SPIN</b> to choose today's active pause!</div></div>
+                </div>
+                <div class="pause-video">
+                    <div class="pv-frame"><iframe id="pauseVideo" data-src="https://www.youtube.com/embed/wed87yyVNcM?rel=0" title="Active pause music" allow="encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+                    <div class="pv-cap">&#127925; Music for the active pause<small>Click the video to play</small></div>
                 </div>
             </div></div></div>
         </div>
@@ -907,6 +916,9 @@
             var onStarter = el && el.id === 'slide-silent-starter';
             if (onStarter && !vid.src) vid.src = vid.dataset.src;
             if (!onStarter && vid.src) vid.removeAttribute('src');
+            var pv = document.getElementById('pauseVideo');
+            var onPause = el && el.id === 'slide-active-pause';
+            if (pv) { if (onPause && !pv.getAttribute('src')) pv.setAttribute('src', pv.dataset.src); if (!onPause && pv.getAttribute('src')) pv.removeAttribute('src'); }
         }
 
         window.addEventListener('resize', function () { fitSlide(document.getElementById(slideOrder[currentIndex])); });
