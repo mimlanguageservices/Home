@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a202c">
     <title>It Takes a Village - Impact 4 Unit 2.1</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -295,6 +299,65 @@
         .pv-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
         .pv-cap { font-size: 1.5rem; font-weight: 800; color: #1a202c; }
         .pv-cap small { display: block; font-size: 1.05rem; font-weight: 500; color: #718096; margin-top: 4px; }
+        /* ===== iPhone / iPad optimisation (appended last so it overrides the desktop rules) ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+        html, body { position: fixed; inset: 0; width: 100%; }
+        .slideshow { position: fixed; inset: 0; width: auto; height: auto; }          /* follows the real visible area (no Safari address-bar cut-off) */
+        .slideshow, .lesson-bar, .toolbar, .nav-arrow { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        button, .bar-seg, .choice-card, .poll-item, .vocab-link, .idx-row, .quiz-btn, .spin-btn, .start-btn, .feedback-emoji { touch-action: manipulation; }
+        /* notch / home-indicator safe areas (landscape iPhone, iPad) */
+        .lesson-bar { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); height: calc(48px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); }
+        .slide-label { left: max(40px, calc(env(safe-area-inset-left) + 16px)); top: calc(62px + env(safe-area-inset-top)); }
+        .nav-arrow.prev { left: max(22px, calc(env(safe-area-inset-left) + 10px)); }
+        .nav-arrow.next { right: max(22px, calc(env(safe-area-inset-right) + 10px)); }
+        .toolbar { right: max(24px, calc(env(safe-area-inset-right) + 12px)); bottom: max(14px, calc(env(safe-area-inset-bottom) + 6px)); }
+        .slide-counter { bottom: max(18px, calc(env(safe-area-inset-bottom) + 10px)); }
+        .notes { max-height: 40vh; max-height: 40dvh; padding-bottom: calc(14px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
+        .index-panel { padding-bottom: env(safe-area-inset-bottom); -webkit-overflow-scrolling: touch; }
+        .index-list { -webkit-overflow-scrolling: touch; }
+        .tool-btn, .timer-pill button, .nav-arrow, .popup-close { min-height: 44px; }  /* Apple's minimum touch target */
+        .nav-arrow { min-width: 44px; }
+        /* touch screens have no hover: stop hover effects sticking after a tap */
+        @media (hover: none) {
+            .nav-arrow:hover { background: rgba(26,32,44,.85); transform: translateY(-50%); }
+            .choice-card:hover, .vocab-link:hover, .quiz-btn:hover, .spin-btn:hover { transform: none; }
+            .bar-seg:hover { filter: none; }
+        }
+        /* iPad portrait / small tablets */
+        @media (max-width: 900px) {
+            .bar-seg { font-size: .7rem; }
+            .bar-seg small { font-size: .6rem; }
+        }
+        /* iPhone (any orientation, narrow) */
+        @media (max-width: 700px) {
+            .bar-seg { font-size: .58rem; padding: 0 2px 5px; gap: 2px; }
+            .bar-seg small, .bar-seg .tick { display: none !important; }
+            .toolbar { left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+            .tool-btn { padding: 8px 12px; font-size: .75rem; }
+            .slide-counter { left: 10px; transform: none; bottom: max(70px, calc(env(safe-area-inset-bottom) + 62px)); font-size: .7rem; padding: 3px 10px; }
+            .slide-counter .ref { display: none; }
+            .nav-arrow { width: 44px; height: 44px; opacity: .8; }
+            .nav-arrow.prev { left: 6px; } .nav-arrow.next { right: 6px; }
+            .popup-content { padding: 28px 22px; }
+            .popup-word { font-size: 2rem; } .popup-definition { font-size: 1.4rem; }
+            .popup-close { padding: 12px 24px; font-size: 1.1rem; }
+        }
+        /* iPhone / small iPad held sideways: very little height, so tighten the chrome */
+        @media (max-height: 520px) {
+            .slide-inner { padding: 70px 64px 44px !important; }
+            .slide-label { top: calc(54px + env(safe-area-inset-top)); font-size: 1rem; }
+            .seg-chip { font-size: .65rem; padding: 2px 9px; }
+            .starter-video { width: 150px; left: 12px; bottom: 10px; }
+            .toolbar { bottom: max(8px, env(safe-area-inset-bottom)); }
+            .tool-btn { padding: 8px 12px; font-size: .75rem; }
+            .notes { max-height: 55vh; max-height: 55dvh; }
+            .popup-content { padding: 22px 28px; }
+            .popup-word { font-size: 2rem; } .popup-definition { font-size: 1.4rem; margin-bottom: 14px; }
+        }
+        /* "turn your phone sideways" hint */
+        .rotate-hint { display: none; position: fixed; left: 10px; right: 10px; top: calc(56px + env(safe-area-inset-top)); z-index: 2000; background: #1a202c; color: #fff; border-radius: 14px; padding: 12px 40px 12px 16px; font-size: .85rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+        .rotate-hint button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; font-size: 1.4rem; width: 40px; height: 40px; }
+        @media (max-width: 700px) and (orientation: portrait) { .rotate-hint.show { display: block; } }
     </style>
 </head>
 <body>
@@ -379,6 +442,15 @@
                 <div class="starter-sub">(Teacher will take Attendance)</div>
             </div></div></div>
             <div class="starter-video"><iframe id="starterVideo" data-src="https://www.youtube.com/embed/xVVnXA8Qvlc?rel=0&autoplay=1" title="Timer video" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+        </div>
+
+        <!-- ============ QR SLIDE ============ -->
+        <div class="slide" id="slide-qr" data-seg="starter" data-notes="<b class='h'>QR slide</b>Students scan the code to open this lesson's slides on their own device. Link: https://mimlanguageservices.github.io/Home/Rochester/Impact-4-Slides/Impact4-Unit2-Lesson1.html">
+            <div class="slide-label">Scan Me</div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col" style="align-items:center;text-align:center;">
+                <div class="slide-heading">&#128241; Scan to open today's slides</div>
+                <svg style="height:min(68vh,68vw);width:min(68vh,68vw);display:block;border-radius:18px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h45v45H0z"/><path stroke="#000000" d="M2 2.5h7m1 0h2m1 0h1m2 0h4m2 0h2m1 0h1m1 0h2m1 0h2m2 0h1m1 0h7M2 3.5h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m4 0h1m4 0h1m1 0h1m3 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h2m2 0h1m3 0h1m1 0h2m4 0h2m4 0h2m1 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m1 0h5m1 0h2m3 0h1m1 0h1m2 0h4m1 0h3m2 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m4 0h1m1 0h1m1 0h2m2 0h1m2 0h1m1 0h5m1 0h2m2 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m2 0h1m1 0h3m2 0h1m2 0h1m4 0h1m1 0h1m3 0h2m2 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 9.5h1m2 0h1m5 0h2m3 0h1m1 0h1m1 0h6M2 10.5h1m1 0h2m1 0h3m1 0h1m4 0h1m2 0h3m1 0h1m1 0h1m2 0h5m3 0h1m2 0h1m1 0h2M2 11.5h1m1 0h1m2 0h1m1 0h4m3 0h3m1 0h6m1 0h1m2 0h5m1 0h3m1 0h1m1 0h1M2 12.5h1m1 0h1m1 0h5m1 0h3m2 0h4m1 0h2m1 0h2m3 0h2m3 0h1m2 0h1m1 0h1M2 13.5h1m1 0h2m1 0h1m8 0h1m1 0h1m1 0h1m1 0h1m2 0h4m1 0h1m1 0h1m1 0h3m5 0h1M2 14.5h3m3 0h1m1 0h2m1 0h2m1 0h1m2 0h1m2 0h1m1 0h1m1 0h4m1 0h1m1 0h1m5 0h2M3 15.5h2m1 0h1m3 0h1m5 0h5m1 0h1m2 0h2m1 0h4m1 0h1m1 0h2m2 0h1m2 0h1M3 16.5h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h1m3 0h3m1 0h2m4 0h2m1 0h2m1 0h1m2 0h4M2 17.5h2m3 0h1m1 0h3m2 0h3m1 0h1m4 0h3m2 0h3m2 0h2m1 0h4M3 18.5h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h3m1 0h3m3 0h3m3 0h1m3 0h1M2 19.5h5m3 0h4m1 0h1m2 0h1m4 0h4m2 0h1m5 0h1m1 0h1m2 0h1M3 20.5h1m4 0h3m2 0h2m2 0h1m2 0h1m3 0h1m3 0h2m2 0h1m2 0h2m1 0h2m1 0h1M3 21.5h3m3 0h1m1 0h3m1 0h1m2 0h3m2 0h1m1 0h2m1 0h1m1 0h3m4 0h1m1 0h4M3 22.5h2m1 0h1m1 0h1m1 0h2m1 0h4m1 0h1m2 0h2m2 0h1m1 0h1m2 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1M4 23.5h1m2 0h1m1 0h3m2 0h1m1 0h3m2 0h3m1 0h1m4 0h4m2 0h3m2 0h2M4 24.5h1m1 0h1m1 0h1m3 0h3m2 0h2m4 0h1m1 0h1m1 0h1m3 0h1m2 0h2m1 0h1m3 0h1M2 25.5h1m2 0h1m4 0h1m3 0h1m1 0h1m1 0h1m1 0h1m4 0h1m1 0h2m1 0h1m1 0h1m3 0h4m1 0h1M3 26.5h1m3 0h3m1 0h3m1 0h5m2 0h1m1 0h1m1 0h3m2 0h1m3 0h1m4 0h1m1 0h1M3 27.5h4m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m2 0h2m1 0h1m2 0h4M6 28.5h1m1 0h1m4 0h1m1 0h2m2 0h1m1 0h1m2 0h1m1 0h3m1 0h5m1 0h2m1 0h1m1 0h2M4 29.5h2m4 0h2m2 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h3m2 0h2m1 0h1m1 0h2M3 30.5h1m4 0h2m2 0h1m1 0h1m1 0h1m5 0h9m2 0h3m2 0h2m2 0h1M3 31.5h2m5 0h3m2 0h1m1 0h3m1 0h2m1 0h1m4 0h1m1 0h1m2 0h2m1 0h1m4 0h1M2 32.5h1m1 0h2m1 0h3m1 0h1m4 0h1m2 0h1m1 0h1m5 0h3m4 0h7M4 33.5h4m1 0h1m2 0h1m2 0h1m1 0h1m1 0h1m1 0h1m2 0h2m5 0h1m1 0h2m1 0h7M3 34.5h2m2 0h2m5 0h1m1 0h1m2 0h2m1 0h2m3 0h15M10 35.5h2m1 0h2m4 0h3m1 0h3m1 0h1m2 0h5m3 0h1m3 0h1M2 36.5h7m1 0h1m1 0h1m1 0h4m2 0h1m1 0h1m2 0h3m2 0h1m1 0h3m1 0h1m1 0h1m1 0h2M2 37.5h1m5 0h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h2m7 0h1m2 0h2m3 0h1m2 0h2M2 38.5h1m1 0h3m1 0h1m5 0h3m5 0h2m1 0h1m2 0h1m2 0h1m2 0h5m1 0h1M2 39.5h1m1 0h3m1 0h1m1 0h4m2 0h1m1 0h2m1 0h1m2 0h3m1 0h1m1 0h1m2 0h2m3 0h2m1 0h1M2 40.5h1m1 0h3m1 0h1m1 0h2m1 0h3m2 0h5m3 0h3m3 0h1m1 0h1m2 0h1m3 0h2M2 41.5h1m5 0h1m2 0h3m3 0h4m1 0h4m2 0h1m1 0h1m3 0h1m3 0h2m1 0h1M2 42.5h7m1 0h1m1 0h1m2 0h2m1 0h1m1 0h1m2 0h2m2 0h1m1 0h1m2 0h4m4 0h2"/></svg>
+            </div></div></div>
         </div>
 
         <!-- ============ CIRCLE TIME (7 min): 3 questions - define, connect, think ============ -->
@@ -520,6 +592,7 @@
         var slideOrder = [
             'slide-title-slide',
             'slide-silent-starter',
+            'slide-qr',
             'slide-circle-time',
             'slide-essential-questions', 'slide-discussion-slide',
             'slide-active-pause',
@@ -549,7 +622,7 @@
             var availH = inner.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
             var natW = wrap.scrollWidth, natH = wrap.scrollHeight;
             if (!natW || !natH) return;
-            var scale = Math.max(0.4, Math.min(2, Math.min(availW / natW, availH / natH)));
+            var scale = Math.max(window.innerWidth < 700 ? 0.12 : 0.4, Math.min(2, Math.min(availW / natW, availH / natH)));
             wrap.style.transform = 'scale(' + scale + ')';
         }
 
@@ -667,6 +740,7 @@
         var SLIDE_NAMES = {
             'slide-title-slide': 'Title Slide',
             'slide-silent-starter': 'Silent Starter',
+            'slide-qr': 'QR Slide',
             'slide-circle-time': 'Circle Time',
             'slide-essential-questions': 'Essential Questions',
             'slide-discussion-slide': 'Discussion Slide',
@@ -914,6 +988,51 @@
 
         window.addEventListener('load', function () { fitSlide(document.getElementById(slideOrder[currentIndex])); });
         renderSlide();
+    </script>
+
+    <script>
+    /* ===== iPhone / iPad touch support ===== */
+    (function () {
+        var isTouch = window.matchMedia('(hover: none)').matches || 'ontouchstart' in window;
+        // Keyboard hints like "(I)" and "(N)" mean nothing on a touch screen
+        if (isTouch) document.querySelectorAll('.tool-btn').forEach(function (b) { b.textContent = b.textContent.replace(/\s*\([A-Za-z]\)\s*$/, ''); });
+
+        // Swipe left = next slide, swipe right = previous slide
+        var sx = 0, sy = 0, st = 0, track = false;
+        function blocked(t) {
+            for (var n = t; n && n !== document.body; n = n.parentElement) {
+                if (n.tagName === 'IFRAME' || n.tagName === 'INPUT' || n.tagName === 'TEXTAREA' || n.isContentEditable) return true;
+                if (n.id === 'indexPanel' || n.id === 'notesPanel' || n.id === 'popupOverlay' || (n.classList && n.classList.contains('wheel-svg'))) return true;
+                var cs = window.getComputedStyle(n);
+                if ((cs.overflowX === 'auto' || cs.overflowX === 'scroll') && n.scrollWidth > n.clientWidth + 2) return true;
+            }
+            return false;
+        }
+        document.addEventListener('touchstart', function (e) {
+            track = e.touches.length === 1 && !blocked(e.target);
+            if (track) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now(); }
+        }, { passive: true });
+        document.addEventListener('touchend', function (e) {
+            if (!track) return; track = false;
+            var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+            if (Date.now() - st > 800 || Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+            if (dx < 0) nextSlide(); else prevSlide();
+        }, { passive: true });
+
+        // Re-fit the slide after rotation / Safari toolbar changes
+        function refit() { var el = document.getElementById(slideOrder[currentIndex]); if (el) fitSlide(el); }
+        window.addEventListener('orientationchange', function () { setTimeout(refit, 250); });
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', refit);
+
+        // Rotate hint for phones held upright
+        if (isTouch && window.innerWidth <= 700 && window.innerHeight > window.innerWidth) {
+            var h = document.createElement('div'); h.className = 'rotate-hint show';
+            h.innerHTML = '&#128241; Turn your phone sideways for the best view<button aria-label="Close">&times;</button>';
+            h.querySelector('button').onclick = function () { h.remove(); };
+            document.body.appendChild(h);
+            setTimeout(function () { h.remove(); }, 9000);
+        }
+    })();
     </script>
 </body>
 </html>
