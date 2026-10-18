@@ -215,6 +215,8 @@
             showSection('practice');
             document.getElementById('loadingScreen').classList.add('hidden');
             setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            // On phones, land on the menu so the student picks Practice Skills or Take Test
+            if (window.matchMedia('(max-width: 600px)').matches && !document.getElementById('navigation').classList.contains('open')) toggleNav();
         }
 
         function showLoadingScreen() {
