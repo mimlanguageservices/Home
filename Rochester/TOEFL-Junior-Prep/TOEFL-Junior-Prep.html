@@ -230,8 +230,8 @@
             showSection('practice');
             document.getElementById('loadingScreen').classList.add('hidden');
             document.getElementById('appContainer').classList.add('visible');
-            // On phones, land on the menu so the student picks Practice Skills or Take Test
-            if (window.matchMedia('(max-width: 600px)').matches && !document.getElementById('navigation').classList.contains('open')) toggleNav();
+            // Wherever the menu is a hidden drawer (phones and tablets held upright), open it so the student picks Practice Skills or Take Test
+            if (!isDocked() && !document.getElementById('navigation').classList.contains('open')) toggleNav();
         }
 
         function showShare() { document.getElementById('shareScreen').classList.add('show'); }
