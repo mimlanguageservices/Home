@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>TOEFL Junior Course Map - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; min-height: 100dvh; color: #2d3748; -webkit-text-size-adjust: 100%; }
+        .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px max(20px, env(safe-area-inset-right)) 10px max(20px, env(safe-area-inset-left)); background: rgba(255,255,255,0.96); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .back { min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 12px; background: #eef2ff; color: #4c51bf; font-weight: 600; text-decoration: none; touch-action: manipulation; }
+        .topbar h1 { font-size: 1.15rem; font-weight: 700; }
+        .spacer { min-width: 90px; }
+        .wrap { max-width: 980px; margin: 0 auto; padding: 22px max(16px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+        .intro { background: #fff; border-radius: 20px; padding: 22px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); margin-bottom: 18px; line-height: 1.6; }
+        .intro h2 { margin-bottom: 8px; }
+        .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+        .fact { background: #f5f7ff; border-radius: 14px; padding: 12px; text-align: center; }
+        .fact b { display: block; color: #4c51bf; font-size: 1.05rem; }
+        .fact span { font-size: 0.85rem; color: #718096; }
+        .legend { color: rgba(255,255,255,0.9); font-size: 0.9rem; margin: 6px 4px 14px; }
+        .weeks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .week { background: #fff; border-radius: 18px; padding: 18px; box-shadow: 0 6px 24px rgba(0,0,0,0.12); }
+        .week h3 { font-size: 1.05rem; display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+        .week h3 small { font-weight: 600; color: #818cf8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .goal { color: #4a5568; font-size: 0.92rem; margin: 6px 0 10px; line-height: 1.45; }
+        .row { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 0; border-top: 1px solid #edf2f7; }
+        .tag { flex: 0 0 82px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 0; border-radius: 8px; text-align: center; }
+        .tag.L { background: #e0e7ff; color: #3730a3; }
+        .tag.G { background: #cffafe; color: #155e75; }
+        .tag.R { background: #dcfce7; color: #166534; }
+        .tag.T { background: #fef3c7; color: #92400e; }
+        .row .what { flex: 1; font-size: 0.93rem; line-height: 1.35; }
+        .go { flex: 0 0 auto; min-height: 40px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; text-decoration: none; font-weight: 600; font-size: 0.9rem; touch-action: manipulation; }
+        .soon { flex: 0 0 auto; font-size: 0.8rem; color: #a0aec0; padding: 0 6px; }
+        .done { flex: 0 0 auto; font-size: 0.8rem; font-weight: 700; color: #38a169; }
+        @media (max-width: 760px) { .weeks { grid-template-columns: 1fr; } .facts { grid-template-columns: 1fr; } .topbar h1 { font-size: 1rem; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <a class="back" href="TOEFL-Junior-Prep.html">&#8592; Back</a>
+        <h1>Course Map</h1>
+        <div class="spacer"></div>
+    </div>
+    <div class="wrap">
+        <div class="intro">
+            <h2>12-Week TOEFL Junior Standard Course</h2>
+            <p>A self-study plan for B1-B2 students. Each week focuses on one skill from each section. Do the practice sets, read the explanations, and aim to improve your score each time. Your best scores are saved on this iPad.</p>
+            <div class="facts">
+                <div class="fact"><b>Listening</b><span>Conversations, instructions, announcements, talks</span></div>
+                <div class="fact"><b>Language Form &amp; Meaning</b><span>Grammar and vocabulary in sentences and short texts</span></div>
+                <div class="fact"><b>Reading</b><span>Informational, narrative, persuasive, academic, practical texts</span></div>
+            </div>
+        </div>
+        <p class="legend">Green &#10003; shows a set you have finished. Tasks marked "Coming soon" are self-review tasks with no page of their own.</p>
+        <div class="weeks" id="weeks"></div>
+    </div>
+
+    <script>
+        const LI = 'Listening-Practice.html';
+        const R = id => `Practice.html?m=reading&set=${id}`;
+        const G = id => `Practice.html?m=language&set=${id}`;
+        // key = progress key used by the practice pages (null = no tracking)
+        const weeks = [
+            { w: 1, t: 'Orientation', goal: 'Learn the test format and see where you start.', rows: [
+                ['T', 'Diagnostic: try one set from each section', null, null],
+                ['L', 'Listening: items 1-3 (short conversations)', LI + '?item=1', 'listening:set1'],
+                ['G', 'Skill drill: Verb Tenses', G('G1'), 'language:G1'],
+                ['R', 'Class Trip Email', R('R3'), 'reading:R3'] ] },
+            { w: 2, t: 'Main idea and detail', goal: 'Listen and read for the main idea and key details.', rows: [
+                ['L', 'Listening: items 7-8 (short talks)', LI + '?item=7', null],
+                ['G', 'Text 1: Letter from a Music Teacher', 'Language-Practice.html?text=T1', 'language:T1'],
+                ['R', 'Why Do We Sleep?', R('R1'), 'reading:R1'] ] },
+            { w: 3, t: 'Instructions and vocabulary', goal: 'Follow steps; work out word meanings from context.', rows: [
+                ['L', 'Listening: items 4 and 9-10 (instructions)', LI + '?item=4', null],
+                ['G', 'Skill drill: Word Choice & Vocabulary', G('G3'), 'language:G3'],
+                ['R', 'Narrative: The Last Bus', R('R2'), 'reading:R2'] ] },
+            { w: 4, t: 'Announcements', goal: 'Catch changes and what you need to do.', rows: [
+                ['L', 'Listening: items 5, 7 and 12 (announcements)', LI + '?item=5', null],
+                ['G', 'Text 2: New Library Rules', 'Language-Practice.html?text=T2', 'language:T2'],
+                ['R', 'Practical text: Summer Adventure Camp', R('R6'), 'reading:R6'] ] },
+            { w: 5, t: 'Academic talks and texts', goal: 'Take notes and follow how ideas connect.', rows: [
+                ['L', 'Listening: items 6 and 15 (science talks)', LI + '?item=6', null],
+                ['G', 'Skill drill: Connectors & Sentence Logic', G('G4'), 'language:G4'],
+                ['R', 'Academic text: Coral Reefs', R('R4'), 'reading:R4'] ] },
+            { w: 6, t: 'Review and Mini Test 1', goal: 'Check your progress and fix weak areas.', rows: [
+                ['L', 'Listening Test mode (one play)', LI + '?test=1', 'listening:test'],
+                ['G', 'Text 3: Join the Science Club!', 'Language-Practice.html?text=T3', 'language:T3'],
+                ['T', 'Redo any set with a low score', null, null] ] },
+            { w: 7, t: 'Conversations', goal: 'Follow two speakers and what each person will do.', rows: [
+                ['L', 'Listening: items 13-14 (longer conversations)', LI + '?item=13', null],
+                ['G', 'Text 4: The Missing Dog', 'Language-Practice.html?text=T4', 'language:T4'],
+                ['R', 'Informational: The Story of Chocolate', R('R7'), 'reading:R7'] ] },
+            { w: 8, t: 'Persuasion and organization', goal: "Find the writer's position and how the text is built.", rows: [
+                ['L', 'Listening: item 11 (speaker purpose)', LI + '?item=11', null],
+                ['G', 'Text 5: Summer Robotics Workshop', 'Language-Practice.html?text=T5', 'language:T5'],
+                ['R', 'Persuasive essay: Should School Start Later?', R('R5'), 'reading:R5'] ] },
+            { w: 9, t: 'Longer academic input', goal: 'Handle longer talks and denser texts.', rows: [
+                ['L', 'Listening: item 16 (bats and echolocation)', LI + '?item=16', null],
+                ['G', 'Text 6: A Teenager Who Cleans the Street', 'Language-Practice.html?text=T6', 'language:T6'],
+                ['R', 'Narrative: The Piano Lesson', R('R8'), 'reading:R8'] ] },
+            { w: 10, t: 'Mixed skills', goal: 'Switch between text types and question types quickly.', rows: [
+                ['L', 'Listening: all items in Practice mode', LI, 'listening:set1'],
+                ['G', 'Text 7: The Bicycle', 'Language-Practice.html?text=T7', 'language:T7'],
+                ['R', 'Redo your weakest passage', null, null] ] },
+            { w: 11, t: 'Full practice tests', goal: 'Practice with timing and stamina.', rows: [
+                ['L', 'Listening Test mode', LI + '?test=1', 'listening:test'],
+                ['G', 'Language timed test (25 min)', 'Language-Practice.html?test=1', 'language:test'],
+                ['R', 'Reading timed test (50 min)', 'Practice.html?m=reading&test=1', 'reading:test'] ] },
+            { w: 12, t: 'Final review', goal: 'Study your mistakes and plan test day.', rows: [
+                ['T', 'Error review: redo questions you missed', null, null],
+                ['T', 'Test-day strategy: repeat the timed tests', null, null] ] }
+        ];
+        let prog = {};
+        try { prog = JSON.parse(localStorage.getItem('tj_progress')) || {}; } catch (e) {}
+        const names = { L: 'Listening', G: 'Language', R: 'Reading', T: 'Test' };
+        document.getElementById('weeks').innerHTML = weeks.map(wk => `
+            <div class="week"><h3>Week ${wk.w}: ${wk.t}<small></small></h3><div class="goal">${wk.goal}</div>
+            ${wk.rows.map(r => {
+                const p = r[3] && prog[r[3]];
+                const action = r[2] ? `<a class="go" href="${r[2]}">${p ? 'Retry' : 'Start'}</a>` : '<span class="soon">Coming soon</span>';
+                const score = p ? `<span class="done">&#10003; ${p.c}/${p.t}</span>` : '';
+                return `<div class="row"><span class="tag ${r[0]}">${names[r[0]]}</span><span class="what">${r[1]}</span>${score}${action}</div>`;
+            }).join('')}</div>`).join('');
+    </script>
+</body>
+</html>

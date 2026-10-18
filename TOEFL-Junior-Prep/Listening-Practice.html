@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>TOEFL Junior Listening - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; min-height: 100dvh; color: #2d3748; -webkit-text-size-adjust: 100%; }
+        .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px max(20px, env(safe-area-inset-right)) 12px max(20px, env(safe-area-inset-left)); background: rgba(255,255,255,0.96); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .back { min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 12px; background: #eef2ff; color: #4c51bf; font-weight: 600; text-decoration: none; touch-action: manipulation; }
+        .topbar h1 { font-size: 1.2rem; font-weight: 700; }
+        .score { font-weight: 600; color: #4c51bf; min-width: 110px; text-align: right; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+        .wrap { max-width: 820px; margin: 0 auto; padding: 24px max(16px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+        .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; }
+        .tab { flex: 0 0 auto; min-height: 44px; min-width: 48px; padding: 0 14px; border: 0; border-radius: 22px; background: rgba(255,255,255,0.25); color: #fff; font: 600 1rem inherit; font-family: inherit; touch-action: manipulation; cursor: pointer; }
+        .tab.active { background: #fff; color: #4c51bf; }
+        .tab.done::after { content: " \2713"; }
+        .card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
+        .modes { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+        .mode { flex: 1 1 250px; border: 2px solid #e2e8f0; border-radius: 16px; padding: 14px 16px; background: #fff; text-align: left; font-family: inherit; touch-action: manipulation; cursor: pointer; color: inherit; }
+        .mode.on { border-color: #667eea; background: #f5f7ff; }
+        .mode b { display: block; margin-bottom: 4px; }
+        .mode span { color: #718096; font-size: 0.9rem; }
+        .type { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #818cf8; margin-bottom: 14px; }
+        .player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 16px; background: #f5f7ff; border-radius: 16px; margin-bottom: 20px; }
+        .play { min-width: 170px; min-height: 56px; padding: 0 24px; border: 0; border-radius: 28px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; font: 600 1.1rem inherit; font-family: inherit; touch-action: manipulation; cursor: pointer; }
+        .play:active { transform: scale(0.97); }
+        .play[disabled] { background: #cbd5e0; }
+        .speed { display: flex; gap: 6px; }
+        .speed button { min-height: 44px; padding: 0 14px; border: 2px solid #c7d2fe; border-radius: 12px; background: #fff; color: #4c51bf; font: 600 0.95rem inherit; font-family: inherit; touch-action: manipulation; cursor: pointer; }
+        .speed button.on { background: #4c51bf; color: #fff; border-color: #4c51bf; }
+        .plays { font-size: 0.9rem; color: #718096; }
+        .q { margin: 22px 0; }
+        .q-text { font-weight: 600; font-size: 1.1rem; margin-bottom: 10px; line-height: 1.4; }
+        .opt { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; margin: 8px 0; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 14px; background: #fff; color: inherit; font: 500 1rem inherit; font-family: inherit; text-align: left; touch-action: manipulation; cursor: pointer; }
+        .opt .letter { flex: 0 0 32px; height: 32px; border-radius: 50%; background: #eef2ff; color: #4c51bf; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .opt.sel { border-color: #667eea; background: #f5f7ff; }
+        .opt.right { border-color: #38a169; background: #f0fff4; }
+        .opt.right .letter { background: #38a169; color: #fff; }
+        .opt.wrong { border-color: #e53e3e; background: #fff5f5; }
+        .opt.wrong .letter { background: #e53e3e; color: #fff; }
+        .why { margin-top: 8px; padding: 10px 14px; border-radius: 12px; background: #fffbea; color: #744210; font-size: 0.95rem; line-height: 1.5; }
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+        .btn { min-height: 52px; padding: 0 24px; border: 0; border-radius: 14px; font: 600 1rem inherit; font-family: inherit; touch-action: manipulation; cursor: pointer; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .btn.ghost { background: #eef2ff; color: #4c51bf; }
+        .btn[disabled] { opacity: 0.4; }
+        details.tr { margin-top: 20px; }
+        details.tr summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; color: #4c51bf; }
+        .tr-body { margin-top: 8px; padding: 14px; background: #f7fafc; border-radius: 12px; line-height: 1.7; }
+        .tr-body b { color: #4c51bf; }
+        .result { text-align: center; padding: 10px 0; font-size: 1.1rem; }
+        .result strong { display: block; font-size: 2.4rem; color: #4c51bf; }
+        .notice { padding: 10px 14px; border-radius: 12px; background: #fef3c7; color: #92400e; font-size: 0.92rem; margin-bottom: 16px; }
+        @media (max-width: 600px) { .topbar h1 { font-size: 1rem; } .card { padding: 16px; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <a class="back" href="TOEFL-Junior-Prep.html">&#8592; Back</a>
+        <h1>Listening Comprehension</h1>
+        <div class="score" id="score"></div>
+    </div>
+    <div class="wrap">
+        <div class="tabs" id="tabs"></div>
+        <div class="card" id="card"></div>
+    </div>
+
+    <script src="audio/listening-data.js"></script>
+    <script>
+        const items = window.LISTENING || [];
+        const params = new URLSearchParams(location.search);
+        let mode = params.get('test') === '1' ? 'test' : 'practice';   // practice: replay + feedback; test: one play, no feedback
+        let finished = false;                                          // test mode: true after Finish (shows feedback)
+        const state = items.map(() => ({ answers: {}, plays: 0, used: false }));
+        let cur = Math.min(Math.max(0, (parseInt(params.get('item'), 10) || 1) - 1), Math.max(0, items.length - 1));
+        let rate = 1;
+        const audio = new Audio();
+        audio.preload = 'auto';
+        let playBtn = null;
+
+        const feedbackOn = () => mode === 'practice' || finished;
+        const qCount = () => items.reduce((n, it) => n + it.questions.length, 0);
+        const correctCount = () => items.reduce((n, it, i) => n + it.questions.filter((q, k) => state[i].answers[k] === q.a).length, 0);
+        const answeredCount = () => state.reduce((n, s) => n + Object.keys(s.answers).length, 0);
+        const itemDone = i => Object.keys(state[i].answers).length === items[i].questions.length;
+
+        function save(id, c, t) {
+            try { const p = JSON.parse(localStorage.getItem('tj_progress')) || {}; if (!p[id] || c >= p[id].c) p[id] = { c, t }; localStorage.setItem('tj_progress', JSON.stringify(p)); } catch (e) {}
+        }
+
+        function renderTabs() {
+            const el = document.getElementById('tabs');
+            el.innerHTML = '';
+            items.forEach((it, i) => {
+                const b = document.createElement('button');
+                b.className = 'tab' + (i === cur ? ' active' : '') + (itemDone(i) ? ' done' : '');
+                b.textContent = i + 1;
+                b.onclick = () => go(i);
+                el.appendChild(b);
+            });
+            document.getElementById('score').textContent = feedbackOn() ? correctCount() + ' / ' + qCount() + ' correct' : answeredCount() + ' / ' + qCount() + ' answered';
+        }
+
+        function setPlayLabel(playing) {
+            if (!playBtn) return;
+            const st = state[cur];
+            if (mode === 'test') playBtn.innerHTML = playing ? '&#9724; Playing...' : (st.used ? 'Played' : '&#9654; Play (one time)');
+            else playBtn.innerHTML = playing ? '&#9632; Stop' : (st.plays ? '&#9654; Play again' : '&#9654; Play audio');
+        }
+
+        function render() {
+            audio.pause();
+            const it = items[cur], st = state[cur], fb = feedbackOn();
+            const card = document.getElementById('card');
+            const letters = 'ABCD';
+            let html = `<div class="modes">
+                <button class="mode ${mode === 'practice' ? 'on' : ''}" data-m="practice"><b>Practice mode</b><span>Play as many times as you like, slower speed, instant feedback</span></button>
+                <button class="mode ${mode === 'test' ? 'on' : ''}" data-m="test"><b>Test mode</b><span>Each recording plays once, no feedback until you finish</span></button></div>`;
+            html += `<div class="type">Item ${cur + 1} of ${items.length} &middot; ${it.type}</div>
+                <div class="player">
+                    <button class="play" id="playBtn"></button>
+                    ${mode === 'practice' ? '<div class="speed" id="speed"><button data-r="0.8">Slower</button><button data-r="1">Normal</button></div>' : ''}
+                    <div class="plays" id="plays"></div>
+                </div>`;
+            it.questions.forEach((q, k) => {
+                const chosen = st.answers[k];
+                html += `<div class="q"><div class="q-text">${k + 1}. ${q.q}</div>`;
+                q.o.forEach((o, j) => {
+                    let cls = 'opt';
+                    if (fb && chosen !== undefined) { if (j === q.a) cls += ' right'; else if (j === chosen) cls += ' wrong'; }
+                    else if (!fb && chosen === j) cls += ' sel';
+                    const locked = mode === 'practice' && chosen !== undefined || finished;
+                    html += `<button class="${cls}" data-k="${k}" data-j="${j}" ${locked ? 'disabled' : ''}><span class="letter">${letters[j]}</span><span>${o}</span></button>`;
+                });
+                if (fb && chosen !== undefined) html += `<div class="why">${chosen === q.a ? 'Correct! ' : 'Not quite. '}${q.why}</div>`;
+                html += '</div>';
+            });
+            if (fb && (mode === 'test' || itemDone(cur))) {
+                const lines = it.turns.map(t => `<div><b>${t.s}:</b> ${t.t}</div>`).join('');
+                html += `<details class="tr"><summary>Show transcript</summary><div class="tr-body">${lines}</div></details>`;
+            }
+            const last = cur === items.length - 1;
+            html += `<div class="actions">
+                <button class="btn ghost" id="prev" ${cur === 0 ? 'disabled' : ''}>&#8592; Previous</button>
+                <button class="btn" id="next">${last ? (mode === 'test' && !finished ? 'Finish test' : 'Finish') : 'Next &#8594;'}</button></div>`;
+            card.innerHTML = html;
+
+            playBtn = document.getElementById('playBtn');
+            setPlayLabel(false);
+            if (mode === 'test' && st.used) playBtn.disabled = true;
+            playBtn.onclick = togglePlay;
+            document.querySelectorAll('#speed button').forEach(b => {
+                b.classList.toggle('on', parseFloat(b.dataset.r) === rate);
+                b.onclick = () => { rate = parseFloat(b.dataset.r); audio.playbackRate = rate; document.querySelectorAll('#speed button').forEach(x => x.classList.toggle('on', x === b)); };
+            });
+            document.getElementById('plays').textContent = mode === 'practice' && st.plays ? 'Played ' + st.plays + (st.plays === 1 ? ' time' : ' times') : '';
+            card.querySelectorAll('.mode').forEach(b => b.onclick = () => switchMode(b.dataset.m));
+            card.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+                state[cur].answers[+b.dataset.k] = +b.dataset.j;
+                const y = window.scrollY; render(); window.scrollTo(0, y);
+                if (mode === 'practice' && items.every((x, i) => itemDone(i))) save('listening:set1', correctCount(), qCount());
+            });
+            document.getElementById('prev').onclick = () => go(cur - 1);
+            document.getElementById('next').onclick = () => last ? finish() : go(cur + 1);
+            renderTabs();
+        }
+
+        function switchMode(m) {
+            if (m === mode) return;
+            if (answeredCount() && !confirm('Switching mode will clear your answers. Continue?')) return;
+            location.href = 'Listening-Practice.html' + (m === 'test' ? '?test=1' : '');
+        }
+
+        function togglePlay() {
+            if (!audio.paused) {
+                if (mode === 'test') return;   // no stopping in test mode
+                audio.pause(); audio.currentTime = 0; setPlayLabel(false); return;
+            }
+            audio.src = 'audio/' + items[cur].id + '.mp3';
+            audio.playbackRate = mode === 'practice' ? rate : 1;
+            audio.play().then(() => {
+                state[cur].plays++;
+                if (mode === 'test') { state[cur].used = true; }
+                document.getElementById('plays').textContent = mode === 'practice' ? 'Played ' + state[cur].plays + (state[cur].plays === 1 ? ' time' : ' times') : '';
+                setPlayLabel(true);
+            }).catch(() => { document.getElementById('plays').textContent = 'Could not play audio. Check the audio folder.'; });
+        }
+        audio.addEventListener('ended', () => { setPlayLabel(false); if (mode === 'test' && playBtn) playBtn.disabled = true; });
+
+        function go(i) {
+            if (i < 0 || i >= items.length) return;
+            if (mode === 'test' && !audio.paused) return;   // stay until the recording ends
+            cur = i; render(); window.scrollTo(0, 0);
+        }
+
+        function finish() {
+            audio.pause();
+            if (mode === 'test' && !finished) {
+                const un = qCount() - answeredCount();
+                if (un && !confirm(un + ' question(s) unanswered. Finish anyway?')) return;
+                finished = true;
+                save('listening:test', correctCount(), qCount());
+            }
+            const c = correctCount(), t = qCount();
+            if (mode === 'practice' && answeredCount() === t) save('listening:set1', c, t);
+            document.getElementById('card').innerHTML = `<div class="result"><div>Your score</div><strong>${c} / ${t}</strong>
+                <p>${answeredCount() < t ? 'You have ' + (t - answeredCount()) + ' unanswered question(s).' : (c === t ? 'Perfect!' : 'Review the items to see the transcripts and explanations.')}</p></div>
+                <div class="actions"><button class="btn ghost" id="review">Review items</button><button class="btn" id="restart">Start over</button></div>`;
+            renderTabs();
+            document.getElementById('review').onclick = () => go(0);
+            document.getElementById('restart').onclick = () => { location.href = 'Listening-Practice.html' + (mode === 'test' ? '?test=1' : ''); };
+        }
+
+        // Swipe between items in practice mode (disabled in test mode so nothing is skipped by accident)
+        let sx = 0, sy = 0;
+        const cardEl = document.getElementById('card');
+        cardEl.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        cardEl.addEventListener('touchend', e => {
+            if (mode === 'test' && !finished) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 90 && Math.abs(dx) > Math.abs(dy) * 2) go(dx < 0 ? cur + 1 : cur - 1);
+        }, { passive: true });
+
+        if (items.length) render(); else document.getElementById('card').textContent = 'No listening items found. Run tools/generate-audio.mjs.';
+    </script>
+</body>
+</html>

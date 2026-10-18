@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>TOEFL Junior Prep - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; height: 100dvh; overflow: hidden; -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+
+        /* LOADING / MENU SCREEN */
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://upload.wikimedia.org/wikipedia/commons/e/e0/Trinity_College_Library%2C_Dublin%2C_Ireland_-_Diliff.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; flex-wrap: wrap; justify-content: center; max-width: 1100px; }
+        .level-card { width: 230px; height: 270px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.4s; } .level-card:nth-child(3) { animation-delay: 0.8s; } .level-card:nth-child(4) { animation-delay: 1.2s; } .level-card:nth-child(5) { animation-delay: 1.6s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:active { transform: scale(0.97); }
+        @media (hover: hover) { .level-card:hover { transform: translateY(-15px) scale(1.05); } }
+        .level-card.listening-card:hover { border-color: #818cf8; box-shadow: 0 20px 60px rgba(129, 140, 248, 0.4); }
+        .level-card.reading-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.language-card:hover { border-color: #22d3ee; box-shadow: 0 20px 60px rgba(34, 211, 238, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .language-card .level-icon { color: #22d3ee; } .listening-card .level-icon { color: #818cf8; } .reading-card .level-icon { color: #4ade80; }
+        .level-name { font-size: 1.7rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* MAIN APP */
+        .app-container { display: flex; flex-direction: column; height: 100vh; height: 100dvh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px max(40px, env(safe-area-inset-right)) 15px max(40px, env(safe-area-inset-left)); border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { min-height: 32px; touch-action: manipulation; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.listening { background: rgba(129, 140, 248, 0.2); color: #3730a3; }
+        .current-level-badge.reading { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.language { background: rgba(34, 211, 238, 0.2); color: #155e75; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100dvh - 95px); flex: 1; min-height: 0; position: relative; overflow: hidden; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px 40px calc(40px + env(safe-area-inset-bottom)); overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        .placeholder-panel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; }
+        .placeholder-icon { font-size: 4rem; }
+        .placeholder-panel h3 { font-size: 1.6rem; color: #2d3748; font-weight: 600; }
+        .placeholder-panel p { max-width: 500px; color: #4a5568; font-size: 1.05rem; line-height: 1.7; }
+        .test-link-list { display: flex; flex-direction: column; gap: 14px; padding: 0; width: 100%; max-width: 600px; margin: 0 auto; align-self: center; }
+        .test-link-card { min-height: 72px; touch-action: manipulation; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; text-decoration: none; color: #2d3748; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.25s ease; }
+        .test-link-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2); border-color: #a5b4fc; }
+        .test-link-card .tlc-name { font-weight: 600; font-size: 1.05rem; }
+        .test-link-card .tlc-meta { font-size: 0.85rem; color: #a0aec0; margin-top: 4px; }
+        .test-link-card .tlc-arrow { font-size: 1.3rem; color: #667eea; white-space: nowrap; }
+        .tlc-score { font-size: 0.9rem; font-weight: 600; color: #38a169; }
+        .navigation { overflow-y: auto; -webkit-overflow-scrolling: touch; width: 300px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px max(20px, env(safe-area-inset-left)); border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -300px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { min-height: 56px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-user-select: none; touch-action: manipulation; padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s ease; text-align: center; font-weight: 500; font-size: 1.1rem; }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        @media (hover: hover) { .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #fff; } }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .menu-toggle { width: 52px; height: 52px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; touch-action: manipulation; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-left { gap: 20px; }
+        /* iPad landscape: keep the menu docked */
+        @media (min-width: 1000px) and (orientation: landscape) {
+            .menu-toggle { display: none; }
+            .navigation { position: relative; left: 0; flex-shrink: 0; box-shadow: none; }
+            .nav-overlay { display: none; }
+        }
+        @media (max-width: 600px) { .navigation { width: 100%; left: -100%; } .menu-toggle { width: 44px; height: 44px; } }
+        .module-text { max-width: 640px; margin: 0 auto 16px; text-align: center; color: #4a5568; font-size: 1.05rem; line-height: 1.7; }
+        .map-row { text-align: center; margin-bottom: 24px; }
+        .course-map-link { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px; border-radius: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-weight: 600; text-decoration: none; touch-action: manipulation; box-shadow: 0 6px 20px rgba(102,126,234,0.35); }
+
+
+        @media (max-width: 600px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.4rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOADING / MENU SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">TOEFL Junior Prep</h1>
+        <p class="game-subtitle">TOEFL Junior Standard</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Choose a Module</p>
+            <div class="level-cards">
+                <div class="level-card listening-card" onclick="startModule('listening')">
+                    <div class="level-icon">&#127911;</div>
+                    <div class="level-name">Listening</div>
+                    <div class="level-desc">Listening Comprehension</div>
+                </div>
+                <div class="level-card language-card" onclick="startModule('language')">
+                    <div class="level-icon">&#128288;</div>
+                    <div class="level-name">Language</div>
+                    <div class="level-desc">Form & Meaning</div>
+                </div>
+                <div class="level-card reading-card" onclick="startModule('reading')">
+                    <div class="level-icon">&#128214;</div>
+                    <div class="level-name">Reading</div>
+                    <div class="level-desc">Reading Comprehension</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>TOEFL Junior Prep</h1>
+                    <div class="current-level-badge listening" id="moduleBadge" onclick="showLoadingScreen()">
+                        <span>Module: </span><span id="currentModuleText">Listening</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" id="navPractice" onclick="showSection('practice')">Practice Skills</div>
+                <div class="nav-item" id="navTest" onclick="showSection('test')">Take Test</div>
+            </div>
+
+            <div class="content">
+                <div class="section active" id="practice">
+                    <h2 id="practiceTitle">Practice Skills</h2>
+                    <p class="module-text" id="moduleText"></p>
+                    <div class="map-row" hidden><a class="course-map-link" href="Course-Map.html">View the 12-week Course Map</a></div>
+                    <div class="placeholder-panel" id="practiceContent"></div>
+                </div>
+                <div class="section" id="test">
+                    <h2 id="testTitle">Take Test</h2>
+                    <p class="module-text" id="testText"></p>
+                    <div class="placeholder-panel" id="testContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/reading-data.js"></script>
+    <script src="data/reading-data-2.js"></script>
+    <script src="data/language-data.js"></script>
+    <script>
+        const moduleData = {
+            listening: { name: 'Listening', icon: '&#127911;', text: 'Short talks, conversations and academic talks. Use Practice mode to replay and slow down the audio, then try Test mode where each recording plays only once.',
+                tests: [
+                    { name: 'Practice (replay + feedback)', meta: '16 audio items · 36 questions · short talks, conversations, academic talks', href: 'Listening-Practice.html', key: 'listening:set1' },
+                    { name: 'Test mode (one play, no feedback)', meta: 'Same items · each recording plays once · score at the end', href: 'Listening-Practice.html?test=1', key: 'listening:test' } ] },
+            language:  { name: 'Language Form & Meaning', icon: '&#128288;', text: 'Complete connected texts (letters, announcements, stories, articles) by choosing the best word or phrase for each numbered blank. Practise grammar (form) and vocabulary and connectors (meaning).',
+                tests: [
+                    { name: 'Timed Test', meta: '7 texts · 42 questions · 25 minutes · score at the end', href: 'Language-Practice.html?test=1', key: 'language:test' },
+                    { name: 'Text practice', meta: '7 connected texts · instant feedback on every blank', href: 'Language-Practice.html', key: null }
+                ].concat((window.PRACTICE_LANGUAGE || []).map(s => ({ name: 'Skill drill: ' + s.title, meta: s.kind + ' · ' + (s.questions || s.items).length + ' questions', href: 'Practice.html?m=language&set=' + s.id, key: 'language:' + s.id }))) },
+            reading:   { name: 'Reading',   icon: '&#128214;', text: 'Read informational, narrative, persuasive, academic and practical texts, then answer questions about main ideas, details, vocabulary, reference and inference.',
+                tests: [ { name: 'Timed Test', meta: '6 texts · ' + ((window.PRACTICE_READING || []).filter(s => s.test).reduce((n, s) => n + s.questions.length, 0)) + ' questions · 50 minutes · score at the end', href: 'Practice.html?m=reading&test=1', key: 'reading:test' } ]
+                    .concat((window.PRACTICE_READING || []).map(s => ({ name: s.title, meta: s.kind + ' · ' + (s.questions || s.items).length + ' questions', href: 'Practice.html?m=reading&set=' + s.id, key: 'reading:' + s.id }))) }
+        };
+        function progress() { try { return JSON.parse(localStorage.getItem('tj_progress')) || {}; } catch (e) { return {}; } }
+        let currentModule = 'listening';
+
+        function startModule(module) {
+            currentModule = module;
+            updateModuleDisplay();
+            showSection('practice');
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function updateModuleDisplay() {
+            const data = moduleData[currentModule];
+            document.getElementById('moduleBadge').className = 'current-level-badge ' + currentModule;
+            document.getElementById('currentModuleText').textContent = data.name;
+            document.getElementById('practiceTitle').textContent = 'Practice Skills: ' + data.name;
+            document.getElementById('moduleText').textContent = data.text;
+            document.getElementById('testTitle').textContent = 'Test 1: ' + data.name;
+            document.getElementById('testText').textContent = 'A full practice test for this section. Your score is saved on this iPad.';
+            updatePracticeContent(data);
+        }
+
+        const isTest = t => /[?&]test=1/.test(t.href);
+        function cardHtml(t, name) {
+            const p = progress()[t.key];
+            return `<a class="test-link-card" href="${t.href}"><div><div class="tlc-name">${name || t.name}</div><div class="tlc-meta">${t.meta}</div></div><div class="tlc-arrow">${p ? '<span class="tlc-score">&#10003; ' + p.c + '/' + p.t + '</span> ' : ''}&#8594;</div></a>`;
+        }
+        function fill(id, list, nameFn, emptyMsg) {
+            const el = document.getElementById(id);
+            if (list.length) { el.className = ''; el.innerHTML = '<div class="test-link-list">' + list.map(t => cardHtml(t, nameFn && nameFn(t))).join('') + '</div>'; }
+            else { el.className = 'placeholder-panel'; el.innerHTML = '<div class="placeholder-icon">&#128221;</div><h3>Content coming soon</h3><p>' + emptyMsg + '</p>'; }
+        }
+        function updatePracticeContent(data) {
+            const all = data.tests || [];
+            fill('practiceContent', all.filter(t => !isTest(t)), null, 'Practice sets for this module will appear here.');
+            fill('testContent', all.filter(isTest), t => 'Test 1 &middot; ' + data.name, 'Tests for this module will appear here.');
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('navPractice').classList.toggle('active', id === 'practice');
+            document.getElementById('navTest').classList.toggle('active', id === 'test');
+            if (document.getElementById('navigation').classList.contains('open')) toggleNav();
+        }
+
+        // ---- Touch gestures (iPad): swipe from the left edge to open the menu, swipe left to close it ----
+        function isDocked() { return window.matchMedia('(min-width: 1000px) and (orientation: landscape)').matches; }
+        let tx = 0, ty = 0, tEdge = false, tTracking = false;
+        document.addEventListener('touchstart', e => {
+            if (!document.getElementById('appContainer').classList.contains('visible')) return;
+            const t = e.touches[0];
+            tx = t.clientX; ty = t.clientY; tEdge = tx < 30; tTracking = e.touches.length === 1;
+        }, { passive: true });
+        document.addEventListener('touchend', e => {
+            if (!tTracking || isDocked()) return;
+            tTracking = false;
+            const t = e.changedTouches[0];
+            const dx = t.clientX - tx, dy = t.clientY - ty;
+            if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+            const open = document.getElementById('navigation').classList.contains('open');
+            if (dx > 0 && tEdge && !open) toggleNav();
+            else if (dx < 0 && open) toggleNav();
+        }, { passive: true });
+        // stop double-tap zoom on iOS
+        let lastTap = 0;
+        document.addEventListener('touchend', e => { const n = Date.now(); if (n - lastTap < 300) e.preventDefault(); lastTap = n; }, { passive: false });
+    </script>
+</body>
+</html>

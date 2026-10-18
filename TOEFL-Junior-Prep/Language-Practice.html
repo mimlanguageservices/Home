@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Language Form &amp; Meaning - TOEFL Junior</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #2d3748; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+        .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+        .topbar { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px max(20px, env(safe-area-inset-right)) 10px max(20px, env(safe-area-inset-left)); background: rgba(255,255,255,0.96); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .back { min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 12px; background: #eef2ff; color: #4c51bf; font-weight: 600; text-decoration: none; touch-action: manipulation; }
+        .topbar h1 { font-size: 1.15rem; font-weight: 700; text-align: center; }
+        .right { min-width: 110px; text-align: right; font-weight: 700; color: #4c51bf; font-variant-numeric: tabular-nums; }
+        .right.low { color: #e53e3e; }
+        .tabs { flex: 0 0 auto; display: flex; gap: 8px; overflow-x: auto; padding: 12px max(16px, env(safe-area-inset-left)); -webkit-overflow-scrolling: touch; }
+        .tab { flex: 0 0 auto; min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: rgba(255,255,255,0.25); color: #fff; font: 600 0.95rem inherit; font-family: inherit; touch-action: manipulation; cursor: pointer; white-space: nowrap; }
+        .tab.active { background: #fff; color: #4c51bf; }
+        .tab .mark { margin-left: 6px; font-size: 0.8rem; }
+        .stage { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 max(16px, env(safe-area-inset-right)) calc(120px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+        .paper { max-width: 860px; margin: 0 auto; background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
+        .paper h2 { font-size: 1.35rem; }
+        .kind { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #818cf8; margin: 4px 0 14px; }
+        .help { color: #718096; font-size: 0.95rem; margin-bottom: 16px; }
+        .body p { line-height: 2.1; font-size: 1.1rem; margin-bottom: 14px; }
+        .blank { display: inline-flex; align-items: center; justify-content: center; min-width: 76px; min-height: 40px; padding: 0 12px; margin: 0 2px; border: 2px dashed #a5b4fc; border-radius: 10px; background: #eef2ff; color: #4c51bf; font: 700 1rem inherit; font-family: inherit; vertical-align: middle; touch-action: manipulation; cursor: pointer; }
+        .blank.chosen { border-style: solid; background: #f5f7ff; }
+        .blank.right { border: 2px solid #38a169; background: #f0fff4; color: #276749; }
+        .blank.wrong { border: 2px solid #e53e3e; background: #fff5f5; color: #9b2c2c; }
+        .blank.active { box-shadow: 0 0 0 3px rgba(102,126,234,0.4); }
+        .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: #fff; border-radius: 22px 22px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.25); padding: 16px max(20px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); transform: translateY(105%); transition: transform 0.25s ease; max-height: 70vh; overflow-y: auto; }
+        .sheet.open { transform: translateY(0); }
+        .sheet-inner { max-width: 760px; margin: 0 auto; }
+        .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 700; }
+        .close { min-height: 44px; min-width: 44px; border: 0; border-radius: 12px; background: #eef2ff; color: #4c51bf; font-size: 1.2rem; touch-action: manipulation; cursor: pointer; }
+        .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .opt { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 14px; background: #fff; color: inherit; font: 500 1.05rem inherit; font-family: inherit; text-align: left; touch-action: manipulation; cursor: pointer; }
+        .opt .letter { flex: 0 0 30px; height: 30px; border-radius: 50%; background: #eef2ff; color: #4c51bf; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .opt.sel { border-color: #667eea; background: #f5f7ff; }
+        .opt.right { border-color: #38a169; background: #f0fff4; }
+        .opt.wrong { border-color: #e53e3e; background: #fff5f5; }
+        .why { margin-top: 10px; padding: 10px 14px; border-radius: 12px; background: #fffbea; color: #744210; font-size: 0.95rem; line-height: 1.5; }
+        .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: center; gap: 12px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(255,255,255,0.96); box-shadow: 0 -4px 20px rgba(0,0,0,0.1); }
+        .btn { min-height: 52px; padding: 0 24px; border: 0; border-radius: 14px; font: 600 1rem inherit; font-family: inherit; touch-action: manipulation; cursor: pointer; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .btn.ghost { background: #eef2ff; color: #4c51bf; }
+        .modes { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+        .mode { flex: 1 1 260px; border: 2px solid #e2e8f0; border-radius: 16px; padding: 14px 16px; background: #fff; text-align: left; font-family: inherit; touch-action: manipulation; cursor: pointer; }
+        .mode.on { border-color: #667eea; background: #f5f7ff; }
+        .mode b { display: block; margin-bottom: 4px; }
+        .mode span { color: #718096; font-size: 0.9rem; }
+        .result { text-align: center; padding: 18px; border-radius: 16px; background: #f5f7ff; margin-bottom: 16px; }
+        .result strong { display: block; font-size: 2.4rem; color: #4c51bf; }
+        @media (max-width: 600px) { .opts { grid-template-columns: 1fr; } .paper { padding: 18px; } .topbar h1 { font-size: 1rem; } }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="topbar">
+        <a class="back" href="TOEFL-Junior-Prep.html">&#8592; Back</a>
+        <h1>Language Form &amp; Meaning</h1>
+        <div class="right" id="right"></div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div class="stage" id="stage"></div>
+</div>
+<div class="sheet" id="sheet"><div class="sheet-inner" id="sheetInner"></div></div>
+<div class="bar" id="bar"></div>
+
+<script src="data/language-texts.js"></script>
+<script>
+    const texts = window.LANGUAGE_TEXTS;
+    const params = new URLSearchParams(location.search);
+    const TEST_MINUTES = 25;                 // guide time for the full 42-question test
+    const L = 'ABCD';
+    let mode = params.get('test') === '1' ? 'test' : 'practice';
+    let started = mode === 'practice';       // test starts when the student presses Start
+    let submitted = false;
+    let cur = Math.max(0, texts.findIndex(t => t.id === params.get('text')));
+    let openBlank = null;                    // {t, b}
+    let secondsLeft = TEST_MINUTES * 60, timerId = null;
+    const answers = {};                      // "T1:0" -> option index
+
+    function key(t, b) { return texts[t].id + ':' + b; }
+    function feedbackOn() { return mode === 'practice' || submitted; }
+    function totals() {
+        let c = 0, n = 0;
+        texts.forEach((tx, t) => tx.blanks.forEach((bl, b) => { n++; if (answers[key(t, b)] === bl.a) c++; }));
+        return { c, n };
+    }
+    function answeredCount() { return Object.keys(answers).length; }
+    function save(id, c, n) {
+        try { const p = JSON.parse(localStorage.getItem('tj_progress')) || {}; if (!p[id] || c >= p[id].c) p[id] = { c, t: n }; localStorage.setItem('tj_progress', JSON.stringify(p)); } catch (e) {}
+    }
+    function saveTextScores() {
+        texts.forEach((tx, t) => {
+            if (tx.blanks.every((bl, b) => answers[key(t, b)] !== undefined)) {
+                save('language:' + tx.id, tx.blanks.filter((bl, b) => answers[key(t, b)] === bl.a).length, tx.blanks.length);
+            }
+        });
+    }
+
+    function renderTabs() {
+        const el = document.getElementById('tabs'); el.innerHTML = '';
+        texts.forEach((tx, i) => {
+            const b = document.createElement('button');
+            const got = tx.blanks.filter((bl, k) => answers[key(i, k)] !== undefined).length;
+            b.className = 'tab' + (i === cur ? ' active' : '');
+            b.innerHTML = (i + 1) + '. ' + tx.title + `<span class="mark">${got}/${tx.blanks.length}</span>`;
+            b.onclick = () => { closeSheet(); cur = i; render(); document.getElementById('stage').scrollTop = 0; };
+            el.appendChild(b);
+        });
+        document.getElementById('right').textContent = mode === 'test' && started && !submitted ? fmt(secondsLeft) : (feedbackOn() ? totals().c + ' / ' + totals().n : answeredCount() + ' answered');
+    }
+    function fmt(s) { return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+
+    function render() {
+        const tx = texts[cur];
+        const stage = document.getElementById('stage');
+        let html = '<div class="paper">';
+        if (mode === 'test' && !started) {
+            html += `<h2>Timed Test: Language Form &amp; Meaning</h2><div class="kind">${texts.reduce((n, t) => n + t.blanks.length, 0)} questions &middot; ${texts.length} texts &middot; ${TEST_MINUTES} minutes</div>
+                <p class="help" style="font-size:1.05rem;line-height:1.7">Each text has numbered blanks. Tap a blank and choose the word or words that best complete the sentence. You can change your answers and move between texts. You will see your score and explanations after you submit. The clock starts when you press Start.</p>
+                <button class="btn" id="startTest" style="margin-top:12px">Start test</button></div>`;
+            stage.innerHTML = html; renderTabs(); renderBar(); return;
+        }
+        if (submitted) {
+            const t = totals();
+            html += `<div class="result"><div>Your score</div><strong>${t.c} / ${t.n}</strong><div>Tap any blank to see the explanation.</div></div>`;
+        }
+        html += `<div class="modes"><button class="mode ${mode === 'practice' ? 'on' : ''}" data-m="practice"><b>Practice mode</b><span>Instant feedback on every blank</span></button><button class="mode ${mode === 'test' ? 'on' : ''}" data-m="test"><b>Timed test mode</b><span>All 7 texts, ${TEST_MINUTES} minutes, no feedback until you submit</span></button></div>`;
+        html += `<h2>${tx.title}</h2><div class="kind">Text ${cur + 1} of ${texts.length} &middot; ${tx.kind}</div>`;
+        html += `<div class="help">Tap a numbered blank and choose the best answer.</div><div class="body">`;
+        const paras = tx.text.split('\n\n');
+        paras.forEach(p => {
+            html += '<p>' + p.replace(/\n/g, '<br>').replace(/\{(\d)\}/g, (m, n) => {
+                const b = +n - 1, a = answers[key(cur, b)];
+                let cls = 'blank', label = n;
+                if (a !== undefined) {
+                    label = tx.blanks[b].o[a]; cls += ' chosen';
+                    if (feedbackOn()) cls += a === tx.blanks[b].a ? ' right' : ' wrong';
+                }
+                if (openBlank && openBlank.t === cur && openBlank.b === b) cls += ' active';
+                return `<button class="${cls}" data-b="${b}">${label}</button>`;
+            }) + '</p>';
+        });
+        html += '</div></div>';
+        stage.innerHTML = html;
+        stage.querySelectorAll('.blank').forEach(el => el.onclick = () => openSheet(cur, +el.dataset.b));
+        stage.querySelectorAll('.mode').forEach(el => el.onclick = () => switchMode(el.dataset.m));
+        renderTabs(); renderBar();
+    }
+
+    function renderBar() {
+        const bar = document.getElementById('bar');
+        let h = '';
+        if (mode === 'test' && started && !submitted) h = `<button class="btn ghost" id="prevT" ${cur === 0 ? 'disabled' : ''}>&#8592; Previous</button><button class="btn ghost" id="nextT" ${cur === texts.length - 1 ? 'disabled' : ''}>Next &#8594;</button><button class="btn" id="submitT">Submit test</button>`;
+        else if (mode === 'practice' || submitted) h = `<button class="btn ghost" id="prevT" ${cur === 0 ? 'disabled' : ''}>&#8592; Previous text</button><button class="btn" id="nextT" ${cur === texts.length - 1 ? 'disabled' : ''}>Next text &#8594;</button>${submitted ? '<button class="btn ghost" id="again">Try again</button>' : ''}`;
+        bar.innerHTML = h;
+        bar.style.display = h ? 'flex' : 'none';
+        const p = document.getElementById('prevT'), n = document.getElementById('nextT'), s = document.getElementById('submitT'), a = document.getElementById('again');
+        if (p) p.onclick = () => { closeSheet(); cur--; render(); document.getElementById('stage').scrollTop = 0; };
+        if (n) n.onclick = () => { closeSheet(); cur++; render(); document.getElementById('stage').scrollTop = 0; };
+        if (s) s.onclick = () => { const un = totals().n - answeredCount(); if (!un || confirm(un + ' question(s) unanswered. Submit anyway?')) submit(); };
+        if (a) a.onclick = () => { location.href = 'Language-Practice.html' + (mode === 'test' ? '?test=1' : ''); };
+        const st = document.getElementById('startTest');
+        if (st) st.onclick = startTest;
+    }
+
+    function openSheet(t, b) {
+        openBlank = { t, b };
+        const bl = texts[t].blanks[b], a = answers[key(t, b)];
+        const locked = mode === 'practice' && a !== undefined;       // practice: one try per blank, then explanation
+        let h = `<div class="sheet-head"><span>Blank ${b + 1}</span><button class="close" id="closeSheet">&#10005;</button></div><div class="opts">`;
+        bl.o.forEach((o, j) => {
+            let cls = 'opt';
+            if (feedbackOn() && a !== undefined) { if (j === bl.a) cls += ' right'; else if (j === a) cls += ' wrong'; }
+            else if (a === j) cls += ' sel';
+            h += `<button class="${cls}" data-j="${j}" ${locked || submitted ? 'disabled' : ''}><span class="letter">${L[j]}</span><span>${o}</span></button>`;
+        });
+        h += '</div>';
+        if (feedbackOn() && a !== undefined) h += `<div class="why">${a === bl.a ? 'Correct! ' : 'Not quite. '}${bl.why}</div>`;
+        document.getElementById('sheetInner').innerHTML = h;
+        document.getElementById('sheet').classList.add('open');
+        document.getElementById('closeSheet').onclick = closeSheet;
+        document.querySelectorAll('#sheetInner .opt').forEach(el => el.onclick = () => choose(t, b, +el.dataset.j));
+        renderKeepScroll();
+    }
+    function closeSheet() { openBlank = null; document.getElementById('sheet').classList.remove('open'); }
+    function renderKeepScroll() { const s = document.getElementById('stage'), top = s.scrollTop; render(); document.getElementById('stage').scrollTop = top; }
+
+    function choose(t, b, j) {
+        answers[key(t, b)] = j;
+        if (mode === 'practice') { saveTextScores(); openSheet(t, b); }   // re-open to show feedback
+        else { closeSheet(); renderKeepScroll(); }
+    }
+
+    function switchMode(m) {
+        if (m === mode) return;
+        location.href = 'Language-Practice.html' + (m === 'test' ? '?test=1' : '');
+    }
+    function startTest() {
+        started = true;
+        timerId = setInterval(() => {
+            secondsLeft--;
+            const r = document.getElementById('right'); r.textContent = fmt(Math.max(0, secondsLeft)); r.classList.toggle('low', secondsLeft <= 300);
+            if (secondsLeft <= 0) submit();
+        }, 1000);
+        render();
+    }
+    function submit() {
+        if (submitted) return;
+        submitted = true; clearInterval(timerId); closeSheet();
+        const t = totals(); save('language:test', t.c, t.n); saveTextScores();
+        document.getElementById('right').classList.remove('low');
+        cur = 0; render(); document.getElementById('stage').scrollTop = 0;
+    }
+
+    render();
+</script>
+</body>
+</html>
