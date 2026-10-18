@@ -30,6 +30,20 @@
         .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
         .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
 
+        .share-btn { position: absolute; top: max(18px, env(safe-area-inset-top)); right: max(18px, env(safe-area-inset-right)); width: 56px; height: 56px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.1); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; touch-action: manipulation; transition: background 0.15s ease, transform 0.12s ease; }
+        .share-btn svg { width: 32px; height: 32px; }
+        .share-btn:active { transform: scale(0.94); }
+        @media (hover: hover) { .share-btn:hover { background: rgba(255,255,255,0.22); } }
+        .share-screen { position: fixed; inset: 0; z-index: 10001; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)); overflow-y: auto; text-align: center; }
+        .share-screen.show { display: flex; }
+        .share-screen h2 { color: #fff; font-size: 2.2rem; font-weight: 700; text-shadow: 0 2px 12px rgba(102,126,234,0.6); }
+        .share-screen p { color: rgba(255,255,255,0.75); font-size: 1.1rem; }
+        .share-qr-card { background: #fff; border-radius: 24px; padding: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.45); }
+        .share-qr { display: block; width: min(70vh, 80vw, 520px); height: min(70vh, 80vw, 520px); }
+        .share-url { color: rgba(255,255,255,0.55); font-size: 0.85rem; word-break: break-all; max-width: 90vw; }
+        .share-back { min-height: 52px; padding: 0 32px; border-radius: 26px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font: 600 1.05rem 'Inter', sans-serif; cursor: pointer; touch-action: manipulation; box-shadow: 0 6px 20px rgba(102,126,234,0.35); }
+        @media (max-height: 560px) { .share-screen { flex-direction: row; flex-wrap: wrap; gap: 14px 30px; } .share-screen h2 { font-size: 1.5rem; } .share-qr { width: min(60vh, 70vw); height: min(60vh, 70vw); } }
+
         /* MAIN APP */
         .app-container { display: flex; flex-direction: column; height: 100vh; height: 100dvh; opacity: 0; transition: opacity 0.2s ease; }
         .app-container.visible { opacity: 1; }
@@ -135,6 +149,16 @@
             </div>
         </div>
         <div class="powered-by">Rochester &middot; Chía</div>
+        <button class="share-btn" onclick="showShare()" aria-label="Share: show QR code" title="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><rect x="7" y="7" width="3.5" height="3.5" rx=".6"/><rect x="13.5" y="7" width="3.5" height="3.5" rx=".6"/><rect x="7" y="13.5" width="3.5" height="3.5" rx=".6"/><path d="M13.5 13.5h1.6v1.6h-1.6zM15.9 15.9H17V17h-1.1zM13.5 16.4h1.1V17h-1.1z"/></svg></button>
+    </div>
+
+    <!-- SHARE SCREEN: QR code for this page -->
+    <div class="share-screen" id="shareScreen">
+        <h2>Scan to open TOEFL Junior Prep</h2>
+        <div class="share-qr-card"><svg class="share-qr" role="img" aria-label="QR code for TOEFL Junior Prep" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h45v45H0z"/><path stroke="#000000" d="M2 2.5h7m1 0h2m1 0h1m2 0h1m1 0h1m1 0h2m1 0h3m6 0h1m3 0h7M2 3.5h1m5 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1m4 0h1m4 0h1m1 0h2m1 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m1 0h7m5 0h2m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m3 0h1m1 0h2m1 0h2m2 0h2m1 0h1m1 0h1m3 0h2m1 0h2m1 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h1m1 0h3m3 0h1m1 0h2m1 0h2m2 0h2m1 0h1m1 0h2m2 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m2 0h1m3 0h2m1 0h3m4 0h1m1 0h2m2 0h1m4 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M11 9.5h1m2 0h1m1 0h1m4 0h1m2 0h2m1 0h4M2 10.5h1m2 0h7m3 0h1m1 0h1m1 0h1m1 0h1m3 0h2m1 0h1m1 0h2m3 0h1m2 0h1m1 0h3M3 11.5h2m2 0h1m2 0h1m3 0h1m1 0h1m3 0h2m3 0h1m1 0h3m1 0h3m4 0h1M3 12.5h2m3 0h1m1 0h3m1 0h1m4 0h1m2 0h1m2 0h1m3 0h4m2 0h1m1 0h2m1 0h1M3 13.5h2m1 0h2m7 0h5m1 0h2m5 0h1m1 0h2m1 0h2m1 0h1m2 0h1m1 0h2M2 14.5h3m2 0h2m2 0h5m5 0h1m3 0h2m2 0h2m3 0h1m1 0h2m3 0h1M2 15.5h1m1 0h1m2 0h1m1 0h2m3 0h3m2 0h1m1 0h3m3 0h2m2 0h2m1 0h5M2 16.5h2m2 0h1m1 0h1m1 0h2m1 0h2m1 0h7m2 0h2m2 0h2m1 0h2m1 0h2m1 0h3m1 0h1M2 17.5h4m3 0h1m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m2 0h1m2 0h1m5 0h2m1 0h4m1 0h1M2 18.5h2m1 0h2m1 0h1m1 0h1m1 0h5m1 0h1m3 0h3m2 0h1m2 0h1m3 0h2M3 19.5h5m2 0h1m2 0h1m2 0h2m1 0h1m1 0h1m1 0h3m6 0h4m2 0h3M4 20.5h1m1 0h7m3 0h1m2 0h4m2 0h1m1 0h3m1 0h3m1 0h1m1 0h2m2 0h2M2 21.5h1m4 0h1m1 0h1m2 0h2m1 0h2m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h2m4 0h1m1 0h3M2 22.5h3m1 0h1m1 0h1m1 0h2m3 0h1m1 0h2m1 0h1m1 0h2m1 0h3m2 0h2m1 0h1m2 0h4m1 0h2M2 23.5h1m3 0h2m2 0h1m3 0h1m1 0h1m4 0h1m2 0h2m3 0h1m1 0h1m1 0h3m1 0h3M5 24.5h1m1 0h4m2 0h1m1 0h2m1 0h1m1 0h1m4 0h3m1 0h1m1 0h2m1 0h1m1 0h1m1 0h2M2 25.5h1m1 0h2m7 0h1m1 0h2m1 0h2m1 0h1m4 0h1m1 0h1m1 0h2m1 0h1m1 0h2m2 0h1m1 0h2M2 26.5h2m2 0h1m1 0h1m1 0h3m1 0h1m2 0h2m2 0h1m3 0h2m3 0h1m2 0h2m1 0h3M4 27.5h1m4 0h2m1 0h2m2 0h3m1 0h1m2 0h1m1 0h1m1 0h1m1 0h4m1 0h1m2 0h2m1 0h1m1 0h1M2 28.5h2m1 0h1m1 0h2m2 0h1m1 0h4m2 0h3m1 0h2m2 0h5m1 0h4m2 0h1m2 0h1M2 29.5h1m2 0h1m1 0h1m1 0h2m1 0h1m2 0h1m1 0h1m2 0h3m1 0h1m1 0h1m6 0h1m3 0h4M2 30.5h2m1 0h1m2 0h2m1 0h4m1 0h1m3 0h1m1 0h1m1 0h2m1 0h2m3 0h2m5 0h1m2 0h1M2 31.5h1m1 0h1m1 0h2m1 0h4m5 0h3m1 0h1m1 0h3m2 0h1m2 0h3m3 0h2m1 0h2M2 32.5h2m1 0h4m1 0h2m1 0h1m1 0h2m2 0h1m2 0h2m1 0h1m1 0h1m1 0h1m3 0h1m1 0h1m2 0h1m3 0h1M2 33.5h4m1 0h1m4 0h3m3 0h1m5 0h1m1 0h2m2 0h1m2 0h1m2 0h1m3 0h3M2 34.5h3m3 0h1m2 0h2m1 0h6m3 0h1m2 0h1m1 0h1m1 0h2m1 0h8M10 35.5h4m1 0h6m3 0h4m1 0h2m2 0h2m3 0h4M2 36.5h7m1 0h1m1 0h3m2 0h1m4 0h2m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m1 0h3M2 37.5h1m5 0h1m1 0h4m1 0h1m1 0h2m1 0h3m2 0h3m1 0h6m3 0h2m1 0h2M2 38.5h1m1 0h3m1 0h1m1 0h1m2 0h2m1 0h1m1 0h2m1 0h1m1 0h3m1 0h1m1 0h2m2 0h8m1 0h1M2 39.5h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h1m3 0h1m2 0h2m1 0h4m3 0h1m1 0h3M2 40.5h1m1 0h3m1 0h1m3 0h2m1 0h1m1 0h2m1 0h4m3 0h3m3 0h3m1 0h4m1 0h1M2 41.5h1m5 0h1m3 0h2m1 0h2m2 0h1m5 0h1m3 0h1m5 0h2m1 0h1m1 0h1m1 0h1M2 42.5h7m1 0h1m1 0h1m1 0h1m2 0h1m6 0h1m1 0h2m5 0h2m3 0h1"/></svg>
+</div>
+        <div class="share-url">https://mimlanguageservices.github.io/Home/Rochester/TOEFL-Junior-Prep/TOEFL-Junior-Prep.html</div>
+        <button class="share-back" onclick="hideShare()">&larr; Back to menu</button>
     </div>
 
     <!-- MAIN APPLICATION -->
@@ -209,6 +233,10 @@
             // On phones, land on the menu so the student picks Practice Skills or Take Test
             if (window.matchMedia('(max-width: 600px)').matches && !document.getElementById('navigation').classList.contains('open')) toggleNav();
         }
+
+        function showShare() { document.getElementById('shareScreen').classList.add('show'); }
+        function hideShare() { document.getElementById('shareScreen').classList.remove('show'); }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') hideShare(); });
 
         function showLoadingScreen() {
             document.getElementById('appContainer').classList.remove('visible');
