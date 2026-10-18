@@ -110,8 +110,8 @@
             else playBtn.innerHTML = playing ? '&#9632; Stop' : (st.plays ? '&#9654; Play again' : '&#9654; Play audio');
         }
 
-        function render() {
-            audio.pause();
+        function render(keepAudio) {
+            if (!keepAudio) audio.pause();   // only stop the audio when the item changes, not when an answer is tapped
             const it = items[cur], st = state[cur], fb = feedbackOn();
             const card = document.getElementById('card');
             const letters = 'ABCD';
@@ -148,7 +148,7 @@
             card.innerHTML = html;
 
             playBtn = document.getElementById('playBtn');
-            setPlayLabel(false);
+            setPlayLabel(!audio.paused);
             if (mode === 'test' && st.used) playBtn.disabled = true;
             playBtn.onclick = togglePlay;
             document.querySelectorAll('#speed button').forEach(b => {
@@ -159,7 +159,7 @@
             card.querySelectorAll('.mode').forEach(b => b.onclick = () => switchMode(b.dataset.m));
             card.querySelectorAll('.opt').forEach(b => b.onclick = () => {
                 state[cur].answers[+b.dataset.k] = +b.dataset.j;
-                const y = window.scrollY; render(); window.scrollTo(0, y);
+                const y = window.scrollY; render(true); window.scrollTo(0, y);
                 if (mode === 'practice' && items.every((x, i) => itemDone(i))) save('listening:set1', correctCount(), qCount());
             });
             document.getElementById('prev').onclick = () => go(cur - 1);
