@@ -7,6 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a202c">
+    <script>(function(){var r=document.documentElement,w=innerWidth,h=innerHeight,m=w<=820||h<=500;if(m)r.classList.add("m");if(m&&w>520)r.classList.add("md");})();</script>
     <title>It Takes a Village - Impact 4 Unit 2.1</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -355,9 +356,110 @@
             .popup-word { font-size: 2rem; } .popup-definition { font-size: 1.4rem; margin-bottom: 14px; }
         }
         /* "turn your phone sideways" hint */
-        .rotate-hint { display: none; position: fixed; left: 10px; right: 10px; top: calc(56px + env(safe-area-inset-top)); z-index: 2000; background: #1a202c; color: #fff; border-radius: 14px; padding: 12px 40px 12px 16px; font-size: .85rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+        .rotate-hint { display: none; position: fixed; left: 10px; right: 10px; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 2000; background: #1a202c; color: #fff; border-radius: 14px; padding: 12px 40px 12px 16px; font-size: .85rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
         .rotate-hint button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; font-size: 1.4rem; width: 40px; height: 40px; }
         @media (max-width: 700px) and (orientation: portrait) { .rotate-hint.show { display: block; } }
+
+        /* ===== MOBILE LAYOUT: phones + small tablets (html.m is set by script when width<=820 or height<=500) =====
+           Slides stop being shrunk to fit; they reflow to one column at a readable size and scroll vertically. */
+        html.m { font-size: 11px; }                 /* every rem size shrinks with this */
+        html.m.md { font-size: 13px; }              /* sideways phone / iPad portrait */
+        html.m { --bar: calc(44px + env(safe-area-inset-top)); --dock: calc(56px + env(safe-area-inset-bottom)); }
+        .m .lesson-bar { height: var(--bar); }
+        .m .bar-seg { font-size: 9.5px; padding: 0 2px 4px; gap: 2px; }
+        .m .bar-seg small, .m .bar-seg .tick { display: none !important; }
+        /* each slide is its own scroll area */
+        .m .slide.active { overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-top: 0; padding-bottom: calc(var(--dock) + 16px); }
+        .m .slide.active:has(.cover-slide) { padding: 0; }
+        .m .slide-label { position: sticky; top: var(--bar); margin-top: var(--bar); left: auto; z-index: 5; background: #fff; border-bottom: 1px solid #edf2f7; padding: 8px 16px; font-size: 15px; }
+        .m .seg-chip { font-size: 10px; padding: 2px 9px; }
+        .m .slide-inner { display: block !important; height: auto !important; overflow: visible; padding: 18px 16px 28px !important; }
+        .m .fit-wrap { transform: none !important; width: 100%; }
+        .m .center-col { max-width: none !important; }
+        /* bottom dock: arrows, counter and teacher buttons in one row */
+        .m .toolbar { left: 0; right: 0; bottom: 0; padding: 7px 58px calc(7px + env(safe-area-inset-bottom)) 112px; background: #1a202c; justify-content: flex-end; flex-wrap: wrap; gap: 6px; min-height: var(--dock); align-items: center; box-shadow: 0 -3px 12px rgba(0,0,0,.25); }
+        .m .tool-btn { font-size: 12px; padding: 8px 12px; background: #2d3748; box-shadow: none; }
+        .m .timer-pill { padding: 4px 6px 4px 12px; }
+        .m .timer-pill .time { font-size: 15px; min-width: 46px; }
+        .m .timer-pill button { font-size: 12px; padding: 5px 10px; min-height: 36px; }
+        .m #segLabel { display: none; }
+        .m .nav-arrow { top: auto; bottom: calc(env(safe-area-inset-bottom) + 6px); transform: none !important; width: 44px; height: 44px; opacity: 1; background: #2d3748; z-index: 62; }
+        .m .nav-arrow.prev { left: calc(env(safe-area-inset-left) + 8px); } .m .nav-arrow.next { right: calc(env(safe-area-inset-right) + 8px); }
+        .m .nav-arrow.hidden { opacity: 0; }
+        .m .slide-counter { left: calc(env(safe-area-inset-left) + 58px); bottom: calc(env(safe-area-inset-bottom) + 19px); transform: none; background: none; color: #a0aec0; font-size: 12px; padding: 0; z-index: 62; }
+        .m .slide-counter .ref { display: none; }
+        .m .notes { bottom: var(--dock); max-height: 45vh; max-height: 45dvh; padding: 14px 16px; font-size: 14px; }
+        /* students on phones/tablets-in-portrait do not need the teacher tools */
+        .m .tool-btn, .m .notes, .m .index-panel { display: none !important; }
+        .m .slide-counter { left: 50%; transform: translateX(-50%); }
+        @media (max-width: 520px) { .m .timer-pill { display: none !important; } }
+        /* content */
+        .m .slide-heading { margin-bottom: 16px; }
+        .m .rule-strip { flex-wrap: wrap; gap: 8px; }
+        .m .rule { padding: 6px 14px; }
+        .m .starter-q { font-size: 3rem; margin-top: 4px; }
+        .m .starter-sub { font-size: 1.6rem; }
+        .m .starter-video { position: static; width: calc(100% - 32px); margin: 4px 16px 24px; }
+        .m .split-layout { flex-direction: column; align-items: stretch; gap: 20px; }
+        .m .split-text, .m .split-image { flex: none !important; width: 100%; }
+        .m .choice-row.c3, .m .choice-row.c4, .m .choice-row.c5 { grid-template-columns: 1fr; gap: 14px; }
+        .m.md .choice-row.c4, .m.md .choice-row.c5 { grid-template-columns: 1fr 1fr; }
+        .m .vocab-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+        .m.md .vocab-grid { grid-template-columns: repeat(3, 1fr); }
+        .m .card-def .def-text { font-size: 1.35rem; }
+        .m .vocab-list { grid-template-columns: 1fr; grid-auto-flow: row; grid-template-rows: none; gap: 8px; }
+        .m .vl-sent { font-size: 1.35rem; }
+        .m .q-item, .m .inq, .m .circle-item { padding: 14px 16px; }
+        .m .book-step { padding: 14px 16px; gap: 14px; }
+        .m .book-n { width: 44px; height: 44px; font-size: 1.6rem; }
+        .m .quiz-btn { padding: 14px 28px; }
+        .m .quiz-row { padding: 10px 14px; }
+        .m .big-quote { font-size: 2.2rem; }
+        .m .base-groups { padding: 8px 18px; }
+        .m .opener-qs { padding-left: 24px; }
+        .m .frames { padding: 12px 16px; }
+        .m .discussion-prompt { padding: 16px 20px; }
+        .m .poll-item { padding: 14px 16px; }
+        .m .next-btn-center { padding: 12px 30px; }
+        .m #slide-qr svg { width: min(86vw, 62vh) !important; height: min(86vw, 62vh) !important; }
+        /* Lesson 3 grammar slides */
+        .m .gram-grid, .m .gram-grid.three { grid-template-columns: 1fr; gap: 14px; }
+        .m .gram-card { padding: 18px 20px; }
+        .m .tl { flex-direction: column; }
+        .m .tl-arrow { transform: rotate(90deg); }
+        .m .tl-svg-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .m .tlsvg { min-width: 560px; }
+        .m .tl-formula { gap: 10px; padding: 12px 18px; width: auto; }
+        .m .ex-wrap.with-side { grid-template-columns: 1fr; }
+        .m .ex-foot { flex-wrap: wrap; }
+        .m .use-row { padding: 12px 14px; gap: 12px; }
+        .m .ans { min-width: 90px; }
+        /* Active Pause wheel */
+        .m .pause-layout { flex-direction: column; align-items: stretch; gap: 22px; }
+        .m .wheel-col { flex: none; display: flex; justify-content: center; padding-top: 26px; }
+        .m .wheel-wrap { width: min(84vw, 400px); height: min(84vw, 400px); }
+        .m .spin-btn { width: 88px; height: 88px; margin: -44px 0 0 -44px; font-size: 1.5rem; border-width: 5px; }
+        .m .pause-result { height: auto; min-height: 240px; overflow: visible; padding: 20px 18px; }
+        .m .pr-in { flex: none; }
+        .m .pr-best { position: static; margin-top: 14px; }
+        .m .pr-img { width: 38%; height: auto; aspect-ratio: 4 / 3; margin-left: 12px; }
+        .m .pr-list { columns: 1; }
+        .m .pr-list li { font-size: 1.4rem; }
+        .m .pause-video { flex-direction: column; align-items: stretch; gap: 10px; }
+        .m .pv-frame { width: 100%; }
+        /* Cover + closing slides */
+        .m .cover-slide { min-height: max(100%, 460px); }
+        .m .cover-panel { width: 100%; padding: 90px 22px calc(var(--dock) + 110px); justify-content: center; }
+        .m .cover-title { font-size: 3rem; }
+        .m .school-logo { top: 12px; right: 12px; padding: 8px 10px; border-radius: 14px; }
+        .m .school-logo img { height: 64px; }
+        .m .start-btn { left: 50%; bottom: calc(var(--dock) + 28px); width: min(260px, 80vw); height: 62px; font-size: 1.7rem; letter-spacing: 4px; }
+        .m .slide.active:has(.cover-slide):not(:has(.cover-panel)) { overflow-y: auto; }
+        .m .cover-slide:has(.cover-panel-left) { height: auto; display: flex; flex-direction: column; }
+        .m .cover-panel-left { position: relative; width: 100%; height: auto; clip-path: none; padding: calc(var(--bar) + 30px) 24px 30px; }
+        .m .cover-right-content { position: relative; width: 100%; height: auto; padding: 28px 20px calc(var(--dock) + 20px); }
+        .m .fb-heading { font-size: 2.6rem; }
+        .m .feedback-emoji { padding: 12px 0; font-size: 2.6rem; }
     </style>
 </head>
 <body>
@@ -449,7 +551,7 @@
             <div class="slide-label">Scan Me</div>
             <div class="slide-inner"><div class="fit-wrap"><div class="center-col" style="align-items:center;text-align:center;">
                 <div class="slide-heading">&#128241; Scan to open today's slides</div>
-                <svg style="height:min(68vh,68vw);width:min(68vh,68vw);display:block;border-radius:18px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h45v45H0z"/><path stroke="#000000" d="M2 2.5h7m1 0h2m1 0h1m2 0h4m2 0h2m1 0h1m1 0h2m1 0h2m2 0h1m1 0h7M2 3.5h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m4 0h1m4 0h1m1 0h1m3 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h2m2 0h1m3 0h1m1 0h2m4 0h2m4 0h2m1 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m1 0h5m1 0h2m3 0h1m1 0h1m2 0h4m1 0h3m2 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m4 0h1m1 0h1m1 0h2m2 0h1m2 0h1m1 0h5m1 0h2m2 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m2 0h1m1 0h3m2 0h1m2 0h1m4 0h1m1 0h1m3 0h2m2 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 9.5h1m2 0h1m5 0h2m3 0h1m1 0h1m1 0h6M2 10.5h1m1 0h2m1 0h3m1 0h1m4 0h1m2 0h3m1 0h1m1 0h1m2 0h5m3 0h1m2 0h1m1 0h2M2 11.5h1m1 0h1m2 0h1m1 0h4m3 0h3m1 0h6m1 0h1m2 0h5m1 0h3m1 0h1m1 0h1M2 12.5h1m1 0h1m1 0h5m1 0h3m2 0h4m1 0h2m1 0h2m3 0h2m3 0h1m2 0h1m1 0h1M2 13.5h1m1 0h2m1 0h1m8 0h1m1 0h1m1 0h1m1 0h1m2 0h4m1 0h1m1 0h1m1 0h3m5 0h1M2 14.5h3m3 0h1m1 0h2m1 0h2m1 0h1m2 0h1m2 0h1m1 0h1m1 0h4m1 0h1m1 0h1m5 0h2M3 15.5h2m1 0h1m3 0h1m5 0h5m1 0h1m2 0h2m1 0h4m1 0h1m1 0h2m2 0h1m2 0h1M3 16.5h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h1m3 0h3m1 0h2m4 0h2m1 0h2m1 0h1m2 0h4M2 17.5h2m3 0h1m1 0h3m2 0h3m1 0h1m4 0h3m2 0h3m2 0h2m1 0h4M3 18.5h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h3m1 0h3m3 0h3m3 0h1m3 0h1M2 19.5h5m3 0h4m1 0h1m2 0h1m4 0h4m2 0h1m5 0h1m1 0h1m2 0h1M3 20.5h1m4 0h3m2 0h2m2 0h1m2 0h1m3 0h1m3 0h2m2 0h1m2 0h2m1 0h2m1 0h1M3 21.5h3m3 0h1m1 0h3m1 0h1m2 0h3m2 0h1m1 0h2m1 0h1m1 0h3m4 0h1m1 0h4M3 22.5h2m1 0h1m1 0h1m1 0h2m1 0h4m1 0h1m2 0h2m2 0h1m1 0h1m2 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1M4 23.5h1m2 0h1m1 0h3m2 0h1m1 0h3m2 0h3m1 0h1m4 0h4m2 0h3m2 0h2M4 24.5h1m1 0h1m1 0h1m3 0h3m2 0h2m4 0h1m1 0h1m1 0h1m3 0h1m2 0h2m1 0h1m3 0h1M2 25.5h1m2 0h1m4 0h1m3 0h1m1 0h1m1 0h1m1 0h1m4 0h1m1 0h2m1 0h1m1 0h1m3 0h4m1 0h1M3 26.5h1m3 0h3m1 0h3m1 0h5m2 0h1m1 0h1m1 0h3m2 0h1m3 0h1m4 0h1m1 0h1M3 27.5h4m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m2 0h2m1 0h1m2 0h4M6 28.5h1m1 0h1m4 0h1m1 0h2m2 0h1m1 0h1m2 0h1m1 0h3m1 0h5m1 0h2m1 0h1m1 0h2M4 29.5h2m4 0h2m2 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h3m2 0h2m1 0h1m1 0h2M3 30.5h1m4 0h2m2 0h1m1 0h1m1 0h1m5 0h9m2 0h3m2 0h2m2 0h1M3 31.5h2m5 0h3m2 0h1m1 0h3m1 0h2m1 0h1m4 0h1m1 0h1m2 0h2m1 0h1m4 0h1M2 32.5h1m1 0h2m1 0h3m1 0h1m4 0h1m2 0h1m1 0h1m5 0h3m4 0h7M4 33.5h4m1 0h1m2 0h1m2 0h1m1 0h1m1 0h1m1 0h1m2 0h2m5 0h1m1 0h2m1 0h7M3 34.5h2m2 0h2m5 0h1m1 0h1m2 0h2m1 0h2m3 0h15M10 35.5h2m1 0h2m4 0h3m1 0h3m1 0h1m2 0h5m3 0h1m3 0h1M2 36.5h7m1 0h1m1 0h1m1 0h4m2 0h1m1 0h1m2 0h3m2 0h1m1 0h3m1 0h1m1 0h1m1 0h2M2 37.5h1m5 0h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h2m7 0h1m2 0h2m3 0h1m2 0h2M2 38.5h1m1 0h3m1 0h1m5 0h3m5 0h2m1 0h1m2 0h1m2 0h1m2 0h5m1 0h1M2 39.5h1m1 0h3m1 0h1m1 0h4m2 0h1m1 0h2m1 0h1m2 0h3m1 0h1m1 0h1m2 0h2m3 0h2m1 0h1M2 40.5h1m1 0h3m1 0h1m1 0h2m1 0h3m2 0h5m3 0h3m3 0h1m1 0h1m2 0h1m3 0h2M2 41.5h1m5 0h1m2 0h3m3 0h4m1 0h4m2 0h1m1 0h1m3 0h1m3 0h2m1 0h1M2 42.5h7m1 0h1m1 0h1m2 0h2m1 0h1m1 0h1m2 0h2m2 0h1m1 0h1m2 0h4m4 0h2"/></svg>
+                <svg style="height:min(68vh,68vw);width:min(68vh,68vw);display:block;margin:0 auto;border-radius:18px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h45v45H0z"/><path stroke="#000000" d="M2 2.5h7m1 0h2m1 0h1m2 0h4m2 0h2m1 0h1m1 0h2m1 0h2m2 0h1m1 0h7M2 3.5h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m4 0h1m4 0h1m1 0h1m3 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m2 0h2m2 0h1m3 0h1m1 0h2m4 0h2m4 0h2m1 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m1 0h5m1 0h2m3 0h1m1 0h1m2 0h4m1 0h3m2 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m4 0h1m1 0h1m1 0h2m2 0h1m2 0h1m1 0h5m1 0h2m2 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m2 0h1m1 0h3m2 0h1m2 0h1m4 0h1m1 0h1m3 0h2m2 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 9.5h1m2 0h1m5 0h2m3 0h1m1 0h1m1 0h6M2 10.5h1m1 0h2m1 0h3m1 0h1m4 0h1m2 0h3m1 0h1m1 0h1m2 0h5m3 0h1m2 0h1m1 0h2M2 11.5h1m1 0h1m2 0h1m1 0h4m3 0h3m1 0h6m1 0h1m2 0h5m1 0h3m1 0h1m1 0h1M2 12.5h1m1 0h1m1 0h5m1 0h3m2 0h4m1 0h2m1 0h2m3 0h2m3 0h1m2 0h1m1 0h1M2 13.5h1m1 0h2m1 0h1m8 0h1m1 0h1m1 0h1m1 0h1m2 0h4m1 0h1m1 0h1m1 0h3m5 0h1M2 14.5h3m3 0h1m1 0h2m1 0h2m1 0h1m2 0h1m2 0h1m1 0h1m1 0h4m1 0h1m1 0h1m5 0h2M3 15.5h2m1 0h1m3 0h1m5 0h5m1 0h1m2 0h2m1 0h4m1 0h1m1 0h2m2 0h1m2 0h1M3 16.5h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h1m3 0h3m1 0h2m4 0h2m1 0h2m1 0h1m2 0h4M2 17.5h2m3 0h1m1 0h3m2 0h3m1 0h1m4 0h3m2 0h3m2 0h2m1 0h4M3 18.5h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1m1 0h3m1 0h3m3 0h3m3 0h1m3 0h1M2 19.5h5m3 0h4m1 0h1m2 0h1m4 0h4m2 0h1m5 0h1m1 0h1m2 0h1M3 20.5h1m4 0h3m2 0h2m2 0h1m2 0h1m3 0h1m3 0h2m2 0h1m2 0h2m1 0h2m1 0h1M3 21.5h3m3 0h1m1 0h3m1 0h1m2 0h3m2 0h1m1 0h2m1 0h1m1 0h3m4 0h1m1 0h4M3 22.5h2m1 0h1m1 0h1m1 0h2m1 0h4m1 0h1m2 0h2m2 0h1m1 0h1m2 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1M4 23.5h1m2 0h1m1 0h3m2 0h1m1 0h3m2 0h3m1 0h1m4 0h4m2 0h3m2 0h2M4 24.5h1m1 0h1m1 0h1m3 0h3m2 0h2m4 0h1m1 0h1m1 0h1m3 0h1m2 0h2m1 0h1m3 0h1M2 25.5h1m2 0h1m4 0h1m3 0h1m1 0h1m1 0h1m1 0h1m4 0h1m1 0h2m1 0h1m1 0h1m3 0h4m1 0h1M3 26.5h1m3 0h3m1 0h3m1 0h5m2 0h1m1 0h1m1 0h3m2 0h1m3 0h1m4 0h1m1 0h1M3 27.5h4m2 0h1m4 0h2m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m2 0h2m1 0h1m2 0h4M6 28.5h1m1 0h1m4 0h1m1 0h2m2 0h1m1 0h1m2 0h1m1 0h3m1 0h5m1 0h2m1 0h1m1 0h2M4 29.5h2m4 0h2m2 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h3m2 0h2m1 0h1m1 0h2M3 30.5h1m4 0h2m2 0h1m1 0h1m1 0h1m5 0h9m2 0h3m2 0h2m2 0h1M3 31.5h2m5 0h3m2 0h1m1 0h3m1 0h2m1 0h1m4 0h1m1 0h1m2 0h2m1 0h1m4 0h1M2 32.5h1m1 0h2m1 0h3m1 0h1m4 0h1m2 0h1m1 0h1m5 0h3m4 0h7M4 33.5h4m1 0h1m2 0h1m2 0h1m1 0h1m1 0h1m1 0h1m2 0h2m5 0h1m1 0h2m1 0h7M3 34.5h2m2 0h2m5 0h1m1 0h1m2 0h2m1 0h2m3 0h15M10 35.5h2m1 0h2m4 0h3m1 0h3m1 0h1m2 0h5m3 0h1m3 0h1M2 36.5h7m1 0h1m1 0h1m1 0h4m2 0h1m1 0h1m2 0h3m2 0h1m1 0h3m1 0h1m1 0h1m1 0h2M2 37.5h1m5 0h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h2m7 0h1m2 0h2m3 0h1m2 0h2M2 38.5h1m1 0h3m1 0h1m5 0h3m5 0h2m1 0h1m2 0h1m2 0h1m2 0h5m1 0h1M2 39.5h1m1 0h3m1 0h1m1 0h4m2 0h1m1 0h2m1 0h1m2 0h3m1 0h1m1 0h1m2 0h2m3 0h2m1 0h1M2 40.5h1m1 0h3m1 0h1m1 0h2m1 0h3m2 0h5m3 0h3m3 0h1m1 0h1m2 0h1m3 0h2M2 41.5h1m5 0h1m2 0h3m3 0h4m1 0h4m2 0h1m1 0h1m3 0h1m3 0h2m1 0h1M2 42.5h7m1 0h1m1 0h1m2 0h2m1 0h1m1 0h1m2 0h2m2 0h1m1 0h1m2 0h4m4 0h2"/></svg>
             </div></div></div>
         </div>
 
@@ -617,6 +719,7 @@
             var wrap = el.querySelector('.fit-wrap');
             if (!inner || !wrap) return;
             wrap.style.transform = 'none';
+            if (document.documentElement.classList.contains('m')) return;   // mobile layout scrolls instead of scaling
             var cs = window.getComputedStyle(inner);
             var availW = inner.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
             var availH = inner.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
@@ -1032,6 +1135,25 @@
             document.body.appendChild(h);
             setTimeout(function () { h.remove(); }, 9000);
         }
+    })();
+    </script>
+    <script>
+    /* ===== Mobile layout switch + scroll reset ===== */
+    (function () {
+        var root = document.documentElement;
+        function setMode() {
+            var w = window.innerWidth, h = window.innerHeight;
+            var m = w <= 820 || h <= 500;
+            root.classList.toggle('m', m);
+            root.classList.toggle('md', m && w > 520);
+        }
+        function refit() { var el = document.getElementById(slideOrder[currentIndex]); if (el) fitSlide(el); }
+        setMode();
+        window.addEventListener('resize', function () { setMode(); refit(); });
+        window.addEventListener('orientationchange', function () { setTimeout(function () { setMode(); refit(); }, 300); });
+        var base = renderSlide;
+        renderSlide = function () { base(); var s = document.querySelector('.slide.active'); if (s) s.scrollTop = 0; };
+        refit();
     })();
     </script>
 </body>
