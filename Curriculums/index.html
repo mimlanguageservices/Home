@@ -275,6 +275,106 @@
       border-color: #3b82f6;
     }
 
+    /* ── Carousel of choice cards ── */
+    .grid { max-width: 1100px; }
+
+    .carousel {
+      position: relative;
+      width: 100%;
+    }
+
+    .carousel-track {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+      justify-content: center;
+      padding: 0.6rem 1rem 2rem;
+    }
+
+    .carousel .choice-card {
+      flex: none;
+      width: 220px;
+      height: 280px;
+      padding: 1.4rem 1rem;
+      border: none;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(145deg, var(--c1), var(--c2));
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+    }
+
+    /* soft decorative circles */
+    .carousel .choice-card::before,
+    .carousel .choice-card::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+    }
+    .carousel .choice-card::before { width: 170px; height: 170px; top: -60px; right: -60px; }
+    .carousel .choice-card::after  { width: 120px; height: 120px; bottom: -40px; left: -40px; }
+
+    .carousel .choice-card:hover {
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.25);
+    }
+
+    /* custom picture cards: image fills the card, label sits on a dark strip */
+    .carousel .choice-card.has-image {
+      background-image: var(--img);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      justify-content: flex-end;
+    }
+    .carousel .choice-card.has-image.img-contain {
+      background-size: contain;
+      background-color: #fff;
+    }
+    .carousel .choice-card.has-image::before { display: none; }
+    .carousel .choice-card.has-image::after {
+      inset: auto 0 0 0;
+      width: auto;
+      height: 45%;
+      border-radius: 0;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0));
+    }
+    .carousel .choice-card.has-image .card-icon { display: none; }
+
+    .carousel .card-icon {
+      font-size: 4.6rem;
+      line-height: 1;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.25));
+      position: relative;
+      z-index: 1;
+    }
+
+    .carousel .card-label {
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.25;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 720px) {
+      .carousel .choice-card { width: 180px; height: 240px; }
+      .carousel-track { gap: 1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .carousel .choice-card { transition: none; }
+    }
+
     /* ── Lesson row (final level) ── */
     .topic-row {
       background: #ffffff;
@@ -968,14 +1068,7 @@
 
       if (!path.grade) {
         const grades = uniqueSorted(entries.map(e => e.grade));
-        grades.forEach(g => {
-          const card = document.createElement('div');
-          card.className = 'choice-card';
-          card.textContent = g;
-          card.onclick = () => { path.grade = g; path.subject = null; path.book = null; render(); };
-          grid.appendChild(card);
-        });
-        grid.style.display = 'flex';
+        renderCarousel(grid, grades, g => { path.grade = g; path.subject = null; path.book = null; render(); });
         return;
       }
 
@@ -983,14 +1076,7 @@
         const subjects = uniqueSorted(
           entries.filter(e => e.grade === path.grade).map(e => e.subject)
         );
-        subjects.forEach(s => {
-          const card = document.createElement('div');
-          card.className = 'choice-card';
-          card.textContent = s;
-          card.onclick = () => { path.subject = s; path.book = null; render(); };
-          grid.appendChild(card);
-        });
-        grid.style.display = 'flex';
+        renderCarousel(grid, subjects, s => { path.subject = s; path.book = null; render(); });
         return;
       }
 
@@ -998,14 +1084,7 @@
         const books = uniqueSorted(
           entries.filter(e => e.grade === path.grade && e.subject === path.subject).map(e => e.book)
         );
-        books.forEach(b => {
-          const card = document.createElement('div');
-          card.className = 'choice-card';
-          card.textContent = b;
-          card.onclick = () => { path.book = b; render(); };
-          grid.appendChild(card);
-        });
-        grid.style.display = 'flex';
+        renderCarousel(grid, books, b => { path.book = b; render(); });
         return;
       }
 
@@ -1057,6 +1136,83 @@
       });
 
       topicsList.style.display = 'flex';
+    }
+
+    // ── Carousel cards: emoji + gradient picked from the label (no image downloads) ──
+    const CARD_THEMES = [
+      ['toefl', '🎓'], ['ielts', '🌐'], ['impact', '💥'], ['oral', '🗣️'], ['speaking', '🎤'],
+      ['listening', '🎧'], ['writing', '✍️'], ['reading', '📖'], ['real world', '🌍'],
+      ['grammar', '📝'], ['vocab', '🔠'], ['phonics', '🔤'], ['math', '➗'], ['science', '🔬'],
+      ['social', '🌎'], ['art', '🎨'], ['music', '🎵'], ['conversation', '💬'], ['business', '💼'],
+      ['explorer', '🧭'], ['english', '🇬🇧'], ['grade', '🏫'],
+    ];
+
+    // Custom pictures by label (lowercase). Falls back to emoji + gradient if the image fails to load.
+    const CARD_IMAGES = {
+      'real world english': { url: 'https://i.pinimg.com/474x/64/49/dd/6449dda31452870e898a43c862ddc291.jpg?nii=t' },
+      'great writing': { url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe3BzvURdCaHJnxhIdlboGuG1ON5WboXTO7nzg8W6ezw&s=10' },
+      'impact 4': { url: 'https://m.media-amazon.com/images/I/61DvKUVklPL._AC_UF1000,1000_QL80_.jpg' },
+      'oral english': { url: 'https://img.magnific.com/premium-vector/concept-learning-italian-italian-language-course-language-school_677161-718.jpg?semt=ais_hybrid&w=740&q=80' },
+      'reading explorer': { url: 'https://images.cdn2.buscalibre.com/fit-in/360x360/89/ff/89ffc22cf43b98ff0e136abbcdb09cbe.jpg' },
+      'toefl junior': { url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHDOvemcPVpziH08HiaOsdU-px4_fe_wK12fMm8MmRLA&s=10' },
+      'virtues': { url: 'https://study.com/cimages/multimages/16/choice_theory_infographic_450pxe19f08ea-0932-48be-a71f-1c6977c49e55.png', fit: 'contain' },
+    };
+
+    function applyCardImage(card, label) {
+      // Prefix match, so "Reading Explorer 2" also picks up the "reading explorer" picture
+      const l = label.trim().toLowerCase();
+      const key = Object.keys(CARD_IMAGES).find(k => l === k || l.startsWith(k + ' '));
+      const img = key && CARD_IMAGES[key];
+      if (!img) return;
+      const probe = new Image();
+      probe.onload = () => {
+        card.style.setProperty('--img', `url("${img.url}")`);
+        card.classList.add('has-image');
+        if (img.fit === 'contain') card.classList.add('img-contain');
+      };
+      probe.src = img.url;
+    }
+
+    function cardTheme(label) {
+      const l = label.toLowerCase();
+      const hit = CARD_THEMES.find(([k]) => l.includes(k));
+      let h = 0;
+      for (let i = 0; i < label.length; i++) h = (h * 31 + label.charCodeAt(i)) % 360;
+      return {
+        icon: hit ? hit[1] : (/^\d+/.test(l) ? '🏫' : '📚'),
+        c1: `hsl(${h}, 75%, 58%)`,
+        c2: `hsl(${(h + 40) % 360}, 70%, 42%)`,
+      };
+    }
+
+    function renderCarousel(container, labels, onPick) {
+      container.innerHTML = '';
+
+      const wrap = document.createElement('div');
+      wrap.className = 'carousel';
+      const track = document.createElement('div');
+      track.className = 'carousel-track';
+
+      labels.forEach(label => {
+        const t = cardTheme(label);
+        const card = document.createElement('div');
+        card.className = 'choice-card';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.style.setProperty('--c1', t.c1);
+        card.style.setProperty('--c2', t.c2);
+        card.innerHTML = '<div class="card-icon"></div><div class="card-label"></div>';
+        card.querySelector('.card-icon').textContent = t.icon;
+        card.querySelector('.card-label').textContent = label;
+        applyCardImage(card, label);
+        card.onclick = () => onPick(label);
+        card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPick(label); } };
+        track.appendChild(card);
+      });
+
+      wrap.appendChild(track);
+      container.appendChild(wrap);
+      container.style.display = 'flex';
     }
 
     function renderBreadcrumb() {
