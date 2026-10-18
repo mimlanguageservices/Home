@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TOEFL Junior Listening - MIM Language Services</title>
+    <title>TOEFL Junior Listening - Rochester</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -67,6 +67,7 @@
         <div class="card" id="card"></div>
     </div>
 
+    <script src="data/badges.js"></script>
     <script src="audio/listening-data.js"></script>
     <script>
         const items = window.LISTENING || [];
@@ -206,6 +207,7 @@
             const c = correctCount(), t = qCount();
             if (mode === 'practice' && answeredCount() === t) save('listening:set1', c, t);
             document.getElementById('card').innerHTML = `<div class="result"><div>Your score</div><strong>${c} / ${t}</strong>
+                ${mode === 'test' && finished ? tjBadgeHtml(c, t) : ''}
                 <p>${answeredCount() < t ? 'You have ' + (t - answeredCount()) + ' unanswered question(s).' : (c === t ? 'Perfect!' : 'Review the items to see the transcripts and explanations.')}</p></div>
                 <div class="actions"><button class="btn ghost" id="review">Review items</button><button class="btn" id="restart">Start over</button></div>`;
             renderTabs();

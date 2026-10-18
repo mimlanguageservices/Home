@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Language Form &amp; Meaning - TOEFL Junior</title>
+    <title>Language Form &amp; Meaning - Rochester</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -68,6 +68,7 @@
 <div class="sheet" id="sheet"><div class="sheet-inner" id="sheetInner"></div></div>
 <div class="bar" id="bar"></div>
 
+<script src="data/badges.js"></script>
 <script src="data/language-texts.js"></script>
 <script>
     const texts = window.LANGUAGE_TEXTS;
@@ -127,7 +128,7 @@
         }
         if (submitted) {
             const t = totals();
-            html += `<div class="result"><div>Your score</div><strong>${t.c} / ${t.n}</strong><div>Tap any blank to see the explanation.</div></div>`;
+            html += `<div class="result"><div>Your score</div><strong>${t.c} / ${t.n}</strong>${mode === 'test' ? tjBadgeHtml(t.c, t.n) : ''}<div>Tap any blank to see the explanation.</div></div>`;
         }
         html += `<div class="modes"><button class="mode ${mode === 'practice' ? 'on' : ''}" data-m="practice"><b>Practice mode</b><span>Instant feedback on every blank</span></button><button class="mode ${mode === 'test' ? 'on' : ''}" data-m="test"><b>Timed test mode</b><span>All 7 texts, ${TEST_MINUTES} minutes, no feedback until you submit</span></button></div>`;
         html += `<h2>${tx.title}</h2><div class="kind">Text ${cur + 1} of ${texts.length} &middot; ${tx.kind}</div>`;

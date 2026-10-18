@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <title>TOEFL Junior Prep - MIM Language Services</title>
+    <title>TOEFL Junior Prep - Rochester</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,8 +29,6 @@
         .level-name { font-size: 1.7rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
         .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
         .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
-        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
-        .powered-by a:hover { color: #fff; }
 
         /* MAIN APP */
         .app-container { display: flex; flex-direction: column; height: 100vh; height: 100dvh; opacity: 0; transition: opacity 0.2s ease; }
@@ -45,9 +43,7 @@
         .current-level-badge.language { background: rgba(34, 211, 238, 0.2); color: #155e75; }
         .current-level-badge:hover { transform: scale(1.05); }
         .header-right { display: flex; align-items: center; gap: 15px; }
-        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
-        .header .website a:hover { color: #553c9a; }
-        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .header-image { height: 74px; width: auto; object-fit: contain; }
         .main-container { display: flex; flex: 1; height: calc(100dvh - 95px); flex: 1; min-height: 0; position: relative; overflow: hidden; }
         .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); }
         .section { display: none; flex: 1; padding: 40px 40px calc(40px + env(safe-area-inset-bottom)); overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; height: 100%; }
@@ -103,8 +99,7 @@
             .level-desc { font-size: 0.85rem; }
             .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
             .header h1 { font-size: 1.1rem; }
-            .header-image { width: 60px; height: 40px; }
-            .header .website { display: none; }
+            .header-image { height: 46px; width: auto; }
             .powered-by { display: none; }
             .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
             .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
@@ -139,7 +134,7 @@
                 </div>
             </div>
         </div>
-        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+        <div class="powered-by">Rochester &middot; Chía</div>
     </div>
 
     <!-- MAIN APPLICATION -->
@@ -156,8 +151,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
-                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+                <img src="img/rochester-logo.png" alt="Rochester School logo" class="header-image">
             </div>
         </div>
 
@@ -184,6 +178,7 @@
         </div>
     </div>
 
+    <script src="data/badges.js"></script>
     <script src="data/reading-data.js"></script>
     <script src="data/reading-data-2.js"></script>
     <script src="data/language-data.js"></script>
@@ -234,7 +229,7 @@
         const isTest = t => /[?&]test=1/.test(t.href);
         function cardHtml(t, name) {
             const p = progress()[t.key];
-            return `<a class="test-link-card" href="${t.href}"><div><div class="tlc-name">${name || t.name}</div><div class="tlc-meta">${t.meta}</div></div><div class="tlc-arrow">${p ? '<span class="tlc-score">&#10003; ' + p.c + '/' + p.t + '</span> ' : ''}&#8594;</div></a>`;
+            return `<a class="test-link-card" href="${t.href}"><div><div class="tlc-name">${name || t.name}</div><div class="tlc-meta">${t.meta}</div></div><div class="tlc-arrow">${p ? '<span class="tlc-score">&#10003; ' + p.c + '/' + p.t + '</span> ' + (/:test$/.test(t.key) ? tjBadgeMini(p.c, p.t) + ' ' : '') : ''}&#8594;</div></a>`;
         }
         function fill(id, list, nameFn, emptyMsg) {
             const el = document.getElementById(id);

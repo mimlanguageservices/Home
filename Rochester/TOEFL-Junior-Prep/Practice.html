@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TOEFL Junior Practice - MIM Language Services</title>
+    <title>TOEFL Junior Practice - Rochester</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -60,6 +60,7 @@
     <div class="stage" id="stage"></div>
 </div>
 
+<script src="data/badges.js"></script>
 <script src="data/reading-data.js"></script>
 <script src="data/reading-data-2.js"></script>
 <script src="data/language-data.js"></script>
@@ -132,7 +133,7 @@
         const hasText = mod === 'reading';
         let q = '';
         if (testMode && submitted && cur === 0 && !st.shownTop) {}
-        if (testMode && submitted) q += `<div class="result"><div>Your test score</div><strong>${totalCorrect()} / ${totalQ()}</strong><div>Review each text to see explanations.</div></div>`;
+        if (testMode && submitted) q += `<div class="result"><div>Your test score</div><strong>${totalCorrect()} / ${totalQ()}</strong>${tjBadgeHtml(totalCorrect(), totalQ())}<div>Review each text to see explanations.</div></div>`;
         items.forEach((it, i) => {
             const ch = st.answers[i];
             q += `<div class="q">${it.type ? `<span class="qtype">${it.type}</span>` : ''}<div class="q-text">${i + 1}. ${it.q.replace(/____/g, '&#95;&#95;&#95;&#95;&#95;')}</div>`;
