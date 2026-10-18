@@ -356,6 +356,12 @@
       z-index: 1;
     }
 
+    .carousel .card-icon.card-num {
+      font-size: 9rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
     .carousel .card-label {
       font-size: 1.15rem;
       font-weight: 700;
@@ -1202,7 +1208,10 @@
         card.style.setProperty('--c1', t.c1);
         card.style.setProperty('--c2', t.c2);
         card.innerHTML = '<div class="card-icon"></div><div class="card-label"></div>';
-        card.querySelector('.card-icon').textContent = t.icon;
+        const icon = card.querySelector('.card-icon');
+        const gradeNum = label.match(/^(\d+)(?:st|nd|rd|th)?\s*grade/i);
+        icon.textContent = gradeNum ? gradeNum[1] : t.icon;
+        if (gradeNum) icon.classList.add('card-num');
         card.querySelector('.card-label').textContent = label;
         applyCardImage(card, label);
         card.onclick = () => onPick(label);
