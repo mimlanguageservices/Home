@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Listening Section 1 - IELTS Prep</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #eef0fa; height: 100vh; overflow: hidden; color: #2d3748; }
+
+        .app { display: flex; height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar { width: 280px; background: rgba(45, 55, 72, 0.98); color: #e2e8f0; display: flex; flex-direction: column; flex-shrink: 0; transition: margin-left 0.3s ease; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-back { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; margin-bottom: 12px; transition: color 0.2s; }
+        .sidebar-back:hover { color: #fff; }
+        .sidebar-title { font-size: 1rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #fff; }
+        .sidebar-sub { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+        .test-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .test-item { padding: 14px 16px; margin: 6px 0; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.9rem; transition: all 0.25s ease; background: rgba(255,255,255,0.05); }
+        .test-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-weight: 600; }
+        .test-item.locked { opacity: 0.4; cursor: not-allowed; }
+        .test-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,0.15); flex-shrink: 0; }
+        .test-item.active .test-badge { background: rgba(255,255,255,0.25); }
+
+        /* MAIN */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .topbar { background: #fff; padding: 14px 30px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.06); z-index: 10; flex-wrap: wrap; gap: 10px; }
+        .topbar-left { display: flex; align-items: center; gap: 14px; }
+        .sidebar-toggle { display: none; width: 38px; height: 38px; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-size: 1.1rem; cursor: pointer; }
+        .topbar h1 { font-size: 1.15rem; font-weight: 700; color: #2d3748; }
+        .topbar-right { display: flex; align-items: center; gap: 20px; }
+        .timer { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #4c51bf; font-size: 1rem; background: #eef0fd; padding: 6px 14px; border-radius: 20px; }
+        .timer-controls { display: flex; gap: 6px; }
+        .timer-btn { width: 34px; height: 34px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .timer-btn:hover:not(:disabled) { transform: scale(1.08); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35); }
+        .timer-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .flag-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: #fdf2f2; color: #e53e3e; font-size: 1rem; cursor: pointer; transition: all 0.2s; }
+        .flag-btn:hover { background: #fed7d7; }
+
+        .content-scroll { flex: 1; overflow-y: auto; padding: 30px 40px 140px; }
+        .question-group { max-width: 850px; margin: 0 auto 40px; }
+        .q-range { font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
+        .q-instructions { font-style: italic; color: #4a5568; margin-bottom: 4px; }
+        .q-instructions strong { font-style: normal; }
+
+        .note-box { border: 2px solid #2d3748; border-radius: 4px; margin-top: 18px; overflow: hidden; }
+        .note-title { text-align: center; font-weight: 700; letter-spacing: 0.5px; padding: 14px; border-bottom: 2px solid #2d3748; background: #f7f8fc; }
+        .note-row { display: grid; grid-template-columns: 160px 1fr; gap: 14px; padding: 12px 20px; border-bottom: 1px solid #cbd5e0; align-items: baseline; }
+        .note-row:last-child { border-bottom: none; }
+        .note-row.example { background: #f7f8fc; font-style: italic; }
+        .note-row .label { font-weight: 700; }
+        .note-row .value { color: #2d3748; }
+        .note-row .value u { text-decoration: underline; }
+        .trip-heading { padding: 10px 20px 0; font-weight: 700; }
+        .trip-list { padding: 4px 20px 14px 44px; }
+        .trip-list li { margin: 8px 0; line-height: 1.6; }
+
+        .blank-cluster { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; position: relative; margin: 0 2px; }
+        .hint-btn { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1px solid #cbd5e0; cursor: pointer; font-size: 0.8rem; line-height: 1; padding: 0; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); opacity: 0.85; transition: all 0.2s; }
+        .hint-btn:hover { opacity: 1; transform: scale(1.12); border-color: #a5b4fc; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25); }
+        .hint-btn.active { opacity: 1; background: #eef0fd; border-color: #667eea; }
+        .btn-row { display: flex; gap: 4px; margin-bottom: 4px; }
+        .btn-row .hint-btn { margin-bottom: 0; }
+        .audio-jump-btn { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1px solid #cbd5e0; cursor: pointer; font-size: 0.75rem; line-height: 1; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); opacity: 0.85; transition: all 0.2s; }
+        .audio-jump-btn:hover { opacity: 1; transform: scale(1.12); border-color: #4ade80; box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3); }
+        .audio-jump-btn.active { opacity: 1; background: #eafaf0; border-color: #38a169; }
+        .hint-popup { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #2d3748; color: #fff; font-size: 0.78rem; padding: 8px 12px; border-radius: 8px; white-space: nowrap; margin-bottom: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); z-index: 40; display: none; }
+        .hint-popup::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #2d3748; }
+        .hint-popup.visible { display: block; }
+        .blank-wrap { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+        .blank-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #cbd5e0; color: #2d3748; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+        .blank-input { border: none; border-bottom: 2px dotted #718096; background: transparent; font-family: inherit; font-size: 1rem; padding: 2px 4px; width: 150px; outline: none; transition: all 0.2s; }
+        .blank-input:focus { border-bottom-color: #667eea; background: #f7f8fc; }
+        .blank-input.correct { border-bottom: 2px solid #38a169; background: rgba(56, 161, 105, 0.08); color: #276749; font-weight: 600; }
+        .blank-input.incorrect { border-bottom: 2px solid #e53e3e; background: rgba(229, 62, 62, 0.08); color: #c53030; }
+        .answer-reveal { font-size: 0.85rem; color: #276749; margin-left: 6px; font-weight: 600; }
+
+        .ielts-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.95rem; }
+        .ielts-table th, .ielts-table td { border: 1px solid #cbd5e0; padding: 12px 14px; text-align: left; vertical-align: top; }
+        .ielts-table th { background: #2d3748; color: #fff; font-weight: 600; }
+        .ielts-table td:first-child { font-weight: 700; }
+        .ielts-table ul { padding-left: 18px; }
+        .ielts-table li { margin: 4px 0; }
+
+        .actions-row { max-width: 850px; margin: 0 auto; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .btn { border: none; padding: 14px 32px; border-radius: 25px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.25s ease; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #edf2f7; color: #4a5568; }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        /* BOTTOM PROGRESS PANEL */
+        .progress-panel { position: fixed; left: 280px; right: 0; bottom: 0; background: #fff; border-top: 1px solid #e2e8f0; padding: 14px 30px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 20; transition: left 0.3s ease; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+        .progress-left { flex: 1; min-width: 260px; }
+        .progress-summary { display: flex; align-items: center; gap: 20px; margin-bottom: 10px; flex-wrap: wrap; font-size: 0.85rem; }
+        .legend-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; }
+        .legend-dot.green { background: #38a169; } .legend-dot.red { background: #e53e3e; } .legend-dot.gray { background: #cbd5e0; }
+        .dots-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .progress-audio { flex-shrink: 0; }
+        .progress-audio audio { width: 280px; max-width: 100%; height: 36px; }
+        .q-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #e2e8f0; background: #fff; color: #4a5568; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .q-dot.unanswered { border-color: #cbd5e0; }
+        .q-dot.correct { background: #38a169; border-color: #38a169; color: #fff; }
+        .q-dot.incorrect { background: #e53e3e; border-color: #e53e3e; color: #fff; }
+
+        @media (max-width: 900px) {
+            .sidebar { position: fixed; left: -280px; top: 0; height: 100vh; z-index: 100; }
+            .sidebar.open { left: 0; }
+            .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+            .progress-panel { left: 0; }
+            .content-scroll { padding: 20px 16px 160px; }
+            .note-row { grid-template-columns: 1fr; gap: 4px; }
+            .blank-input { width: 120px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a class="sidebar-back" href="IELTS-Prep.html">&#8592; Back to Modules</a>
+            <div class="sidebar-title">Listening</div>
+            <div class="sidebar-sub">Practice Tests</div>
+        </div>
+        <div class="test-list">
+            <div class="test-item active">
+                <span>Section 1: Self-Drive Tours in the USA</span>
+                <span class="test-badge" id="sidebarProgress">0%</span>
+            </div>
+            <div class="test-item locked"><span>Section 2: Coming soon</span></div>
+            <div class="test-item locked"><span>Section 3: Coming soon</span></div>
+            <div class="test-item locked"><span>Section 4: Coming soon</span></div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
+                <h1>Listening Section 1 &mdash; Self-Drive Tours in the USA</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="timer">&#9201;&#65039; <span id="timerText">00:00</span></div>
+                <div class="timer-controls">
+                    <button class="timer-btn" id="timerStartBtn" onclick="startTimer()" title="Start">&#9654;&#65039;</button>
+                    <button class="timer-btn" id="timerPauseBtn" onclick="pauseTimer()" title="Pause" disabled>&#9208;&#65039;</button>
+                    <button class="timer-btn" id="timerResetBtn" onclick="resetTimer()" title="Reset">&#8635;</button>
+                </div>
+                <button class="flag-btn" title="Flag for review">&#9873;&#65039;</button>
+            </div>
+        </div>
+
+        <div class="content-scroll">
+
+            <div class="question-group">
+                <div class="q-range">Questions 1&ndash;6</div>
+                <p class="q-instructions">Complete the notes below.</p>
+                <p class="q-instructions"><strong>Write ONE WORD for each answer.</strong></p>
+
+                <div class="note-box">
+                    <div class="note-title">SELF-DRIVE TOURS IN THE USA</div>
+
+                    <div class="note-row example">
+                        <div class="label">Example</div>
+                        <div class="value"></div>
+                    </div>
+                    <div class="note-row">
+                        <div class="label">Name:</div>
+                        <div class="value">Andrea <u>Brown</u></div>
+                    </div>
+                    <div class="note-row">
+                        <div class="label">Address:</div>
+                        <div class="value">24 <span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(1, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(174, this)" title="Play audio from 2:54">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">1</span><input class="blank-input" data-q="1" autocomplete="off" spellcheck="false"></span><span class="hint-popup" id="hint-1">Listen for a street name.</span></span> Road</div>
+                    </div>
+                    <div class="note-row">
+                        <div class="label">Postcode:</div>
+                        <div class="value">BH5 2OP</div>
+                    </div>
+                    <div class="note-row">
+                        <div class="label">Phone:</div>
+                        <div class="value">(mobile) 077 8664 3091</div>
+                    </div>
+                    <div class="note-row">
+                        <div class="label">Heard about company from:</div>
+                        <div class="value"><span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(2, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(213, this)" title="Play audio from 3:33">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">2</span><input class="blank-input" data-q="2" autocomplete="off" spellcheck="false"></span><span class="hint-popup" id="hint-2">Listen for where she found out about the company.</span></span></div>
+                    </div>
+
+                    <div class="trip-heading">Possible self-drive tours</div>
+                    <div class="trip-heading" style="font-weight:600; padding-top:10px;">Trip One:</div>
+                    <ul class="trip-list">
+                        <li>Los Angeles: customer wants to visit some <span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(3, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(235, this)" title="Play audio from 3:55">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">3</span><input class="blank-input" data-q="3" autocomplete="off" spellcheck="false"></span><span class="hint-popup" id="hint-3">Listen for an adjective describing a type of park.</span></span> parks with her children</li>
+                        <li>Yosemite Park: customer wants to stay in a lodge, not a <span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(4, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(250, this)" title="Play audio from 4:10">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">4</span><input class="blank-input" data-q="4" autocomplete="off" spellcheck="false"></span><span class="hint-popup" id="hint-4">Listen for another type of accommodation.</span></span></li>
+                    </ul>
+                    <div class="trip-heading" style="font-weight:600;">Trip Two:</div>
+                    <ul class="trip-list" style="padding-bottom: 18px;">
+                        <li>Customer wants to see the <span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(5, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(270, this)" title="Play audio from 4:30">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">5</span><input class="blank-input" data-q="5" autocomplete="off" spellcheck="false"></span><span class="hint-popup" id="hint-5">Listen for a type of historic building.</span></span> on the way to Cambria</li>
+                        <li>At Santa Monica: not interested in shopping</li>
+                        <li>At San Diego, wants to spend time on the <span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(6, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(292, this)" title="Play audio from 4:52">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">6</span><input class="blank-input" data-q="6" autocomplete="off" spellcheck="false"></span><span class="hint-popup" id="hint-6">Listen for a place by the ocean.</span></span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="question-group">
+                <div class="q-range">Questions 7&ndash;10</div>
+                <p class="q-instructions">Complete the table below.</p>
+                <p class="q-instructions"><strong>Write ONE WORD AND/OR A NUMBER for each answer.</strong></p>
+
+                <table class="ielts-table">
+                    <thead>
+                        <tr><th></th><th>Number of days</th><th>Total distance</th><th>Price (per person)</th><th>Includes</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Trip One</td>
+                            <td>12 days</td>
+                            <td><span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(7, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(355, this)" title="Play audio from 5:55">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">7</span><input class="blank-input" data-q="7" autocomplete="off" spellcheck="false" style="width:80px;"></span><span class="hint-popup" id="hint-7">Listen for a number.</span></span> km</td>
+                            <td>&pound;525</td>
+                            <td><ul><li>accommodation</li><li>car</li><li>one <span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(8, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(370, this)" title="Play audio from 6:10">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">8</span><input class="blank-input" data-q="8" autocomplete="off" spellcheck="false" style="width:100px;"></span><span class="hint-popup" id="hint-8">Listen for a mode of transport.</span></span></li></ul></td>
+                        </tr>
+                        <tr>
+                            <td>Trip Two</td>
+                            <td>9 days</td>
+                            <td>980 km</td>
+                            <td>&pound;<span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(9, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(385, this)" title="Play audio from 6:25">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">9</span><input class="blank-input" data-q="9" autocomplete="off" spellcheck="false" style="width:80px;"></span><span class="hint-popup" id="hint-9">Listen for a price in pounds.</span></span></td>
+                            <td><ul><li>accommodation</li><li>car</li><li><span class="blank-cluster"><span class="btn-row"><button type="button" class="hint-btn" onclick="toggleHint(10, this)" title="Show hint">&#128161;</button><button type="button" class="audio-jump-btn" onclick="jumpToAudio(392, this)" title="Play audio from 6:32">&#128264;</button></span><span class="blank-wrap"><span class="blank-num">10</span><input class="blank-input" data-q="10" autocomplete="off" spellcheck="false" style="width:100px;"></span><span class="hint-popup" id="hint-10">Listen for a meal included in the price.</span></span></li></ul></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
+                <button class="btn btn-secondary" onclick="restartTest()">Restart</button>
+            </div>
+        </div>
+
+        <div class="progress-panel">
+            <div class="progress-left">
+                <div class="progress-summary">
+                    <span><span class="legend-dot green"></span><span id="correctCount">0</span> Correct</span>
+                    <span><span class="legend-dot red"></span><span id="incorrectCount">0</span> Incorrect</span>
+                    <span><span class="legend-dot gray"></span><span id="unansweredCount">10</span> Unanswered</span>
+                </div>
+                <div class="dots-row" id="dotsRow"></div>
+            </div>
+            <div class="progress-audio">
+                <audio controls id="listeningAudio">
+                    <source src="https://static.wixstatic.com/mp3/593d03_0ec60a26323c444d9ffd46ed091f37ff.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const answers = {
+        1: ["ardleigh"],
+        2: ["newspaper"],
+        3: ["theme"],
+        4: ["tent"],
+        5: ["castle"],
+        6: ["beach", "beaches"],
+        7: ["2020"],
+        8: ["flight"],
+        9: ["429"],
+        10: ["dinner"]
+    };
+    const totalQuestions = Object.keys(answers).length;
+    let elapsedSeconds = 0;
+    let timerInterval = null;
+
+    function renderTimer() {
+        const m = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+        const s = String(elapsedSeconds % 60).padStart(2, '0');
+        document.getElementById('timerText').textContent = `${m}:${s}`;
+    }
+
+    function startTimer() {
+        if (timerInterval) return;
+        timerInterval = setInterval(() => { elapsedSeconds++; renderTimer(); }, 1000);
+        document.getElementById('timerStartBtn').disabled = true;
+        document.getElementById('timerPauseBtn').disabled = false;
+    }
+
+    function pauseTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        document.getElementById('timerStartBtn').disabled = false;
+        document.getElementById('timerPauseBtn').disabled = true;
+    }
+
+    function resetTimer() {
+        pauseTimer();
+        elapsedSeconds = 0;
+        renderTimer();
+    }
+
+    function toggleHint(q, btn) {
+        const popup = document.getElementById(`hint-${q}`);
+        popup.classList.toggle('visible');
+        btn.classList.toggle('active');
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.blank-cluster')) {
+            document.querySelectorAll('.hint-popup.visible').forEach(p => p.classList.remove('visible'));
+            document.querySelectorAll('.hint-btn.active').forEach(b => b.classList.remove('active'));
+        }
+    });
+
+    function jumpToAudio(seconds, btn) {
+        const audio = document.getElementById('listeningAudio');
+        audio.currentTime = seconds;
+        audio.play();
+        document.querySelectorAll('.audio-jump-btn.active').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        startTimer();
+    }
+
+    function buildDots() {
+        const row = document.getElementById('dotsRow');
+        row.innerHTML = '';
+        for (let i = 1; i <= totalQuestions; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'q-dot unanswered';
+            dot.textContent = i;
+            dot.id = `dot-${i}`;
+            dot.onclick = () => {
+                const input = document.querySelector(`.blank-input[data-q="${i}"]`);
+                if (input) { input.scrollIntoView({ behavior: 'smooth', block: 'center' }); input.focus(); }
+            };
+            row.appendChild(dot);
+        }
+    }
+
+    function checkAnswers() {
+        let correct = 0, incorrect = 0, unanswered = 0;
+        document.querySelectorAll('.answer-reveal').forEach(el => el.remove());
+        for (let i = 1; i <= totalQuestions; i++) {
+            const input = document.querySelector(`.blank-input[data-q="${i}"]`);
+            const dot = document.getElementById(`dot-${i}`);
+            const val = input.value.trim().toLowerCase();
+            input.classList.remove('correct', 'incorrect');
+            dot.classList.remove('correct', 'incorrect', 'unanswered');
+            if (!val) {
+                unanswered++;
+                dot.classList.add('unanswered');
+                continue;
+            }
+            const isCorrect = answers[i].includes(val);
+            if (isCorrect) {
+                correct++;
+                input.classList.add('correct');
+                dot.classList.add('correct');
+            } else {
+                incorrect++;
+                input.classList.add('incorrect');
+                dot.classList.add('incorrect');
+                const reveal = document.createElement('span');
+                reveal.className = 'answer-reveal';
+                reveal.textContent = `Answer: ${answers[i][0]}`;
+                input.insertAdjacentElement('afterend', reveal);
+            }
+        }
+        document.getElementById('correctCount').textContent = correct;
+        document.getElementById('incorrectCount').textContent = incorrect;
+        document.getElementById('unansweredCount').textContent = unanswered;
+        document.getElementById('sidebarProgress').textContent = Math.round((correct / totalQuestions) * 100) + '%';
+        pauseTimer();
+    }
+
+    function restartTest() {
+        document.querySelectorAll('.blank-input').forEach(input => { input.value = ''; input.classList.remove('correct', 'incorrect'); });
+        document.querySelectorAll('.answer-reveal').forEach(el => el.remove());
+        buildDots();
+        document.getElementById('correctCount').textContent = 0;
+        document.getElementById('incorrectCount').textContent = 0;
+        document.getElementById('unansweredCount').textContent = totalQuestions;
+        document.getElementById('sidebarProgress').textContent = '0%';
+        resetTimer();
+    }
+
+    buildDots();
+    renderTimer();
+</script>
+</body>
+</html>

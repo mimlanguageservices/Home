@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>IELTS Prep - MIM Language Services</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; overflow: hidden; }
+
+        /* LOADING / MENU SCREEN */
+        .loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, rgba(26, 26, 46, 0.85) 0%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.85) 100%), url('https://upload.wikimedia.org/wikipedia/commons/e/e0/Trinity_College_Library%2C_Dublin%2C_Ireland_-_Diliff.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.8s ease, transform 0.8s ease; }
+        .loading-screen.hidden { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .game-title { font-size: 3.5rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 10px; text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); animation: titlePulse 3s ease-in-out infinite; }
+        .game-subtitle { font-size: 1.3rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 60px; letter-spacing: 2px; text-transform: uppercase; text-align: center; padding: 0 20px; }
+        @keyframes titlePulse { 0%, 100% { text-shadow: 0 0 30px rgba(102, 126, 234, 0.8), 0 0 60px rgba(118, 75, 162, 0.5); } 50% { text-shadow: 0 0 50px rgba(102, 126, 234, 1), 0 0 100px rgba(118, 75, 162, 0.8); } }
+        .level-select-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .select-prompt { font-size: 1.3rem; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px; animation: fadeInUp 1s ease 0.5s both; }
+        .level-cards { display: flex; gap: 30px; perspective: 1000px; flex-wrap: wrap; justify-content: center; max-width: 1000px; }
+        .level-card { width: 200px; height: 240px; background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; animation: cardFloat 3s ease-in-out infinite; backdrop-filter: blur(10px); }
+        .level-card:nth-child(1) { animation-delay: 0s; } .level-card:nth-child(2) { animation-delay: 0.4s; } .level-card:nth-child(3) { animation-delay: 0.8s; } .level-card:nth-child(4) { animation-delay: 1.2s; }
+        @keyframes cardFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .level-card:hover { transform: translateY(-15px) scale(1.05); }
+        .level-card.listening-card:hover { border-color: #818cf8; box-shadow: 0 20px 60px rgba(129, 140, 248, 0.4); }
+        .level-card.reading-card:hover { border-color: #4ade80; box-shadow: 0 20px 60px rgba(74, 222, 128, 0.4); }
+        .level-card.writing-card:hover { border-color: #f472b6; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.4); }
+        .level-card.speaking-card:hover { border-color: #fbbf24; box-shadow: 0 20px 60px rgba(251, 191, 36, 0.4); }
+        .level-icon { font-size: 3rem; margin-bottom: 15px; }
+        .listening-card .level-icon { color: #818cf8; } .reading-card .level-icon { color: #4ade80; } .writing-card .level-icon { color: #f472b6; } .speaking-card .level-icon { color: #fbbf24; }
+        .level-name { font-size: 1.7rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .level-desc { font-size: 1rem; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 0 15px; }
+        .powered-by { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; }
+        .powered-by a { color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: color 0.3s; }
+        .powered-by a:hover { color: #fff; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* MAIN APP */
+        .app-container { display: flex; flex-direction: column; height: 100vh; opacity: 0; transition: opacity 0.5s ease 0.3s; }
+        .app-container.visible { opacity: 1; }
+        .header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); position: relative; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .menu-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .menu-toggle span { width: 22px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s ease; }
+        .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+        .header-title { display: flex; flex-direction: column; }
+        .header h1 { color: #2d3748; font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .current-level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 4px; cursor: pointer; transition: all 0.3s ease; }
+        .current-level-badge.listening { background: rgba(129, 140, 248, 0.2); color: #3730a3; }
+        .current-level-badge.reading { background: rgba(74, 222, 128, 0.2); color: #166534; }
+        .current-level-badge.writing { background: rgba(244, 114, 182, 0.2); color: #9d174d; }
+        .current-level-badge.speaking { background: rgba(251, 191, 36, 0.2); color: #92400e; }
+        .current-level-badge:hover { transform: scale(1.05); }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .header .website a { color: #4c51bf; text-decoration: none; font-size: 1rem; font-weight: 500; transition: color 0.3s ease; }
+        .header .website a:hover { color: #553c9a; }
+        .header-image { width: 100px; height: 65px; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .main-container { display: flex; flex: 1; height: calc(100vh - 95px); position: relative; overflow: hidden; }
+        .navigation { width: 280px; background: rgba(45, 55, 72, 0.98); backdrop-filter: blur(10px); padding: 30px 20px; border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: -280px; top: 0; height: 100%; z-index: 50; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 30px rgba(0, 0, 0, 0.3); }
+        .navigation.open { left: 0; }
+        .nav-item { padding: 16px 24px; margin: 8px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #e2e8f0; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; font-weight: 500; font-size: 1.1rem; backdrop-filter: blur(5px); }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .nav-item.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; border-color: transparent; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3); }
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 40; }
+        .nav-overlay.visible { opacity: 1; visibility: visible; }
+        .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .section { display: none; flex: 1; padding: 40px; overflow-y: auto; height: 100%; }
+        .section.active { display: flex; flex-direction: column; }
+        .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
+        .placeholder-panel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; }
+        .placeholder-icon { font-size: 4rem; }
+        .placeholder-panel h3 { font-size: 1.6rem; color: #2d3748; font-weight: 600; }
+        .placeholder-panel p { max-width: 500px; color: #4a5568; font-size: 1.05rem; line-height: 1.7; }
+        .test-link-list { display: flex; flex-direction: column; gap: 14px; padding: 0; width: 100%; max-width: 600px; margin: 0 auto; align-self: center; }
+        .test-link-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; text-decoration: none; color: #2d3748; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.25s ease; }
+        .test-link-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2); border-color: #a5b4fc; }
+        .test-link-card .tlc-name { font-weight: 600; font-size: 1.05rem; }
+        .test-link-card .tlc-meta { font-size: 0.85rem; color: #a0aec0; margin-top: 4px; }
+        .test-link-card .tlc-arrow { font-size: 1.3rem; color: #667eea; }
+
+        @media (max-width: 768px) {
+            body { overflow-x: hidden; touch-action: pan-y; }
+            .header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 10px 15px; }
+            .app-container { padding-top: 60px; }
+            .loading-screen { padding: 20px; }
+            .game-title { font-size: 2rem; padding: 0 10px; }
+            .game-subtitle { font-size: 1rem; display: block; }
+            .level-cards { flex-direction: column; gap: 15px; }
+            .level-card { width: 220px; height: 150px; }
+            .level-icon { font-size: 2rem; margin-bottom: 8px; }
+            .level-name { font-size: 1.4rem; }
+            .level-desc { font-size: 0.85rem; }
+            .select-prompt { font-size: 1.1rem; margin-bottom: 20px; }
+            .header h1 { font-size: 1.1rem; }
+            .header-image { width: 60px; height: 40px; }
+            .header .website { display: none; }
+            .powered-by { display: none; }
+            .menu-toggle { width: 40px; height: 40px; }
+            .current-level-badge { font-size: 0.75rem; padding: 3px 8px; }
+            .navigation { width: 100%; left: -100%; }
+            .main-container { height: auto; min-height: calc(100vh - 70px); overflow-y: auto; }
+            .section { padding: 15px; }
+            .section h2 { font-size: 1.5rem; margin-bottom: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOADING / MENU SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="game-title">IELTS Prep</h1>
+        <p class="game-subtitle">Master Every Skill</p>
+        <div class="level-select-container">
+            <p class="select-prompt">Choose a Module</p>
+            <div class="level-cards">
+                <div class="level-card listening-card" onclick="startModule('listening')">
+                    <div class="level-icon">&#127911;</div>
+                    <div class="level-name">Listening</div>
+                    <div class="level-desc">Audio & comprehension</div>
+                </div>
+                <div class="level-card reading-card" onclick="startModule('reading')">
+                    <div class="level-icon">&#128214;</div>
+                    <div class="level-name">Reading</div>
+                    <div class="level-desc">Passages & questions</div>
+                </div>
+                <div class="level-card writing-card" onclick="startModule('writing')">
+                    <div class="level-icon">&#9999;&#65039;</div>
+                    <div class="level-name">Writing</div>
+                    <div class="level-desc">Task 1 & Task 2</div>
+                </div>
+                <div class="level-card speaking-card" onclick="startModule('speaking')">
+                    <div class="level-icon">&#127908;</div>
+                    <div class="level-name">Speaking</div>
+                    <div class="level-desc">Parts 1, 2 & 3</div>
+                </div>
+            </div>
+        </div>
+        <div class="powered-by">Powered by <a href="https://www.mimlanguageservices.com/" target="_blank">MIM Language Services</a></div>
+    </div>
+
+    <!-- MAIN APPLICATION -->
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" onclick="toggleNav()"><span></span><span></span><span></span></button>
+                <div class="header-title">
+                    <h1>IELTS Prep</h1>
+                    <div class="current-level-badge listening" id="moduleBadge" onclick="showLoadingScreen()">
+                        <span>Module: </span><span id="currentModuleText">Listening</span>
+                        <span style="font-size: 0.75rem; opacity: 0.7;">(click to change)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="website"><a href="https://www.mimlanguageservices.com/" target="_blank">www.mimlanguageservices.com</a></div>
+                <a href="https://www.mimlanguageservices.com/" target="_blank"><img src="https://static.wixstatic.com/media/593d03_8958d96b0f6d4d1ea9dffa7f89bffe8b~mv2.png" alt="MIM Logo" class="header-image"></a>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+            <div class="navigation" id="navigation">
+                <div class="nav-item active" onclick="showSection('overview', this)">Overview</div>
+                <div class="nav-item" onclick="showSection('practice', this)">Practice</div>
+                <div class="nav-item" onclick="showSection('tips', this)">Tips & Strategy</div>
+            </div>
+
+            <div class="content">
+                <div class="section active" id="overview">
+                    <h2 id="overviewTitle">Listening Overview</h2>
+                    <div class="placeholder-panel">
+                        <div class="placeholder-icon" id="overviewIcon">&#127911;</div>
+                        <h3>Content coming soon</h3>
+                        <p id="overviewText">This is the Listening module shell. Lesson slides, audio, and exercises will be added here next.</p>
+                    </div>
+                </div>
+                <div class="section" id="practice">
+                    <h2>Practice</h2>
+                    <div class="placeholder-panel" id="practiceContent">
+                        <div class="placeholder-icon">&#128221;</div>
+                        <h3>Content coming soon</h3>
+                        <p>Practice questions and exercises for this module will appear here.</p>
+                    </div>
+                </div>
+                <div class="section" id="tips">
+                    <h2>Tips & Strategy</h2>
+                    <div class="placeholder-panel">
+                        <div class="placeholder-icon">&#128161;</div>
+                        <h3>Content coming soon</h3>
+                        <p>Exam strategy and tips for this module will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const moduleData = {
+            listening: { name: 'Listening', icon: '&#127911;', text: 'This is the Listening module shell. Lesson slides, audio, and exercises will be added here next.',
+                tests: [ { name: 'Section 1: Self-Drive Tours in the USA', meta: 'Note & table completion · 10 questions', href: 'Listening-Section-1.html' } ] },
+            reading:   { name: 'Reading',   icon: '&#128214;', text: 'This is the Reading module shell. Passages, vocabulary, and question types will be added here next.',
+                tests: [ { name: 'Passage 1', meta: 'TRUE/FALSE/NOT GIVEN + short answer · passage pending', href: 'Reading-Passage-1.html' } ] },
+            writing:   { name: 'Writing',   icon: '&#9999;&#65039;', text: 'This is the Writing module shell. Task 1 and Task 2 prompts and model answers will be added here next.' },
+            speaking:  { name: 'Speaking',  icon: '&#127908;', text: 'This is the Speaking module shell. Parts 1, 2, and 3 prompts and sample answers will be added here next.' }
+        };
+        let currentModule = 'listening';
+
+        function startModule(module) {
+            currentModule = module;
+            updateModuleDisplay();
+            document.getElementById('loadingScreen').classList.add('hidden');
+            setTimeout(() => { document.getElementById('appContainer').classList.add('visible'); }, 300);
+            showSection('practice', document.querySelectorAll('.nav-item')[1]);
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('appContainer').classList.remove('visible');
+            setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
+        }
+
+        function updateModuleDisplay() {
+            const data = moduleData[currentModule];
+            document.getElementById('moduleBadge').className = 'current-level-badge ' + currentModule;
+            document.getElementById('currentModuleText').textContent = data.name;
+            document.getElementById('overviewTitle').textContent = data.name + ' Overview';
+            document.getElementById('overviewIcon').innerHTML = data.icon;
+            document.getElementById('overviewText').textContent = data.text;
+            updatePracticeContent(data);
+        }
+
+        function updatePracticeContent(data) {
+            const el = document.getElementById('practiceContent');
+            if (data.tests && data.tests.length) {
+                el.className = '';
+                el.innerHTML = '<div class="test-link-list">' + data.tests.map(t =>
+                    `<a class="test-link-card" href="${t.href}"><div><div class="tlc-name">${t.name}</div><div class="tlc-meta">${t.meta}</div></div><div class="tlc-arrow">&#8594;</div></a>`
+                ).join('') + '</div>';
+            } else {
+                el.className = 'placeholder-panel';
+                el.innerHTML = '<div class="placeholder-icon">&#128221;</div><h3>Content coming soon</h3><p>Practice questions and exercises for this module will appear here.</p>';
+            }
+        }
+
+        function toggleNav() {
+            document.getElementById('navigation').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('visible');
+            document.getElementById('menuToggle').classList.toggle('active');
+        }
+
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) element.classList.add('active');
+            if (document.getElementById('navigation').classList.contains('open')) toggleNav();
+        }
+    </script>
+</body>
+</html>
