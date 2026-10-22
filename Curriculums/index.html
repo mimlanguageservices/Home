@@ -245,6 +245,23 @@
 
     .breadcrumb .sep { color: #cbd5e1; }
 
+    .back-btn {
+      font: inherit;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      background: #3b82f6;
+      border: none;
+      border-radius: 999px;
+      padding: 0.65rem 1.6rem;
+      margin-right: 0.75rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+      transition: background 0.15s, transform 0.15s;
+    }
+
+    .back-btn:hover { background: #2563eb; transform: translateX(-2px); }
+
     /* ── Grid of choice cards ── */
     .grid {
       display: flex;
@@ -1224,10 +1241,28 @@
       container.style.display = 'flex';
     }
 
+    // Step up one level: lessons → books → subjects → grades
+    function canGoBack() { return !!path.grade; }
+
+    function goBack() {
+      if (path.book) path.book = null;
+      else if (path.subject) path.subject = null;
+      else path.grade = null;
+      render();
+    }
+
     function renderBreadcrumb() {
       const bc = document.getElementById('breadcrumb');
       bc.innerHTML = '';
       bc.style.display = 'flex';
+
+      if (canGoBack()) {
+        const back = document.createElement('button');
+        back.className = 'back-btn';
+        back.textContent = '← Back';
+        back.onclick = goBack;
+        bc.appendChild(back);
+      }
 
       const home = document.createElement('span');
       home.className = 'crumb' + (path.grade ? '' : ' current');
