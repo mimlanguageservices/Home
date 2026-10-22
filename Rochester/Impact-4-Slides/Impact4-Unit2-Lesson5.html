@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a202c">
+    <script>(function(){var r=document.documentElement,w=innerWidth,h=innerHeight,m=w<=820||h<=500;if(m)r.classList.add("m");if(m&&w>520)r.classList.add("md");})();</script>
+    <title>Mapping Colombia - Impact 4 Unit 2.5</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a202c; }
+
+
+        /* ===== Slideshow shell (same engine as Compo-Culture) ===== */
+        .slideshow { position: relative; width: 100vw; height: 100vh; background: #ffffff; overflow: hidden; }
+        .slide { display: none; width: 100%; height: 100%; position: relative; }
+        .slide.active { display: block; }
+        .slide-inner { width: 100%; height: 100%; overflow: hidden; padding: 120px 88px 60px; display: flex; align-items: center; justify-content: center; }
+        .fit-wrap { width: 100%; transform-origin: center center; }
+
+        .slide-label { position: absolute; top: 62px; left: 40px; font-weight: 700; font-size: 1.35rem; color: #1a202c; z-index: 5; display: flex; align-items: center; gap: 12px; }
+        .seg-chip { font-size: 0.8rem; font-weight: 700; color: #fff; padding: 4px 12px; border-radius: 14px; text-transform: uppercase; letter-spacing: .5px; }
+        .seg-chip.starter { background: #6366f1; } .seg-chip.circle { background: #f59e0b; } .seg-chip.lesson { background: #0ea5e9; }
+        .seg-chip.pause { background: #10b981; } .seg-chip.process { background: #ec4899; }
+
+
+        /* ===== Lesson map bar: navigation menu across the top (hidden on the title slide) ===== */
+        .lesson-bar { position: fixed; top: 0; left: 0; right: 0; height: 48px; display: none; z-index: 45; background: #1a202c; box-shadow: 0 3px 12px rgba(0,0,0,.25); }
+        .lesson-bar.show { display: flex; }
+        .bar-seg { position: relative; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; border-right: 2px solid #1a202c; min-width: 0; padding: 0 6px 6px; font-family: inherit; font-weight: 700; font-size: .8rem; line-height: 1.05; color: #fff; text-align: center; cursor: pointer; opacity: .55; transition: opacity .25s ease, filter .25s ease; background: var(--c); }
+        .bar-seg:last-child { border-right: none; }
+        .bar-seg:hover { opacity: 1; filter: brightness(1.1); }
+        .bar-seg small { display: block; font-weight: 500; font-size: .68rem; opacity: .9; }
+        .bar-seg.done { opacity: .85; }
+        .bar-seg.done .tick { display: inline-flex; }
+        .bar-seg.current { opacity: 1; }
+        .bar-seg.current::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: #fff; }
+        .bar-seg .tick { display: none; align-items: center; justify-content: center; flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: #fff; color: #2f9e5f; font-size: .8rem; font-weight: 800; }
+        .bar-seg.current .tick { display: none; }
+        .bar-seg span.lbl { overflow: hidden; }
+        .lesson-clock { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: rgba(0,0,0,.45); pointer-events: none; z-index: 2; }
+        .lesson-clock i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ffe08a, #ffce54); box-shadow: 0 0 8px rgba(255,206,84,.8); transition: width 1s linear; }
+        .lesson-clock.over i { background: #fc8181; box-shadow: 0 0 8px rgba(252,129,129,.8); }
+        /* Nav */
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); width: 46px; height: 46px; border-radius: 50%; background: rgba(26,32,44,.85); color: #fff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.3rem; z-index: 50; transition: all .25s ease; box-shadow: 0 4px 15px rgba(0,0,0,.25); }
+        .nav-arrow:hover { background: #667eea; transform: translateY(-50%) scale(1.08); }
+        .nav-arrow.prev { left: 22px; } .nav-arrow.next { right: 22px; }
+        .nav-arrow.hidden { opacity: 0; pointer-events: none; }
+        .slide-counter { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); font-size: .85rem; color: #a0aec0; font-weight: 500; z-index: 50; background: rgba(255,255,255,.85); padding: 4px 14px; border-radius: 20px; }
+
+        /* Timer + notes toggle */
+        .toolbar { position: fixed; bottom: 14px; right: 24px; display: flex; gap: 10px; align-items: center; z-index: 60; }
+        .timer-pill { display: flex; align-items: center; gap: 10px; background: #1a202c; color: #fff; border-radius: 26px; padding: 6px 8px 6px 18px; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 4px 15px rgba(0,0,0,.25); }
+        .timer-pill .time { font-size: 1.15rem; min-width: 54px; }
+        .timer-pill.low .time { color: #fc8181; }
+        .timer-pill button, .tool-btn { border: none; background: #667eea; color: #fff; border-radius: 18px; padding: 6px 14px; font-weight: 600; font-size: .85rem; cursor: pointer; font-family: inherit; }
+        .tool-btn { background: #1a202c; padding: 10px 16px; border-radius: 22px; box-shadow: 0 4px 15px rgba(0,0,0,.25); }
+        .timer-pill button:hover, .tool-btn:hover { background: #4a5568; }
+
+
+        /* ===== Slide references + index panel ===== */
+        .slide-counter .ref { margin-left: 8px; padding-left: 8px; border-left: 1px solid #cbd5e0; color: #4a5568; font-weight: 600; cursor: pointer; }
+        .slide-counter .ref:hover { color: #667eea; }
+        .index-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 92vw); background: #fff; z-index: 900; box-shadow: -10px 0 40px rgba(0,0,0,.35); display: none; flex-direction: column; font-size: 1rem; }
+        .index-panel.show { display: flex; }
+        .index-head { padding: 18px 20px; background: #1a202c; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .index-head b { font-size: 1.15rem; flex: 1; }
+        .index-head button, .idx-copy { border: none; border-radius: 16px; padding: 6px 14px; font: 600 .85rem 'Inter', sans-serif; cursor: pointer; background: #667eea; color: #fff; }
+        .index-head button:hover, .idx-copy:hover { background: #4a5568; }
+        .index-hint { padding: 10px 20px; font-size: .85rem; color: #718096; background: #f7fafc; border-bottom: 1px solid #e2e8f0; }
+        .index-list { overflow: auto; flex: 1; }
+        .idx-row { display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid #edf2f7; cursor: pointer; }
+        .idx-row:hover { background: #f0f3ff; }
+        .idx-row.current { background: #e0f2fe; }
+        .idx-n { width: 26px; text-align: right; font-weight: 700; color: #a0aec0; }
+        .idx-main { flex: 1; min-width: 0; }
+        .idx-title { font-weight: 600; color: #1a202c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .idx-ref { font: 600 .8rem ui-monospace, Consolas, monospace; color: #4a5568; }
+        .idx-copy { background: #edf2f7; color: #2d3748; }
+        /* Teacher notes drawer (hidden by default; press N) */
+        .notes { position: fixed; left: 0; right: 0; bottom: 0; max-height: 40vh; overflow: auto; background: #fffbea; border-top: 4px solid #f0a500; padding: 18px 90px 22px; z-index: 40; display: none; font-size: 1rem; line-height: 1.55; color: #5c4400; }
+        .notes.show { display: block; }
+        .notes b.h { display: block; text-transform: uppercase; font-size: .75rem; letter-spacing: 1.2px; margin-bottom: 4px; }
+        .notes .ct { margin-top: 8px; padding: 8px 12px; background: #fff; border-left: 4px solid #667eea; border-radius: 6px; color: #2d3748; }
+
+        /* ===== Cover slides ===== */
+        .cover-slide { width: 100%; height: 100%; position: relative; overflow: hidden; }
+        .cover-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        /* Faded colour gradient over the photo: clear on the left, deepening to the right where the text sits */
+        .cover-panel { position: absolute; top: 0; right: 0; width: 62%; height: 100%; background: linear-gradient(90deg, rgba(30,64,175,0) 0%, rgba(37,99,235,.55) 30%, rgba(79,70,229,.85) 62%, rgba(49,46,129,.95) 100%); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 60px 70px 60px 26%; color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.35); }
+        .cover-title { font-size: 2.8rem; font-weight: 800; line-height: 1.1; margin-bottom: 22px; }
+        .cover-meta { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; opacity: .95; }
+        .cover-buttons { display: flex; gap: 16px; margin: 30px 0 25px; }
+        .cover-btn { width: 78px; height: 78px; border-radius: 50%; background: rgba(45,55,72,.8); border: 2px solid #ffce54; color: #fff; font-size: .75rem; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; cursor: pointer; line-height: 1.2; padding: 4px; }
+        .cover-btn:hover { background: rgba(102,126,234,.9); }
+        .cover-website { font-size: .9rem; opacity: .9; }
+        .school-logo { position: absolute; top: 4vh; right: 3vw; z-index: 6; background: #fff; border-radius: 22px; padding: 14px 18px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+        .school-logo img { display: block; height: clamp(100px, 24vh, 190px); width: auto; }
+
+        /* ===== START button (animations borrowed from What-Drives-Civilization: float, shine sweep, glow pulse, hover lift, fade-scale exit) ===== */
+        .cover-slide { transition: opacity .8s ease, transform .8s ease; }
+        .cover-slide.leaving { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        .start-btn {
+            position: absolute; z-index: 6;
+            left: 77%; bottom: 9%;                 /* sits under the text on the gradient */
+            transform: translateX(-50%);
+            width: 300px; height: 84px;
+            border: 3px solid #ffce54; border-radius: 42px;
+            background: linear-gradient(145deg, rgba(26,32,44,.92) 0%, rgba(45,55,72,.92) 100%);
+            color: #fff; font-family: inherit; font-weight: 800; font-size: 1.9rem; letter-spacing: 6px;
+            cursor: pointer; overflow: hidden;
+            backdrop-filter: blur(10px);
+            animation: startFloat 3s ease-in-out infinite, startGlow 3s ease-in-out infinite;
+            transition: border-color .3s ease, background .3s ease;
+        }
+        .start-btn span { position: relative; z-index: 2; }
+        .start-btn::before {                      /* shine sweep, runs continuously */
+            content: ''; position: absolute; top: -50%; left: -60%; width: 40%; height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+            transform: rotate(25deg);
+            animation: startShine 3.2s ease-in-out infinite;
+        }
+        .start-btn:hover {
+            animation-play-state: paused;
+            transform: translateX(-50%) translateY(-12px) scale(1.07);
+            border-color: #4ade80;
+            background: linear-gradient(145deg, #2f7fd4 0%, #4aa3e0 100%);
+            box-shadow: 0 20px 60px rgba(74,222,128,.45), 0 0 40px rgba(74,222,128,.25);
+        }
+        .start-btn:active { transform: translateX(-50%) translateY(-4px) scale(.97); }
+        @keyframes startFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50%      { transform: translateX(-50%) translateY(-10px); }
+        }
+        @keyframes startGlow {
+            0%, 100% { box-shadow: 0 8px 30px rgba(255,206,84,.35), 0 0 0 0 rgba(255,206,84,.5); }
+            50%      { box-shadow: 0 18px 50px rgba(255,206,84,.6),  0 0 0 18px rgba(255,206,84,0); }
+        }
+        @keyframes startShine {
+            0%   { left: -60%; opacity: 1; }
+            45%, 100% { left: 130%; opacity: 0; }
+        }
+
+        .cover-panel-left { position: absolute; top: 0; left: 0; width: 52%; height: 100%; background: linear-gradient(160deg,#4aa3e0 0%,#2f7fd4 100%); clip-path: polygon(0 0,82% 0,64% 100%,0% 100%); display: flex; flex-direction: column; justify-content: center; padding: 60px 90px 60px 70px; color: #fff; }
+        .fb-heading { font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+        .fb-sub { font-size: 1.2rem; font-weight: 700; line-height: 1.4; }
+        .cover-right-content { position: absolute; top: 0; right: 0; width: 55%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 60px 70px; }
+        .feedback-slider { display: flex; gap: 8px; margin-bottom: 25px; }
+        .feedback-emoji { flex: 1; text-align: center; padding: 16px 0; border-radius: 12px; font-size: 1.7rem; cursor: pointer; transition: all .25s ease; }
+        .feedback-emoji:nth-child(1){background:#fed7d7}.feedback-emoji:nth-child(2){background:#feebc8}.feedback-emoji:nth-child(3){background:#fefcbf}.feedback-emoji:nth-child(4){background:#c6f6d5}.feedback-emoji:nth-child(5){background:#9ae6b4}
+        .feedback-emoji.selected { transform: scale(1.15); box-shadow: 0 6px 18px rgba(0,0,0,.2); }
+        .thanks-note { display: none; margin-bottom: 15px; color: #48bb78; font-weight: 600; }
+        .thanks-note.show { display: block; }
+
+        /* ===== Content ===== */
+        .center-col { max-width: 1150px; margin: 0 auto; }
+        .slide-heading { text-align: center; font-size: 2.2rem; font-weight: 800; color: #1a202c; margin-bottom: 26px; }
+        .poll-question { font-size: 1.7rem; font-weight: 600; color: #1a202c; margin-bottom: 8px; }
+        .poll-subtext { font-size: 1.1rem; color: #a0aec0; margin-bottom: 24px; }
+        .poll-item { display: flex; align-items: center; gap: 14px; padding: 18px 24px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 14px; cursor: pointer; transition: all .2s ease; font-size: 1.5rem; color: #2d3748; }
+        .poll-item:hover { background: #f7fafc; }
+        .poll-icon { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #cbd5e0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .75rem; color: transparent; }
+        .poll-item.selected .poll-icon { color: #fff; background: #667eea; border-color: #667eea; }
+        .poll-item.selected { border-color: #667eea; background: #f0f3ff; }
+        .why-text { text-align: center; font-weight: 700; font-size: 1.6rem; color: #1a202c; margin-top: 26px; }
+
+        .discussion-prompt { background: #fdf3d8; border-radius: 30px; padding: 22px 32px; display: flex; align-items: center; justify-content: center; gap: 14px; font-weight: 600; color: #1a202c; font-size: 1.55rem; max-width: 800px; margin: 0 auto; text-align: center; }
+        .q-item { background: #fff; border-left: 4px solid #667eea; padding: 20px 26px; border-radius: 10px; margin-bottom: 18px; font-size: 1.55rem; color: #2d3748; box-shadow: 0 4px 15px rgba(0,0,0,.06); }
+        .q-item .sub { display: block; font-size: 1.1rem; color: #a0aec0; margin-top: 6px; }
+        .big-quote { font-size: 2.6rem; font-weight: 800; color: #1a202c; line-height: 1.25; text-align: center; margin: 0 auto 14px; max-width: 980px; }
+        .quote-by { text-align: center; font-size: 1.4rem; color: #718096; margin-bottom: 30px; }
+        .split-layout { display: flex; align-items: center; gap: 60px; width: 100%; }
+        .split-text { flex: 1.1; min-width: 0; } .split-image { flex: .9; min-width: 0; }
+        .split-image img { width: 100%; display: block; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+        .split-text p, .split-text li { font-size: 1.6rem; color: #2d3748; line-height: 1.5; margin-bottom: 14px; }
+        .split-text ul, .split-text ol { padding-left: 30px; }
+        .img-caption { text-align: center; color: #a0aec0; font-size: 1rem; margin-top: 8px; }
+        .frames { background: #f7fafc; border-radius: 14px; padding: 18px 24px; margin-top: 18px; }
+        .frames p { font-size: 1.35rem !important; color: #2d3748; margin-bottom: 6px !important; }
+
+        .vocab-link { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: #fff; padding: 2px 10px; border-radius: 8px; font-weight: 500; cursor: pointer; }
+        .vocab-link:hover { transform: translateY(-1px); }
+        .next-btn-center { display: block; margin: 30px auto 0; background: #1a202c; color: #fff; border: none; padding: 14px 38px; border-radius: 25px; font-weight: 600; cursor: pointer; font-size: 1.2rem; }
+        .next-btn-center:hover { background: #667eea; }
+
+        /* Choice cards */
+        .choice-row { display: grid; gap: 22px; margin-top: 10px; }
+        .choice-row.c3 { grid-template-columns: repeat(3, 1fr); }
+        .choice-row.c4 { grid-template-columns: repeat(4, 1fr); }
+        .choice-row.c5 { grid-template-columns: repeat(5, 1fr); }
+        .choice-card { background: #fff; border: 2px solid #e2e8f0; border-radius: 16px; padding: 24px 22px; cursor: pointer; transition: all .2s ease; box-shadow: 0 6px 20px rgba(0,0,0,.06); text-align: center; }
+        .choice-card:hover { transform: translateY(-4px); border-color: #667eea; }
+        .choice-card.selected { border-color: #667eea; background: #f0f3ff; box-shadow: 0 8px 24px rgba(102,126,234,.3); }
+        .choice-card .emoji { font-size: 3rem; display: block; margin-bottom: 8px; }
+        .choice-card h4 { font-size: 1.4rem; color: #1a202c; margin-bottom: 8px; }
+        .choice-card p { font-size: 1.1rem; color: #4a5568; line-height: 1.4; }
+        .letter { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: #1a202c; color: #fff; font-weight: 800; margin-bottom: 8px; }
+
+        /* Silent starter task card */
+        .starter-q { font-size: 4.2rem; font-weight: 800; line-height: 1.2; color: #1a202c; text-align: center; margin: 10px auto 18px; max-width: 1100px; }
+        .starter-q span { display: block; margin-top: 22px; color: #6366f1; }
+        .starter-verb { display: block; font-size: 2.4rem; font-weight: 800; color: #6366f1; margin-bottom: 10px; }
+        .starter-sub { text-align: center; font-size: 1.8rem; color: #718096; font-weight: 500; }
+        .reading-note { font-size: 1.15rem; color: #a0aec0; margin-bottom: 14px; }
+        .book-step { display: flex; align-items: center; gap: 22px; background: #f7fafc; border-radius: 16px; padding: 22px 30px; margin-bottom: 20px; font-size: 2.4rem; font-weight: 700; color: #1a202c; }
+        .book-n { flex-shrink: 0; width: 60px; height: 60px; border-radius: 50%; background: #0284c7; color: #fff; font-size: 2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+        .book-link { color: #0284c7; text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 6px; cursor: pointer; transition: color .2s ease; }
+        .book-link:hover { color: #6366f1; }
+        .quiz-bell { text-align: center; font-size: 5rem; line-height: 1; margin-bottom: 8px; display: block; animation: quizRing 2.4s ease-in-out infinite; transform-origin: 50% 10%; }
+        @keyframes quizRing { 0%, 60%, 100% { transform: rotate(0); } 10% { transform: rotate(14deg); } 20% { transform: rotate(-12deg); } 30% { transform: rotate(8deg); } 40% { transform: rotate(-6deg); } 50% { transform: rotate(3deg); } }
+        .quiz-details { max-width: 760px; margin: 0 auto 30px; }
+        .quiz-row { font-size: 2rem; color: #2d3748; background: #f7fafc; border-left: 6px solid #0284c7; border-radius: 12px; padding: 12px 24px; margin-bottom: 12px; }
+        .quiz-btn { display: block; width: fit-content; margin: 0 auto; background: linear-gradient(135deg, #0ea5e9, #6366f1); color: #fff; text-decoration: none; font-size: 2.4rem; font-weight: 800; padding: 22px 54px; border-radius: 50px; box-shadow: 0 12px 34px rgba(99,102,241,.45); transition: transform .2s ease, box-shadow .2s ease; animation: quizPulse 2.6s ease-in-out infinite; }
+        .quiz-btn:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 20px 50px rgba(99,102,241,.6); animation-play-state: paused; }
+        @keyframes quizPulse { 0%, 100% { box-shadow: 0 12px 34px rgba(99,102,241,.45), 0 0 0 0 rgba(14,165,233,.5); } 50% { box-shadow: 0 12px 34px rgba(99,102,241,.45), 0 0 0 20px rgba(14,165,233,0); } }
+        .quiz-url { text-align: center; margin-top: 16px; font-size: 1rem; color: #a0aec0; word-break: break-all; }
+        .gram-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+        .gram-card { border-radius: 20px; padding: 26px 34px; }
+        .gram-rule { background: #eff6ff; border-top: 8px solid #0284c7; }
+        .gram-examples { background: #f0fdf4; border-top: 8px solid #10b981; }
+        .gram-tag { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #4a5568; margin-bottom: 10px; }
+        .gram-formula { font-size: 2.6rem; font-weight: 800; color: #0369a1; line-height: 1.25; }
+        .gram-use { font-size: 1.9rem; color: #2d3748; line-height: 1.4; }
+        .gram-ex { font-size: 1.9rem; color: #1a202c; line-height: 1.35; background: #fff; border-radius: 12px; padding: 12px 18px; margin-bottom: 14px; }
+        .gram-grid.three { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .gram-grid.three .gram-card { padding: 20px 24px; }
+        .gram-grid.three .gram-formula { font-size: 2rem; margin-bottom: 10px; }
+        .gram-grid.three .gram-use { font-size: 1.45rem; margin-bottom: 14px; }
+        .gram-grid.three .gram-ex { font-size: 1.4rem; padding: 10px 14px; margin-bottom: 10px; }
+        .g-simple { background: #eff6ff; border-top: 8px solid #0284c7; }
+        .g-cont { background: #f5f3ff; border-top: 8px solid #7c3aed; }
+        .g-perf { background: #f0fdf4; border-top: 8px solid #10b981; }
+        .g-simple .gram-formula { color: #0369a1; } .g-cont .gram-formula { color: #6d28d9; } .g-perf .gram-formula { color: #047857; }
+        .gram-signals { text-align: center; font-size: 1.5rem; color: #2d3748; margin-top: 18px; background: #fdf3d8; border-radius: 30px; padding: 12px 24px; }
+        .tl-sub { text-align: center; font-size: 2rem; color: #4a5568; margin-bottom: 22px; }
+        .tl { display: flex; align-items: stretch; gap: 10px; }
+        .tl-card { flex: 1; border-radius: 20px; padding: 22px 24px; display: flex; flex-direction: column; gap: 10px; }
+        .tl-card.t1 { background: #eff6ff; border-top: 8px solid #0284c7; } .tl-card.t2 { background: #f5f3ff; border-top: 8px solid #7c3aed; } .tl-card.t3 { background: #f0fdf4; border-top: 8px solid #10b981; }
+        .tl-when { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #4a5568; }
+        .tl-tag { font-size: 1.6rem; font-weight: 800; color: #1a202c; }
+        .tl-sent { font-size: 1.9rem; line-height: 1.35; color: #1a202c; background: #fff; border-radius: 12px; padding: 14px 16px; }
+        .tl-why { font-size: 1.3rem; color: #4a5568; font-style: italic; }
+        .tl-arrow { align-self: center; font-size: 3rem; font-weight: 800; color: #a0aec0; }
+        .ex-wrap { display: grid; grid-template-columns: 1fr; gap: 22px; }
+        .ex-wrap.with-side { grid-template-columns: 340px 1fr; }
+        .ex-side { border-radius: 20px; padding: 20px 24px; align-self: start; }
+        .ex-side-row { display: flex; flex-direction: column; background: #fff; border-radius: 12px; padding: 8px 14px; margin-bottom: 10px; font-size: 1.35rem; color: #1a202c; }
+        .ex-side-row b { font-size: 1.1rem; color: #4a5568; }
+        .ex-list { display: flex; flex-direction: column; gap: 12px; }
+        .ex-item { display: flex; align-items: flex-start; gap: 16px; background: #f7fafc; border-radius: 14px; padding: 14px 20px; }
+        .ex-n { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: #0284c7; color: #fff; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .ex-text { font-size: 1.9rem; line-height: 1.5; color: #1a202c; }
+        .ans { display: inline-block; min-width: 150px; text-align: center; font-weight: 800; color: #0369a1; background: #e0f2fe; border-radius: 8px; padding: 0 10px; filter: blur(7px); cursor: pointer; transition: filter .25s ease; user-select: none; }
+        .ans.revealed { filter: none; }
+        .ex-foot { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 20px; }
+        .ex-reveal { font-size: 1.2rem; font-weight: 700; color: #fff; background: #1a202c; border-radius: 24px; padding: 10px 22px; cursor: pointer; white-space: nowrap; }
+        .ex-reveal:hover { background: #667eea; }
+        .tl-svg-wrap { max-width: 1100px; margin: 0 auto; }
+        .tlsvg { width: 100%; height: auto; display: block; font-family: 'Inter', sans-serif; overflow: visible; }
+        .tlsvg .grow { transform-box: fill-box; transform-origin: left center; animation: tlGrow 1s ease-out .3s both; }
+        .tlsvg .pop { transform-box: fill-box; transform-origin: center; animation: tlPop .5s cubic-bezier(.34,1.56,.64,1) .1s both; }
+        .tlsvg .pop2 { transform-box: fill-box; transform-origin: center; animation: tlPop .5s cubic-bezier(.34,1.56,.64,1) 1.1s both; }
+        .tlsvg .draw { stroke-dasharray: 600; stroke-dashoffset: 600; animation: tlDraw 1.1s ease-out .6s forwards; }
+        @keyframes tlGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        @keyframes tlPop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes tlDraw { to { stroke-dashoffset: 0; } }
+        .tl-formula { display: flex; align-items: center; justify-content: center; gap: 22px; flex-wrap: wrap; border-radius: 40px; padding: 14px 30px; margin: 10px auto 0; width: fit-content; font-size: 1.7rem; }
+        .tl-formula b { font-size: 1.9rem; }
+        .tl-formula span { color: #1a202c; }
+        .use-list { display: flex; flex-direction: column; gap: 14px; max-width: 1100px; margin: 0 auto; }
+        .use-row { display: flex; align-items: flex-start; gap: 20px; border-radius: 16px; padding: 14px 24px; border-left: 10px solid var(--uc); background: var(--ub); }
+        .u-simple { --uc: #0284c7; --ub: #eff6ff; } .u-cont { --uc: #7c3aed; --ub: #f5f3ff; } .u-perf { --uc: #10b981; --ub: #f0fdf4; }
+        .use-n { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--uc); color: #fff; font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; margin-top: 4px; }
+        .use-label { font-size: 1.7rem; font-weight: 800; color: #1a202c; line-height: 1.25; }
+        .use-ex { font-size: 1.6rem; color: #2d3748; line-height: 1.35; margin-top: 4px; font-style: italic; }
+        .pause-layout { display: flex; align-items: center; gap: 44px; }
+        .wheel-col { flex: 0 0 470px; }
+        .wheel-wrap { position: relative; width: 470px; height: 470px; }
+        .wheel-svg { cursor: default; user-select: none; -webkit-user-select: none; width: 100%; height: 100%; display: block; transition: transform 5.2s cubic-bezier(.12,.62,.08,1); filter: drop-shadow(0 10px 24px rgba(0,0,0,.28)); }
+        .wheel-pointer { position: absolute; left: 50%; top: -22px; width: 54px; height: 62px; margin-left: -27px; z-index: 3; filter: drop-shadow(0 3px 5px rgba(0,0,0,.35)); }
+        .spin-btn { position: absolute; left: 50%; top: 50%; width: 118px; height: 118px; margin: -59px 0 0 -59px; border-radius: 50%; border: 6px solid #1a202c; background: #fff; color: #1a202c; font: 800 1.7rem 'Inter', sans-serif; letter-spacing: 2px; cursor: pointer; z-index: 2; box-shadow: 0 6px 18px rgba(0,0,0,.35); transition: transform .15s ease, background .2s ease; animation: spinPulse 2.2s ease-in-out infinite; }
+        .spin-btn:hover { transform: scale(1.08); background: #fef3c7; }
+        .spin-btn:disabled { cursor: default; animation: none; opacity: .75; transform: none; background: #e5e7eb; }
+        @keyframes spinPulse { 0%, 100% { box-shadow: 0 6px 18px rgba(0,0,0,.35), 0 0 0 0 rgba(245,158,11,.55); } 50% { box-shadow: 0 6px 18px rgba(0,0,0,.35), 0 0 0 16px rgba(245,158,11,0); } }
+        .pause-result { flex: 1; min-width: 0; height: 470px; background: #f7fafc; border-radius: 24px; padding: 26px 32px; overflow: hidden; display: flex; flex-direction: column; border-top: 10px solid #10b981; }
+        .pr-idle { margin: auto; text-align: center; font-size: 2.2rem; font-weight: 700; color: #4a5568; line-height: 1.35; }
+        .pr-idle span { display: block; font-size: 4.5rem; margin-bottom: 12px; }
+        .pr-in { animation: prIn .45s ease both; display: block; position: relative; flex: 1; min-height: 0; }
+        @keyframes prIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        .pr-img { float: right; width: 210px; height: 150px; object-fit: cover; border-radius: 14px; margin: 0 0 10px 18px; box-shadow: 0 4px 12px rgba(0,0,0,.22); }
+        .pr-emoji { display: flex; align-items: center; justify-content: center; font-size: 4.6rem; background: #e0f2fe; box-shadow: none; }
+        .pr-num { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: #1a202c; color: #fff; font-weight: 800; font-size: 1.4rem; margin-right: 14px; flex-shrink: 0; }
+        .pr-title { display: flex; align-items: center; font-size: 2rem; font-weight: 800; color: #1a202c; line-height: 1.15; }
+        .pr-tag { display: inline-block; margin-top: 8px; background: #d1fae5; color: #047857; font-weight: 700; font-size: 1.05rem; padding: 4px 14px; border-radius: 20px; }
+        .pr-desc { font-size: 1.3rem; line-height: 1.35; color: #2d3748; margin-top: 10px; }
+        .pr-lt { font-size: 1.2rem; font-weight: 800; color: #4a5568; margin-top: 10px; }
+        .pr-list { margin: 6px 0 0 26px; padding: 0; columns: 2; column-gap: 28px; }
+        .pr-list li { font-size: 1.2rem; line-height: 1.25; color: #1a202c; margin-bottom: 4px; break-inside: avoid; }
+        .pr-note { font-size: 1.25rem; line-height: 1.35; color: #2d3748; margin-top: 8px; background: #fff; border-radius: 12px; padding: 8px 14px; }
+        .pr-best { position: absolute; left: 0; right: 0; bottom: 0; font-size: 1.2rem; color: #047857; font-weight: 700; }
+        .pr-best span { background: #d1fae5; border-radius: 20px; padding: 6px 16px; display: inline-block; }
+        .pause-video { display: flex; align-items: center; gap: 22px; margin-top: 16px; }
+        .pv-frame { width: 240px; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 6px 18px rgba(0,0,0,.3); flex-shrink: 0; }
+        .pv-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+        .pv-cap { font-size: 1.5rem; font-weight: 800; color: #1a202c; }
+        .pv-cap small { display: block; font-size: 1.05rem; font-weight: 500; color: #718096; margin-top: 4px; }
+        .reading-text p { font-size: 2.2rem; line-height: 1.6; color: #2d3748; margin-bottom: 20px; }
+        .vocab-list { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: column; grid-template-rows: repeat(8, auto); gap: 8px 36px; }
+        .vl-item { display: flex; gap: 12px; align-items: flex-start; background: #f7fafc; border-radius: 12px; padding: 8px 14px; }
+        .vl-n { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #0284c7; color: #fff; font-weight: 800; font-size: .9rem; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+        .vl-word { display: block; font-size: 1.45rem; font-weight: 800; color: #0369a1; line-height: 1.2; }
+        .vl-sent { display: block; font-size: 1.15rem; line-height: 1.3; color: #2d3748; }
+        .opener-quote { margin-top: 14px; font-size: 2rem; font-weight: 800; line-height: 1.3; color: #1a202c; }
+        .base-groups { text-align: center; font-size: 2.4rem; font-weight: 800; color: #1a202c; background: #e0f2fe; border-radius: 40px; padding: 10px 30px; margin: 0 auto 22px; width: fit-content; }
+        .opener-quote span { display: block; margin-top: 6px; font-size: 1.4rem; font-weight: 500; color: #718096; }
+        .opener-qs { padding-left: 40px; }
+        .opener-qs li { font-size: 1.85rem !important; line-height: 1.35; margin-bottom: 20px; color: #2d3748; }
+        .opener-qs li::marker { font-weight: 800; color: #0ea5e9; }
+        .inq { display: flex; flex-direction: column; gap: 6px; background: #f7fafc; border-radius: 16px; padding: 18px 30px; margin-bottom: 20px; }
+        .inq-tag { font-weight: 800; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        .inq-tag.factual { color: #2b6cb0; } .inq-tag.conceptual { color: #6b46c1; } .inq-tag.debatable { color: #c05621; }
+        .inq-text { font-size: 2.3rem; font-weight: 700; line-height: 1.3; color: #1a202c; }
+        .q-type { margin-bottom: 6px; font-weight: 800; font-size: 1.1rem; color: #b7791f; text-transform: uppercase; letter-spacing: 2px; }
+        .q-type span { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: #f59e0b; color: #fff; margin-right: 12px; letter-spacing: 0; }
+        .circle-q { font-size: 2.1rem; font-weight: 800; line-height: 1.25; color: #1a202c; }
+        .circle-item { background: #fffbeb; border-left: 8px solid #f59e0b; border-radius: 14px; padding: 16px 28px; margin-bottom: 20px; }
+        .starter-video { position: absolute; left: 24px; bottom: 20px; width: 240px; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.3); background: #000; z-index: 6; }
+        .starter-video iframe { width: 100%; height: 100%; border: 0; display: block; }
+        .rule-strip { display: flex; justify-content: center; gap: 18px; margin-bottom: 26px; }
+        .rule { background: #edf2f7; border-radius: 30px; padding: 10px 24px; font-weight: 700; font-size: 1.2rem; color: #2d3748; }
+
+        /* Flashcards (vocab) */
+        .vocab-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 10px; }
+        .flashcard { width: 100%; height: 0; padding-bottom: 130%; position: relative; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: absolute; inset: 0; transition: transform .6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.08); display: flex; flex-direction: column; }
+        .flashcard-front { background: #fff; }
+        .card-def { padding: 12px 10px 4px; text-align: center; }
+        .card-def .def-text { font-size: 1.15rem; color: #2d3748; line-height: 1.32; }
+        .card-def .pos-tag { font-style: italic; color: #a0aec0; font-size: 1rem; margin-top: 8px; }
+        .card-image-area { flex: 1; background: #f2f4f8; display: flex; align-items: center; justify-content: center; font-size: 3.4rem; position: relative; }
+        .flip-icon { position: absolute; bottom: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(26,32,44,.6); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .75rem; }
+        .flashcard-back { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: #fff; transform: rotateY(180deg); align-items: center; justify-content: center; padding: 16px; }
+        .flashcard-term { font-weight: 700; font-size: 1.7rem; text-align: center; }
+
+        /* TEMPLATE placeholders: clearly visible until you fill them in */
+        .tbd { background: #fef3c7; border-bottom: 3px dashed #f59e0b; border-radius: 4px; padding: 0 6px; color: #92400e; }
+        body.hide-tbd .tbd { background: none; border-bottom: none; color: inherit; }
+        .placeholder-box { max-width: 700px; margin: 24px auto; text-align: center; padding: 40px 30px; border: 2px dashed #cbd5e0; border-radius: 16px; color: #a0aec0; background: #f7fafc; font-size: 1.3rem; }
+        .placeholder-box .big-icon { font-size: 3rem; margin-bottom: 12px; }
+
+        /* Popup */
+        .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .popup-content { background: rgba(255,255,255,.97); border-radius: 20px; padding: 56px 64px; max-width: min(1100px, 92vw); margin: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+        .popup-word { color: #1a202c; font-size: 3.6rem; font-weight: 700; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
+        .popup-definition { color: #4a5568; line-height: 1.45; margin-bottom: 25px; font-size: 2.8rem; }
+        .popup-close { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color: #fff; border: none; padding: 16px 36px; font-size: 1.4rem; border-radius: 25px; cursor: pointer; font-weight: 500; float: right; }
+
+        @media (max-width: 900px) {
+            .slide-inner { padding: 120px 24px 60px; }
+            .cover-panel { width: 100%; padding: 40px 30px; background: linear-gradient(180deg, rgba(30,64,175,.2), rgba(49,46,129,.95)); }
+            .start-btn { left: 50%; }
+            .vocab-grid { grid-template-columns: repeat(2, 1fr); }
+            .split-layout { flex-direction: column; gap: 24px; }
+            .choice-row.c3, .choice-row.c4, .choice-row.c5 { grid-template-columns: 1fr 1fr; }
+            .notes { padding: 14px 20px; }
+        }
+        /* ===== iPhone / iPad optimisation (appended last so it overrides the desktop rules) ===== */
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+        html, body { position: fixed; inset: 0; width: 100%; }
+        .slideshow { position: fixed; inset: 0; width: auto; height: auto; }          /* follows the real visible area (no Safari address-bar cut-off) */
+        .slideshow, .lesson-bar, .toolbar, .nav-arrow { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        button, .bar-seg, .choice-card, .poll-item, .vocab-link, .idx-row, .quiz-btn, .spin-btn, .start-btn, .feedback-emoji { touch-action: manipulation; }
+        /* notch / home-indicator safe areas (landscape iPhone, iPad) */
+        .lesson-bar { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); height: calc(48px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); }
+        .slide-label { left: max(40px, calc(env(safe-area-inset-left) + 16px)); top: calc(62px + env(safe-area-inset-top)); }
+        .nav-arrow.prev { left: max(22px, calc(env(safe-area-inset-left) + 10px)); }
+        .nav-arrow.next { right: max(22px, calc(env(safe-area-inset-right) + 10px)); }
+        .toolbar { right: max(24px, calc(env(safe-area-inset-right) + 12px)); bottom: max(14px, calc(env(safe-area-inset-bottom) + 6px)); }
+        .slide-counter { bottom: max(18px, calc(env(safe-area-inset-bottom) + 10px)); }
+        .notes { max-height: 40vh; max-height: 40dvh; padding-bottom: calc(14px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
+        .index-panel { padding-bottom: env(safe-area-inset-bottom); -webkit-overflow-scrolling: touch; }
+        .index-list { -webkit-overflow-scrolling: touch; }
+        .tool-btn, .timer-pill button, .nav-arrow, .popup-close { min-height: 44px; }  /* Apple's minimum touch target */
+        .nav-arrow { min-width: 44px; }
+        /* touch screens have no hover: stop hover effects sticking after a tap */
+        @media (hover: none) {
+            .nav-arrow:hover { background: rgba(26,32,44,.85); transform: translateY(-50%); }
+            .choice-card:hover, .vocab-link:hover, .quiz-btn:hover, .spin-btn:hover { transform: none; }
+            .bar-seg:hover { filter: none; }
+        }
+        /* iPad portrait / small tablets */
+        @media (max-width: 900px) {
+            .bar-seg { font-size: .7rem; }
+            .bar-seg small { font-size: .6rem; }
+        }
+        /* iPhone (any orientation, narrow) */
+        @media (max-width: 700px) {
+            .bar-seg { font-size: .58rem; padding: 0 2px 5px; gap: 2px; }
+            .bar-seg small, .bar-seg .tick { display: none !important; }
+            .toolbar { left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+            .tool-btn { padding: 8px 12px; font-size: .75rem; }
+            .slide-counter { left: 10px; transform: none; bottom: max(70px, calc(env(safe-area-inset-bottom) + 62px)); font-size: .7rem; padding: 3px 10px; }
+            .slide-counter .ref { display: none; }
+            .nav-arrow { width: 44px; height: 44px; opacity: .8; }
+            .nav-arrow.prev { left: 6px; } .nav-arrow.next { right: 6px; }
+            .popup-content { padding: 28px 22px; }
+            .popup-word { font-size: 2rem; } .popup-definition { font-size: 1.4rem; }
+            .popup-close { padding: 12px 24px; font-size: 1.1rem; }
+        }
+        /* iPhone / small iPad held sideways: very little height, so tighten the chrome */
+        @media (max-height: 520px) {
+            .slide-inner { padding: 70px 64px 44px !important; }
+            .slide-label { top: calc(54px + env(safe-area-inset-top)); font-size: 1rem; }
+            .seg-chip { font-size: .65rem; padding: 2px 9px; }
+            .starter-video { width: 150px; left: 12px; bottom: 10px; }
+            .toolbar { bottom: max(8px, env(safe-area-inset-bottom)); }
+            .tool-btn { padding: 8px 12px; font-size: .75rem; }
+            .notes { max-height: 55vh; max-height: 55dvh; }
+            .popup-content { padding: 22px 28px; }
+            .popup-word { font-size: 2rem; } .popup-definition { font-size: 1.4rem; margin-bottom: 14px; }
+        }
+        /* "turn your phone sideways" hint */
+        .rotate-hint { display: none; position: fixed; left: 10px; right: 10px; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 2000; background: #1a202c; color: #fff; border-radius: 14px; padding: 12px 40px 12px 16px; font-size: .85rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+        .rotate-hint button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; font-size: 1.4rem; width: 40px; height: 40px; }
+        @media (max-width: 700px) and (orientation: portrait) { .rotate-hint.show { display: block; } }
+
+        /* ===== MOBILE LAYOUT: phones + small tablets (html.m is set by script when width<=820 or height<=500) =====
+           Slides stop being shrunk to fit; they reflow to one column at a readable size and scroll vertically. */
+        html.m { font-size: 11px; }                 /* every rem size shrinks with this */
+        html.m.md { font-size: 13px; }              /* sideways phone / iPad portrait */
+        html.m { --bar: calc(44px + env(safe-area-inset-top)); --dock: calc(56px + env(safe-area-inset-bottom)); }
+        .m .lesson-bar { height: var(--bar); }
+        .m .bar-seg { font-size: 9.5px; padding: 0 2px 4px; gap: 2px; }
+        .m .bar-seg small, .m .bar-seg .tick { display: none !important; }
+        /* each slide is its own scroll area */
+        .m .slide.active { overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-top: 0; padding-bottom: calc(var(--dock) + 16px); }
+        .m .slide.active:has(.cover-slide) { padding: 0; }
+        .m .slide-label { position: sticky; top: var(--bar); margin-top: var(--bar); left: auto; z-index: 5; background: #fff; border-bottom: 1px solid #edf2f7; padding: 8px 16px; font-size: 15px; }
+        .m .seg-chip { font-size: 10px; padding: 2px 9px; }
+        .m .slide-inner { display: block !important; height: auto !important; overflow: visible; padding: 18px 16px 28px !important; }
+        .m .fit-wrap { transform: none !important; width: 100%; }
+        .m .center-col { max-width: none !important; }
+        /* bottom dock: arrows, counter and teacher buttons in one row */
+        .m .toolbar { left: 0; right: 0; bottom: 0; padding: 7px 58px calc(7px + env(safe-area-inset-bottom)) 112px; background: #1a202c; justify-content: flex-end; flex-wrap: wrap; gap: 6px; min-height: var(--dock); align-items: center; box-shadow: 0 -3px 12px rgba(0,0,0,.25); }
+        .m .tool-btn { font-size: 12px; padding: 8px 12px; background: #2d3748; box-shadow: none; }
+        .m .timer-pill { padding: 4px 6px 4px 12px; }
+        .m .timer-pill .time { font-size: 15px; min-width: 46px; }
+        .m .timer-pill button { font-size: 12px; padding: 5px 10px; min-height: 36px; }
+        .m #segLabel { display: none; }
+        .m .nav-arrow { top: auto; bottom: calc(env(safe-area-inset-bottom) + 6px); transform: none !important; width: 44px; height: 44px; opacity: 1; background: #2d3748; z-index: 62; }
+        .m .nav-arrow.prev { left: calc(env(safe-area-inset-left) + 8px); } .m .nav-arrow.next { right: calc(env(safe-area-inset-right) + 8px); }
+        .m .nav-arrow.hidden { opacity: 0; }
+        .m .slide-counter { left: calc(env(safe-area-inset-left) + 58px); bottom: calc(env(safe-area-inset-bottom) + 19px); transform: none; background: none; color: #a0aec0; font-size: 12px; padding: 0; z-index: 62; }
+        .m .slide-counter .ref { display: none; }
+        .m .notes { bottom: var(--dock); max-height: 45vh; max-height: 45dvh; padding: 14px 16px; font-size: 14px; }
+        /* students on phones/tablets-in-portrait do not need the teacher tools */
+        .m .tool-btn, .m .notes, .m .index-panel { display: none !important; }
+        .m .slide-counter { left: 50%; transform: translateX(-50%); }
+        @media (max-width: 520px) { .m .timer-pill { display: none !important; } }
+        /* content */
+        .m .slide-heading { margin-bottom: 16px; }
+        .m .rule-strip { flex-wrap: wrap; gap: 8px; }
+        .m .rule { padding: 6px 14px; }
+        .m .starter-q { font-size: 3rem; margin-top: 4px; }
+        .m .starter-sub { font-size: 1.6rem; }
+        .m .starter-video { position: static; width: calc(100% - 32px); margin: 4px 16px 24px; }
+        .m .split-layout { flex-direction: column; align-items: stretch; gap: 20px; }
+        .m .split-text, .m .split-image { flex: none !important; width: 100%; }
+        .m .choice-row.c3, .m .choice-row.c4, .m .choice-row.c5 { grid-template-columns: 1fr; gap: 14px; }
+        .m.md .choice-row.c4, .m.md .choice-row.c5 { grid-template-columns: 1fr 1fr; }
+        .m .vocab-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+        .m.md .vocab-grid { grid-template-columns: repeat(3, 1fr); }
+        .m .card-def .def-text { font-size: 1.35rem; }
+        .m .vocab-list { grid-template-columns: 1fr; grid-auto-flow: row; grid-template-rows: none; gap: 8px; }
+        .m .vl-sent { font-size: 1.35rem; }
+        .m .q-item, .m .inq, .m .circle-item { padding: 14px 16px; }
+        .m .book-step { padding: 14px 16px; gap: 14px; }
+        .m .book-n { width: 44px; height: 44px; font-size: 1.6rem; }
+        .m .quiz-btn { padding: 14px 28px; }
+        .m .quiz-row { padding: 10px 14px; }
+        .m .big-quote { font-size: 2.2rem; }
+        .m .base-groups { padding: 8px 18px; }
+        .m .opener-qs { padding-left: 24px; }
+        .m .frames { padding: 12px 16px; }
+        .m .discussion-prompt { padding: 16px 20px; }
+        .m .poll-item { padding: 14px 16px; }
+        .m .next-btn-center { padding: 12px 30px; }
+        .m #slide-qr svg { width: min(86vw, 62vh) !important; height: min(86vw, 62vh) !important; }
+        /* Lesson 3 grammar slides */
+        .m .gram-grid, .m .gram-grid.three { grid-template-columns: 1fr; gap: 14px; }
+        .m .gram-card { padding: 18px 20px; }
+        .m .tl { flex-direction: column; }
+        .m .tl-arrow { transform: rotate(90deg); }
+        .m .tl-svg-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .m .tlsvg { min-width: 560px; }
+        .m .tl-formula { gap: 10px; padding: 12px 18px; width: auto; }
+        .m .ex-wrap.with-side { grid-template-columns: 1fr; }
+        .m .ex-foot { flex-wrap: wrap; }
+        .m .use-row { padding: 12px 14px; gap: 12px; }
+        .m .ans { min-width: 90px; }
+        /* Active Pause wheel */
+        .m .pause-layout { flex-direction: column; align-items: stretch; gap: 22px; }
+        .m .wheel-col { flex: none; display: flex; justify-content: center; padding-top: 26px; }
+        .m .wheel-wrap { width: min(84vw, 400px); height: min(84vw, 400px); }
+        .m .spin-btn { width: 88px; height: 88px; margin: -44px 0 0 -44px; font-size: 1.5rem; border-width: 5px; }
+        .m .pause-result { height: auto; min-height: 240px; overflow: visible; padding: 20px 18px; }
+        .m .pr-in { flex: none; }
+        .m .pr-best { position: static; margin-top: 14px; }
+        .m .pr-img { width: 38%; height: auto; aspect-ratio: 4 / 3; margin-left: 12px; }
+        .m .pr-list { columns: 1; }
+        .m .pr-list li { font-size: 1.4rem; }
+        .m .pause-video { flex-direction: column; align-items: stretch; gap: 10px; }
+        .m .pv-frame { width: 100%; }
+        /* Cover + closing slides */
+        .m .cover-slide { min-height: max(100%, 460px); }
+        .m .cover-panel { width: 100%; padding: 90px 22px calc(var(--dock) + 110px); justify-content: center; }
+        .m .cover-title { font-size: 3rem; }
+        .m .school-logo { top: 12px; right: 12px; padding: 8px 10px; border-radius: 14px; }
+        .m .school-logo img { height: 64px; }
+        .m .start-btn { left: 50%; bottom: calc(var(--dock) + 28px); width: min(260px, 80vw); height: 62px; font-size: 1.7rem; letter-spacing: 4px; }
+        .m .slide.active:has(.cover-slide):not(:has(.cover-panel)) { overflow-y: auto; }
+        .m .cover-slide:has(.cover-panel-left) { height: auto; display: flex; flex-direction: column; }
+        .m .cover-panel-left { position: relative; width: 100%; height: auto; clip-path: none; padding: calc(var(--bar) + 30px) 24px 30px; }
+        .m .cover-right-content { position: relative; width: 100%; height: auto; padding: 28px 20px calc(var(--dock) + 20px); }
+        .m .fb-heading { font-size: 2.6rem; }
+        .m .feedback-emoji { padding: 12px 0; font-size: 2.6rem; }
+
+        /* Quiz: multiple choice, mistakes (Lesson 4) */
+        .mcq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+        .mcq-item { background: #f7fafc; border-radius: 14px; padding: 14px 18px; display: flex; flex-direction: column; gap: 12px; }
+        .mcq-q { display: flex; align-items: flex-start; gap: 14px; font-size: 1.6rem; line-height: 1.4; color: #1a202c; }
+        .mcq-opts { display: flex; flex-wrap: wrap; gap: 8px; padding-left: 52px; }
+        .mcq-opt { font: 700 1.25rem 'Inter', sans-serif; color: #2d3748; background: #fff; border: 2px solid #cbd5e0; border-radius: 10px; padding: 8px 14px; cursor: pointer; transition: background .2s ease, border-color .2s ease, color .2s ease; touch-action: manipulation; }
+        .mcq-opt:hover { border-color: #667eea; }
+        .mcq-opt.right { background: #d1fae5; border-color: #10b981; color: #047857; }
+        .mcq-opt.right::after { content: ' \2713'; }
+        .mcq-opt.wrong { background: #fee2e2; border-color: #ef4444; color: #b91c1c; animation: mcqShake .4s ease; }
+        @keyframes mcqShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+        /* One question per slide */
+        .q1-wrap { max-width: 1200px !important; margin: 0 auto; width: 100%; }
+        .q1-head { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 10px; flex-wrap: wrap; }
+        .q1-dots { display: flex; gap: 8px; }
+        .q1-dots i { width: 16px; height: 16px; border-radius: 50%; background: #e2e8f0; }
+        .q1-dots i.done { background: #93c5fd; }
+        .q1-dots i.on { background: #0284c7; transform: scale(1.25); }
+        .q1-card { display: flex; align-items: flex-start; gap: 26px; background: #f7fafc; border-left: 10px solid #0284c7; border-radius: 22px; padding: 38px 46px; font-size: 3rem; font-weight: 600; line-height: 1.4; color: #1a202c; box-shadow: 0 8px 26px rgba(0,0,0,.06); }
+        .q1-n { flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%; background: #0284c7; color: #fff; font-size: 2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 4px; }
+        .q1-card .ans { min-width: 220px; }
+        .q1-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 26px; }
+        .q1-opts .mcq-opt { display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 2.1rem; padding: 24px 18px; border-radius: 18px; border-width: 3px; }
+        .q1-letter { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%; background: #1a202c; color: #fff; font-size: 1.5rem; }
+        .q1-fix { text-align: center; font-size: 3rem; font-weight: 600; margin-top: 26px; color: #1a202c; }
+        .q1-fix .err-arrow { font-size: 3rem; }
+        .q1-fix .ans { min-width: 320px; padding: 4px 20px; }
+        .m .q1-card { font-size: 1.6rem; padding: 20px; gap: 14px; }
+        .m .q1-n { width: 44px; height: 44px; font-size: 1.3rem; }
+        .m .q1-opts { grid-template-columns: 1fr; gap: 10px; }
+        .m .q1-opts .mcq-opt { font-size: 1.4rem; padding: 14px; justify-content: flex-start; }
+        .m .q1-fix { font-size: 1.6rem; }
+        .m .q1-fix .ans { min-width: 160px; }
+        .err { color: inherit; }
+        .err-arrow { color: #a0aec0; font-weight: 800; margin: 0 6px; }
+        .m .mcq-grid { grid-template-columns: 1fr; }
+        .m .mcq-opts { padding-left: 0; }
+        /* ===== Lesson 5: Mapping Colombia ===== */
+        .th-top { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
+        .th-top .letter { margin: 0; }
+        .th-ex { font-size: .95rem !important; color: #0369a1 !important; margin-top: 6px; font-style: italic; }
+        .sw { display: inline-block; width: 38px; height: 22px; border-radius: 5px; border: 2px solid #64748b; vertical-align: middle; margin-right: 8px; }
+        .sym { display: inline-block; min-width: 38px; text-align: center; font-size: 1.5rem; vertical-align: middle; margin-right: 8px; line-height: 1; }
+        .lg-rule { font-size: 1.15rem; color: #4a5568; background: #fff; border-radius: 12px; padding: 8px 12px; text-align: center; }
+        .tl-card.t4 { background: #fff1f2; border-top: 8px solid #ec4899; }
+        .map-hint { line-height: 1.3; text-align: center; font-size: 1rem; color: #718096; margin-top: 6px; }
+        .map-full { position: fixed; inset: 0; z-index: 1100; background: rgba(10,14,24,.94); display: none; align-items: center; justify-content: center; cursor: zoom-out; }
+        .map-full.show { display: flex; }
+        .map-full .mf-box { position: relative; line-height: 0; height: 100vh; max-width: 100vw; aspect-ratio: 1312 / 1199; }
+        .map-full .mf-box img { width: 100%; height: 100%; display: block; border: 0; border-radius: 0; }
+        .map-full .mf-box span { font-size: 1.5rem !important; width: 46px !important; height: 46px !important; line-height: 40px !important; }
+        .map-full .mf-close { position: absolute; top: 14px; right: 18px; z-index: 2; background: #fff; color: #1a202c; border: none; border-radius: 22px; padding: 10px 18px; font: 700 1rem 'Inter', sans-serif; cursor: pointer; }
+        .chk-top { display: flex; align-items: center; justify-content: center; gap: 22px; margin-bottom: 16px; }
+        .chk-count { background: #1a202c; color: #fff; font-weight: 800; font-size: 1.6rem; border-radius: 30px; padding: 6px 22px; font-variant-numeric: tabular-nums; }
+        .chk-count.full { background: #10b981; }
+        .chk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 22px; }
+        .chk-item { display: flex; gap: 16px; align-items: flex-start; background: #f7fafc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 12px 18px; cursor: pointer; transition: background .2s ease, border-color .2s ease; touch-action: manipulation; }
+        .chk-item .box { flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px; border: 3px solid #a0aec0; background: #fff; display: flex; align-items: center; justify-content: center; color: transparent; font-weight: 800; font-size: 1.4rem; margin-top: 2px; transition: all .2s ease; }
+        .chk-item.on { background: #ecfdf5; border-color: #10b981; }
+        .chk-item.on .box { background: #10b981; border-color: #10b981; color: #fff; }
+        .chk-t { font-size: 1.5rem; font-weight: 800; color: #1a202c; line-height: 1.2; }
+        .chk-d { font-size: 1.15rem; color: #4a5568; line-height: 1.3; margin-top: 2px; }
+        .m .chk-grid { grid-template-columns: 1fr; }
+        .m .chk-top { flex-wrap: wrap; gap: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="popup-overlay" id="popupOverlay" onclick="closePopupOutside(event)">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup()">Close</button>
+            <div class="popup-word" id="popupWord"></div>
+            <div class="popup-definition" id="popupDefinition"></div>
+        </div>
+    </div>
+
+    <!-- Lesson map bar (also the navigation menu) -->
+    <div class="lesson-bar" id="lessonBar">
+        <button class="bar-seg" data-seg="starter" style="flex:7;--c:#6366f1" onclick="jumpToSeg('starter')"><span class="tick">&#10003;</span><span class="lbl">Silent Starter<small>7 min</small></span></button>
+        <button class="bar-seg" data-seg="circle"  style="flex:7;--c:#f59e0b" onclick="jumpToSeg('circle')"><span class="tick">&#10003;</span><span class="lbl">Circle Time<small>7 min</small></span></button>
+        <button class="bar-seg" data-seg="lessonA" style="flex:21;--c:#0ea5e9" onclick="jumpToSeg('lessonA')"><span class="tick">&#10003;</span><span class="lbl">Lesson A<small>21 min</small></span></button>
+        <button class="bar-seg" data-seg="pause"   style="flex:7;--c:#10b981" onclick="jumpToSeg('pause')"><span class="tick">&#10003;</span><span class="lbl">Active Pause<small>7 min</small></span></button>
+        <button class="bar-seg" data-seg="lessonB" style="flex:21;--c:#0284c7" onclick="jumpToSeg('lessonB')"><span class="tick">&#10003;</span><span class="lbl">Lesson B<small>21 min</small></span></button>
+        <button class="bar-seg" data-seg="process" style="flex:7;--c:#ec4899" onclick="jumpToSeg('process')"><span class="tick">&#10003;</span><span class="lbl">Processing<small>7 min</small></span></button>
+        <div class="lesson-clock" id="lessonClock" title="Lesson clock: not started"><i id="lessonClockFill"></i></div>
+    </div>
+
+    <button class="nav-arrow prev" id="prevArrow" onclick="prevSlide()">&#8249;</button>
+    <button class="nav-arrow next" id="nextArrow" onclick="nextSlide()">&#8250;</button>
+    <div class="slide-counter" id="slideCounter"></div>
+
+    <div class="toolbar">
+        <div class="timer-pill" id="timerPill" style="display:none;">
+            <span id="segLabel" style="font-weight:600;font-size:.8rem;opacity:.8;"></span>
+            <span class="time" id="timerTime">00:00</span>
+            <button onclick="toggleTimer()" id="timerBtn">Start</button>
+            <button onclick="resetTimer()" style="background:#4a5568;">&#8635;</button>
+        </div>
+        <button class="tool-btn" onclick="toggleIndex()">Slide index (I)</button>
+        <button class="tool-btn" onclick="toggleNotes()">Teacher notes (N)</button>
+    </div>
+
+    <!-- Slide index: every slide's reference code, click to jump, copy to reuse -->
+    <div class="index-panel" id="indexPanel">
+        <div class="index-head"><b>Slide index &middot; <span id="idxLesson"></span></b><button onclick="copyAllRefs()">Copy all</button><button onclick="toggleIndex()">Close</button></div>
+        <div class="index-hint">Click a slide to jump to it. Click <b>Copy</b> to copy its reference code (e.g. to tell Claude &ldquo;reuse slide U2.5/checklist&rdquo;).</div>
+        <div class="index-list" id="indexList"></div>
+    </div>
+
+    <!-- Teacher notes content swaps per slide -->
+    <div class="notes" id="notesPanel"></div>
+
+    <div class="slideshow">
+
+        <!-- 1. TITLE -->
+        <div class="slide active" id="slide-title-slide" data-seg="none" data-notes="<b class='h'>Before class</b>(Lesson 5 / Unit 2.5) Mapping Colombia - One Department, One Story. Set up the circle of chairs and decide your talking piece. <b>Materials for the project:</b> large paper (A3 if possible), pencils, colored pencils or markers, rulers, and a way for pairs to research (devices, or printed fact sheets if devices are not available). Press T on each section to start its timer. Press N to show/hide these notes.<div class='ct'><b>Choice Theory:</b> Greet every student at the door by name - connection first (Love &amp; Belonging).</div>">
+            <div class="cover-slide">
+                <img class="cover-image" src="img/barn-raising-photo.png" alt="Amish barn raising in Ohio, US">
+                <div class="cover-panel">
+                    <div class="cover-title">MAPPING<br>COLOMBIA</div>
+                    <div class="cover-meta">IMPACT 4 &middot; UNIT 2.5</div>
+                    <div class="cover-meta">8TH GRADE ESL</div>
+                    <div class="cover-meta">70 MINUTES</div>
+                    <div class="cover-title" style="margin-top:10px;font-size:2.2rem;">One Department, One Story</div>
+                    <div class="cover-website" style="margin-top:22px;">Rochester &middot; Chía</div>
+                </div>
+                <div class="school-logo"><img src="img/rochester-logo.png" alt="Rochester School logo"></div>
+                <button class="start-btn" onclick="startLesson(this)"><span>START</span></button>
+            </div>
+        </div>
+
+        <!-- ============ SILENT STARTER (7 min) ============ -->
+        <div class="slide" id="slide-silent-starter" data-seg="starter" data-notes="<b class='h'>Silent starter &middot; 7 min</b>The small timer video (bottom left) starts by itself when this slide appears - click it if it doesn't. Students enter, sit and write silently and independently (minimum 4 sentences) while you take attendance.<br><br><b>Purpose:</b> students begin thinking about which department they might map today, and which kind of information could be shown on a map. Do not correct now. Walk the room and note interesting departments and ideas - you can use them in Circle Time and when pairs choose their story.<div class='ct'><b>Choice Theory:</b> Power and Freedom - students choose a place that matters to them and decide what to share. A calm, identical routine every lesson = Survival (safety). Don't police - if someone isn't writing, ask quietly: 'What do you want to do right now?'</div>">
+            <div class="slide-label">Silent Starter <span class="seg-chip starter">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="rule-strip"><div class="rule">&#128263; Voices off</div><div class="rule">&#9999;&#65039; Pencils sharp</div><div class="rule">&#128221; Minimum 4 sentences</div></div>
+                <div class="starter-q" style="font-size:2.7rem;"><small class="starter-verb">Think about the departments of Colombia.</small><span style="display:block;margin-top:12px;color:#0284c7;">1: Which department would you like to know better? Why?</span><span style="display:block;margin-top:12px;color:#7c3aed;">2: What do you already know about its people, climate or nature?</span><span style="display:block;margin-top:12px;color:#059669;">3: What would you show on a map of it?</span></div>
+                <div class="starter-sub">(Teacher will take Attendance)</div>
+            </div></div></div>
+            <div class="starter-video"><iframe id="starterVideo" data-src="https://www.youtube.com/embed/xVVnXA8Qvlc?rel=0&autoplay=1" title="Timer video" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+        </div>
+
+        <!-- ============ QR SLIDE ============ -->
+        <div class="slide" id="slide-qr" data-seg="starter" data-notes="<b class='h'>QR slide</b>Students scan the code to open this lesson's slides on their own device. Link: https://mimlanguageservices.github.io/Home/Rochester/Impact-4-Slides/Impact4-Unit2-Lesson5.html">
+            <div class="slide-label">Scan Me</div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col" style="align-items:center;text-align:center;">
+                <div class="slide-heading">&#128241; Scan to open today's slides</div>
+                <svg style="height:min(68vh,68vw);width:min(68vh,68vw);display:block;margin:0 auto;border-radius:18px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h45v45H0z"/><path stroke="#000000" d="M2 2.5h7m1 0h1m2 0h1m1 0h5m2 0h2m1 0h1m1 0h2m1 0h2m2 0h1m1 0h7M2 3.5h1m5 0h1m1 0h2m2 0h3m3 0h1m4 0h1m4 0h1m1 0h1m3 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m3 0h1m6 0h1m1 0h2m4 0h2m4 0h2m1 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m1 0h2m1 0h5m3 0h1m1 0h1m2 0h4m1 0h3m2 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m3 0h2m1 0h1m1 0h2m2 0h1m2 0h1m1 0h5m1 0h2m2 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m2 0h1m1 0h3m2 0h1m2 0h1m4 0h1m1 0h1m3 0h2m2 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 9.5h1m2 0h1m5 0h2m3 0h1m1 0h1m1 0h6M2 10.5h1m1 0h2m1 0h3m1 0h1m4 0h1m2 0h3m1 0h1m1 0h1m2 0h5m3 0h1m2 0h1m1 0h2M2 11.5h1m1 0h1m2 0h1m1 0h4m3 0h3m1 0h6m1 0h1m2 0h5m1 0h3m1 0h1m1 0h1M3 12.5h2m1 0h1m1 0h3m1 0h3m2 0h4m1 0h2m1 0h2m3 0h2m3 0h1m2 0h1m1 0h1M2 13.5h1m1 0h4m8 0h1m1 0h1m1 0h1m1 0h1m2 0h4m1 0h1m1 0h1m1 0h3m5 0h1M4 14.5h1m2 0h2m1 0h2m1 0h2m1 0h1m1 0h2m2 0h1m1 0h1m1 0h4m1 0h1m1 0h1m5 0h2M3 15.5h2m1 0h1m3 0h1m2 0h2m1 0h1m1 0h3m1 0h1m2 0h2m1 0h4m1 0h1m1 0h2m2 0h1m2 0h1M3 16.5h1m1 0h1m1 0h2m1 0h2m1 0h2m1 0h1m1 0h1m1 0h3m1 0h2m4 0h2m1 0h2m1 0h1m2 0h4M2 17.5h2m3 0h1m1 0h3m1 0h1m1 0h2m6 0h3m2 0h3m2 0h2m1 0h4M3 18.5h1m1 0h1m2 0h1m1 0h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h3m1 0h3m3 0h3m3 0h1m3 0h1M2 19.5h5m3 0h1m1 0h2m4 0h1m4 0h4m2 0h1m5 0h1m1 0h1m2 0h1M3 20.5h1m4 0h3m1 0h6m2 0h1m3 0h1m3 0h2m5 0h2m1 0h2m1 0h1M3 21.5h3m3 0h1m1 0h3m2 0h1m1 0h3m2 0h1m1 0h2m1 0h1m1 0h3m4 0h1m1 0h4M3 22.5h2m1 0h1m1 0h1m1 0h6m2 0h1m2 0h2m2 0h1m1 0h1m2 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1M4 23.5h2m1 0h1m1 0h4m1 0h1m2 0h2m2 0h3m1 0h1m4 0h4m2 0h3m2 0h2M4 24.5h3m1 0h3m1 0h3m2 0h2m4 0h1m1 0h1m1 0h1m3 0h1m2 0h2m1 0h1m3 0h1M2 25.5h1m1 0h1m4 0h2m3 0h1m1 0h1m1 0h1m1 0h1m4 0h1m1 0h2m1 0h1m1 0h1m3 0h4m1 0h1M3 26.5h1m3 0h3m1 0h3m1 0h5m2 0h1m1 0h1m1 0h3m2 0h1m3 0h1m4 0h1m1 0h1M3 27.5h3m3 0h1m4 0h2m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m2 0h2m1 0h1m2 0h4M3 28.5h1m2 0h1m1 0h1m4 0h1m1 0h2m2 0h1m1 0h1m2 0h1m1 0h3m1 0h5m1 0h2m1 0h1m1 0h2M3 29.5h3m4 0h2m2 0h3m1 0h1m1 0h2m1 0h1m2 0h1m1 0h3m2 0h2m1 0h1m1 0h2M6 30.5h4m2 0h1m1 0h1m1 0h1m1 0h1m3 0h9m2 0h3m2 0h2m2 0h1M3 31.5h2m2 0h1m2 0h3m2 0h1m1 0h3m1 0h2m1 0h1m4 0h1m1 0h1m2 0h2m1 0h1m4 0h1M2 32.5h1m1 0h2m1 0h3m1 0h1m4 0h2m1 0h1m1 0h1m5 0h3m4 0h7M4 33.5h4m1 0h1m2 0h4m2 0h2m1 0h1m2 0h2m5 0h1m1 0h2m1 0h7M3 34.5h2m2 0h2m5 0h1m1 0h2m1 0h2m1 0h2m3 0h15M10 35.5h2m1 0h2m4 0h3m1 0h3m1 0h1m2 0h5m3 0h1m3 0h1M2 36.5h7m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m2 0h3m2 0h1m1 0h3m1 0h1m1 0h1m1 0h2M2 37.5h1m5 0h1m1 0h1m1 0h2m1 0h1m2 0h2m1 0h2m7 0h1m2 0h2m3 0h1m2 0h2M2 38.5h1m1 0h3m1 0h1m2 0h1m2 0h2m6 0h2m1 0h1m2 0h1m2 0h1m2 0h5m1 0h1M2 39.5h1m1 0h3m1 0h1m1 0h4m2 0h1m1 0h2m1 0h1m2 0h3m1 0h1m1 0h1m2 0h2m3 0h2m1 0h1M2 40.5h1m1 0h3m1 0h1m1 0h2m1 0h3m2 0h5m3 0h3m3 0h1m1 0h1m2 0h1m3 0h2M2 41.5h1m5 0h1m2 0h3m3 0h4m1 0h4m2 0h1m1 0h1m3 0h1m3 0h2m1 0h1M2 42.5h7m1 0h1m1 0h1m2 0h2m1 0h1m1 0h1m2 0h2m2 0h1m1 0h1m2 0h4m4 0h2"/></svg>
+
+            </div></div></div>
+        </div>
+
+        <!-- ============ CIRCLE TIME (7 min): define, connect, think ============ -->
+        <div class="slide" id="slide-circle-time" data-seg="circle" data-notes="<b class='h'>Circle time &middot; 7 min (about 2-2.5 min per question)</b>Chairs in a circle, one talking piece. You go first and model a short, honest answer. 'I pass' is always OK. After each speaker everyone says 'Thank you.' Do not correct grammar in the circle.<br><br><b>1 &middot; DEFINE</b> (identify, clarify or explain a concept). Collect 2-3 ideas and agree a class definition: a map is a drawing of a place that shows where things are; a <b>thematic map</b> shows ONE subject (e.g. population, climate, resources) instead of everything.<br><i>Prompts:</i> 'A map is ______.' / 'A thematic map shows ______.'<br><br><b>2 &middot; CONNECT</b> (share own experiences). Listeners only listen: no comments, no fixing.<br><i>Prompts:</i> 'I used a map when ______.' / 'The map helped me because ______.'<br><br><b>3 &middot; THINK</b> (predict and imagine). Give 20 seconds of silent thinking first. Accept every idea; ask 'What makes you think that?' This question previews today's project and recycles the future simple.<br><i>Prompts:</i> 'I would show ______ on a map.' / 'People will notice ______.'<div class='ct'><b>Choice Theory:</b> Love &amp; Belonging - the circle meets the need to be heard. Passing is always allowed (Freedom); every answer counts (Power). Connecting habits: listening, supporting, encouraging, respecting.</div>">
+            <div class="slide-label">Circle Time <span class="seg-chip circle">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="circle-item"><div class="q-type"><span>1</span> Define it</div><div class="circle-q">What is a <u>map</u>? What does a <u>thematic map</u> show?</div></div>
+                <div class="circle-item"><div class="q-type"><span>2</span> Connect to you</div><div class="circle-q">Think of a map you have used (a phone, a school, a video game). When did it help you?</div></div>
+                <div class="circle-item"><div class="q-type"><span>3</span> Think about it</div><div class="circle-q">If you could show one story about Colombia on a map, what would it be? What do you think people will notice?</div></div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ PROJECT OVERVIEW (Lesson A). Reference code: U2.5/project-overview ============ -->
+        <div class="slide" id="slide-project-overview" data-seg="lessonA" data-notes="<b class='h'>Lesson A &middot; The challenge (about 2 min)</b>Reference code: <b>U2.5/project-overview</b>. Read the challenge aloud. Stress the three products: one map, one clear legend, three sentences. Explain that this is a <b>pair project</b> that mixes geography and English, and that it connects to Unit 2: maps make communities (and their stories) more visible - like the YouthMappers in the unit.<br><br>Ask: 'What does a department have that Colombia does not?' (a smaller, more detailed story).<br><b>Pacing for Lesson A (21 min):</b> challenge 2 - key words 3 - anatomy of a map 3 - choose a story 4 - checklist 3 - legend methods 3 - legend practice 3.<div class='ct'><b>Choice Theory:</b> Power - students will choose the department and the story. Belonging - the pair works as a team, and the finished maps can be shared with the village (the class).</div>">
+            <div class="slide-label">The Challenge <span class="seg-chip lesson">Part A</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="rule-strip"><div class="rule">&#128101; Pair project</div><div class="rule">&#127757; Geography + ESL</div><div class="rule">&#128270; Research + design</div></div>
+                <div class="slide-heading" style="margin-bottom:12px;">Mapping Colombia: One Department, One Story</div>
+                <div class="tl-sub" style="margin-bottom:18px;">Choose <b>one department</b> and make a <b>thematic map</b> that shows something important about it.</div>
+                <div class="gram-grid three">
+                    <div class="gram-card g-simple"><div class="gram-tag">Product 1</div><div class="gram-formula">&#128506;&#65039; One original map</div><div class="gram-use">Focused on one subject.</div></div>
+                    <div class="gram-card g-cont"><div class="gram-tag">Product 2</div><div class="gram-formula">&#128273; One clear legend</div><div class="gram-use">Anyone can read your map without your help.</div></div>
+                    <div class="gram-card g-perf"><div class="gram-tag">Product 3</div><div class="gram-formula">&#9997;&#65039; Short explanation</div><div class="gram-use">What does the map reveal?</div></div>
+                </div>
+                <div class="gram-signals">A <b>thematic map</b> focuses on <b>one</b> subject: population, climate, natural resources or culture.</div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ KEY WORDS (Lesson A). Reference code: U2.5/key-words ============ -->
+        <div class="slide" id="slide-key-words" data-seg="lessonA" data-notes="<b class='h'>Key words &middot; about 3 min</b>Reference code: <b>U2.5/key-words</b>. Read each word and sentence aloud; students repeat. Then pairs choose three words they are not sure about and explain them to each other (with a gesture or a quick sketch). These words reappear in the checklist, the legend and the interpretation, so do not over-teach now.<div class='ct'><b>Choice Theory:</b> Power - students decide which words they need to practise. Allow Spanish for a quick meaning check, then say it again in English.</div>">
+            <div class="slide-label">Key Words <span class="seg-chip lesson">Part A</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:18px;">Key words for our maps</div>
+                <div class="vocab-list" style="grid-template-rows:repeat(6,auto);">
+                    <div class="vl-item"><span class="vl-n">1</span><div><span class="vl-word">thematic map</span><span class="vl-sent">A thematic map shows one topic, such as rainfall or population.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">2</span><div><span class="vl-word">department</span><span class="vl-sent">Chía is in the department of Cundinamarca.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">3</span><div><span class="vl-word">municipality</span><span class="vl-sent">Each department is divided into municipalities.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">4</span><div><span class="vl-word">legend (key)</span><span class="vl-sent">The legend explains what each color and symbol means.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">5</span><div><span class="vl-word">symbol</span><span class="vl-sent">A black circle can be a symbol for a major city.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">6</span><div><span class="vl-word">density</span><span class="vl-sent">Population density is how many people live in one square kilometer.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">7</span><div><span class="vl-word">resource</span><span class="vl-sent">Coal and gold are natural resources.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">8</span><div><span class="vl-word">protected area</span><span class="vl-sent">A national park is a protected area.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">9</span><div><span class="vl-word">source</span><span class="vl-sent">A source is where you found your information.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">10</span><div><span class="vl-word">reliable</span><span class="vl-sent">A reliable source gives information we can trust.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">11</span><div><span class="vl-word">pattern</span><span class="vl-sent">The map shows a pattern: more people live near the cities.</span></div></div>
+                    <div class="vl-item"><span class="vl-n">12</span><div><span class="vl-word">compare</span><span class="vl-sent">Compare the two areas: which one has more people?</span></div></div>
+                </div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ ANATOMY OF A THEMATIC MAP (Lesson A). Reference code: U2.5/map-anatomy ============ -->
+        <div class="slide" id="slide-map-anatomy" data-seg="lessonA" data-notes="<b class='h'>Anatomy of a thematic map &middot; about 3 min</b>Reference code: <b>U2.5/map-anatomy</b>. This is a model map (Mineral Resources of Pará, Brazil, using ANM and IBGE data, 2022) made as a classroom example: use it to show what a finished map looks like, not as a source of data. It uses a different country on purpose so no pair copies it. Point to each numbered badge on the map and have students find the matching number in the list. Ask: 'What does this map show?' 'What does dark blue mean?' 'Could someone understand this map without asking me?' (That is the test for a good legend.)<br><br>The eight numbers are exactly the checklist on the next slide.<div class='ct'><b>Choice Theory:</b> Power - students judge the map for themselves: what is clear, what is missing?</div>">
+            <div class="slide-label">Anatomy of a Map <span class="seg-chip lesson">Part A</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="split-layout" style="gap:36px;">
+                    <div style="flex:1.55;min-width:0;"><div class="map-zoom" title="Click to enlarge" onclick="openMapFull(this)" style="position:relative;line-height:0;cursor:zoom-in;"><img src="img/para-brazil-map.png" alt="Mineral Resources of Pará - example thematic map" style="width:100%;height:auto;display:block;border:2px solid #e2e8f0;border-radius:16px;"><span style="position:absolute;left:13%;top:22.5%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#ec4899;border:3px solid #fff;color:#fff;font:800 1.05rem/28px Inter,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);">1</span><span style="position:absolute;left:3.4%;top:4.8%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#ec4899;border:3px solid #fff;color:#fff;font:800 1.05rem/28px Inter,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);">2</span><span style="position:absolute;left:41.5%;top:34.6%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#ec4899;border:3px solid #fff;color:#fff;font:800 1.05rem/28px Inter,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);">3</span><span style="position:absolute;left:71.2%;top:11.2%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#ec4899;border:3px solid #fff;color:#fff;font:800 1.05rem/28px Inter,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);">4</span><span style="position:absolute;left:37.5%;top:37.9%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#ec4899;border:3px solid #fff;color:#fff;font:800 1.05rem/28px Inter,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);">5</span><span style="position:absolute;left:90%;top:73.7%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#ec4899;border:3px solid #fff;color:#fff;font:800 1.05rem/28px Inter,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);">6</span><span style="position:absolute;left:69%;top:90.4%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#ec4899;border:3px solid #fff;color:#fff;font:800 1.05rem/28px Inter,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);">7</span><span style="position:absolute;left:0.8%;top:81.4%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#ec4899;border:3px solid #fff;color:#fff;font:800 1.05rem/28px Inter,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4);">8</span></div><div class="map-hint">&#128269; Click the map to enlarge</div></div>
+                    <div style="flex:.9;min-width:0;">
+                        <div class="slide-heading" style="text-align:left;font-size:1.9rem;margin-bottom:14px;">Find all 8 parts</div>
+                        <div class="ex-list" style="gap:8px;">
+                            <div class="ex-item" style="padding:7px 14px;align-items:center;"><span class="ex-n" style="margin-top:0;background:#ec4899;width:34px;height:34px;font-size:1.05rem;">1</span><span class="ex-text" style="font-size:1.4rem;">Department outline</span></div>
+                            <div class="ex-item" style="padding:7px 14px;align-items:center;"><span class="ex-n" style="margin-top:0;background:#ec4899;width:34px;height:34px;font-size:1.05rem;">2</span><span class="ex-text" style="font-size:1.4rem;">Clear title</span></div>
+                            <div class="ex-item" style="padding:7px 14px;align-items:center;"><span class="ex-n" style="margin-top:0;background:#ec4899;width:34px;height:34px;font-size:1.05rem;">3</span><span class="ex-text" style="font-size:1.4rem;">Thematic display</span></div>
+                            <div class="ex-item" style="padding:7px 14px;align-items:center;"><span class="ex-n" style="margin-top:0;background:#ec4899;width:34px;height:34px;font-size:1.05rem;">4</span><span class="ex-text" style="font-size:1.4rem;">Legend or key</span></div>
+                            <div class="ex-item" style="padding:7px 14px;align-items:center;"><span class="ex-n" style="margin-top:0;background:#ec4899;width:34px;height:34px;font-size:1.05rem;">5</span><span class="ex-text" style="font-size:1.4rem;">Geographic labels</span></div>
+                            <div class="ex-item" style="padding:7px 14px;align-items:center;"><span class="ex-n" style="margin-top:0;background:#ec4899;width:34px;height:34px;font-size:1.05rem;">6</span><span class="ex-text" style="font-size:1.4rem;">North arrow</span></div>
+                            <div class="ex-item" style="padding:7px 14px;align-items:center;"><span class="ex-n" style="margin-top:0;background:#ec4899;width:34px;height:34px;font-size:1.05rem;">7</span><span class="ex-text" style="font-size:1.4rem;">Sources</span></div>
+                            <div class="ex-item" style="padding:7px 14px;align-items:center;"><span class="ex-n" style="margin-top:0;background:#ec4899;width:34px;height:34px;font-size:1.05rem;">8</span><span class="ex-text" style="font-size:1.4rem;">Interpretation</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ CHOOSE YOUR MAP STORY (Lesson A). Reference code: U2.5/choose-story ============ -->
+        <div class="slide" id="slide-choose-story" data-seg="lessonA" data-notes="<b class='h'>Choose your story &middot; about 4 min</b>Reference code: <b>U2.5/choose-story</b>. Read the six themes. Students tap a card to mark the one they like most (this is only for discussion; pairs make the real decision in Lesson B). Give pairs 30 seconds to talk about their favourite theme and why.<br><br><b>Teacher recommendation:</b> push A, B, D and E first - they are visually interesting and have good, easy-to-find data. C and F work well when students can find suitable data. A theme must have data students can really find: if exact data is unavailable, they choose another theme or clearly state the limits of the information.<br><br><b>Theme D (Indigenous communities):</b> insist on respectful terminology and official sources (documented territories and resguardos only). Never let students guess where communities live.<div class='ct'><b>Choice Theory:</b> Freedom - a real choice among six themes. Power - they choose a story that matters to them.</div>">
+            <div class="slide-label">Choose Your Story <span class="seg-chip lesson">Part A</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:14px;">What story will your map tell?</div>
+                <div class="choice-row c3" style="gap:16px;">
+                    <div class="choice-card" style="padding:16px 16px;" onclick="pickOne(this)"><div class="th-top"><span class="letter">A</span><span class="emoji" style="font-size:2.3rem;margin:0;">&#128101;</span></div><h4 style="font-size:1.35rem;">Where do people live?</h4><p style="font-size:1.05rem;"><b>Population and settlement</b><br>Show density, distribution or major cities.</p><p class="th-ex">Example: shade municipalities low / medium / high.</p></div>
+                    <div class="choice-card" style="padding:16px 16px;" onclick="pickOne(this)"><div class="th-top"><span class="letter">B</span><span class="emoji" style="font-size:2.3rem;margin:0;">&#127777;&#65039;</span></div><h4 style="font-size:1.35rem;">Hot, cold, or in between?</h4><p style="font-size:1.05rem;"><b>Climate and geography</b><br>Show temperature, rainfall, elevation or ecosystems.</p><p class="th-ex">Example: a color gradient for temperature.</p></div>
+                    <div class="choice-card" style="padding:16px 16px;" onclick="pickOne(this)"><div class="th-top"><span class="letter">C</span><span class="emoji" style="font-size:2.3rem;margin:0;">&#9935;&#65039;</span></div><h4 style="font-size:1.35rem;">What lies beneath the land?</h4><p style="font-size:1.05rem;"><b>Natural resources</b><br>Show minerals, coal, gold, oil or other resources.</p><p class="th-ex">Example: symbols for deposits, production sites and mining.</p></div>
+                    <div class="choice-card" style="padding:16px 16px;" onclick="pickOne(this)"><div class="th-top"><span class="letter">D</span><span class="emoji" style="font-size:2.3rem;margin:0;">&#129309;</span></div><h4 style="font-size:1.35rem;">Who are the people of this land?</h4><p style="font-size:1.05rem;"><b>Indigenous communities and cultural geography</b><br>Show officially documented territories, reservations and resguardos.</p><p class="th-ex">Use respectful words and reliable sources.</p></div>
+                    <div class="choice-card" style="padding:16px 16px;" onclick="pickOne(this)"><div class="th-top"><span class="letter">E</span><span class="emoji" style="font-size:2.3rem;margin:0;">&#127807;</span></div><h4 style="font-size:1.35rem;">Nature worth protecting</h4><p style="font-size:1.05rem;"><b>Environment and biodiversity</b><br>Show national parks, protected areas, rivers or forests.</p><p class="th-ex">Example: shaded areas for protected zones.</p></div>
+                    <div class="choice-card" style="padding:16px 16px;" onclick="pickOne(this)"><div class="th-top"><span class="letter">F</span><span class="emoji" style="font-size:2.3rem;margin:0;">&#127806;</span></div><h4 style="font-size:1.35rem;">What does this department produce?</h4><p style="font-size:1.05rem;"><b>Agriculture and the economy</b><br>Show crops, livestock or other major activities.</p><p class="th-ex">Example: symbols for coffee, rice, cacao or bananas.</p></div>
+                </div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ THE MAP CHECKLIST (Lesson A). Reference code: U2.5/checklist ============ -->
+        <div class="slide" id="slide-checklist" data-seg="lessonA" data-notes="<b class='h'>The map checklist &middot; about 3 min</b>Reference code: <b>U2.5/checklist</b>. Every pair gets the same eight requirements, whatever their theme - this makes the project easy to assess. Read the items; students tap each one to tick it (the counter shows 0/8). Ask them to find each item on the example map from the previous slide. Remind them they will use this checklist again to check their own map and a classmate's map at the end of Lesson B.<br><br>A <b>scale bar</b> is an optional extension, not a requirement: the map is thematic, not for navigation.<div class='ct'><b>Choice Theory:</b> Power - clear, equal criteria let students judge their own work (self-evaluation). Predictability = safety (Survival).</div>">
+            <div class="slide-label">The Map Checklist <span class="seg-chip lesson">Part A</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="chk-top"><div class="slide-heading" style="margin:0;">What every map must include</div><div class="chk-count">0 / 8</div></div>
+                <div class="chk-grid">
+                    <div class="chk-item" onclick="toggleChk(this)"><span class="box">&#10003;</span><div><div class="chk-t">1. Department outline</div><div class="chk-d">Show the department's approximate boundaries and identify it by name.</div></div></div>
+                    <div class="chk-item" onclick="toggleChk(this)"><span class="box">&#10003;</span><div><div class="chk-t">2. Clear title</div><div class="chk-d">Give the map a specific title, such as &ldquo;Population Density in Antioquia.&rdquo;</div></div></div>
+                    <div class="chk-item" onclick="toggleChk(this)"><span class="box">&#10003;</span><div><div class="chk-t">3. Thematic display</div><div class="chk-d">Show the chosen information with colors, symbols, patterns or proportional circles.</div></div></div>
+                    <div class="chk-item" onclick="toggleChk(this)"><span class="box">&#10003;</span><div><div class="chk-t">4. Legend or key</div><div class="chk-d">Explain exactly what every color, symbol, line or pattern means.</div></div></div>
+                    <div class="chk-item" onclick="toggleChk(this)"><span class="box">&#10003;</span><div><div class="chk-t">5. Geographic labels</div><div class="chk-d">Label relevant municipalities, cities, rivers, protected areas or other features.</div></div></div>
+                    <div class="chk-item" onclick="toggleChk(this)"><span class="box">&#10003;</span><div><div class="chk-t">6. Orientation</div><div class="chk-d">Include a north arrow or compass.</div></div></div>
+                    <div class="chk-item" onclick="toggleChk(this)"><span class="box">&#10003;</span><div><div class="chk-t">7. Sources</div><div class="chk-d">List the sources you used and the year of the data, when available.</div></div></div>
+                    <div class="chk-item" onclick="toggleChk(this)"><span class="box">&#10003;</span><div><div class="chk-t">8. Map interpretation</div><div class="chk-d">Write three sentences explaining what the map reveals.</div></div></div>
+                </div>
+                <div class="gram-signals" style="font-size:1.3rem;margin-top:14px;">&#11088; Extension: add a <b>scale bar</b> (optional).</div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ THE LEGEND (Lesson A). Reference code: U2.5/legend-methods ============ -->
+        <div class="slide" id="slide-legend-methods" data-seg="lessonA" data-notes="<b class='h'>The legend is the most important part &middot; about 3 min</b>Reference code: <b>U2.5/legend-methods</b>. The legend is a central learning objective, not a decorative box: students make deliberate decisions about how to represent their information. Walk through the three methods using the examples.<br><br><b>Method 1 - color categories:</b> best for density, temperature, rainfall, crop production. The categories must be defined with <b>real data</b>, not chosen arbitrarily.<br><b>Method 2 - symbols:</b> best for minerals, cities, Indigenous community locations, crops, protected areas. Every symbol represents the same type of feature, always.<br><b>Method 3 - sizes:</b> best for comparing quantities (city populations, crop production). Define the size categories, or use proportional circles based on real figures.<br><br>Students may combine methods if they have a clear reason (e.g. colors for density + symbols for major cities).<div class='ct'><b>Choice Theory:</b> Power and Freedom - students choose the method that fits their data and justify it.</div>">
+            <div class="slide-label">The Legend <span class="seg-chip lesson">Part A</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:14px;">Three ways to build a legend</div>
+                <div class="gram-grid three">
+                    <div class="gram-card g-simple">
+                        <div class="gram-tag">Method 1</div>
+                        <div class="gram-formula" style="font-size:1.8rem;">Color categories</div>
+                        <div class="gram-use" style="font-size:1.25rem;">Best for density, temperature, rainfall, crops.</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sw" style="background:#dbeafe;"></span> low density</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sw" style="background:#93c5fd;"></span> moderate density</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sw" style="background:#1d4ed8;"></span> high density</div>
+                        <div class="lg-rule">Define the categories with <b>real data</b>.</div>
+                    </div>
+                    <div class="gram-card g-cont">
+                        <div class="gram-tag">Method 2</div>
+                        <div class="gram-formula" style="font-size:1.8rem;">Symbols</div>
+                        <div class="gram-use" style="font-size:1.25rem;">Best for minerals, cities, communities, parks.</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sym" style="color:#d4a017;">&#9670;</span> documented gold mine</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sym" style="color:#0f172a;">&#9679;</span> major city</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sym" style="color:#16a34a;">&#9650;</span> protected area</div>
+                        <div class="lg-rule">One symbol = <b>one type</b> of feature.</div>
+                    </div>
+                    <div class="gram-card g-perf">
+                        <div class="gram-tag">Method 3</div>
+                        <div class="gram-formula" style="font-size:1.8rem;">Different sizes</div>
+                        <div class="gram-use" style="font-size:1.25rem;">Best for comparing quantities.</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sym" style="color:#0f172a;font-size:.9rem;">&#9679;</span> smaller population</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sym" style="color:#0f172a;font-size:1.5rem;">&#9679;</span> medium population</div>
+                        <div class="gram-ex" style="font-size:1.3rem;"><span class="sym" style="color:#0f172a;font-size:2.2rem;line-height:.6;">&#9679;</span> larger population</div>
+                        <div class="lg-rule">Define sizes, or use <b>real figures</b>.</div>
+                    </div>
+                </div>
+                <div class="gram-signals" style="font-size:1.3rem;">&#129309; You can <b>combine</b> methods if you have a clear reason.</div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ LEGEND PRACTICE (Lesson A). Reference code: U2.5/legend-practice ============ -->
+        <div class="slide" id="slide-legend-practice" data-seg="lessonA" data-notes="<b class='h'>Legend practice &middot; about 3 min</b>Reference code: <b>U2.5/legend-practice</b>. Pairs read each situation and decide which legend method fits best (20 seconds each), then click the blurred answer to reveal. Accept a different answer if the pair can <b>justify</b> it - for example coffee production can be shown with colors or with sizes. The last item is the combine-methods example.<br><br>Ask for reasons with a frame: 'We would use ______ because ______.'<div class='ct'><b>Choice Theory:</b> Power - explaining WHY is the learning. Fun - quick pair competition.</div>">
+            <div class="slide-label">Legend Practice <span class="seg-chip lesson">Part A</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:6px;">Which legend method fits best?</div>
+                <div class="tl-sub" style="margin-bottom:16px;font-size:1.6rem;">Color categories &middot; Symbols &middot; Different sizes &middot; a combination</div>
+                <div class="ex-wrap"><div class="ex-list">
+                    <div class="ex-item"><span class="ex-n">1</span><span class="ex-text" style="font-size:1.6rem;">Show where the gold mines in a department are. &rarr; <span class="ans" onclick="toggleAns(this)">Symbols</span></span></div>
+                    <div class="ex-item"><span class="ex-n">2</span><span class="ex-text" style="font-size:1.6rem;">Compare the population of five cities. &rarr; <span class="ans" onclick="toggleAns(this)">Different sizes</span></span></div>
+                    <div class="ex-item"><span class="ex-n">3</span><span class="ex-text" style="font-size:1.6rem;">Show low, medium and high rainfall in each municipality. &rarr; <span class="ans" onclick="toggleAns(this)">Color categories</span></span></div>
+                    <div class="ex-item"><span class="ex-n">4</span><span class="ex-text" style="font-size:1.6rem;">Show where the national parks are. &rarr; <span class="ans" onclick="toggleAns(this)">Symbols</span></span></div>
+                    <div class="ex-item"><span class="ex-n">5</span><span class="ex-text" style="font-size:1.6rem;">Show how much coffee each municipality produces. &rarr; <span class="ans" onclick="toggleAns(this)">Colors or sizes</span></span></div>
+                    <div class="ex-item"><span class="ex-n">6</span><span class="ex-text" style="font-size:1.6rem;">Show population density and the major cities. &rarr; <span class="ans" onclick="toggleAns(this)">Colors + symbols</span></span></div>
+                </div>
+                <div class="ex-foot"><span class="ex-reveal" onclick="revealAll(this)">Show / hide answers</span><span class="gram-signals" style="margin:0;font-size:1.3rem;">We would use ______ because ______.</span></div></div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ ACTIVE PAUSE (7 min): spin the wheel. Reference code: U2.5/active-pause ============ -->
+        <div class="slide" id="slide-active-pause" data-seg="pause" data-notes="<b class='h'>Active pause &middot; 7 min</b>Press <b>SPIN</b>: the wheel picks one of 10 activities at random and shows how to run it. Everyone stands. The 7-minute timer starts by itself when this slide opens - when it ends, three slow breaths and back to seats.<br><br><b>Music</b> Click the video at the bottom to play the music (it never starts by itself; it stops when you leave the slide).<br><br><b>Your choice of activity</b> Click any section of the wheel instead of the SPIN button: the wheel spins exactly as normal but lands on the section you clicked. There is no pointer or highlight on the wheel, so students will not notice.<br><br><b>Choice</b> If the class really cannot do the activity (not enough space, too noisy), they may spin once more. Anyone may choose a low-impact version (step in place, raise the hands) or the calm option, with no explanation needed.<div class='ct'><b>Choice Theory:</b> Fun and Survival - the body needs to move. Freedom - students choose how big to move. Belonging - partner and group activities (Mirror Challenge, Rock-Paper-Scissors, Follow the Leader) build connection.</div>">
+            <div class="slide-label">Active Pause <span class="seg-chip pause">7 min</span></div>
+            <div class="slide-inner" style="padding:100px 60px 84px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
+                <div class="pause-layout">
+                    <div class="wheel-col">
+                        <div class="wheel-wrap">
+                            <svg class="wheel-pointer" viewBox="0 0 60 70"><path d="M30 66 L6 8 Q30 -4 54 8 Z" fill="#1a202c" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></svg>
+                            <svg id="wheelSvg" class="wheel-svg" viewBox="-250 -250 500 500"><g id="wheelGroup"></g><circle r="236" fill="none" stroke="#1a202c" stroke-width="8"/></svg>
+                            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN</button>
+                        </div>
+                    </div>
+                    <div class="pause-result" id="pauseResult"><div class="pr-idle"><span>&#127905;</span>Press <b>SPIN</b> to choose today's active pause!</div></div>
+                </div>
+                <div class="pause-video">
+                    <div class="pv-frame"><iframe id="pauseVideo" data-src="https://www.youtube.com/embed/wed87yyVNcM?rel=0" title="Active pause music" allow="encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+                    <div class="pv-cap">&#127925; Music for the active pause<small>Click the video to play</small></div>
+                </div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ CHOOSE YOUR DEPARTMENT AND THEME (Lesson B). Reference code: U2.5/choose-team ============ -->
+        <div class="slide" id="slide-choose-team" data-seg="lessonB" data-notes="<b class='h'>Lesson B &middot; Step 1: choose (about 4 min)</b>Reference code: <b>U2.5/choose-team</b>. Pairs agree on a department and a theme (A-F). Rule: they must be able to find <b>real data</b> for it. Walk around and approve every choice before they start. Suggest a department students know (family, a trip, our own Cundinamarca) so they have personal motivation. Avoid pairs where both students pick the same department as three other pairs in a row - variety makes a better class display.<br><br><b>Pacing for Lesson B (21 min):</b> choose 4 - goal level 1 - research rules 2 - work plan and work time about 9 - interpretation 3 - peer check 2.<div class='ct'><b>Choice Theory:</b> Freedom and Power - the pair chooses its own story. Belonging - both partners must agree; use 'What do you want?' not 'What should we do?'</div>">
+            <div class="slide-label">Step 1: Choose <span class="seg-chip lesson">Part B</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:16px;">Step 1: Choose your story</div>
+                <div class="q-item"><b>1. Department.</b> Which department will you map?<span class="sub">Think of a place you know, visited or want to understand.</span></div>
+                <div class="q-item"><b>2. Theme (A&ndash;F).</b> Which story will your map tell?<span class="sub">Can you find real data about it? If not, choose another theme.</span></div>
+                <div class="q-item"><b>3. Display.</b> Colors, symbols or sizes?<span class="sub">Choose the legend method that fits your information.</span></div>
+                <div class="frames" style="margin-top:6px;">
+                    <p>Our department is <b>______</b>. Our theme is <b>______</b>.</p>
+                    <p>Our map will show <b>______</b> in <b>______</b>.</p>
+                </div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ CHOOSE YOUR GOAL LEVEL (Lesson B). Reference code: U2.5/levels ============ -->
+        <div class="slide" id="slide-levels" data-seg="lessonB" data-notes="<b class='h'>Choose your goal &middot; about 1 min</b>Reference code: <b>U2.5/levels</b>. All pairs do the same basic assignment; ready students extend it without needing a separate project. Pairs decide which level they will aim for (they can change their mind).<br><br><b>Competent:</b> one thematic map with a complete legend, accurate labels and three sentences.<br><b>Advanced:</b> more detailed data, explains a pattern, justifies the display method.<br><b>Mastery:</b> adds a second related data layer or a comparison and explains how the two relate.<div class='ct'><b>Choice Theory:</b> Power - students set their own challenge level. Everyone can reach Competent; stretching is a choice, not a requirement.</div>">
+            <div class="slide-label">Your Goal <span class="seg-chip lesson">Part B</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:6px;">Choose your goal</div>
+                <div class="tl-sub" style="margin-bottom:16px;">Everyone does the same project. How far will you go?</div>
+                <div class="gram-grid three">
+                    <div class="gram-card g-simple"><div class="gram-tag">&#127881; Competent</div><div class="gram-use" style="font-size:1.45rem;margin-bottom:14px;">One thematic map with a complete legend, accurate labels and three sentences.</div><div class="gram-ex" style="font-size:1.25rem;">Example: map the population density of a department.</div></div>
+                    <div class="gram-card g-cont"><div class="gram-tag">&#11088; Advanced</div><div class="gram-use" style="font-size:1.45rem;margin-bottom:14px;">More detailed data. Explain a pattern and justify your display method.</div><div class="gram-ex" style="font-size:1.25rem;">Example: compare density across municipalities and explain the pattern.</div></div>
+                    <div class="gram-card g-perf"><div class="gram-tag">&#127942; Mastery</div><div class="gram-use" style="font-size:1.45rem;margin-bottom:14px;">Add a second related data layer or comparison. Explain how they relate.</div><div class="gram-ex" style="font-size:1.25rem;">Example: add major cities and discuss how the two layers relate.</div></div>
+                </div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ RESEARCH RULES (Lesson B). Reference code: U2.5/research-rules ============ -->
+        <div class="slide" id="slide-research-rules" data-seg="lessonB" data-notes="<b class='h'>Research rules &middot; about 2 min</b>Reference code: <b>U2.5/research-rules</b>. These rules keep the project achievable and stop students inventing information. Read them aloud; check understanding: 'How many sources?' 'What do you write next to a statistic?' 'What if you cannot find the data?'<br><br><b>Starting points:</b> DANE (national statistics) for population; IDEAM (the institute for hydrology, meteorology and environmental studies) for climate and environment; Agencia Nacional de Minería for mining. For Indigenous territories, students investigate official information from Colombian government agencies responsible for Indigenous affairs and land. Check the sources your pairs actually open - if a page is not authoritative, it does not count as the official source.<br><br>If exact data is unavailable, they choose a different theme or clearly state the limits of the information.<div class='ct'><b>Choice Theory:</b> Power - students become careful researchers. Honest limits are a strength, not a failure.</div>">
+            <div class="slide-label">Research Rules <span class="seg-chip lesson">Part B</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:12px;">Research rules</div>
+                <div class="use-list" style="gap:10px;">
+                    <div class="use-row u-simple" style="padding:10px 22px;"><span class="use-n">1</span><div><div class="use-label" style="font-size:1.5rem;">Use at least <u>two</u> reliable sources &ndash; one official or authoritative.</div></div></div>
+                    <div class="use-row u-cont" style="padding:10px 22px;"><span class="use-n">2</span><div><div class="use-label" style="font-size:1.5rem;">Write the source and the data year.</div></div></div>
+                    <div class="use-row u-perf" style="padding:10px 22px;"><span class="use-n">3</span><div><div class="use-label" style="font-size:1.5rem;">Never invent statistics or claim a place has a resource or community without evidence.</div></div></div>
+                    <div class="use-row u-simple" style="padding:10px 22px;"><span class="use-n">4</span><div><div class="use-label" style="font-size:1.5rem;">Use the same units and comparable categories.</div></div></div>
+                    <div class="use-row u-cont" style="padding:10px 22px;"><span class="use-n">5</span><div><div class="use-label" style="font-size:1.5rem;">No exact data? Choose a different theme or say what the limits are.</div></div></div>
+                </div>
+                <div class="gram-signals" style="font-size:1.25rem;margin-top:14px;">&#128270; Starting points: <b>DANE</b> (population) &middot; <b>IDEAM</b> (climate, environment) &middot; <b>Agencia Nacional de Miner&iacute;a</b> (mining) &middot; official government agencies (Indigenous affairs and land)</div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ WORK PLAN AND WORK TIME (Lesson B). Reference code: U2.5/work-plan ============ -->
+        <div class="slide" id="slide-work-plan" data-seg="lessonB" data-notes="<b class='h'>Work plan and work time &middot; about 9 min</b>Reference code: <b>U2.5/work-plan</b>. Leave this slide up while pairs work. Suggested roles: one <b>researcher</b> (finds data, records the sources and years) and one <b>designer</b> (draws the outline and builds the legend); they swap halfway so both do both jobs. Pairs work on large paper. Walk round with the eight-point checklist: check data first, then the legend.<br><br>If time runs out, this project carries on into the next lesson; the finished product is one map, one legend and three sentences. Pairs who finish early move to the Advanced or Mastery goal.<div class='ct'><b>Choice Theory:</b> Belonging and Power - a shared task with clear jobs. If a pair argues, ask: 'What do you each want? What can you both do?'</div>">
+            <div class="slide-label">Work Plan <span class="seg-chip lesson">Part B</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:6px;">Work plan</div>
+                <div class="tl-sub" style="margin-bottom:16px;font-size:1.7rem;">&#128269; Researcher &nbsp;+&nbsp; &#127912; Designer &nbsp;&middot;&nbsp; swap jobs halfway</div>
+                <div class="tl">
+                    <div class="tl-card t1"><div class="tl-when">Step 1</div><div class="tl-tag">Find the data</div><div class="tl-why" style="font-style:normal;font-size:1.35rem;">Two reliable sources. Write the source and the year.</div></div>
+                    <div class="tl-arrow">&rarr;</div>
+                    <div class="tl-card t2"><div class="tl-when">Step 2</div><div class="tl-tag">Draw the outline</div><div class="tl-why" style="font-style:normal;font-size:1.35rem;">Department outline, name and the labels you need.</div></div>
+                    <div class="tl-arrow">&rarr;</div>
+                    <div class="tl-card t3"><div class="tl-when">Step 3</div><div class="tl-tag">Show it</div><div class="tl-why" style="font-style:normal;font-size:1.35rem;">Add colors, symbols or sizes. Build the legend.</div></div>
+                    <div class="tl-arrow">&rarr;</div>
+                    <div class="tl-card t4"><div class="tl-when">Step 4</div><div class="tl-tag">Finish</div><div class="tl-why" style="font-style:normal;font-size:1.35rem;">Title, north arrow, sources, then three sentences.</div></div>
+                </div>
+                <div class="gram-signals" style="font-size:1.3rem;margin-top:18px;">&#9989; Check the <b>8-point checklist</b> as you work.</div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ MAP INTERPRETATION (Lesson B). Reference code: U2.5/interpretation ============ -->
+        <div class="slide" id="slide-interpretation" data-seg="lessonB" data-notes="<b class='h'>Map interpretation &middot; about 3 min</b>Reference code: <b>U2.5/interpretation</b>. Three sentences keep this a geography project, not a long research essay. Read the three questions and frames. Model with the example (a population map). Stress that their conclusions must be <b>supported by the information they collected</b>: if the data does not show it, they cannot say it.<br><br><b>Language focus:</b> present simple for what the map shows ('The map shows...'), comparatives ('higher', 'fewer') and the future simple from Unit 2 for the importance sentence ('This pattern will affect...'). Accept any accurate wording at this level.<div class='ct'><b>Choice Theory:</b> Power - students explain their own discovery. Belonging - partners read the three sentences aloud to each other before writing the final version.</div>">
+            <div class="slide-label">Map Interpretation <span class="seg-chip lesson">Part B</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:12px;">Three sentences: what does your map reveal?</div>
+                <div class="ex-list" style="gap:10px;">
+                    <div class="ex-item"><span class="ex-n">1</span><span class="ex-text" style="font-size:1.55rem;"><b>What does your map show?</b><br><i style="color:#4a5568;">Our map shows ______ in ______.</i></span></div>
+                    <div class="ex-item"><span class="ex-n">2</span><span class="ex-text" style="font-size:1.55rem;"><b>What pattern or difference did you discover?</b><br><i style="color:#4a5568;">______ is higher/lower/more/fewer in ______ than in ______.</i></span></div>
+                    <div class="ex-item"><span class="ex-n">3</span><span class="ex-text" style="font-size:1.55rem;"><b>Why might this information be important?</b><br><i style="color:#4a5568;">This pattern can affect ______ because ______.</i></span></div>
+                </div>
+                <div class="frames" style="margin-top:14px;"><p style="font-size:1.2rem !important;"><b>Example (a population map):</b> The map shows population density in ______. The population is concentrated in a few urban areas, while other areas have lower density. This pattern can affect where roads, schools and hospitals are built.</p></div>
+                <div class="gram-signals" style="font-size:1.25rem;margin-top:12px;">&#128221; Your conclusions must be <b>supported by your data</b>.</div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ PEER CHECK (Lesson B). Reference code: U2.5/peer-check ============ -->
+        <div class="slide" id="slide-peer-check" data-seg="lessonB" data-notes="<b class='h'>Peer check &middot; about 2 min</b>Reference code: <b>U2.5/peer-check</b>. Two pairs swap maps. The test: can the other pair understand the map <b>without the makers' help</b>? They use the eight-point checklist and give feedback as <b>two stars and a wish</b> (two things that work, one thing to improve). Keep feedback kind and specific. Each pair then writes down one change to make next class.<div class='ct'><b>Choice Theory:</b> Belonging - respectful feedback builds community. Power - the maker decides what to change. Connecting habits: encouraging, respecting, supporting.</div>">
+            <div class="slide-label">Peer Check <span class="seg-chip lesson">Part B</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+
+                <div class="slide-heading" style="margin-bottom:12px;">Peer check: two stars and a wish</div>
+                <div class="ex-list">
+                    <div class="ex-item"><span class="ex-n">1</span><span class="ex-text" style="font-size:1.7rem;"><b>Swap</b> maps with another pair. Read it <u>without</u> help from the makers.</span></div>
+                    <div class="ex-item"><span class="ex-n">2</span><span class="ex-text" style="font-size:1.7rem;"><b>Check</b> the 8 points. Is every color, symbol and line in the legend?</span></div>
+                    <div class="ex-item"><span class="ex-n" style="background:#f59e0b;">&#11088;</span><span class="ex-text" style="font-size:1.7rem;"><b>Two stars:</b> <i>Your ______ is clear because ______.</i></span></div>
+                    <div class="ex-item"><span class="ex-n" style="background:#ec4899;">&#10024;</span><span class="ex-text" style="font-size:1.7rem;"><b>One wish:</b> <i>One thing to improve is ______.</i></span></div>
+                </div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ PROCESSING ACTIVITY (7 min) ============ -->
+        <div class="slide" id="slide-processing" data-seg="process" data-notes="<b class='h'>Processing activity &middot; 7 min</b>2 min individual jot, 3 min share with your map partner, 2 min whole class (volunteers). Keep it non-judgemental: ask 'What choices did you make?' not 'Why did you not finish?'. Allow Spanish for the hardest ideas, then rephrase together in English.<div class='ct'><b>Choice Theory:</b> This is WDEP - Wants, Doing, Evaluation, Planning - the heart of reality therapy. Total behaviour: what did I DO, THINK and FEEL? Did it meet my needs, and did it help me and my partner?</div>">
+            <div class="slide-label">Processing Activity <span class="seg-chip process">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="slide-heading">How did it go?</div>
+                <div class="q-item"><b>W &middot; What did we want?</b> What did our pair want our map to say?</div>
+                <div class="q-item"><b>D &middot; What did we do?</b> What did we choose to do, think and feel while we worked?</div>
+                <div class="q-item"><b>E &middot; Did it help?</b> Did our choices help our map, our partner and our learning?</div>
+                <div class="q-item"><b>P &middot; What's our plan?</b> One thing we'll keep. One thing we'll change.</div>
+            </div></div></div>
+        </div>
+
+        <div class="slide" id="slide-exit-ticket" data-seg="process" data-notes="<b class='h'>Exit ticket &middot; last minutes</b>Slips or notebooks. Read them later: they show each pair's department, theme and open questions, and the faces tell you who needs a one-to-one check-in. Collect the maps and planning notes in a safe place so the project can continue next lesson. Homework: <span class='tbd'>[e.g. find one more reliable source for your theme]</span>.<div class='ct'><b>Choice Theory:</b> Power - the student judges their own progress (self-evaluation), not the teacher.</div>">
+            <div class="slide-label">Exit Ticket <span class="seg-chip process">7 min</span></div>
+            <div class="slide-inner"><div class="fit-wrap"><div class="center-col">
+                <div class="slide-heading">Exit ticket</div>
+                <div class="q-item">Our department is ______ and our theme is ______.</div>
+                <div class="q-item">One question we still need to answer, and one source we will use.</div>
+                <div class="q-item">How was today? <span style="font-size:1.8rem;">&#128542; &#128528; &#128578; &#128512;</span></div>
+            </div></div></div>
+        </div>
+
+        <!-- ============ CLOSING ============ -->
+        <div class="slide" id="slide-end" data-seg="none" data-notes="<b class='h'>Close</b>Thank the class. Optionally leave this slide up while students leave and tap an emoji on the way out.<div class='ct'><b>Choice Theory:</b> End on connection - say goodbye by name.</div>">
+            <div class="cover-slide">
+                <div class="cover-panel-left">
+                    <div class="fb-heading">THANK YOU,<br>MAPMAKERS!</div>
+                    <div class="fb-sub">How was today's class?</div>
+                </div>
+                <div class="cover-right-content">
+                    <div class="feedback-slider">
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128542;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128577;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128528;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128578;</div>
+                        <div class="feedback-emoji" onclick="selectFeedback(this)">&#128512;</div>
+                    </div>
+                    <div class="thanks-note" id="thanksNote">Thanks for your feedback!</div>
+                    <div style="color:#4a5568;font-weight:600;">See you next class &mdash; Unit 2.6</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        var slideOrder = [
+            'slide-title-slide',
+            'slide-silent-starter',
+            'slide-qr',
+            'slide-circle-time',
+            'slide-project-overview',
+            'slide-key-words',
+            'slide-map-anatomy',
+            'slide-choose-story',
+            'slide-checklist',
+            'slide-legend-methods',
+            'slide-legend-practice',
+            'slide-active-pause',
+            'slide-choose-team',
+            'slide-levels',
+            'slide-research-rules',
+            'slide-work-plan',
+            'slide-interpretation',
+            'slide-peer-check',
+            'slide-processing',
+            'slide-exit-ticket',
+            'slide-end'
+        ];
+        var currentIndex = 0;
+
+        // Timer blocks (minutes). Lesson A and B are separate 21-minute blocks.
+        var SEGMENTS = {
+            circle:  { label: 'Circle Time',    min: 7 },
+            lessonA: { label: 'Lesson A',       min: 21 },
+            pause:   { label: 'Active Pause',   min: 7 },
+            lessonB: { label: 'Lesson B',       min: 21 },
+            process: { label: 'Processing',     min: 7 }
+        };
+        var activeSeg = null, remaining = 0, timerHandle = null;
+
+        function fitSlide(el) {
+            if (!el) return;
+            var inner = el.querySelector('.slide-inner');
+            var wrap = el.querySelector('.fit-wrap');
+            if (!inner || !wrap) return;
+            wrap.style.transform = 'none';
+            if (document.documentElement.classList.contains('m')) return;   // mobile layout scrolls instead of scaling
+            var cs = window.getComputedStyle(inner);
+            var availW = inner.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+            var availH = inner.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+            var natW = wrap.scrollWidth, natH = wrap.scrollHeight;
+            if (!natW || !natH) return;
+            var scale = Math.max(window.innerWidth < 700 ? 0.12 : 0.4, Math.min(2, Math.min(availW / natW, availH / natH)));
+            wrap.style.transform = 'scale(' + scale + ')';
+        }
+
+        function renderSlide() {
+            document.querySelectorAll('.slide').forEach(function (s) { s.classList.remove('active'); });
+            var el = document.getElementById(slideOrder[currentIndex]);
+            if (el) el.classList.add('active');
+            document.getElementById('prevArrow').classList.toggle('hidden', currentIndex === 0);
+            document.getElementById('nextArrow').classList.toggle('hidden', currentIndex === 0 || currentIndex === slideOrder.length - 1);
+            var sc = document.getElementById('slideCounter'); sc.textContent = (currentIndex + 1) + ' / ' + slideOrder.length + ' '; var rs = document.createElement('span'); rs.className = 'ref'; rs.title = 'Click to copy this slide reference'; rs.textContent = slideRef(slideOrder[currentIndex]); rs.onclick = function () { copyText(slideRef(slideOrder[currentIndex]), rs); }; sc.appendChild(rs);
+            requestAnimationFrame(function () { fitSlide(el); });
+            if (el) el.querySelectorAll('img').forEach(function (img) {
+                if (!img.complete) img.addEventListener('load', function () { fitSlide(el); }, { once: true });
+            });
+            document.getElementById('notesPanel').innerHTML = (el && el.dataset.notes) || '';
+            syncTimer(el ? el.dataset.seg : 'none');
+            updateBar(el);
+            var vid = document.getElementById('starterVideo');
+            var onStarter = el && el.id === 'slide-silent-starter';
+            if (onStarter && !vid.src) vid.src = vid.dataset.src;
+            if (!onStarter && vid.src) vid.removeAttribute('src');
+            var pv = document.getElementById('pauseVideo');
+            var onPause = el && el.id === 'slide-active-pause';
+            if (pv) { if (onPause && !pv.getAttribute('src')) pv.setAttribute('src', pv.dataset.src); if (!onPause && pv.getAttribute('src')) pv.removeAttribute('src'); }
+        }
+
+        window.addEventListener('resize', function () { fitSlide(document.getElementById(slideOrder[currentIndex])); });
+
+        function goToSlideId(id) { var i = slideOrder.indexOf(id); if (i !== -1) { currentIndex = i; renderSlide(); } }
+        function nextSlide(fromStart) { if (currentIndex === 0 && fromStart !== true) return;   // title slide: only START moves on
+            if (currentIndex < slideOrder.length - 1) { currentIndex++; renderSlide(); } }
+        function startLesson(btn) {
+            var cover = btn.closest('.cover-slide');
+            startLessonClock();
+            cover.classList.add('leaving');
+            setTimeout(function () { nextSlide(true); cover.classList.remove('leaving'); }, 700);
+        }
+        function prevSlide() { if (currentIndex > 0) { currentIndex--; renderSlide(); } }
+
+        // ----- Timer: resets when you move into a new block, keeps running within a block -----
+        function fmt(s) { s = Math.max(0, s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+        function paintTimer() {
+            document.getElementById('timerTime').textContent = fmt(remaining);
+            document.getElementById('timerPill').classList.toggle('low', remaining <= 60 && remaining > 0);
+        }
+        function stopTimer() { clearInterval(timerHandle); timerHandle = null; document.getElementById('timerBtn').textContent = 'Start'; }
+        function syncTimer(seg) {
+            var pill = document.getElementById('timerPill');
+            if (!SEGMENTS[seg]) { pill.style.display = 'none'; stopTimer(); activeSeg = null; return; }
+            pill.style.display = 'flex';
+            if (seg !== activeSeg) {
+                activeSeg = seg; stopTimer();
+                remaining = SEGMENTS[seg].min * 60;
+                document.getElementById('segLabel').textContent = SEGMENTS[seg].label;
+                paintTimer();
+                toggleTimer();   // auto-start when a new block opens
+            }
+        }
+        function toggleTimer() {
+            if (!activeSeg) return;
+            if (timerHandle) { stopTimer(); return; }
+            document.getElementById('timerBtn').textContent = 'Pause';
+            timerHandle = setInterval(function () {
+                remaining--; paintTimer();
+                if (remaining <= 0) { stopTimer(); beep(); }
+            }, 1000);
+        }
+        function resetTimer() { if (!activeSeg) return; stopTimer(); remaining = SEGMENTS[activeSeg].min * 60; paintTimer(); }
+        function beep() { try { var c = new (window.AudioContext || window.webkitAudioContext)(), o = c.createOscillator(); o.connect(c.destination); o.frequency.value = 660; o.start(); setTimeout(function () { o.stop(); }, 600); } catch (e) {} }
+
+        // ----- 70-minute lesson clock (starts when START is pressed on the title slide) -----
+        var LESSON_MS = 70 * 60 * 1000, lessonStart = null, lessonClockHandle = null;
+        function startLessonClock() {
+            if (lessonStart) return;
+            lessonStart = Date.now();
+            tickLessonClock();
+            lessonClockHandle = setInterval(tickLessonClock, 1000);
+        }
+        function tickLessonClock() {
+            var el = Date.now() - lessonStart;
+            var pct = Math.min(100, el / LESSON_MS * 100);
+            document.getElementById('lessonClockFill').style.width = pct + '%';
+            var clock = document.getElementById('lessonClock');
+            clock.classList.toggle('over', el >= LESSON_MS);
+            var m = Math.floor(el / 60000), s = Math.floor(el / 1000) % 60;
+            clock.title = 'Lesson clock: ' + m + ':' + String(s).padStart(2, '0') + ' of 70:00';
+            if (el >= LESSON_MS) { clearInterval(lessonClockHandle); }
+        }
+
+        // ----- Lesson map bar / navigation menu -----
+        var BAR_ORDER = ['starter', 'circle', 'lessonA', 'pause', 'lessonB', 'process'];
+        function jumpToSeg(seg) {
+            for (var i = 0; i < slideOrder.length; i++) {
+                if (document.getElementById(slideOrder[i]).dataset.seg === seg) { currentIndex = i; renderSlide(); return; }
+            }
+        }
+        function updateBar(el) {
+            var bar = document.getElementById('lessonBar');
+            var onTitle = !el || el.id === 'slide-title-slide';
+            bar.classList.toggle('show', !onTitle);
+            if (onTitle) return;
+            var seg = el.dataset.seg;
+            var cur = BAR_ORDER.indexOf(seg);
+            if (cur === -1) cur = BAR_ORDER.length;   // closing slide: everything is complete
+            bar.querySelectorAll('.bar-seg').forEach(function (b) {
+                var idx = BAR_ORDER.indexOf(b.dataset.seg);
+                b.classList.toggle('done', idx < cur);
+                b.classList.toggle('current', idx === cur);
+            });
+        }
+
+        // ----- Slide references: stable codes built from the lesson code + slide id -----
+        var LESSON_REF = 'U2.5';
+        function slideRef(id) { return LESSON_REF + '/' + id.replace(/^slide-/, ''); }
+        var SLIDE_NAMES = {
+            'slide-title-slide': "Title Slide",
+            'slide-silent-starter': "Silent Starter",
+            'slide-qr': "QR Slide",
+            'slide-circle-time': "Circle Time",
+            'slide-project-overview': "The Challenge",
+            'slide-key-words': "Key Words",
+            'slide-map-anatomy': "Anatomy of a Thematic Map",
+            'slide-choose-story': "Choose Your Story (themes A-F)",
+            'slide-checklist': "The Map Checklist (8 points)",
+            'slide-legend-methods': "The Legend: 3 Methods",
+            'slide-legend-practice': "Legend Practice",
+            'slide-active-pause': "Active Pause",
+            'slide-choose-team': "Step 1: Choose Department + Theme",
+            'slide-levels': "Choose Your Goal Level",
+            'slide-research-rules': "Research Rules",
+            'slide-work-plan': "Work Plan",
+            'slide-interpretation': "Map Interpretation (3 sentences)",
+            'slide-peer-check': "Peer Check",
+            'slide-processing': "Processing",
+            'slide-exit-ticket': "Exit Ticket",
+            'slide-end': "Closing Slide"
+        };
+        function slideTitle(el) { return SLIDE_NAMES[el.id] || el.id; }
+        function copyText(text, btn) {
+            function done() { if (btn) { var o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = o; }, 1200); } }
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+            function fallback() { var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} document.body.removeChild(ta); }
+        }
+        function copyAllRefs() {
+            var lines = slideOrder.map(function (id, i) { return (i + 1) + '. ' + slideRef(id) + ' - ' + slideTitle(document.getElementById(id)); });
+            copyText(lines.join('\n'), event && event.target);
+        }
+        function buildIndex() {
+            document.getElementById('idxLesson').textContent = LESSON_REF;
+            var list = document.getElementById('indexList'); list.innerHTML = '';
+            slideOrder.forEach(function (id, i) {
+                var row = document.createElement('div'); row.className = 'idx-row' + (i === currentIndex ? ' current' : '');
+                row.innerHTML = '<span class="idx-n">' + (i + 1) + '</span><div class="idx-main"><div class="idx-title"></div><div class="idx-ref"></div></div><button class="idx-copy">Copy</button>';
+                row.querySelector('.idx-title').textContent = slideTitle(document.getElementById(id));
+                row.querySelector('.idx-ref').textContent = slideRef(id);
+                row.querySelector('.idx-copy').onclick = function (e) { e.stopPropagation(); copyText(slideRef(id), e.target); };
+                row.onclick = function () { if (i === 0 && currentIndex !== 0) return; currentIndex = i; renderSlide(); toggleIndex(); };
+                list.appendChild(row);
+            });
+        }
+        function toggleIndex() {
+            var p = document.getElementById('indexPanel');
+            if (!p.classList.contains('show')) buildIndex();
+            p.classList.toggle('show');
+        }
+
+        // ----- Interactions -----
+        // ----- Click a map to view it full screen (click, Esc or the button closes it) -----
+        function openMapFull(el) {
+            var f = document.getElementById('mapFull');
+            if (!f) { f = document.createElement('div'); f.id = 'mapFull'; f.className = 'map-full'; f.onclick = closeMapFull; document.body.appendChild(f); }
+            var box = document.createElement('div'); box.className = 'mf-box'; box.innerHTML = el.innerHTML;
+            var hint = box.querySelector('.map-hint'); if (hint) hint.remove();
+            f.innerHTML = ''; f.appendChild(box);
+            var b = document.createElement('button'); b.className = 'mf-close'; b.textContent = 'Close ✕'; f.appendChild(b);
+            f.classList.add('show');
+        }
+        function closeMapFull() { var f = document.getElementById('mapFull'); if (f) f.classList.remove('show'); }
+        // ----- Map checklist: tick items, counter turns green at 8/8 -----
+        function toggleChk(el) {
+            el.classList.toggle('on');
+            var s = el.closest('.slide'), n = s.querySelectorAll('.chk-item.on').length, c = s.querySelector('.chk-count');
+            c.textContent = n + ' / ' + s.querySelectorAll('.chk-item').length;
+            c.classList.toggle('full', n === s.querySelectorAll('.chk-item').length);
+        }
+        function toggleNotes() { document.getElementById('notesPanel').classList.toggle('show'); }
+        // ----- Exercise answers: click one to reveal, or reveal/hide all on the slide -----
+        function toggleAns(el) { el.classList.toggle('revealed'); }
+        function revealAll(btn) {
+            var slide = btn.closest('.slide');
+            var all = slide.querySelectorAll('.ans');
+            var anyHidden = Array.prototype.some.call(all, function (a) { return !a.classList.contains('revealed'); });
+            all.forEach(function (a) { a.classList.toggle('revealed', anyHidden); });
+            var ok = slide.querySelectorAll('.mcq-opt[data-ok]');
+            if (ok.length) {
+                var show = Array.prototype.some.call(ok, function (o) { return !o.classList.contains('right'); });
+                slide.querySelectorAll('.mcq-opt').forEach(function (o) { o.classList.remove('wrong'); o.classList.toggle('right', show && o.hasAttribute('data-ok')); });
+            }
+        }
+        // ----- Quiz: multiple choice (green = correct, red = try again) -----
+        function pickOpt(btn) {
+            if (btn.hasAttribute('data-ok')) { btn.classList.toggle('right'); return; }
+            btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong');
+        }
+        // ----- Active Pause: spin the wheel -----
+        var PAUSE_ACTIVITIES = [
+          {
+            "name": "The 7-Minute Fitness Challenge",
+            "short": "Fitness Challenge",
+            "tag": "Easy to organize",
+            "desc": "Students perform a series of exercises for 40 seconds, followed by 20 seconds to rest and change exercises.",
+            "list": [
+              "Jumping jacks",
+              "Squats",
+              "High knees",
+              "Mountain climbers (standing or on the floor)",
+              "Arm circles",
+              "Running in place",
+              "Stretching"
+            ],
+            "best": "A quick energy boost with no equipment.",
+            "img": "img/pause-1.jpg"
+          },
+          {
+            "name": "Simon Says: Fitness Edition",
+            "short": "Simon Says",
+            "desc": "One student or the teacher gives instructions. Students move only when the instruction begins with “Simon says.”",
+            "listTitle": "Examples:",
+            "list": [
+              "Simon says, jump five times!",
+              "Simon says, touch your toes!",
+              "Simon says, balance on one foot!",
+              "Simon says, do three squats!",
+              "Turn around! (Don't move unless Simon says.)"
+            ],
+            "best": "Listening skills, concentration, and laughter.",
+            "img": "img/pause-2.jpg"
+          },
+          {
+            "name": "Freeze Dance",
+            "short": "Freeze Dance",
+            "desc": "Play energetic music. Students dance or move around their own space. When the music stops, everyone freezes.",
+            "note": "Add challenges: freeze like a superhero, an athlete, a robot, or a statue.",
+            "best": "Releasing energy and improving mood.",
+            "img": "img/pause-3.jpg"
+          },
+          {
+            "name": "Mirror Challenge",
+            "short": "Mirror Challenge",
+            "desc": "Students work in pairs. One student leads slow or energetic movements while the other copies them like a mirror. Switch leaders after one minute.",
+            "note": "Try arm movements, side steps, squats, knee raises, and balance poses.",
+            "best": "Cooperation, coordination, and focus.",
+            "img": "img/pause-4.jpg"
+          },
+          {
+            "name": "Rock-Paper-Scissors Fitness Battle",
+            "short": "RPS Battle",
+            "desc": "Students find a partner and play rock-paper-scissors. The winner chooses a safe exercise for both students to perform.",
+            "note": "Examples: five jumping jacks, five squats, ten seconds of high knees, or five arm circles. Then they challenge another partner.",
+            "best": "Friendly competition and social interaction.",
+            "img": "img/pause-5.jpg"
+          },
+          {
+            "name": "Follow the Leader Relay",
+            "short": "Follow the Leader",
+            "desc": "Divide the class into small groups. One student leads the group through movements for 30 seconds before passing leadership to another student.",
+            "note": "Leaders can choose side steps, arm swings, knee raises, or dance moves. Students can remain in place if the classroom is small.",
+            "best": "Leadership, collaboration, and student choice.",
+            "emoji": "👥"
+          },
+          {
+            "name": "Stretch and Reset",
+            "short": "Stretch & Reset",
+            "desc": "A calmer active pause for students who need to reset after demanding academic work.",
+            "list": [
+              "Reach for the sky.",
+              "Stretch each arm across the body.",
+              "Roll the shoulders.",
+              "Gently twist from side to side.",
+              "Balance on one foot.",
+              "Take slow breaths."
+            ],
+            "best": "Reducing tension and returning to focused work.",
+            "img": "img/pause-7.jpg"
+          },
+          {
+            "name": "Action Charades",
+            "short": "Action Charades",
+            "desc": "A student acts out an activity while classmates guess it. Students must use their bodies rather than speak.",
+            "note": "Ideas: swimming, skateboarding, climbing a mountain, boxing, surfing, playing basketball, or escaping a volcano.",
+            "best": "ESL vocabulary, creativity, and movement.",
+            "emoji": "🎭"
+          },
+          {
+            "name": "The 30-Second Movement Countdown",
+            "short": "30-Sec Countdown",
+            "desc": "Display or call out a different movement every 30 seconds. Students have to keep moving until the countdown ends.",
+            "note": "Try jumping jacks, fast feet, side steps, squats, imaginary jump rope, and speed skating without equipment.",
+            "best": "A predictable, high-energy routine.",
+            "img": "img/pause-9.jpg"
+          },
+          {
+            "name": "Move If It Is True!",
+            "short": "Move If True",
+            "desc": "The teacher calls out a statement. Students perform a movement if it applies to them.",
+            "list": [
+              "“Move if you like soccer!”",
+              "“Jump if you have a pet!”",
+              "“Do three squats if you enjoy music!”",
+              "“Take three side steps if you like adventure!”",
+              "“Stretch your arms if you enjoy learning English!”"
+            ],
+            "note": "Students can choose low-impact alternatives, such as raising their hands or stepping in place.",
+            "img": "img/pause-10.jpg"
+          }
+        ];
+        var WHEEL_COLORS = ['#ef4444', '#f59e0b', '#eab308', '#84cc16', '#10b981', '#06b6d4', '#3b82f6', '#6366f1', '#a855f7', '#ec4899'];
+        var wheelRotation = 0, wheelSpinning = false;
+        function initWheel() {
+            var g = document.getElementById('wheelGroup');
+            if (!g || g.childNodes.length) return;
+            var NS = 'http://www.w3.org/2000/svg', R = 236, n = PAUSE_ACTIVITIES.length, step = 360 / n;
+            PAUSE_ACTIVITIES.forEach(function (act, i) {
+                var a0 = (i * step - 90) * Math.PI / 180, a1 = ((i + 1) * step - 90) * Math.PI / 180;
+                var p = document.createElementNS(NS, 'path');
+                p.setAttribute('d', 'M0 0 L' + (R * Math.cos(a0)).toFixed(2) + ' ' + (R * Math.sin(a0)).toFixed(2) + ' A' + R + ' ' + R + ' 0 0 1 ' + (R * Math.cos(a1)).toFixed(2) + ' ' + (R * Math.sin(a1)).toFixed(2) + ' Z');
+                p.setAttribute('fill', WHEEL_COLORS[i % WHEEL_COLORS.length]);
+                p.setAttribute('stroke', '#fff'); p.setAttribute('stroke-width', '3');
+                p.addEventListener('click', function () { spinWheel(i); });
+                g.appendChild(p);
+                var mid = i * step + step / 2 - 90;
+                var t = document.createElementNS(NS, 'g'); t.setAttribute('transform', 'rotate(' + mid + ')');
+                var label = document.createElementNS(NS, 'text');
+                label.setAttribute('x', '70'); label.setAttribute('y', '6');
+                label.setAttribute('font-size', '16'); label.setAttribute('font-weight', '800'); label.setAttribute('fill', '#fff');
+                label.setAttribute('stroke', 'rgba(0,0,0,.45)'); label.setAttribute('stroke-width', '3.5'); label.setAttribute('paint-order', 'stroke');
+                label.textContent = act.short;
+                var num = document.createElementNS(NS, 'text');
+                num.setAttribute('x', '224'); num.setAttribute('y', '8'); num.setAttribute('text-anchor', 'end');
+                num.setAttribute('font-size', '24'); num.setAttribute('font-weight', '800'); num.setAttribute('fill', '#fff');
+                num.setAttribute('stroke', 'rgba(0,0,0,.45)'); num.setAttribute('stroke-width', '4'); num.setAttribute('paint-order', 'stroke');
+                num.textContent = String(i + 1);
+                t.addEventListener('click', function () { spinWheel(i); });
+                t.appendChild(label); t.appendChild(num); g.appendChild(t);
+            });
+        }
+        initWheel();
+        function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+        function showPauseResult(k) {
+            var act = PAUSE_ACTIVITIES[k], box = document.getElementById('pauseResult');
+            box.innerHTML = '';
+            var wrap = mk('div', 'pr-in');
+            if (act.img) { var pic = document.createElement('img'); pic.className = 'pr-img'; pic.src = act.img; pic.alt = act.name; wrap.appendChild(pic); }
+            else if (act.emoji) { wrap.appendChild(mk('div', 'pr-img pr-emoji', act.emoji)); }
+            var title = mk('div', 'pr-title'); title.appendChild(mk('span', 'pr-num', String(k + 1))); title.appendChild(mk('span', '', act.name)); wrap.appendChild(title);
+            if (act.tag) wrap.appendChild(mk('div', 'pr-tag', act.tag));
+            wrap.appendChild(mk('div', 'pr-desc', act.desc));
+            if (act.listTitle) wrap.appendChild(mk('div', 'pr-lt', act.listTitle));
+            if (act.list) { var ul = mk('ul', 'pr-list'); act.list.forEach(function (x) { ul.appendChild(mk('li', '', x)); }); wrap.appendChild(ul); }
+            if (act.note) wrap.appendChild(mk('div', 'pr-note', act.note));
+            if (act.best) { var b = mk('div', 'pr-best'); b.appendChild(mk('span', '', 'Best for: ' + act.best)); wrap.appendChild(b); }
+            box.appendChild(wrap);
+        }
+        function spinWheel(forced) {
+            if (wheelSpinning) return;
+            wheelSpinning = true;
+            var btn = document.getElementById('spinBtn'); btn.disabled = true;
+            var n = PAUSE_ACTIVITIES.length, step = 360 / n;
+            var k = (typeof forced === 'number' && forced >= 0 && forced < n) ? forced : Math.floor(Math.random() * n);   // clicked section wins, otherwise random
+            var jitter = (Math.random() - 0.5) * (step * 0.7);           // land anywhere inside the wedge, not always dead centre
+            var want = ((360 - (k * step + step / 2 + jitter)) % 360 + 360) % 360;
+            var cur = ((wheelRotation % 360) + 360) % 360;
+            wheelRotation += ((want - cur) + 360) % 360 + 360 * (5 + Math.floor(Math.random() * 3));
+            document.getElementById('pauseResult').innerHTML = '<div class="pr-idle"><span>&#127905;</span>Spinning&hellip;</div>';
+            document.getElementById('wheelSvg').style.transform = 'rotate(' + wheelRotation + 'deg)';
+            setTimeout(function () { showPauseResult(k); wheelSpinning = false; btn.disabled = false; btn.textContent = 'SPIN AGAIN'; btn.style.fontSize = '1.1rem'; }, 5400);
+        }
+
+        function flipCard(card) { card.classList.toggle('flipped'); }
+        function togglePollOption(o) { o.classList.toggle('selected'); }
+        function pickOne(card) {
+            var siblings = card.parentElement.children;
+            for (var i = 0; i < siblings.length; i++) if (siblings[i] !== card) siblings[i].classList.remove('selected');
+            card.classList.toggle('selected');
+        }
+        function selectFeedback(emoji) {
+            document.querySelectorAll('.feedback-emoji').forEach(function (e) { e.classList.remove('selected'); });
+            emoji.classList.add('selected');
+            document.getElementById('thanksNote').classList.add('show');
+        }
+        // ----- Vocabulary popups: word -> example sentence -----
+        var VOCAB = {};
+        function vocabPopup(key) { showPopup(key, VOCAB[key]); }
+
+        function showPopup(word, def) {
+            document.getElementById('popupWord').textContent = word;
+            document.getElementById('popupDefinition').textContent = def;
+            document.getElementById('popupOverlay').style.display = 'flex';
+        }
+        function closePopup() { document.getElementById('popupOverlay').style.display = 'none'; }
+        function closePopupOutside(e) { if (e.target.id === 'popupOverlay') closePopup(); }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.target && e.target.isContentEditable) return;
+            if (e.key === 'ArrowRight') nextSlide();
+            else if (e.key === 'ArrowLeft') prevSlide();
+            else if (e.key === 't' || e.key === 'T') toggleTimer();
+            else if (e.key === 'n' || e.key === 'N') toggleNotes();
+            else if (e.key === 'h' || e.key === 'H') document.body.classList.toggle('hide-tbd');
+            else if (e.key === 'i' || e.key === 'I') toggleIndex();
+            else if (e.key === 'Escape') { closePopup(); closeMapFull(); document.getElementById('indexPanel').classList.remove('show'); }
+        });
+
+        window.addEventListener('load', function () { fitSlide(document.getElementById(slideOrder[currentIndex])); });
+        renderSlide();
+    </script>
+
+    <script>
+    /* ===== iPhone / iPad touch support ===== */
+    (function () {
+        var isTouch = window.matchMedia('(hover: none)').matches || 'ontouchstart' in window;
+        // Keyboard hints like "(I)" and "(N)" mean nothing on a touch screen
+        if (isTouch) document.querySelectorAll('.tool-btn').forEach(function (b) { b.textContent = b.textContent.replace(/\s*\([A-Za-z]\)\s*$/, ''); });
+
+        // Swipe left = next slide, swipe right = previous slide
+        var sx = 0, sy = 0, st = 0, track = false;
+        function blocked(t) {
+            for (var n = t; n && n !== document.body; n = n.parentElement) {
+                if (n.tagName === 'IFRAME' || n.tagName === 'INPUT' || n.tagName === 'TEXTAREA' || n.isContentEditable) return true;
+                if (n.id === 'indexPanel' || n.id === 'notesPanel' || n.id === 'popupOverlay' || (n.classList && n.classList.contains('wheel-svg'))) return true;
+                var cs = window.getComputedStyle(n);
+                if ((cs.overflowX === 'auto' || cs.overflowX === 'scroll') && n.scrollWidth > n.clientWidth + 2) return true;
+            }
+            return false;
+        }
+        document.addEventListener('touchstart', function (e) {
+            track = e.touches.length === 1 && !blocked(e.target);
+            if (track) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now(); }
+        }, { passive: true });
+        document.addEventListener('touchend', function (e) {
+            if (!track) return; track = false;
+            var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+            if (Date.now() - st > 800 || Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+            if (dx < 0) nextSlide(); else prevSlide();
+        }, { passive: true });
+
+        // Re-fit the slide after rotation / Safari toolbar changes
+        function refit() { var el = document.getElementById(slideOrder[currentIndex]); if (el) fitSlide(el); }
+        window.addEventListener('orientationchange', function () { setTimeout(refit, 250); });
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', refit);
+
+        // Rotate hint for phones held upright
+        if (isTouch && window.innerWidth <= 700 && window.innerHeight > window.innerWidth) {
+            var h = document.createElement('div'); h.className = 'rotate-hint show';
+            h.innerHTML = '&#128241; Turn your phone sideways for the best view<button aria-label="Close">&times;</button>';
+            h.querySelector('button').onclick = function () { h.remove(); };
+            document.body.appendChild(h);
+            setTimeout(function () { h.remove(); }, 9000);
+        }
+    })();
+    </script>
+    <script>
+    /* ===== Mobile layout switch + scroll reset ===== */
+    (function () {
+        var root = document.documentElement;
+        function setMode() {
+            var w = window.innerWidth, h = window.innerHeight;
+            var m = w <= 820 || h <= 500;
+            root.classList.toggle('m', m);
+            root.classList.toggle('md', m && w > 520);
+        }
+        function refit() { var el = document.getElementById(slideOrder[currentIndex]); if (el) fitSlide(el); }
+        setMode();
+        window.addEventListener('resize', function () { setMode(); refit(); });
+        window.addEventListener('orientationchange', function () { setTimeout(function () { setMode(); refit(); }, 300); });
+        var base = renderSlide;
+        renderSlide = function () { base(); var s = document.querySelector('.slide.active'); if (s) s.scrollTop = 0; };
+        refit();
+    })();
+    </script>
+</body>
+</html>
