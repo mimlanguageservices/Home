@@ -70,12 +70,15 @@
 
 <script src="data/badges.js"></script>
 <script src="data/language-texts.js"></script>
+<script src="data/load-book.js"></script>
 <script>
-    const texts = window.LANGUAGE_TEXTS;
     const params = new URLSearchParams(location.search);
+    const testNo = /^\d+$/.test(params.get('test') || '') ? +params.get('test') : 0;   // 0 = practice; 1 = original timed test; 2+ = extra timed tests
+    const testQS = testNo ? '?test=' + testNo : '';
+    const texts = window.LANGUAGE_TEXTS.filter(t => testNo >= 2 ? t.test === testNo : !t.test);
     const TEST_MINUTES = 25;                 // guide time for the full 42-question test
     const L = 'ABCD';
-    let mode = params.get('test') === '1' ? 'test' : 'practice';
+    let mode = testNo ? 'test' : 'practice';
     let started = mode === 'practice';       // test starts when the student presses Start
     let submitted = false;
     let cur = Math.max(0, texts.findIndex(t => t.id === params.get('text')));
@@ -121,7 +124,7 @@
         const stage = document.getElementById('stage');
         let html = '<div class="paper">';
         if (mode === 'test' && !started) {
-            html += `<h2>Timed Test: Language Form &amp; Meaning</h2><div class="kind">${texts.reduce((n, t) => n + t.blanks.length, 0)} questions &middot; ${texts.length} texts &middot; ${TEST_MINUTES} minutes</div>
+            html += `<h2>Timed Test${testNo > 1 ? " " + testNo : ""}: Language Form &amp; Meaning</h2><div class="kind">${texts.reduce((n, t) => n + t.blanks.length, 0)} questions &middot; ${texts.length} texts &middot; ${TEST_MINUTES} minutes</div>
                 <p class="help" style="font-size:1.05rem;line-height:1.7">Each text has numbered blanks. Tap a blank and choose the word or words that best complete the sentence. You can change your answers and move between texts. You will see your score and explanations after you submit. The clock starts when you press Start.</p>
                 <button class="btn" id="startTest" style="margin-top:12px">Start test</button></div>`;
             stage.innerHTML = html; renderTabs(); renderBar(); return;
@@ -135,7 +138,7 @@
         html += `<div class="help">Tap a numbered blank and choose the best answer.</div><div class="body">`;
         const paras = tx.text.split('\n\n');
         paras.forEach(p => {
-            html += '<p>' + p.replace(/\n/g, '<br>').replace(/\{(\d)\}/g, (m, n) => {
+            html += '<p>' + p.replace(/\n/g, '<br>').replace(/\{(\d+)\}/g, (m, n) => {
                 const b = +n - 1, a = answers[key(cur, b)];
                 let cls = 'blank', label = n;
                 if (a !== undefined) {
@@ -156,7 +159,7 @@
     function renderBar() {
         const bar = document.getElementById('bar');
         let h = '';
-        if (mode === 'test' && started && !submitted) h = `<button class="btn ghost" id="prevT" ${cur === 0 ? 'disabled' : ''}>&#8592; Previous</button><button class="btn ghost" id="nextT" ${cur === texts.length - 1 ? 'disabled' : ''}>Next &#8594;</button><button class="btn" id="submitT">Submit test</button>`;
+        if (mode === 'test' && started && !submitted) h = `<button class="btn ghost" id="prevT" ${cur === 0 ? 'disabled' : ''}>&#8592; Previous</button><button class="btn ghost" id="nextT" ${cur === texts.length - 1 ? 'disabled' : ''}>Next &#8594;</button>${cur === texts.length - 1 ? '<button class="btn" id="submitT">Submit test</button>' : ''}`;
         else if (mode === 'practice' || submitted) h = `<button class="btn ghost" id="prevT" ${cur === 0 ? 'disabled' : ''}>&#8592; Previous text</button><button class="btn" id="nextT" ${cur === texts.length - 1 ? 'disabled' : ''}>Next text &#8594;</button>${submitted ? '<button class="btn ghost" id="again">Try again</button>' : ''}`;
         bar.innerHTML = h;
         bar.style.display = h ? 'flex' : 'none';
@@ -164,7 +167,7 @@
         if (p) p.onclick = () => { closeSheet(); cur--; render(); document.getElementById('stage').scrollTop = 0; };
         if (n) n.onclick = () => { closeSheet(); cur++; render(); document.getElementById('stage').scrollTop = 0; };
         if (s) s.onclick = () => { const un = totals().n - answeredCount(); if (!un || confirm(un + ' question(s) unanswered. Submit anyway?')) submit(); };
-        if (a) a.onclick = () => { location.href = 'Language-Practice.html' + (mode === 'test' ? '?test=1' : ''); };
+        if (a) a.onclick = () => { location.href = 'Language-Practice.html' + testQS; };
         const st = document.getElementById('startTest');
         if (st) st.onclick = startTest;
     }
@@ -181,7 +184,7 @@
             h += `<button class="${cls}" data-j="${j}" ${locked || submitted ? 'disabled' : ''}><span class="letter">${L[j]}</span><span>${o}</span></button>`;
         });
         h += '</div>';
-        if (feedbackOn() && a !== undefined) h += `<div class="why">${a === bl.a ? 'Correct! ' : 'Not quite. '}${bl.why}</div>`;
+        if (feedbackOn() && a !== undefined) h += `<div class="why">${a === bl.a ? 'Correct! ' : 'Not quite. '}${bl.why || ''}</div>`;
         document.getElementById('sheetInner').innerHTML = h;
         document.getElementById('sheet').classList.add('open');
         document.getElementById('closeSheet').onclick = closeSheet;
@@ -199,7 +202,7 @@
 
     function switchMode(m) {
         if (m === mode) return;
-        location.href = 'Language-Practice.html' + (m === 'test' ? '?test=1' : '');
+        location.href = 'Language-Practice.html' + (m === 'test' ? '?test=' + (testNo || 1) : '');
     }
     function startTest() {
         started = true;
@@ -213,7 +216,7 @@
     function submit() {
         if (submitted) return;
         submitted = true; clearInterval(timerId); closeSheet();
-        const t = totals(); save('language:test', t.c, t.n); saveTextScores();
+        const t = totals(); save(testNo > 1 ? 'language:test' + testNo : 'language:test', t.c, t.n); saveTextScores();
         document.getElementById('right').classList.remove('low');
         cur = 0; render(); document.getElementById('stage').scrollTop = 0;
     }

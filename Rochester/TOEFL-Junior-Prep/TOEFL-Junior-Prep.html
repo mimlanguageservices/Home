@@ -72,6 +72,8 @@
         .test-link-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2); border-color: #a5b4fc; }
         .test-link-card .tlc-name { font-weight: 600; font-size: 1.05rem; }
         .test-link-card .tlc-meta { font-size: 0.85rem; color: #a0aec0; margin-top: 4px; }
+        .test-link-card .tlc-reset { min-height: 36px; padding: 6px 14px; margin-right: 6px; border: 1px solid #cbd5e0; border-radius: 999px; background: #fff; color: #4a5568; font: inherit; font-size: 0.8rem; font-weight: 600; touch-action: manipulation; cursor: pointer; }
+        .test-link-card .tlc-reset:hover { background: #fed7d7; border-color: #fc8181; color: #9b2c2c; }
         .test-link-card .tlc-arrow { font-size: 1.3rem; color: #667eea; white-space: nowrap; }
         .tlc-score { font-size: 0.9rem; font-weight: 600; color: #38a169; }
         .navigation { overflow-y: auto; -webkit-overflow-scrolling: touch; width: 300px; background: rgba(45, 55, 72, 0.98); padding: 30px max(20px, env(safe-area-inset-left)); border-right: 1px solid rgba(255, 255, 255, 0.1); position: absolute; left: 0; top: 0; height: 100%; z-index: 50; transform: translateX(-100%); transition: transform 0.2s ease; will-change: transform; box-shadow: 2px 0 8px rgba(0, 0, 0, 0.25); }
@@ -205,21 +207,38 @@
     <script src="data/badges.js"></script>
     <script src="data/reading-data.js"></script>
     <script src="data/reading-data-2.js"></script>
+    <script src="data/reading-data-3.js"></script>
+    <script src="data/reading-data-4.js"></script>
+    <script src="data/reading-data-5.js"></script>
     <script src="data/language-data.js"></script>
+    <script src="data/language-texts.js"></script>
+    <script src="data/load-book.js"></script>
+    <script src="audio/listening-data.js"></script>
     <script>
+        // Timed tests are found from the data: a reading text belongs to a test via test/test2/test3/t, a language text or listening item via .test
+        const readingTestNo = s => s.t || (s.test ? 1 : s.test2 ? 2 : s.test3 ? 3 : 0);
+        const testNumbers = (list, f) => [...new Set(list.map(f).filter(n => n >= 2))].sort((x, y) => x - y);
+        function readingTestCards() {
+            const R = window.PRACTICE_READING || [];
+            const nums = [...new Set(R.map(readingTestNo).filter(n => n > 0))].sort((x, y) => x - y);
+            return nums.map(n => {
+                const sets = R.filter(s => readingTestNo(s) === n);
+                return { name: 'Timed Test ' + n, meta: sets.length + ' texts · ' + sets.reduce((a, s) => a + s.questions.length, 0) + ' questions · 50 minutes · score at the end', href: 'Practice.html?m=reading&test=' + n, key: n === 1 ? 'reading:test' : 'reading:test' + n };
+            });
+        }
         const moduleData = {
             listening: { name: 'Listening', icon: '&#127911;', text: 'Short talks, conversations and academic talks. Use Practice mode to replay and slow down the audio, then try Test mode where each recording plays only once.',
                 tests: [
                     { name: 'Practice (replay + feedback)', meta: '16 audio items · 36 questions · short talks, conversations, academic talks', href: 'Listening-Practice.html', key: 'listening:set1' },
-                    { name: 'Test mode (one play, no feedback)', meta: 'Same items · each recording plays once · score at the end', href: 'Listening-Practice.html?test=1', key: 'listening:test' } ] },
+                    { name: 'Test mode (one play, no feedback)', meta: 'Same items · each recording plays once · score at the end', href: 'Listening-Practice.html?test=1', key: 'listening:test' } ].concat(testNumbers(window.LISTENING || [], i => i.test).map(n => ({ name: 'Timed Test ' + n, meta: (window.LISTENING || []).filter(i => i.test === n).length + ' audio items · ' + (window.LISTENING || []).filter(i => i.test === n).reduce((a, i) => a + i.questions.length, 0) + ' questions · each recording plays once · score at the end', href: 'Listening-Practice.html?test=' + n, key: 'listening:test' + n }))) },
             language:  { name: 'Language Form & Meaning', icon: '&#128288;', text: 'Complete connected texts (letters, announcements, stories, articles) by choosing the best word or phrase for each numbered blank. Practise grammar (form) and vocabulary and connectors (meaning).',
                 tests: [
                     { name: 'Timed Test', meta: '7 texts · 42 questions · 25 minutes · score at the end', href: 'Language-Practice.html?test=1', key: 'language:test' },
                     { name: 'Text practice', meta: '7 connected texts · instant feedback on every blank', href: 'Language-Practice.html', key: null }
-                ].concat((window.PRACTICE_LANGUAGE || []).map(s => ({ name: 'Skill drill: ' + s.title, meta: s.kind + ' · ' + (s.questions || s.items).length + ' questions', href: 'Practice.html?m=language&set=' + s.id, key: 'language:' + s.id }))) },
+                ].concat(testNumbers(window.LANGUAGE_TEXTS || [], t => t.test).map(n => ({ name: 'Timed Test ' + n, meta: (window.LANGUAGE_TEXTS || []).filter(t => t.test === n).length + ' texts · ' + (window.LANGUAGE_TEXTS || []).filter(t => t.test === n).reduce((a, t) => a + t.blanks.length, 0) + ' questions · 25 minutes · score at the end', href: 'Language-Practice.html?test=' + n, key: 'language:test' + n })).concat((window.PRACTICE_LANGUAGE || []).map(s => ({ name: 'Skill drill: ' + s.title, meta: s.kind + ' · ' + (s.questions || s.items).length + ' questions', href: 'Practice.html?m=language&set=' + s.id, key: 'language:' + s.id })))) },
             reading:   { name: 'Reading',   icon: '&#128214;', text: 'Read informational, narrative, persuasive, academic and practical texts, then answer questions about main ideas, details, vocabulary, reference and inference.',
-                tests: [ { name: 'Timed Test', meta: '6 texts · ' + ((window.PRACTICE_READING || []).filter(s => s.test).reduce((n, s) => n + s.questions.length, 0)) + ' questions · 50 minutes · score at the end', href: 'Practice.html?m=reading&test=1', key: 'reading:test' } ]
-                    .concat((window.PRACTICE_READING || []).map(s => ({ name: s.title, meta: s.kind + ' · ' + (s.questions || s.items).length + ' questions', href: 'Practice.html?m=reading&set=' + s.id, key: 'reading:' + s.id }))) }
+                tests: readingTestCards()
+                    .concat((window.PRACTICE_READING || []).filter(s => !readingTestNo(s)).map(s => ({ name: s.title, meta: s.kind + ' · ' + (s.questions || s.items).length + ' questions', href: 'Practice.html?m=reading&set=' + s.id, key: 'reading:' + s.id }))) }
         };
         function progress() { try { return JSON.parse(localStorage.getItem('tj_progress')) || {}; } catch (e) { return {}; } }
         let currentModule = 'listening';
@@ -249,15 +268,21 @@
             document.getElementById('currentModuleText').textContent = data.name;
             document.getElementById('practiceTitle').textContent = 'Practice Skills: ' + data.name;
             document.getElementById('moduleText').textContent = data.text;
-            document.getElementById('testTitle').textContent = 'Test 1: ' + data.name;
+            document.getElementById('testTitle').textContent = 'Tests: ' + data.name;
             document.getElementById('testText').textContent = 'A full practice test for this section. Your score is saved on this iPad.';
             updatePracticeContent(data);
         }
 
-        const isTest = t => /[?&]test=1/.test(t.href);
+        const isTest = t => /[?&]test=\d/.test(t.href);
         function cardHtml(t, name) {
             const p = progress()[t.key];
-            return `<a class="test-link-card" href="${t.href}"><div><div class="tlc-name">${name || t.name}</div><div class="tlc-meta">${t.meta}</div></div><div class="tlc-arrow">${p ? '<span class="tlc-score">&#10003; ' + p.c + '/' + p.t + '</span> ' + (/:test$/.test(t.key) ? tjBadgeMini(p.c, p.t) + ' ' : '') : ''}&#8594;</div></a>`;
+            return `<a class="test-link-card" href="${t.href}"><div><div class="tlc-name">${name || t.name}</div><div class="tlc-meta">${t.meta}</div></div><div class="tlc-arrow">${p ? '<span class="tlc-score">&#10003; ' + p.c + '/' + p.t + '</span> ' + (/:test\d?$/.test(t.key) ? tjBadgeMini(p.c, p.t) + ' ' : '') + '<button type="button" class="tlc-reset" onclick="resetScore(event, \'' + t.key + '\')">Reset</button> ' : ''}&#8594;</div></a>`;
+        }
+        function resetScore(e, key) {
+            e.preventDefault(); e.stopPropagation();
+            if (!confirm('Reset your saved score for this? This cannot be undone.')) return;
+            try { const p = progress(); delete p[key]; localStorage.setItem('tj_progress', JSON.stringify(p)); } catch (err) {}
+            updatePracticeContent(moduleData[currentModule]);
         }
         function fill(id, list, nameFn, emptyMsg) {
             const el = document.getElementById(id);
@@ -267,7 +292,7 @@
         function updatePracticeContent(data) {
             const all = data.tests || [];
             fill('practiceContent', all.filter(t => !isTest(t)), null, 'Practice sets for this module will appear here.');
-            fill('testContent', all.filter(isTest), t => 'Test 1 &middot; ' + data.name, 'Tests for this module will appear here.');
+            fill('testContent', all.filter(isTest), t => 'Test ' + t.href.match(/test=(\d)/)[1] + ' &middot; ' + data.name, 'Tests for this module will appear here.');
         }
 
         function toggleNav() {

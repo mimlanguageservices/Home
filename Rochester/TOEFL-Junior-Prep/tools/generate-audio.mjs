@@ -1,4 +1,4 @@
-// Usage: node generate-audio.mjs [--force] [L01 L02 ...]
+// Usage: node generate-audio.mjs [--force] [L01 L02 T02-01 ...]   (run build-bt-listening.mjs first for the T.. items)
 // Reads listening-scripts.json, writes ../audio/<id>.mp3 and ../audio/listening-data.json
 import { MsEdgeTTS, OUTPUT_FORMAT } from 'msedge-tts';
 import fs from 'node:fs/promises';
@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(here, '..', 'audio');
 const data = JSON.parse(await fs.readFile(path.join(here, 'listening-scripts.json'), 'utf8'));
-for (const extra of ['listening-scripts-2.json']) {
+for (const extra of ['listening-scripts-2.json', 'listening-scripts-bt.json']) {
   const more = JSON.parse(await fs.readFile(path.join(here, extra), 'utf8'));
   Object.assign(data.voices, more.voices);
   data.items.push(...more.items);

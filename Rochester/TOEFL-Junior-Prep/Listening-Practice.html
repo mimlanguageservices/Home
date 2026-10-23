@@ -70,9 +70,11 @@
     <script src="data/badges.js"></script>
     <script src="audio/listening-data.js"></script>
     <script>
-        const items = window.LISTENING || [];
         const params = new URLSearchParams(location.search);
-        let mode = params.get('test') === '1' ? 'test' : 'practice';   // practice: replay + feedback; test: one play, no feedback
+        const testNo = /^\d+$/.test(params.get('test') || '') ? +params.get('test') : 0;   // 0 = practice; 1 = original test mode; 2+ = extra timed tests
+        const testQS = testNo ? '?test=' + testNo : '';
+        const items = (window.LISTENING || []).filter(i => testNo >= 2 ? i.test === testNo : !i.test);
+        let mode = testNo ? 'test' : 'practice';   // practice: replay + feedback; test: one play, no feedback
         let finished = false;                                          // test mode: true after Finish (shows feedback)
         const state = items.map(() => ({ answers: {}, plays: 0, used: false }));
         let cur = Math.min(Math.max(0, (parseInt(params.get('item'), 10) || 1) - 1), Math.max(0, items.length - 1));
@@ -135,7 +137,7 @@
                     const locked = mode === 'practice' && chosen !== undefined || finished;
                     html += `<button class="${cls}" data-k="${k}" data-j="${j}" ${locked ? 'disabled' : ''}><span class="letter">${letters[j]}</span><span>${o}</span></button>`;
                 });
-                if (fb && chosen !== undefined) html += `<div class="why">${chosen === q.a ? 'Correct! ' : 'Not quite. '}${q.why}</div>`;
+                if (fb && chosen !== undefined) html += `<div class="why">${chosen === q.a ? 'Correct! ' : 'Not quite. '}${q.why || ''}</div>`;
                 html += '</div>';
             });
             if (fb && (mode === 'test' || itemDone(cur))) {
@@ -171,7 +173,7 @@
         function switchMode(m) {
             if (m === mode) return;
             if (answeredCount() && !confirm('Switching mode will clear your answers. Continue?')) return;
-            location.href = 'Listening-Practice.html' + (m === 'test' ? '?test=1' : '');
+            location.href = 'Listening-Practice.html' + (m === 'test' ? '?test=' + (testNo || 1) : '');
         }
 
         function togglePlay() {
@@ -202,7 +204,7 @@
                 const un = qCount() - answeredCount();
                 if (un && !confirm(un + ' question(s) unanswered. Finish anyway?')) return;
                 finished = true;
-                save('listening:test', correctCount(), qCount());
+                save(testNo > 1 ? 'listening:test' + testNo : 'listening:test', correctCount(), qCount());
             }
             const c = correctCount(), t = qCount();
             if (mode === 'practice' && answeredCount() === t) save('listening:set1', c, t);
@@ -212,7 +214,7 @@
                 <div class="actions"><button class="btn ghost" id="review">Review items</button><button class="btn" id="restart">Start over</button></div>`;
             renderTabs();
             document.getElementById('review').onclick = () => go(0);
-            document.getElementById('restart').onclick = () => { location.href = 'Listening-Practice.html' + (mode === 'test' ? '?test=1' : ''); };
+            document.getElementById('restart').onclick = () => { location.href = 'Listening-Practice.html' + testQS; };
         }
 
         // Swipe between items in practice mode (disabled in test mode so nothing is skipped by accident)
