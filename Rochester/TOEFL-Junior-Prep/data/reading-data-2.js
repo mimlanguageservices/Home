@@ -5,13 +5,13 @@
 
   byId("R1").questions.push(
     { type: "Title", q: "Which would be the best title for the passage?", o: ["How to Fall Asleep Faster", "Why Sleep Matters", "The Dangers of Phones", "Growing Taller at Night"], a: 1, why: "The passage explains the important jobs sleep does for the body and the brain." },
-    { type: "Not/Except", q: "All of the following are mentioned as jobs of sleep EXCEPT", o: ["helping muscles and bones heal", "strengthening the immune system", "sorting information in the brain", "making people feel hungry"], a: 3, why: "Hunger is never mentioned." }
+    { type: "Not/Except", q: "All of the following are mentioned as jobs of sleep EXCEPT", o: ["helping muscles and bones heal", "strengthening the immune system", "making people feel hungry", "sorting information in the brain"], a: 2, why: "Hunger is never mentioned." }
   );
   byId("R2").questions.push(
     { type: "Reference", q: "In paragraph 2, the word \"them\" refers to", o: ["the streets", "people going home from work", "Nadia's classmates", "her bags"], a: 1, why: "She had to push past the people going home from work." }
   );
   byId("R4").questions.push(
-    { type: "Not/Except", q: "All of the following are true of corals EXCEPT that they", o: ["are animals", "build reefs", "can make food from sunlight without any help", "live together with algae"], a: 2, why: "The algae use sunlight to make food and share it with the coral; corals do not do this alone." }
+    { type: "Not/Except", q: "All of the following are true of corals EXCEPT that they", o: ["are animals", "build reefs", "live together with algae", "can make food from sunlight without any help"], a: 3, why: "The algae use sunlight to make food and share it with the coral; corals do not do this alone." }
   );
   byId("R5").questions.push(
     { type: "Title", q: "Which would be the best title for this essay?", o: ["Teenagers and Their Phones", "The Case for a Later School Start", "Why Sports Are Important", "How Schools Raise Attendance"], a: 1, why: "The essay argues that schools should start later." }
@@ -30,12 +30,12 @@
       questions: [
         { type: "Title", q: "Which is the best title for the passage?", o: ["The Journey of a Favorite Treat", "How to Grow Cacao Trees", "Why Chocolate Is Bad for You", "The Aztec Empire"], a: 0, why: "The passage follows chocolate from ancient times to today." },
         { type: "Detail", q: "How did the Maya and Aztecs prepare chocolate?", o: ["They baked it into bars", "They ground the seeds and mixed them with water, chili peppers, and spices", "They ate the seeds raw", "They mixed it with milk and sugar"], a: 1, why: "Paragraph 2 describes a bitter drink made from ground seeds, water, chili peppers, and spices." },
-        { type: "Vocabulary", q: "The word \"valuable\" in paragraph 2 is closest in meaning to", o: ["worth a lot", "dangerous", "common", "bitter"], a: 0, why: "The Aztecs even used the seeds as money." },
-        { type: "Detail", q: "Why did the Spanish add sugar and honey to chocolate?", o: ["It was too expensive", "They found it too bitter", "They wanted to sell it as medicine", "It was too thick"], a: 1, why: "The Spanish found the drink too bitter." },
-        { type: "Reference", q: "In paragraph 3, the word \"it\" in \"it remained expensive\" refers to", o: ["Europe", "the nobility", "chocolate", "honey"], a: 2, why: "The sentence is about chocolate." },
-        { type: "Not/Except", q: "All of the following are mentioned as changes in the 1800s EXCEPT", o: ["machines that could press the seeds", "the first solid chocolate bar", "the creation of milk chocolate", "the arrival of chocolate in Europe"], a: 3, why: "Chocolate reached Europe in the 1500s." },
-        { type: "Inference", q: "What can be inferred about chocolate before the 1800s?", o: ["Everyone could buy it", "Ordinary people probably could not afford it", "It was always sweet", "It was made only in Africa"], a: 1, why: "It was expensive and mostly for wealthy people." },
-        { type: "Purpose", q: "Why does the author mention fair-trade chocolate in the last paragraph?", o: ["To show that chocolate is unhealthy", "To suggest that consumers can help farmers who earn little", "To explain how milk chocolate is made", "To prove that cacao grows only in Africa"], a: 1, why: "Many farmers earn very little, so more consumers choose fair-trade chocolate." }
+        { type: "Vocabulary", q: "The word \"valuable\" in paragraph 2 is closest in meaning to", o: ["dangerous", "common", "worth a lot", "bitter"], a: 2, why: "The Aztecs even used the seeds as money." },
+        { type: "Detail", q: "Why did the Spanish add sugar and honey to chocolate?", o: ["It was too expensive", "They wanted to sell it as medicine", "They found it too bitter", "It was too thick"], a: 2, why: "The Spanish found the drink too bitter." },
+        { type: "Reference", q: "In paragraph 3, the word \"it\" in \"it remained expensive\" refers to", o: ["Europe", "the nobility", "honey", "chocolate"], a: 3, why: "The sentence is about chocolate." },
+        { type: "Not/Except", q: "All of the following are mentioned as changes in the 1800s EXCEPT", o: ["the arrival of chocolate in Europe", "machines that could press the seeds", "the first solid chocolate bar", "the creation of milk chocolate"], a: 0, why: "Chocolate reached Europe in the 1500s." },
+        { type: "Inference", q: "What can be inferred about chocolate before the 1800s?", o: ["Everyone could buy it", "It was always sweet", "It was made only in Africa", "Ordinary people probably could not afford it"], a: 3, why: "It was expensive and mostly for wealthy people." },
+        { type: "Purpose", q: "Why does the author mention fair-trade chocolate in the last paragraph?", o: ["To show that chocolate is unhealthy", "To explain how milk chocolate is made", "To prove that cacao grows only in Africa", "To suggest that consumers can help farmers who earn little"], a: 3, why: "Many farmers earn very little, so more consumers choose fair-trade chocolate." }
       ]
     },
     {
@@ -49,12 +49,12 @@
       ],
       questions: [
         { type: "Main idea", q: "What is the story mainly about?", o: ["A boy learns not to stop when he makes a mistake", "A boy decides to quit piano", "A teacher plans a talent show", "A grandmother visits a school"], a: 0, why: "Eli learns from his teacher to keep playing after a mistake." },
-        { type: "Detail", q: "Why did Eli feel more nervous than usual today?", o: ["He had not practiced", "The talent show was a week away", "Mrs. Alvarez was angry", "The piano was broken"], a: 1, why: "The talent show was only a week away, and he had promised his grandmother." },
+        { type: "Detail", q: "Why did Eli feel more nervous than usual today?", o: ["He had not practiced", "Mrs. Alvarez was angry", "The talent show was a week away", "The piano was broken"], a: 2, why: "The talent show was only a week away, and he had promised his grandmother." },
         { type: "Vocabulary", q: "The word \"stumbled\" in paragraph 2 is closest in meaning to", o: ["made a mistake while moving", "fell down", "rested", "played loudly"], a: 0, why: "His fingers made a mistake in the third line." },
-        { type: "Inference", q: "How does Mrs. Alvarez feel about Eli's mistake?", o: ["Disappointed", "Understanding and supportive", "Angry", "Bored"], a: 1, why: "She did not frown; she smiled and sat beside him." },
-        { type: "Purpose", q: "Why does Mrs. Alvarez tell the story about her teacher?", o: ["To show she was a better student", "To help Eli think differently about mistakes", "To change the subject", "To tell Eli to quit"], a: 1, why: "The teacher's advice changes how Eli sees mistakes." },
-        { type: "Reference", q: "In the last sentence of paragraph 4, \"That\" refers to", o: ["the piano", "Eli's playing without stopping", "the talent show", "the third line"], a: 1, why: "She is praising how Eli kept going." },
-        { type: "Detail", q: "How does Eli feel at the end of the story?", o: ["Still very nervous", "Hopeful and excited", "Angry at himself", "Tired"], a: 1, why: "He hums on the way home and looks forward to the talent show." }
+        { type: "Inference", q: "How does Mrs. Alvarez feel about Eli's mistake?", o: ["Disappointed", "Angry", "Understanding and supportive", "Bored"], a: 2, why: "She did not frown; she smiled and sat beside him." },
+        { type: "Purpose", q: "Why does Mrs. Alvarez tell the story about her teacher?", o: ["To show she was a better student", "To change the subject", "To tell Eli to quit", "To help Eli think differently about mistakes"], a: 3, why: "The teacher's advice changes how Eli sees mistakes." },
+        { type: "Reference", q: "In the last sentence of paragraph 4, \"That\" refers to", o: ["Eli's playing without stopping", "the piano", "the talent show", "the third line"], a: 0, why: "She is praising how Eli kept going." },
+        { type: "Detail", q: "How does Eli feel at the end of the story?", o: ["Still very nervous", "Angry at himself", "Tired", "Hopeful and excited"], a: 3, why: "He hums on the way home and looks forward to the talent show." }
       ]
     }
   );

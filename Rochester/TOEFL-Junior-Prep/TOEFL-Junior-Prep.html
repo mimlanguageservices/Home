@@ -292,7 +292,7 @@
         function updatePracticeContent(data) {
             const all = data.tests || [];
             fill('practiceContent', all.filter(t => !isTest(t)), null, 'Practice sets for this module will appear here.');
-            fill('testContent', all.filter(isTest), t => 'Test ' + t.href.match(/test=(\d)/)[1] + ' &middot; ' + data.name, 'Tests for this module will appear here.');
+            fill('testContent', all.filter(isTest), t => 'Test ' + t.href.match(/test=(\d+)/)[1] + ' &middot; ' + data.name, 'Tests for this module will appear here.');
         }
 
         function toggleNav() {

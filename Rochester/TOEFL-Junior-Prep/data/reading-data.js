@@ -9,10 +9,10 @@ window.PRACTICE_READING = [
     ],
     questions: [
       { type: "Main idea", q: "What is the main idea of the passage?", o: ["Teenagers use their phones too much", "Sleep is an important, active process for the body and brain", "Adults need less sleep than children", "Scientists cannot explain why we sleep"], a: 1, why: "The whole passage explains the jobs sleep does for the body and the brain." },
-      { type: "Detail", q: "According to the passage, what happens to the body during sleep?", o: ["It stops working", "It releases chemicals that help muscles and bones heal", "It grows taller immediately", "It burns more energy than during the day"], a: 1, why: "Paragraph 2: our bodies release chemicals that help muscles and bones grow and heal." },
-      { type: "Vocabulary", q: "The word \"discarding\" in paragraph 3 is closest in meaning to", o: ["remembering", "organizing", "throwing away", "repeating"], a: 2, why: "The brain keeps what is useful and discards (throws away) the rest." },
-      { type: "Inference", q: "What can be inferred about students who stay up all night to study?", o: ["They usually get better grades", "They may remember less than students who sleep", "They need less sleep than other students", "They use their phones more"], a: 1, why: "Students who study and sleep well remember more than those who stay up all night." },
-      { type: "Detail", q: "Why does the author mention phone screens?", o: ["To show that phones are useful for studying", "To explain one reason teenagers may not sleep enough", "To prove that light helps the brain", "To compare phones with computers"], a: 1, why: "Late-night phone use is partly to blame for teenagers' lack of sleep." }
+      { type: "Detail", q: "According to the passage, what happens to the body during sleep?", o: ["It stops working", "It grows taller immediately", "It releases chemicals that help muscles and bones heal", "It burns more energy than during the day"], a: 2, why: "Paragraph 2: our bodies release chemicals that help muscles and bones grow and heal." },
+      { type: "Vocabulary", q: "The word \"discarding\" in paragraph 3 is closest in meaning to", o: ["remembering", "organizing", "repeating", "throwing away"], a: 3, why: "The brain keeps what is useful and discards (throws away) the rest." },
+      { type: "Inference", q: "What can be inferred about students who stay up all night to study?", o: ["They may remember less than students who sleep", "They usually get better grades", "They need less sleep than other students", "They use their phones more"], a: 0, why: "Students who study and sleep well remember more than those who stay up all night." },
+      { type: "Detail", q: "Why does the author mention phone screens?", o: ["To show that phones are useful for studying", "To prove that light helps the brain", "To explain one reason teenagers may not sleep enough", "To compare phones with computers"], a: 2, why: "Late-night phone use is partly to blame for teenagers' lack of sleep." }
     ]
   },
   {
@@ -24,11 +24,11 @@ window.PRACTICE_READING = [
       "Just then, a car stopped beside her. The window came down, and she saw her neighbor, Mr. Kamau. \"Missed it?\" he asked with a kind smile. \"Hop in. I'm driving that way anyway.\" Nadia let out a long breath. Maybe the evening wasn't ruined after all."
     ],
     questions: [
-      { type: "Detail", q: "Why was Nadia late?", o: ["She missed her class", "She stayed at the library to finish a project", "She walked home slowly", "She was waiting for Mr. Kamau"], a: 1, why: "She had stayed late at the library to finish her science project." },
+      { type: "Detail", q: "Why was Nadia late?", o: ["She stayed at the library to finish a project", "She missed her class", "She walked home slowly", "She was waiting for Mr. Kamau"], a: 0, why: "She had stayed late at the library to finish her science project." },
       { type: "Vocabulary", q: "In paragraph 1, the phrase \"felt her stomach drop\" shows that Nadia felt", o: ["hungry", "sick", "worried", "sleepy"], a: 2, why: "The phrase describes the sudden worry of realizing she might miss the bus." },
       { type: "Detail", q: "Why couldn't the bus driver hear Nadia?", o: ["The traffic was too loud", "He was wearing headphones", "She did not shout", "The windows were open"], a: 0, why: "The driver could not hear her over the traffic." },
-      { type: "Inference", q: "What does Mr. Kamau probably do next?", o: ["Drive Nadia home", "Follow the bus to the next stop", "Ask Nadia to walk", "Call Nadia's parents"], a: 0, why: "He says, 'Hop in. I'm driving that way anyway.'" },
-      { type: "Purpose", q: "Why does the author end with \"Maybe the evening wasn't ruined after all\"?", o: ["To show that Nadia is angry", "To show that Nadia now feels hopeful", "To show that the bus will return", "To show that Nadia forgot her project"], a: 1, why: "She breathes out in relief, so her mood changes to hopeful." }
+      { type: "Inference", q: "What does Mr. Kamau probably do next?", o: ["Follow the bus to the next stop", "Ask Nadia to walk", "Call Nadia's parents", "Drive Nadia home"], a: 3, why: "He says, 'Hop in. I'm driving that way anyway.'" },
+      { type: "Purpose", q: "Why does the author end with \"Maybe the evening wasn't ruined after all\"?", o: ["To show that Nadia now feels hopeful", "To show that Nadia is angry", "To show that the bus will return", "To show that Nadia forgot her project"], a: 0, why: "She breathes out in relief, so her mood changes to hopeful." }
     ]
   },
   {
@@ -47,10 +47,10 @@ window.PRACTICE_READING = [
     ],
     questions: [
       { type: "Purpose", q: "Why did Ms. Hernandez write this email?", o: ["To cancel a museum visit", "To give families information about a class trip", "To ask for science project ideas", "To announce a new cafeteria"], a: 1, why: "The email explains the details of the trip." },
-      { type: "Detail", q: "What time must students arrive at school on May 9?", o: ["8:00 a.m.", "8:15 a.m.", "3:30 p.m.", "12:00 p.m."], a: 0, why: "Buses leave at 8:15, so students must arrive by 8:00." },
-      { type: "Detail", q: "What happens if a student does not return the signed form?", o: ["The student pays extra", "The student goes on a different day", "The student stays at school", "The student goes with another class to the museum"], a: 2, why: "Students without a form will stay at school with another class." },
+      { type: "Detail", q: "What time must students arrive at school on May 9?", o: ["8:15 a.m.", "3:30 p.m.", "8:00 a.m.", "12:00 p.m."], a: 2, why: "Buses leave at 8:15, so students must arrive by 8:00." },
+      { type: "Detail", q: "What happens if a student does not return the signed form?", o: ["The student stays at school", "The student pays extra", "The student goes on a different day", "The student goes with another class to the museum"], a: 0, why: "Students without a form will stay at school with another class." },
       { type: "Not/Except", q: "Which of the following is NOT mentioned as something students should bring?", o: ["A packed lunch", "A water bottle", "Comfortable shoes", "A notebook"], a: 3, why: "A notebook is never mentioned." },
-      { type: "Detail", q: "What should a family do to volunteer as a chaperone?", o: ["Talk to a homeroom teacher on Friday", "Send a signed form", "Reply to the email by Monday", "Come to school at 8:00"], a: 2, why: "Reply to the email by Monday." }
+      { type: "Detail", q: "What should a family do to volunteer as a chaperone?", o: ["Talk to a homeroom teacher on Friday", "Reply to the email by Monday", "Send a signed form", "Come to school at 8:00"], a: 1, why: "Reply to the email by Monday." }
     ]
   },
   {
@@ -62,11 +62,11 @@ window.PRACTICE_READING = [
       "This partnership is fragile. When the water becomes too warm, corals push out their algae. Without the algae, the coral loses its color and much of its food, a process known as bleaching. A bleached coral is not yet dead, but if the water does not cool quickly, it may starve. Many scientists believe that rising ocean temperatures are the greatest threat to reefs today."
     ],
     questions: [
-      { type: "Main idea", q: "What is the passage mainly about?", o: ["How to protect fish", "What coral reefs are and why they are threatened", "How polyps travel across the ocean", "Why Australia has a large reef"], a: 1, why: "It explains what reefs are, how they work, and the threat of warming water." },
-      { type: "Detail", q: "Why do scientists call reefs the \"rainforests of the sea\"?", o: ["They are green", "They grow quickly", "They support a huge variety of life", "They are found in warm rain"], a: 2, why: "Reefs are home to about a quarter of marine species." },
+      { type: "Main idea", q: "What is the passage mainly about?", o: ["How to protect fish", "How polyps travel across the ocean", "Why Australia has a large reef", "What coral reefs are and why they are threatened"], a: 3, why: "It explains what reefs are, how they work, and the threat of warming water." },
+      { type: "Detail", q: "Why do scientists call reefs the \"rainforests of the sea\"?", o: ["They are green", "They support a huge variety of life", "They grow quickly", "They are found in warm rain"], a: 1, why: "Reefs are home to about a quarter of marine species." },
       { type: "Reference", q: "In paragraph 3, \"they\" in \"they share much of it\" refers to", o: ["corals", "algae", "polyps", "colors"], a: 1, why: "The algae use sunlight to make food, and they (the algae) share it." },
-      { type: "Detail", q: "What happens during bleaching?", o: ["Corals grow quickly", "Corals lose their algae and their color", "Corals turn into rocks", "Corals move to cooler water"], a: 1, why: "Corals push out their algae, lose color, and lose food." },
-      { type: "Inference", q: "What can be inferred about a bleached coral?", o: ["It is already dead", "It can sometimes recover if the water cools", "It never changes color again", "It makes more algae"], a: 1, why: "It is not yet dead, but may starve if the water does not cool quickly." },
+      { type: "Detail", q: "What happens during bleaching?", o: ["Corals lose their algae and their color", "Corals grow quickly", "Corals turn into rocks", "Corals move to cooler water"], a: 0, why: "Corals push out their algae, lose color, and lose food." },
+      { type: "Inference", q: "What can be inferred about a bleached coral?", o: ["It is already dead", "It never changes color again", "It can sometimes recover if the water cools", "It makes more algae"], a: 2, why: "It is not yet dead, but may starve if the water does not cool quickly." },
       { type: "Vocabulary", q: "The word \"fragile\" in paragraph 4 is closest in meaning to", o: ["easily damaged", "very old", "extremely large", "brightly colored"], a: 0, why: "Fragile means easily broken or harmed." }
     ]
   },
@@ -81,11 +81,11 @@ window.PRACTICE_READING = [
     ],
     questions: [
       { type: "Purpose", q: "What is the author's main purpose?", o: ["To describe a typical school morning", "To persuade readers that schools should start later", "To explain how body clocks work", "To compare two school schedules"], a: 1, why: "The author states a position and gives reasons for it." },
-      { type: "Detail", q: "According to the author, what happens to teenagers' body clocks?", o: ["They stop working", "They change, so teens fall asleep and wake later", "They become faster", "They are the same as adults'"], a: 1, why: "Paragraph 2 explains the change during adolescence." },
-      { type: "Inference", q: "Why does the author compare a 7:30 start to an adult waking at 5:30?", o: ["To show that adults work too much", "To help readers understand how early it feels for teens", "To prove that teenagers are lazy", "To suggest adults should also start later"], a: 1, why: "It is an analogy showing how early 7:30 feels to a teen's body clock." },
+      { type: "Detail", q: "According to the author, what happens to teenagers' body clocks?", o: ["They stop working", "They become faster", "They are the same as adults'", "They change, so teens fall asleep and wake later"], a: 3, why: "Paragraph 2 explains the change during adolescence." },
+      { type: "Inference", q: "Why does the author compare a 7:30 start to an adult waking at 5:30?", o: ["To show that adults work too much", "To prove that teenagers are lazy", "To suggest adults should also start later", "To help readers understand how early it feels for teens"], a: 3, why: "It is an analogy showing how early 7:30 feels to a teen's body clock." },
       { type: "Detail", q: "Which result of later start times is mentioned?", o: ["Shorter lunches", "Higher attendance", "More homework", "Fewer sports teams"], a: 1, why: "Attendance went up." },
-      { type: "Organization", q: "Why does the author mention the argument about sports and after-school jobs?", o: ["To admit the idea has no problems", "To respond to a possible objection and answer it", "To end the essay", "To introduce a new topic"], a: 1, why: "The author names a concern and then says it can be solved." },
-      { type: "Vocabulary", q: "The word \"adjusting\" in paragraph 4 is closest in meaning to", o: ["canceling", "changing slightly", "repeating", "measuring"], a: 1, why: "Adjusting means making small changes." }
+      { type: "Organization", q: "Why does the author mention the argument about sports and after-school jobs?", o: ["To respond to a possible objection and answer it", "To admit the idea has no problems", "To end the essay", "To introduce a new topic"], a: 0, why: "The author names a concern and then says it can be solved." },
+      { type: "Vocabulary", q: "The word \"adjusting\" in paragraph 4 is closest in meaning to", o: ["canceling", "repeating", "changing slightly", "measuring"], a: 2, why: "Adjusting means making small changes." }
     ]
   },
   {
@@ -105,11 +105,11 @@ window.PRACTICE_READING = [
       "What to bring: sleeping bag, flashlight, swimsuit, hiking shoes, sunscreen. Phones and tablets are not permitted, but campers may write letters home. Counselors are available 24 hours a day. Space is limited to 60 campers per session."
     ],
     questions: [
-      { type: "Detail", q: "What is the age range for the camp?", o: ["8 to 12", "11 to 15", "13 to 18", "10 to 16"], a: 1, why: "The heading says Ages 11–15." },
+      { type: "Detail", q: "What is the age range for the camp?", o: ["8 to 12", "13 to 18", "11 to 15", "10 to 16"], a: 2, why: "The heading says Ages 11–15." },
       { type: "Detail", q: "What can campers choose to do in the morning?", o: ["Hiking or movie night", "Canoeing, rock climbing, or art studio", "Team games or talent show", "Swimming or campfire"], a: 1, why: "9:00 morning activity: canoeing, rock climbing, or art studio." },
-      { type: "Calculation", q: "How much would the second session cost for a family that registers for two sessions?", o: ["$780", "$702", "$680", "$858"], a: 1, why: "10% of $780 is $78, so the second session costs $702." },
+      { type: "Calculation", q: "How much would the second session cost for a family that registers for two sessions?", o: ["$780", "$680", "$858", "$702"], a: 3, why: "10% of $780 is $78, so the second session costs $702." },
       { type: "Not/Except", q: "Which item is NOT allowed at camp?", o: ["Flashlight", "Sunscreen", "Tablet", "Swimsuit"], a: 2, why: "Phones and tablets are not permitted." },
-      { type: "Detail", q: "When must the $100 deposit be paid?", o: ["On the first day of camp", "By May 1", "By June 17", "After Session 1"], a: 1, why: "A $100 deposit is required by May 1." }
+      { type: "Detail", q: "When must the $100 deposit be paid?", o: ["By May 1", "On the first day of camp", "By June 17", "After Session 1"], a: 0, why: "A $100 deposit is required by May 1." }
     ]
   }
 ];
