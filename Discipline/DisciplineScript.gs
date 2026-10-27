@@ -14,35 +14,41 @@
 // 8. Paste that URL into Discipline.html where it says SCRIPT_URL
 //    (or open the app, tap the gear icon, and paste it there)
 //
+// After editing this code, redeploy the SAME deployment so the URL
+// stays the same: Deploy -> Manage deployments -> edit (pencil) ->
+// Version: New version -> Deploy.
+//
 // The app talks to this script with plain GET requests (no CORS
 // pre-flight), matching the pattern already used elsewhere in this
 // project.
 //
-//   ?mode=roster                          -> returns the student list
-//   ?mode=record&class=8A&name=...&action=Warning
-//                                         -> ticks the matching column
-//                                            TRUE and writes a Log row
+//   ?mode=roster       -> returns the student list
+//   ?mode=report&class=8A&name=...&image=...&code=1.1&situation=...
+//                      -> appends one row to the Situations tab
+//   ?mode=situations   -> returns every reported situation, newest first
 // ============================================================
 
 const SPREADSHEET_ID = '1U37diEkPAAupol2Yg0ahOAOSGKN8DkI_av6LdhP-p7I';
 const ROSTER_SHEET_NAME = 'Sheet1'; // change if your tab has another name
-const LOG_SHEET_NAME = 'Log';
+const SITUATIONS_SHEET_NAME = 'Situations';
 
 // Column positions in the roster sheet (1-indexed)
 const COL_CLASS = 1; // A
 const COL_NAME = 2; // B
 const COL_IMAGE = 3; // C
-const COL_WARNING = 4; // D
-const COL_MOVE_SEATS = 5; // E
-const COL_INCIDENT = 6; // F
 const COL_GENDER = 9; // I
 
-// Maps the action name coming from the app to its column
-const ACTION_COLUMNS = {
-  'Warning': COL_WARNING,
-  'Move Seats': COL_MOVE_SEATS,
-  'Incident': COL_INCIDENT
-};
+// Situations tab layout. The tab is created automatically on the
+// first report. Status and Notes are filled in by hand in the sheet
+// as each case moves through its process; the app shows them.
+const SITUATION_HEADERS = ['Date', 'Class', 'Student', 'Photo', 'Code', 'Situation', 'Status', 'Notes', 'Photo URL'];
+const SCOL_DATE = 1;
+const SCOL_STATUS = 7;
+const SCOL_PHOTO_URL = 9;
+
+// Choices for the Status dropdown in the sheet. Edit freely — the
+// first one is what every new report starts with.
+const STATUSES = ['Reported', 'In process', 'Resolved'];
 
 // ------------------------------------------------------------------
 // ACCESS PIN
@@ -65,14 +71,11 @@ function doGet(e) {
       return respond({ success: false, error: gate.error, unauthorized: true });
     }
     const mode = (e.parameter.mode || 'roster').toLowerCase();
-    if (mode === 'record') {
-      return recordAction(e);
+    if (mode === 'report') {
+      return reportSituation(e);
     }
-    if (mode === 'reset') {
-      return resetActions(e);
-    }
-    if (mode === 'resetclass') {
-      return resetClass(e);
+    if (mode === 'situations') {
+      return getSituations();
     }
     return getRoster();
   } catch (err) {
@@ -115,120 +118,91 @@ function getRoster() {
       class: (row[COL_CLASS - 1] || '').toString().trim(),
       name: name,
       image: (row[COL_IMAGE - 1] || '').toString().trim(),
-      gender: normalizeGender(row[COL_GENDER - 1]),
-      warning: toBool(row[COL_WARNING - 1]),
-      moveSeats: toBool(row[COL_MOVE_SEATS - 1]),
-      incident: toBool(row[COL_INCIDENT - 1])
+      gender: normalizeGender(row[COL_GENDER - 1])
     });
   });
 
   return respond({ success: true, students: students });
 }
 
-function recordAction(e) {
+function reportSituation(e) {
   const className = (e.parameter.class || '').toString().trim();
   const studentName = (e.parameter.name || '').toString().trim();
-  const action = (e.parameter.action || '').toString().trim();
+  const image = (e.parameter.image || '').toString().trim();
+  const code = (e.parameter.code || '').toString().trim();
+  const situation = (e.parameter.situation || '').toString().trim();
 
-  if (!studentName || !action) {
-    return respond({ success: false, error: 'Missing name or action' });
-  }
-  const targetCol = ACTION_COLUMNS[action];
-  if (!targetCol) {
-    return respond({ success: false, error: 'Unknown action: ' + action });
+  if (!studentName || !code) {
+    return respond({ success: false, error: 'Missing student or situation' });
   }
 
-  const sheet = getSheet(ROSTER_SHEET_NAME);
-  const studentRow = findStudentRow(sheet, className, studentName);
-  if (studentRow === -1) {
-    return respond({ success: false, error: 'Student not found: ' + studentName });
+  const sheet = getSituationsSheet();
+  const photo = image ? '=IMAGE("' + image.replace(/"/g, '""') + '")' : '';
+  const now = new Date();
+
+  // Lock so two phones reporting at once can't land on the same row.
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    sheet.appendRow([now, className, studentName, photo, code, situation, STATUSES[0], '', image]);
+    const row = sheet.getLastRow();
+    sheet.getRange(row, SCOL_STATUS).setDataValidation(
+      SpreadsheetApp.newDataValidation().requireValueInList(STATUSES, true).build()
+    );
+    sheet.setRowHeight(row, 60);
+  } finally {
+    lock.releaseLock();
   }
 
-  sheet.getRange(studentRow, targetCol).setValue(true);
-  appendLog(className, studentName, action);
-
-  return respond({ success: true, class: className, name: studentName, action: action });
+  return respond({
+    success: true,
+    situation: {
+      date: now.toISOString(), class: className, name: studentName, image: image,
+      code: code, situation: situation, status: STATUSES[0], notes: ''
+    }
+  });
 }
 
-function resetActions(e) {
-  const className = (e.parameter.class || '').toString().trim();
-  const studentName = (e.parameter.name || '').toString().trim();
-
-  if (!studentName) {
-    return respond({ success: false, error: 'Missing name' });
-  }
-
-  const sheet = getSheet(ROSTER_SHEET_NAME);
-  const studentRow = findStudentRow(sheet, className, studentName);
-  if (studentRow === -1) {
-    return respond({ success: false, error: 'Student not found: ' + studentName });
-  }
-
-  sheet.getRange(studentRow, COL_WARNING).setValue(false);
-  sheet.getRange(studentRow, COL_MOVE_SEATS).setValue(false);
-  sheet.getRange(studentRow, COL_INCIDENT).setValue(false);
-  appendLog(className, studentName, 'Reset');
-
-  return respond({ success: true, class: className, name: studentName, action: 'Reset' });
-}
-
-function resetClass(e) {
-  const className = (e.parameter.class || '').toString().trim();
-  if (!className) {
-    return respond({ success: false, error: 'Missing class' });
-  }
-
-  const sheet = getSheet(ROSTER_SHEET_NAME);
+function getSituations() {
+  const sheet = getSituationsSheet();
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) {
-    return respond({ success: true, class: className, cleared: 0 });
+    return respond({ success: true, situations: [] });
   }
 
-  // Read class column + the three flag columns in one go.
-  const numRows = lastRow - 1;
-  const classVals = sheet.getRange(2, COL_CLASS, numRows, 1).getValues();
-  const flagRange = sheet.getRange(2, COL_WARNING, numRows, 3);
-  const flagVals = flagRange.getValues();
+  const values = sheet.getRange(2, 1, lastRow - 1, SITUATION_HEADERS.length).getValues();
+  const list = [];
+  values.forEach(function (r) {
+    if (!r[2]) return; // no student name -> blank row
+    const d = r[SCOL_DATE - 1];
+    list.push({
+      date: d instanceof Date ? d.toISOString() : String(d || ''),
+      class: String(r[1] || '').trim(),
+      name: String(r[2] || '').trim(),
+      code: String(r[4] || '').trim(),
+      situation: String(r[5] || '').trim(),
+      status: String(r[SCOL_STATUS - 1] || '').trim(),
+      notes: String(r[7] || '').trim(),
+      image: String(r[SCOL_PHOTO_URL - 1] || '').trim()
+    });
+  });
+  list.reverse(); // newest first
 
-  let cleared = 0;
-  for (let i = 0; i < numRows; i++) {
-    if ((classVals[i][0] || '').toString().trim().toLowerCase() === className.toLowerCase()) {
-      flagVals[i][0] = false;
-      flagVals[i][1] = false;
-      flagVals[i][2] = false;
-      cleared++;
-    }
-  }
-
-  flagRange.setValues(flagVals);
-  appendLog(className, '(whole class)', 'Reset class');
-
-  return respond({ success: true, class: className, cleared: cleared });
+  return respond({ success: true, situations: list });
 }
 
-function findStudentRow(sheet, className, studentName) {
-  const lastRow = sheet.getLastRow();
-  const rows = sheet.getRange(1, 1, lastRow, COL_NAME).getValues();
-  for (let i = 0; i < rows.length; i++) {
-    const rowName = (rows[i][COL_NAME - 1] || '').toString().trim().toLowerCase();
-    const rowClass = (rows[i][COL_CLASS - 1] || '').toString().trim().toLowerCase();
-    const nameMatches = rowName === studentName.toLowerCase();
-    const classMatches = !className || rowClass === className.toLowerCase();
-    if (nameMatches && classMatches) {
-      return i + 1; // 1-indexed
-    }
-  }
-  return -1;
-}
-
-function appendLog(className, studentName, action) {
+function getSituationsSheet() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  let log = ss.getSheetByName(LOG_SHEET_NAME);
-  if (!log) {
-    log = ss.insertSheet(LOG_SHEET_NAME);
-    log.appendRow(['Timestamp', 'Class', 'Student', 'Action']);
+  let sheet = ss.getSheetByName(SITUATIONS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SITUATIONS_SHEET_NAME);
+    sheet.appendRow(SITUATION_HEADERS);
+    sheet.getRange(1, 1, 1, SITUATION_HEADERS.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    sheet.getRange('A:A').setNumberFormat('yyyy-mm-dd hh:mm');
+    sheet.setColumnWidth(4, 70);
   }
-  log.appendRow([new Date(), className, studentName, action]);
+  return sheet;
 }
 
 function getSheet(name) {
@@ -236,11 +210,6 @@ function getSheet(name) {
   const sheet = ss.getSheetByName(name) || ss.getSheets()[0];
   if (!sheet) throw new Error('Sheet "' + name + '" not found');
   return sheet;
-}
-
-function toBool(v) {
-  if (v === true) return true;
-  return v.toString().trim().toLowerCase() === 'true';
 }
 
 function normalizeGender(v) {

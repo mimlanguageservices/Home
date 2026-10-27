@@ -54,6 +54,7 @@
   }
   .tile:active{background:var(--card-2);}
   .tile .sub{display:block; font-size:13px; font-weight:400; color:var(--muted); margin-top:2px;}
+  .tile.situations{border-color:var(--incident); border-left-width:4px;}
 
   .student-row{
     display:flex; align-items:center; gap:14px;
@@ -61,10 +62,6 @@
     border-radius:14px; padding:12px 14px; width:100%; text-align:left; color:var(--text);
   }
   .student-row:active{background:var(--card-2);}
-  .student-row{border-left-width:4px;}
-  .student-row.lvl-warning{border-left-color:var(--warning);}
-  .student-row.lvl-move{border-left-color:var(--move);}
-  .student-row.lvl-incident{border-left-color:var(--incident);}
   .student-row.boy{background:var(--boy-bg); color:var(--gender-text);}
   .student-row.girl{background:var(--girl-bg); color:var(--gender-text);}
   .student-row.boy:active{background:var(--boy-bg-2);}
@@ -77,18 +74,6 @@
     display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; color:var(--muted);
   }
   .student-row .name{flex:1; font-weight:600; font-size:16px;}
-  .status-tag{
-    font-size:11px; font-weight:700; letter-spacing:.02em;
-    padding:3px 8px; border-radius:999px; color:#fff; flex:none; white-space:nowrap;
-  }
-  .status-tag.warning{background:var(--warning);}
-  .status-tag.move{background:var(--move);}
-  .status-tag.incident{background:var(--incident);}
-  .flags{display:flex; gap:4px; flex:none;}
-  .flag{width:9px; height:9px; border-radius:50%; background:var(--line);}
-  .flag.warning{background:var(--warning);}
-  .flag.move{background:var(--move);}
-  .flag.incident{background:var(--incident);}
 
   .search{
     width:100%; border:1px solid var(--line); background:var(--card);
@@ -101,20 +86,8 @@
     border-radius:16px; padding:26px 18px; font-size:22px; font-weight:700;
     display:flex; flex-direction:column; align-items:center; gap:6px;
   }
-  .action-btn .desc{font-size:13px; font-weight:400; opacity:.9;}
-  .action-btn.warning{background:var(--warning);}
   .action-btn.move{background:var(--move);}
-  .action-btn.incident{background:var(--incident);}
   .action-btn:active{filter:brightness(.9);}
-  .action-btn[disabled]{opacity:.5;}
-
-  .reset-btn{
-    border:1px solid var(--line); background:transparent; color:var(--muted);
-    width:100%; border-radius:14px; padding:16px 18px; font-size:15px; font-weight:600;
-    margin-top:18px;
-  }
-  .reset-btn:active{background:var(--card);}
-  .reset-btn.armed{border-color:var(--incident); color:var(--incident);}
 
   .profile{
     display:flex; align-items:center; gap:14px; margin-bottom:20px;
@@ -123,6 +96,49 @@
   .profile .avatar{width:56px; height:56px; font-size:20px;}
   .profile .name{font-size:18px; font-weight:700;}
   .profile .status{font-size:13px; color:var(--muted); margin-top:3px;}
+
+  /* situation menu */
+  .group-title{
+    font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted); margin:18px 2px 8px;
+  }
+  .group-title:first-of-type{margin-top:0;}
+  .sit-btn{
+    border:1px solid var(--line); background:var(--card); color:var(--text);
+    width:100%; text-align:left; border-radius:12px; padding:14px;
+    font-size:15px; display:flex; gap:12px; align-items:flex-start;
+  }
+  .sit-btn:active{background:var(--card-2);}
+  .sit-btn .code{font-weight:700; color:var(--incident); flex:none; min-width:30px;}
+  .sit-btn.t2 .code{color:var(--warning);}
+
+  /* situations log */
+  .sit-card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:12px 14px; display:flex; gap:12px; align-items:flex-start;
+  }
+  .sit-card .avatar{width:48px; height:48px; font-size:15px;}
+  .sit-card .body{flex:1; min-width:0;}
+  .sit-card .who{font-weight:700; font-size:15px;}
+  .sit-card .who .cls{font-weight:400; color:var(--muted); font-size:13px;}
+  .sit-card .what{font-size:14px; margin-top:3px;}
+  .sit-card .what b{color:var(--incident);}
+  .sit-card .when{font-size:12px; color:var(--muted); margin-top:4px;}
+  .sit-card .notes{font-size:13px; color:var(--muted); margin-top:6px; font-style:italic; word-break:break-word;}
+  .pill{
+    font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px;
+    color:#fff; background:var(--line); flex:none; white-space:nowrap;
+  }
+  .pill.reported{background:var(--incident);}
+  .pill.in-process{background:var(--warning);}
+  .pill.resolved{background:var(--ok);}
+
+  .filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;}
+  .chip{
+    border:1px solid var(--line); background:transparent; color:var(--muted);
+    border-radius:999px; padding:7px 13px; font-size:13px; font-weight:600;
+  }
+  .chip.on{background:var(--text); color:var(--bg); border-color:var(--text);}
 
   .msg{
     text-align:center; color:var(--muted); padding:40px 10px; font-size:15px;
@@ -138,7 +154,7 @@
   .toast.show{transform:translateX(-50%) translateY(0);}
   .toast.err{background:var(--incident);}
 
-  /* settings sheet */
+  /* dialogs */
   dialog{
     border:0; border-radius:16px; padding:20px; width:calc(100% - 32px); max-width:460px;
     background:var(--card); color:var(--text);
@@ -156,6 +172,11 @@
     background:var(--card-2); color:var(--text);
   }
   dialog button.primary{background:var(--move); color:#fff;}
+  dialog button.danger{background:var(--incident); color:#fff;}
+  dialog button[disabled]{opacity:.5;}
+  #confirm h2{font-size:20px; text-align:center; margin-bottom:14px;}
+  #confirm .profile{margin-bottom:14px; background:var(--bg);}
+  #confirm .row button{flex:1; padding:14px; font-size:16px;}
 </style>
 </head>
 <body>
@@ -184,6 +205,15 @@
   </div>
 </dialog>
 
+<dialog id="confirm">
+  <h2>Are you sure?</h2>
+  <div id="confirmBody"></div>
+  <div class="row">
+    <button id="confirmCancel">Cancel</button>
+    <button class="danger" id="confirmOk">Confirm</button>
+  </div>
+</dialog>
+
 <script>
 /* ------------------------------------------------------------------
    CONFIG
@@ -192,7 +222,27 @@
 ------------------------------------------------------------------ */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypVEbFCfSeu1ONvARs79N_9KhE46iOh3yPO7I4wJ_IK8b6G-495X3x6aM3rnERZHk2HA/exec";
 
-/* Confirmation sound played when a student is escalated. */
+/* The Situations tile is placed right after this class. */
+const SITUATIONS_AFTER_CLASS = "8C";
+
+/* The menu shown when a student is tapped. */
+const SITUATION_TYPES = [
+  { group:"Type 1", cls:"t1", items:[
+    { code:"1.1", label:"Aggressive or inappropriate behavior" },
+    { code:"1.2", label:"Theft, plagiarism, or academic fraud" },
+    { code:"1.3", label:"Alcohol, tobacco, vaping, or drug use" },
+    { code:"1.4", label:"Inappropriate sexual behavior" },
+    { code:"1.5", label:"Failure to follow environmental policies" },
+    { code:"1.6", label:"Failure to follow safety and tech protocols" },
+    { code:"1.7", label:"Repeated disruption of teaching and learning (three times)" }
+  ]},
+  { group:"Type 2", cls:"t2", items:[
+    { code:"2.A", label:"Repeated or systematic situations" },
+    { code:"2.B", label:"Situations involving harm without incapacity" }
+  ]}
+];
+
+/* Confirmation sound played when a situation is reported. */
 const DING = new Audio("https://static.wixstatic.com/mp3/593d03_244b1a7fddcf4931957cde0d504d0354.mp3");
 DING.preload = "auto";
 function playDing(){
@@ -200,16 +250,22 @@ function playDing(){
 }
 
 const state = {
-  screen: "class",     // class -> student
+  screen: "class",     // class -> student -> report ; class -> situations
   students: [],
   className: null,
+  studentIdx: null,
+  pending: null,       // situation item awaiting confirmation
+  sending: false,
   loading: false,
   refreshing: false,
   cacheTs: 0,
   error: null,
   pinError: null,
-  classResetArmed: false,
-  query: ""
+  query: "",
+  situations: null,    // null = never loaded
+  sitLoading: false,
+  sitError: null,
+  sitFilter: "Open"
 };
 
 const els = {
@@ -220,7 +276,10 @@ const els = {
   gear: document.getElementById("gearBtn"),
   toast: document.getElementById("toast"),
   dialog: document.getElementById("settings"),
-  urlInput: document.getElementById("urlInput")
+  urlInput: document.getElementById("urlInput"),
+  confirm: document.getElementById("confirm"),
+  confirmBody: document.getElementById("confirmBody"),
+  confirmOk: document.getElementById("confirmOk")
 };
 
 function getUrl(){
@@ -241,6 +300,29 @@ function apiUrl(paramObj){
   const params = new URLSearchParams(paramObj);
   params.set("pin", getPin());
   return url + (url.includes("?") ? "&" : "?") + params.toString();
+}
+
+/* GET the script and parse JSON. A rejected PIN sends the user back
+   to the PIN screen and resolves to null. */
+async function api(paramObj){
+  const res = await fetch(apiUrl(paramObj));
+  const raw = await res.text();
+  let data;
+  try{ data = JSON.parse(raw); }
+  catch(_){
+    throw new Error("Server did not return JSON (HTTP " + res.status + "). " +
+      "This usually means the Web App is asking for a Google login. " +
+      "First 120 chars: " + raw.slice(0,120));
+  }
+  if(data.unauthorized){
+    localStorage.removeItem("disciplinePin");
+    state.screen = "pin";
+    state.pinError = data.error || "Incorrect PIN.";
+    render();
+    return null;
+  }
+  if(!data.success) throw new Error(data.error || "Request failed");
+  return data;
 }
 
 /* ---------- roster cache (instant load) ---------- */
@@ -264,7 +346,6 @@ async function loadRoster(){
   const haveCache = cached && Array.isArray(cached.students) && cached.students.length;
   if(haveCache){
     state.students = cached.students;
-    applyLocalFlags();
     state.cacheTs = cached.ts;
     state.loading = false;
     state.refreshing = true;
@@ -276,28 +357,11 @@ async function loadRoster(){
 
   // 2. Refresh from the server in the background.
   try{
-    const res = await fetch(apiUrl({ mode:"roster" }));
-    const raw = await res.text();
-    let data;
-    try{ data = JSON.parse(raw); }
-    catch(_){
-      throw new Error("Server did not return JSON (HTTP " + res.status + "). " +
-        "This usually means the Web App is asking for a Google login. " +
-        "First 120 chars: " + raw.slice(0,120));
-    }
-    if(data.unauthorized){
-      localStorage.removeItem("disciplinePin");
-      state.screen = "pin";
-      state.pinError = data.error || "Incorrect PIN.";
-      state.loading = false; state.refreshing = false;
-      render();
-      return;
-    }
-    if(!data.success) throw new Error(data.error || "Could not load roster");
+    const data = await api({ mode:"roster" });
+    if(!data){ state.loading = false; state.refreshing = false; return; }
     const fresh = data.students || [];
     if(fresh.length){
       state.students = fresh;
-      applyLocalFlags();
       state.cacheTs = Date.now();
       writeCache(fresh);
     }else if(!haveCache){
@@ -317,55 +381,55 @@ async function loadRoster(){
   render();
 }
 
-/* ------------------------------------------------------------------
-   Discipline flags live ON THIS DEVICE only (localStorage). The
-   sheet's columns D/E/F are ignored entirely — the roster fetch is
-   used purely for names, classes and photos.
-   Shape: { "8A|Martin Angulo Toro": { w:true, m:false, i:false } }
------------------------------------------------------------------- */
-const FLAGS_KEY = "disciplineFlags";
-function loadFlags(){
-  try{ return JSON.parse(localStorage.getItem(FLAGS_KEY) || "{}"); }catch(_){ return {}; }
-}
-function saveFlags(f){
-  try{ localStorage.setItem(FLAGS_KEY, JSON.stringify(f)); }catch(_){}
-}
-function flagId(s){ return (s.class || "") + "|" + s.name; }
-
-/* Overlay this device's stored flags onto the roster. */
-function applyLocalFlags(){
-  const f = loadFlags();
-  state.students.forEach(s => {
-    const rec = f[flagId(s)] || {};
-    s.warning   = !!rec.w;
-    s.moveSeats = !!rec.m;
-    s.incident  = !!rec.i;
-  });
-}
-
-/* Persist one student's flags to the device. */
-function setFlags(s, w, m, i){
-  s.warning = w; s.moveSeats = m; s.incident = i;
-  const f = loadFlags();
-  const id = flagId(s);
-  if(!w && !m && !i) delete f[id];
-  else f[id] = { w: w, m: m, i: i };
-  saveFlags(f);
-}
-
-/* Clear every student in the current class. */
-function doClassReset(){
-  const cls = state.className;
-  const f = loadFlags();
-  state.students.forEach(s => {
-    if(s.class === cls){
-      s.warning = false; s.moveSeats = false; s.incident = false;
-      delete f[flagId(s)];
-    }
-  });
-  saveFlags(f);
-  toast("Cleared all flags in " + cls);
+async function loadSituations(){
+  state.sitLoading = true;
+  state.sitError = null;
   render();
+  try{
+    const data = await api({ mode:"situations" });
+    if(!data){ state.sitLoading = false; return; }
+    state.situations = data.situations || [];
+  }catch(err){
+    state.sitError = err.message;
+  }
+  state.sitLoading = false;
+  render();
+}
+
+/* Send the confirmed situation to the spreadsheet. */
+async function submitReport(){
+  const s = state.students[state.studentIdx];
+  const item = state.pending;
+  if(!s || !item || state.sending) return;
+  state.sending = true;
+  els.confirmOk.disabled = true;
+  els.confirmOk.textContent = "Sending…";
+  try{
+    const data = await api({
+      mode:"report", class:s.class || "", name:s.name, image:s.image || "",
+      code:item.code, situation:item.label
+    });
+    if(data && !data.situation){
+      throw new Error("the Apps Script is out of date — redeploy DisciplineScript.gs");
+    }
+    if(data){
+      playDing();
+      if(state.situations) state.situations.unshift(data.situation);
+      toast("Reported " + item.code + " — " + firstName(s.name));
+      els.confirm.close();
+      state.screen = "student";
+      state.studentIdx = null;
+      render();
+    }else{
+      els.confirm.close();
+    }
+  }catch(err){
+    toast("Not sent: " + err.message, true);
+  }
+  state.sending = false;
+  state.pending = null;
+  els.confirmOk.disabled = false;
+  els.confirmOk.textContent = "Confirm";
 }
 
 /* ---------- screens ---------- */
@@ -382,7 +446,9 @@ function render(){
   els.crumb.textContent =
     locked ? "" :
     state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
-    "Tap: Warning → Move Seats → Incident → clear" + (state.refreshing ? "   ·   updating…" : "");
+    state.screen === "student" ? "Tap a student to report a situation" + (state.refreshing ? "   ·   updating…" : "") :
+    state.screen === "report" ? "Choose the type of situation" :
+    "";
 
   if(locked) return renderPin();
 
@@ -393,7 +459,9 @@ function render(){
     return;
   }
 
-  if(state.screen === "class")   return renderClasses();
+  if(state.screen === "class")      return renderClasses();
+  if(state.screen === "situations") return renderSituations();
+  if(state.screen === "report")     return renderReport();
   return renderStudents();
 }
 
@@ -430,24 +498,23 @@ function renderClasses(){
       '<button class="tile" onclick="loadRoster()">↻&nbsp; Retry</button>';
     return;
   }
-  els.view.innerHTML = '<div class="grid">' + list.map(c => {
+  const sitTile =
+    '<button class="tile situations" onclick="openSituations()">' +
+      '<span>Situations<span class="sub">Reported cases and their process</span></span>' +
+    '</button>';
+  const tiles = list.map(c => {
     const n = state.students.filter(s => s.class === c).length;
     return '<button class="tile" onclick="pickClass(\'' + esc(c) + '\')">' +
              '<span>Class ' + esc(c) + '<span class="sub">' + n + ' students</span></span>' +
            '</button>';
-  }).join("") + '</div>';
+  });
+  const at = list.indexOf(SITUATIONS_AFTER_CLASS);
+  tiles.splice(at === -1 ? tiles.length : at + 1, 0, sitTile);
+  els.view.innerHTML = '<div class="grid">' + tiles.join("") + '</div>';
 }
 
 /* Sort order: boys first, then girls, then unspecified. */
 function genderRank(s){ return s.gender === "boy" ? 0 : s.gender === "girl" ? 1 : 2; }
-
-/* Highest level currently on the student, for the row's look. */
-function currentLevel(s){
-  if(s.incident)  return { cls:"incident", label:"Incident" };
-  if(s.moveSeats) return { cls:"move",     label:"Moved seats" };
-  if(s.warning)   return { cls:"warning",  label:"Warning" };
-  return { cls:"", label:"" };
-}
 
 function renderStudents(){
   els.title.textContent = "Class " + state.className;
@@ -458,82 +525,138 @@ function renderStudents(){
 
   const rows = roster.map(s => {
     const idx = state.students.indexOf(s);
-    const lvl = currentLevel(s);
     const g = s.gender === "boy" ? " boy" : s.gender === "girl" ? " girl" : "";
-    return '<button class="student-row' + g + (lvl.cls ? " lvl-" + lvl.cls : "") + '" onclick="cycleStudent(' + idx + ')">' +
+    return '<button class="student-row' + g + '" onclick="pickStudent(' + idx + ')">' +
              avatar(s) +
              '<span class="name">' + esc(s.name) + '</span>' +
-             (lvl.label ? '<span class="status-tag ' + lvl.cls + '">' + lvl.label + '</span>' : '') +
-             '<span class="flags">' +
-               '<span class="flag ' + (s.warning?"warning":"") + '"></span>' +
-               '<span class="flag ' + (s.moveSeats?"move":"") + '"></span>' +
-               '<span class="flag ' + (s.incident?"incident":"") + '"></span>' +
-             '</span>' +
            '</button>';
   }).join("");
 
-  const classCount = state.students.filter(s => s.class === state.className).length;
   els.view.innerHTML =
     '<input class="search" id="q" placeholder="Search name…" value="' + esc(state.query) + '">' +
-    '<div class="grid">' + (rows || '<div class="msg">No matches.</div>') + '</div>' +
-    '<button class="reset-btn' + (state.classResetArmed ? ' armed' : '') + '" onclick="classResetTapped()">' +
-      (state.classResetArmed
-        ? "Tap again to clear ALL " + classCount + " students in " + esc(state.className)
-        : "Reset entire class") +
-    '</button>';
+    '<div class="grid">' + (rows || '<div class="msg">No matches.</div>') + '</div>';
 
   const q = document.getElementById("q");
   q.addEventListener("input", e => { state.query = e.target.value; renderStudents(); });
-  if(!state.classResetArmed && !skipSearchFocus){
+  if(!skipSearchFocus){
     q.focus({preventScroll:true});
     const len = q.value.length; q.setSelectionRange(len,len);
   }
   skipSearchFocus = false;
 }
 
+function renderReport(){
+  const s = state.students[state.studentIdx];
+  els.title.textContent = "Report a situation";
+  let html =
+    '<div class="profile">' + avatar(s) +
+      '<div><div class="name">' + esc(s.name) + '</div>' +
+      '<div class="status">Class ' + esc(s.class) + '</div></div>' +
+    '</div>';
+  SITUATION_TYPES.forEach(t => {
+    html += '<div class="group-title">' + esc(t.group) + '</div><div class="grid" style="gap:8px;">';
+    t.items.forEach(it => {
+      html += '<button class="sit-btn ' + t.cls + '" onclick="askConfirm(\'' + it.code + '\')">' +
+                '<span class="code">' + esc(it.code) + '</span><span>' + esc(it.label) + '</span>' +
+              '</button>';
+    });
+    html += '</div>';
+  });
+  els.view.innerHTML = html;
+  window.scrollTo(0,0);
+}
+
+/* "Open" = anything not yet Resolved. */
+function isResolved(x){ return (x.status || "").toLowerCase() === "resolved"; }
+
+function renderSituations(){
+  els.title.textContent = "Situations";
+  if(state.sitLoading && !state.situations){
+    els.view.innerHTML = '<div class="msg">Loading situations…</div>';
+    return;
+  }
+  if(state.sitError && !state.situations){
+    els.view.innerHTML =
+      '<div class="msg" style="text-align:left; word-break:break-word;">' + esc(state.sitError) + '</div>' +
+      '<button class="tile" onclick="loadSituations()">↻&nbsp; Retry</button>';
+    return;
+  }
+  const all = state.situations || [];
+  const open = all.filter(x => !isResolved(x));
+  const shown =
+    state.sitFilter === "Open" ? open :
+    state.sitFilter === "Resolved" ? all.filter(isResolved) : all;
+
+  const chip = (name, n) =>
+    '<button class="chip' + (state.sitFilter === name ? ' on' : '') + '" onclick="setSitFilter(\'' + name + '\')">' +
+      name + ' (' + n + ')</button>';
+
+  const cards = shown.map(x => {
+    const st = x.status || "Reported";
+    return '<div class="sit-card">' +
+             avatar(x) +
+             '<div class="body">' +
+               '<div class="who">' + esc(x.name) + ' <span class="cls">· ' + esc(x.class) + '</span></div>' +
+               '<div class="what"><b>' + esc(x.code) + '</b> ' + esc(x.situation) + '</div>' +
+               '<div class="when">' + esc(fmtDate(x.date)) + '</div>' +
+               (x.notes ? '<div class="notes">' + esc(x.notes) + '</div>' : '') +
+             '</div>' +
+             '<span class="pill ' + slug(st) + '">' + esc(st) + '</span>' +
+           '</div>';
+  }).join("");
+
+  els.crumb.textContent = state.sitLoading ? "Updating…" : "Status is updated in the Situations tab of the spreadsheet";
+  els.view.innerHTML =
+    '<div class="filters">' +
+      chip("Open", open.length) + chip("Resolved", all.length - open.length) + chip("All", all.length) +
+    '</div>' +
+    '<div class="grid">' + (cards || '<div class="msg">Nothing here.</div>') + '</div>';
+}
+
 /* ---------- actions ---------- */
-function pickClass(c){ state.className = c; state.query = ""; state.classResetArmed = false; state.screen = "student"; render(); }
+function pickClass(c){ state.className = c; state.query = ""; state.screen = "student"; render(); }
+function pickStudent(idx){ state.studentIdx = idx; state.screen = "report"; render(); }
+function openSituations(){ state.screen = "situations"; loadSituations(); }
+function setSitFilter(f){ state.sitFilter = f; render(); }
 function goBack(){
-  if(state.screen === "student"){ state.screen = "class"; state.className = null; state.classResetArmed = false; }
+  if(state.screen === "report"){ state.screen = "student"; state.studentIdx = null; skipSearchFocus = true; }
+  else if(state.screen === "student"){ state.screen = "class"; state.className = null; }
+  else if(state.screen === "situations"){ state.screen = "class"; }
   render();
 }
 
 /* When true, the next student-list render won't grab the search box
-   (so tapping rows doesn't pop the phone keyboard open). */
+   (so coming back from a report doesn't pop the phone keyboard open). */
 let skipSearchFocus = false;
 
-/* Tap a student to move it one rung up the ladder:
-   none -> Warning -> Move Seats -> Incident -> (4th tap) silent clear. */
-function cycleStudent(idx){
-  skipSearchFocus = true;
-  const s = state.students[idx];
-  if(!s.warning){          playDing(); setFlags(s, true,  false, false); }
-  else if(!s.moveSeats){   playDing(); setFlags(s, true,  true,  false); }
-  else if(!s.incident){    playDing(); setFlags(s, true,  true,  true ); }
-  else {                               setFlags(s, false, false, false); }  // 4th tap: silent
-  render();
-}
-
-/* Same two-tap guard for wiping a whole class. */
-let classResetTimer;
-function classResetTapped(){
-  if(!state.classResetArmed){
-    state.classResetArmed = true;
-    render();
-    clearTimeout(classResetTimer);
-    classResetTimer = setTimeout(() => { state.classResetArmed = false; render(); }, 3000);
-    return;
-  }
-  clearTimeout(classResetTimer);
-  state.classResetArmed = false;
-  playDing();
-  doClassReset();
+function askConfirm(code){
+  const s = state.students[state.studentIdx];
+  let item = null;
+  SITUATION_TYPES.forEach(t => t.items.forEach(it => { if(it.code === code) item = it; }));
+  if(!s || !item) return;
+  state.pending = item;
+  els.confirmBody.innerHTML =
+    '<div class="profile">' + avatar(s) +
+      '<div><div class="name">' + esc(s.name) + '</div>' +
+      '<div class="status">Class ' + esc(s.class) + '</div></div>' +
+    '</div>' +
+    '<p style="font-size:15px; color:var(--text); text-align:center; margin-bottom:18px;">' +
+      '<b style="color:var(--incident);">' + esc(item.code) + '</b> ' + esc(item.label) +
+    '</p>';
+  els.confirm.showModal();
 }
 
 /* ---------- helpers ---------- */
 function firstName(n){ return (n || "").split(" ")[0]; }
 function initials(n){ return (n||"?").split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase(); }
-function avatar(s, big){
+function slug(s){ return String(s).toLowerCase().trim().replace(/\s+/g,"-"); }
+function fmtDate(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return iso || "";
+  return d.toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short", year:"numeric" }) +
+         " · " + d.toLocaleTimeString(undefined, { hour:"numeric", minute:"2-digit" });
+}
+function avatar(s){
   if(s.image){
     return '<img class="avatar" src="' + esc(s.image) + '" alt="" ' +
       'onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'avatar\',textContent:\'' + initials(s.name) + '\'}))">';
@@ -551,7 +674,7 @@ function toast(text, isErr){
   toastTimer = setTimeout(() => { els.toast.className = "toast" + (isErr ? " err" : ""); }, 2600);
 }
 
-/* ---------- settings ---------- */
+/* ---------- dialogs ---------- */
 function openSettings(){
   els.urlInput.value = getUrl();
   els.dialog.showModal();
@@ -568,7 +691,17 @@ document.getElementById("saveSettings").addEventListener("click", () => {
   els.dialog.close();
   loadRoster();
 });
+document.getElementById("confirmCancel").addEventListener("click", () => {
+  if(state.sending) return;
+  state.pending = null;
+  els.confirm.close();
+});
+els.confirmOk.addEventListener("click", submitReport);
+els.confirm.addEventListener("cancel", e => { if(state.sending) e.preventDefault(); });
 els.back.addEventListener("click", goBack);
+
+/* Old 3-strike flags are no longer used. */
+localStorage.removeItem("disciplineFlags");
 
 /* ---------- go ---------- */
 if(getPin()){
