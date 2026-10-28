@@ -25,6 +25,7 @@ function build() {
   rep('<h1 id="page-title">Curriculums</h1>\n  <p id="subtitle">Browse by grade, subject, book, and lesson</p>',
       '<h1 id="page-title">Real World English 8</h1>\n  <p id="subtitle">Browse by book and lesson</p>');
   rep('  <div class="resource-list" id="resource-list" style="display:none"></div>\n  <div class="letter-stage" id="letter-stage" style="display:none"></div>\n', '');
+  cut('\n  <div class="kanban-wrap"', '\n  <script>');
   cut('    // Sidebar resource pages', '    // ============================================================\n\n    // Sheet columns');
   rep("const SHEET_ID = '13vuBiyaM82zExzUjD4im2Zhoys_q3PjKt2Th3AiKFnE';\n",
       "const SHEET_ID = '13vuBiyaM82zExzUjD4im2Zhoys_q3PjKt2Th3AiKFnE';\n" +

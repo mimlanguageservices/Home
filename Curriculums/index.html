@@ -554,6 +554,158 @@
     }
     .shuffle-btn:active { transform: rotate(180deg); }
 
+    /* ── Kanban board ── */
+    .kanban-wrap {
+      width: 100%;
+      max-width: 1200px;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .kanban-toolbar {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .kanban-toolbar-btn {
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .kanban-toolbar-btn:hover { background: #fee2e2; }
+
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    .kanban-col {
+      background: #ffffff;
+      border-radius: 14px;
+      border: 2px solid transparent;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 320px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .kanban-col.drag-over {
+      background: #eef2ff;
+      border: 2px dashed #3b82f6;
+    }
+
+    .kanban-col-header {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      text-align: center;
+      padding: 0.85rem 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .kanban-cards {
+      padding: 0.8rem 0.8rem 0.3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .kanban-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.95rem;
+      color: #1e293b;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
+    }
+
+    .kanban-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .kanban-card.dragging { opacity: 0.4; cursor: grabbing; }
+
+    .kanban-card-text { flex: 1; overflow-wrap: anywhere; }
+
+    .kanban-delete-btn {
+      background: none;
+      border: none;
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 2px 4px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .kanban-delete-btn:hover { color: #dc2626; }
+
+    .kanban-empty {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 1.2rem;
+      font-style: italic;
+    }
+
+    .kanban-add-row {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.5rem 0.8rem 0.8rem;
+    }
+
+    .kanban-input {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .kanban-input:focus { border-color: #3b82f6; }
+
+    .kanban-add-btn {
+      padding: 0.4rem 0.9rem;
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .kanban-add-btn:hover { background: #2563eb; }
+
+    @media (max-width: 720px) {
+      .kanban-board { grid-template-columns: 1fr; }
+    }
+
     /* ── Loading / Error / Empty ── */
     #status {
       color: #64748b;
@@ -575,6 +727,7 @@
       <button class="sidebar-link" id="nav-silent-starter">Silent Starter</button>
       <button class="sidebar-link" id="nav-circle-time">Circle Time</button>
       <button class="sidebar-link" id="nav-processing">Processing</button>
+      <button class="sidebar-link" id="nav-kanban">Kanban</button>
     </div>
   </nav>
 
@@ -593,6 +746,13 @@
   <div class="topics-list" id="topics-list" style="display:none"></div>
   <div class="resource-list" id="resource-list" style="display:none"></div>
   <div class="letter-stage" id="letter-stage" style="display:none"></div>
+
+  <div class="kanban-wrap" id="kanban" style="display:none">
+    <div class="kanban-toolbar">
+      <button class="kanban-toolbar-btn" id="kanban-clear">🗑 Clear All</button>
+    </div>
+    <div class="kanban-board" id="kanban-board"></div>
+  </div>
 
   <script>
     // ============================================================
@@ -617,6 +777,10 @@
         slots: 3,
       },
     };
+
+    // Kanban sync — Web App URL from deploying Curriculums/KanbanScript.gs.
+    // Leave empty to keep the board in this browser only.
+    const KANBAN_SYNC_URL = 'https://script.google.com/macros/s/AKfycbyWW5E6bpPn0Eihhf66-U-7efcfJHE_uyILq32v6NU9n2M1nRrFOM3wOCiD4YPbFq6O/exec';
     // ============================================================
 
     // Sheet columns (header row, any order): Grade, Subject, Book, Lesson, Link
@@ -768,6 +932,7 @@
       document.getElementById('nav-silent-starter').classList.toggle('active', view === 'silent-starter');
       document.getElementById('nav-circle-time').classList.toggle('active', view === 'circle-time');
       document.getElementById('nav-processing').classList.toggle('active', view === 'processing-letters' || view === 'processing-category');
+      document.getElementById('nav-kanban').classList.toggle('active', view === 'kanban');
     }
 
     function hideAllPanels() {
@@ -777,6 +942,7 @@
       document.getElementById('topics-list').style.display = 'none';
       document.getElementById('resource-list').style.display = 'none';
       document.getElementById('letter-stage').style.display = 'none';
+      document.getElementById('kanban').style.display = 'none';
     }
 
     function setCornerVideo(url) {
@@ -1034,6 +1200,225 @@
       });
 
       list.style.display = 'flex';
+    }
+
+    // ── Kanban: To Do / Doing / Done, saved in this browser ──
+    const KANBAN_STORAGE_KEY = 'curriculums_kanban_v1';
+    const KANBAN_COLS = [
+      { id: 'todo',  label: 'To Do', bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+      { id: 'doing', label: 'Doing', bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+      { id: 'done',  label: 'Done',  bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+    ];
+    const KANBAN_POLL_MS = 15000;
+    let kanbanData = null;
+    let kanbanDrag = null; // { col, index }
+    let kanbanEdits = 0;   // bumped on every local change, so stale fetches are ignored
+    let kanbanSaveTimer = null;
+    let kanbanSaving = false;
+
+    function normalizeBoard(raw) {
+      const board = { todo: [], doing: [], done: [] };
+      if (raw) KANBAN_COLS.forEach(c => { if (Array.isArray(raw[c.id])) board[c.id] = raw[c.id].map(String); });
+      return board;
+    }
+
+    function loadKanban() {
+      try {
+        kanbanData = normalizeBoard(JSON.parse(localStorage.getItem(KANBAN_STORAGE_KEY)));
+      } catch (e) {
+        kanbanData = normalizeBoard(null);
+      }
+    }
+
+    function saveKanban() {
+      kanbanEdits++;
+      try { localStorage.setItem(KANBAN_STORAGE_KEY, JSON.stringify(kanbanData)); } catch (e) {}
+      if (!KANBAN_SYNC_URL) return;
+      // Short debounce so a quick burst of edits goes up as one save
+      clearTimeout(kanbanSaveTimer);
+      kanbanSaveTimer = setTimeout(pushKanban, 400);
+    }
+
+    async function pushKanban() {
+      kanbanSaveTimer = null;
+      kanbanSaving = true;
+      const editsAtSend = kanbanEdits;
+      try {
+        // text/plain keeps this a "simple" request, so Apps Script needs no CORS preflight
+        const res = await fetch(KANBAN_SYNC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(kanbanData),
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error);
+      } catch (e) {
+        // Still saved locally — retry shortly unless a newer save is already queued
+        if (editsAtSend === kanbanEdits && !kanbanSaveTimer) kanbanSaveTimer = setTimeout(pushKanban, 5000);
+      } finally {
+        kanbanSaving = false;
+      }
+    }
+
+    async function pullKanban() {
+      if (!KANBAN_SYNC_URL || kanbanSaving || kanbanSaveTimer || kanbanDrag) return;
+      const editsAtSend = kanbanEdits;
+      try {
+        const res = await fetch(`${KANBAN_SYNC_URL}?cachebust=${Date.now()}`);
+        const data = await res.json();
+        if (!data.ok) return;
+        // Skip if the board was edited locally while this request was in flight
+        if (editsAtSend !== kanbanEdits || kanbanSaving || kanbanSaveTimer || kanbanDrag) return;
+        const board = normalizeBoard(data.board);
+        if (JSON.stringify(board) === JSON.stringify(kanbanData)) return;
+        kanbanData = board;
+        try { localStorage.setItem(KANBAN_STORAGE_KEY, JSON.stringify(kanbanData)); } catch (e) {}
+        renderKanban();
+      } catch (e) {}
+    }
+
+    // Poll for changes from other devices while the board is on screen
+    setInterval(() => {
+      if (view === 'kanban' && !document.hidden) pullKanban();
+    }, KANBAN_POLL_MS);
+    document.addEventListener('visibilitychange', () => {
+      if (view === 'kanban' && !document.hidden) pullKanban();
+    });
+
+    function buildKanbanBoard() {
+      const board = document.getElementById('kanban-board');
+      board.innerHTML = '';
+
+      KANBAN_COLS.forEach(c => {
+        const col = document.createElement('div');
+        col.className = 'kanban-col';
+        col.ondragover = e => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          col.classList.add('drag-over');
+        };
+        col.ondragleave = e => {
+          if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+        };
+        col.ondrop = e => {
+          e.preventDefault();
+          col.classList.remove('drag-over');
+          if (!kanbanDrag) return;
+          const task = kanbanData[kanbanDrag.col].splice(kanbanDrag.index, 1)[0];
+          kanbanData[c.id].push(task);
+          kanbanDrag = null;
+          saveKanban();
+          renderKanban();
+        };
+
+        const header = document.createElement('div');
+        header.className = 'kanban-col-header';
+        header.style.background = c.bg;
+        header.textContent = c.label;
+        col.appendChild(header);
+
+        const cards = document.createElement('div');
+        cards.className = 'kanban-cards';
+        cards.id = 'kanban-cards-' + c.id;
+        col.appendChild(cards);
+
+        const addRow = document.createElement('div');
+        addRow.className = 'kanban-add-row';
+        const input = document.createElement('input');
+        input.className = 'kanban-input';
+        input.type = 'text';
+        input.placeholder = 'Add a task...';
+        const addBtn = document.createElement('button');
+        addBtn.className = 'kanban-add-btn';
+        addBtn.type = 'button';
+        addBtn.textContent = '+';
+        const add = () => {
+          const text = input.value.trim();
+          if (!text) return;
+          kanbanData[c.id].push(text);
+          input.value = '';
+          saveKanban();
+          renderKanban();
+        };
+        addBtn.onclick = add;
+        input.onkeydown = e => { if (e.key === 'Enter') add(); };
+        addRow.appendChild(input);
+        addRow.appendChild(addBtn);
+        col.appendChild(addRow);
+
+        board.appendChild(col);
+      });
+    }
+
+    function renderKanban() {
+      KANBAN_COLS.forEach(c => {
+        const el = document.getElementById('kanban-cards-' + c.id);
+        el.innerHTML = '';
+
+        if (!kanbanData[c.id].length) {
+          el.innerHTML = '<div class="kanban-empty">Nothing here yet</div>';
+          return;
+        }
+
+        kanbanData[c.id].forEach((task, i) => {
+          const card = document.createElement('div');
+          card.className = 'kanban-card';
+          card.draggable = true;
+          card.ondragstart = e => {
+            kanbanDrag = { col: c.id, index: i };
+            e.dataTransfer.effectAllowed = 'move';
+            card.classList.add('dragging');
+          };
+          card.ondragend = () => {
+            card.classList.remove('dragging');
+            document.querySelectorAll('.kanban-col').forEach(col => col.classList.remove('drag-over'));
+          };
+
+          const text = document.createElement('span');
+          text.className = 'kanban-card-text';
+          text.textContent = task;
+          card.appendChild(text);
+
+          const del = document.createElement('button');
+          del.className = 'kanban-delete-btn';
+          del.type = 'button';
+          del.title = 'Delete';
+          del.textContent = '✕';
+          del.onclick = () => {
+            kanbanData[c.id].splice(i, 1);
+            saveKanban();
+            renderKanban();
+          };
+          card.appendChild(del);
+
+          el.appendChild(card);
+        });
+      });
+    }
+
+    function clearKanban() {
+      if (!confirm('Clear all tasks from the Kanban board?')) return;
+      kanbanData = { todo: [], doing: [], done: [] };
+      saveKanban();
+      renderKanban();
+    }
+
+    function goToKanban() {
+      view = 'kanban';
+      setActiveNav();
+      document.body.classList.remove('tv-mode');
+      document.getElementById('page-title').textContent = 'Kanban';
+      document.getElementById('subtitle').textContent = 'Drag tasks between columns to track progress';
+      setCornerVideo(null);
+
+      hideAllPanels();
+      if (!kanbanData) {
+        loadKanban();
+        buildKanbanBoard();
+      }
+      renderKanban();
+      document.getElementById('kanban').style.display = 'flex';
+      pullKanban();
     }
 
     function renderResourceList(items, page) {
@@ -1308,6 +1693,8 @@
     document.getElementById('nav-silent-starter').onclick = () => goToResourcePage('silent-starter');
     document.getElementById('nav-circle-time').onclick = () => goToResourcePage('circle-time');
     document.getElementById('nav-processing').onclick = goToProcessing;
+    document.getElementById('nav-kanban').onclick = goToKanban;
+    document.getElementById('kanban-clear').onclick = clearKanban;
 
     setActiveNav();
     loadSheet();
