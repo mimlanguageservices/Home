@@ -660,6 +660,19 @@
       transition: color 0.15s;
     }
     .kanban-delete-btn:hover { color: #dc2626; }
+    .kanban-delete-btn.kanban-edit-btn:hover { color: #3b82f6; }
+
+    .kanban-edit-input {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 0.95rem;
+      padding: 0.3rem 0.5rem;
+      border: 1px solid #3b82f6;
+      border-radius: 6px;
+      color: #1e293b;
+      outline: none;
+    }
 
     .kanban-empty {
       color: #94a3b8;
@@ -1215,6 +1228,7 @@
     let kanbanEdits = 0;   // bumped on every local change, so stale fetches are ignored
     let kanbanSaveTimer = null;
     let kanbanSaving = false;
+    let kanbanEditing = false; // a card is open for editing — hold off on pulls so it isn't re-rendered away
 
     function normalizeBoard(raw) {
       const board = { todo: [], doing: [], done: [] };
@@ -1261,14 +1275,14 @@
     }
 
     async function pullKanban() {
-      if (!KANBAN_SYNC_URL || kanbanSaving || kanbanSaveTimer || kanbanDrag) return;
+      if (!KANBAN_SYNC_URL || kanbanSaving || kanbanSaveTimer || kanbanDrag || kanbanEditing) return;
       const editsAtSend = kanbanEdits;
       try {
         const res = await fetch(`${KANBAN_SYNC_URL}?cachebust=${Date.now()}`);
         const data = await res.json();
         if (!data.ok) return;
         // Skip if the board was edited locally while this request was in flight
-        if (editsAtSend !== kanbanEdits || kanbanSaving || kanbanSaveTimer || kanbanDrag) return;
+        if (editsAtSend !== kanbanEdits || kanbanSaving || kanbanSaveTimer || kanbanDrag || kanbanEditing) return;
         const board = normalizeBoard(data.board);
         if (JSON.stringify(board) === JSON.stringify(kanbanData)) return;
         kanbanData = board;
@@ -1377,7 +1391,17 @@
           const text = document.createElement('span');
           text.className = 'kanban-card-text';
           text.textContent = task;
+          text.title = 'Double-click to edit';
+          text.ondblclick = () => editKanbanCard(card, c.id, i);
           card.appendChild(text);
+
+          const edit = document.createElement('button');
+          edit.className = 'kanban-delete-btn kanban-edit-btn';
+          edit.type = 'button';
+          edit.title = 'Edit';
+          edit.textContent = '✎';
+          edit.onclick = () => editKanbanCard(card, c.id, i);
+          card.appendChild(edit);
 
           const del = document.createElement('button');
           del.className = 'kanban-delete-btn';
@@ -1394,6 +1418,42 @@
           el.appendChild(card);
         });
       });
+    }
+
+    // Swap a card's text for an input. Enter or clicking away saves, Escape cancels;
+    // clearing the text cancels too (use ✕ to delete).
+    function editKanbanCard(card, col, index) {
+      if (kanbanEditing) return;
+      kanbanEditing = true;
+      card.draggable = false;
+      card.innerHTML = '';
+
+      const input = document.createElement('input');
+      input.className = 'kanban-edit-input';
+      input.type = 'text';
+      input.value = kanbanData[col][index];
+      card.appendChild(input);
+
+      let finished = false;
+      const finish = save => {
+        if (finished) return;
+        finished = true;
+        kanbanEditing = false;
+        const text = input.value.trim();
+        if (save && text && text !== kanbanData[col][index]) {
+          kanbanData[col][index] = text;
+          saveKanban();
+        }
+        renderKanban();
+      };
+      input.onkeydown = e => {
+        if (e.key === 'Enter') finish(true);
+        else if (e.key === 'Escape') finish(false);
+      };
+      input.onblur = () => finish(true);
+
+      input.focus();
+      input.select();
     }
 
     function clearKanban() {
