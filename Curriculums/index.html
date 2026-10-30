@@ -554,6 +554,21 @@
     }
     .shuffle-btn:active { transform: rotate(180deg); }
 
+    /* ── Group Splitter (embedded GroupSplitter/GroupSplitter.html) ── */
+    .group-splitter-wrap {
+      width: 100%;
+      max-width: 1200px;
+    }
+    .group-splitter-wrap iframe {
+      display: block;
+      width: 100%;
+      height: calc(100vh - 11rem);
+      min-height: 520px;
+      border: none;
+      border-radius: 12px;
+      background: #f0f4f8;
+    }
+
     /* ── Kanban board ── */
     .kanban-wrap {
       width: 100%;
@@ -740,6 +755,7 @@
       <button class="sidebar-link" id="nav-silent-starter">Silent Starter</button>
       <button class="sidebar-link" id="nav-circle-time">Circle Time</button>
       <button class="sidebar-link" id="nav-processing">Processing</button>
+      <button class="sidebar-link" id="nav-group-splitter">Group Splitter</button>
       <button class="sidebar-link" id="nav-kanban">Kanban</button>
     </div>
   </nav>
@@ -759,6 +775,10 @@
   <div class="topics-list" id="topics-list" style="display:none"></div>
   <div class="resource-list" id="resource-list" style="display:none"></div>
   <div class="letter-stage" id="letter-stage" style="display:none"></div>
+
+  <div class="group-splitter-wrap" id="group-splitter" style="display:none">
+    <iframe id="group-splitter-frame" title="Group Splitter"></iframe>
+  </div>
 
   <div class="kanban-wrap" id="kanban" style="display:none">
     <div class="kanban-toolbar">
@@ -945,6 +965,7 @@
       document.getElementById('nav-silent-starter').classList.toggle('active', view === 'silent-starter');
       document.getElementById('nav-circle-time').classList.toggle('active', view === 'circle-time');
       document.getElementById('nav-processing').classList.toggle('active', view === 'processing-letters' || view === 'processing-category');
+      document.getElementById('nav-group-splitter').classList.toggle('active', view === 'group-splitter');
       document.getElementById('nav-kanban').classList.toggle('active', view === 'kanban');
     }
 
@@ -955,6 +976,7 @@
       document.getElementById('topics-list').style.display = 'none';
       document.getElementById('resource-list').style.display = 'none';
       document.getElementById('letter-stage').style.display = 'none';
+      document.getElementById('group-splitter').style.display = 'none';
       document.getElementById('kanban').style.display = 'none';
     }
 
@@ -1463,6 +1485,21 @@
       renderKanban();
     }
 
+    function goToGroupSplitter() {
+      view = 'group-splitter';
+      setActiveNav();
+      document.body.classList.remove('tv-mode');
+      document.getElementById('page-title').textContent = 'Group Splitter';
+      document.getElementById('subtitle').textContent = 'Split a class into pairs, threes, or fours';
+      setCornerVideo(null);
+
+      hideAllPanels();
+      // Load once and keep it, so the groups stay put when switching views.
+      const frame = document.getElementById('group-splitter-frame');
+      if (!frame.getAttribute('src')) frame.src = '../GroupSplitter/GroupSplitter.html?embed=1';
+      document.getElementById('group-splitter').style.display = '';
+    }
+
     function goToKanban() {
       view = 'kanban';
       setActiveNav();
@@ -1753,6 +1790,7 @@
     document.getElementById('nav-silent-starter').onclick = () => goToResourcePage('silent-starter');
     document.getElementById('nav-circle-time').onclick = () => goToResourcePage('circle-time');
     document.getElementById('nav-processing').onclick = goToProcessing;
+    document.getElementById('nav-group-splitter').onclick = goToGroupSplitter;
     document.getElementById('nav-kanban').onclick = goToKanban;
     document.getElementById('kanban-clear').onclick = clearKanban;
 

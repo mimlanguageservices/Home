@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1f2933">
+<title>Group Splitter</title>
+<style>
+  :root{
+    --bg:#111827; --card:#1f2937; --card-2:#273244;
+    --text:#f3f4f6; --muted:#9ca3af; --line:#374151;
+    --accent:#7c3aed; --danger:#dc2626; --ok:#059669;
+    --boy:#2563eb; --girl:#db2777;
+    --boy-bg:#cfe4ff; --boy-bg-2:#b4d4ff;
+    --girl-bg:#ffd9ec; --girl-bg-2:#ffc2e0;
+    --gender-text:#1f2937;
+  }
+  /* Light look when embedded in the Curriculums site (?embed=1). */
+  html.light{
+    --bg:#f0f4f8; --card:#ffffff; --card-2:#f1f5f9;
+    --text:#1e293b; --muted:#64748b; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  button{font-family:inherit; cursor:pointer;}
+  .wrap{max-width:520px; margin:0 auto; padding:16px;}
+  .wrap.wide{max-width:1200px;}
+
+  header{
+    display:flex; align-items:center; gap:10px;
+    padding:6px 2px 14px;
+  }
+  header .back{
+    border:0; background:var(--card); color:var(--text);
+    width:38px; height:38px; border-radius:10px; font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--line);
+  }
+  header .back[hidden]{display:none;}
+  header h1{font-size:17px; margin:0; font-weight:600; flex:1;}
+  header .gear{
+    border:0; background:transparent; color:var(--muted);
+    font-size:20px; width:38px; height:38px;
+  }
+  .crumb{color:var(--muted); font-size:13px; padding:0 2px 12px;}
+
+  .grid{display:flex; flex-direction:column; gap:12px;}
+
+  .tile{
+    border:0; text-align:left; width:100%;
+    background:var(--card); color:var(--text);
+    border-radius:14px; padding:18px 16px; font-size:18px; font-weight:600;
+    display:flex; align-items:center; gap:14px;
+    border:1px solid var(--line);
+  }
+  .tile:active{background:var(--card-2);}
+  .tile .sub{display:block; font-size:13px; font-weight:400; color:var(--muted); margin-top:2px;}
+
+  .avatar{
+    width:64px; height:64px; border-radius:50%; object-fit:cover;
+    background:var(--card-2); flex:none;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; color:var(--muted);
+  }
+
+  .search{
+    width:100%; border:1px solid var(--line); background:var(--card);
+    color:var(--text); border-radius:12px; padding:12px 14px; font-size:16px; margin-bottom:12px;
+  }
+  .search::placeholder{color:var(--muted);}
+
+  .action-btn{
+    border:0; width:100%; color:#fff; background:var(--accent);
+    border-radius:16px; padding:22px 18px; font-size:22px; font-weight:700;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .action-btn .sub{font-size:13px; font-weight:500; opacity:.85;}
+  .action-btn:active{filter:brightness(.9);}
+  .action-btn[disabled]{opacity:.45;}
+
+  .section-title{
+    font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted); margin:20px 2px 8px;
+  }
+  .section-title:first-child{margin-top:0;}
+
+  /* group size picker */
+  .sizes{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .size-btn{
+    border:1px solid var(--line); background:var(--card); color:var(--text);
+    border-radius:14px; padding:14px 6px; font-size:28px; font-weight:800;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+  }
+  .size-btn .sub{font-size:12px; font-weight:500; color:var(--muted);}
+  .size-btn.on{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .size-btn.on .sub{color:#fff; opacity:.85;}
+
+  .toggle{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    border:1px solid var(--line); background:var(--card); color:var(--text);
+    border-radius:12px; padding:12px 14px; font-size:15px;
+  }
+  .toggle .sw{
+    width:42px; height:24px; border-radius:999px; background:var(--line);
+    position:relative; flex:none; transition:background .15s;
+  }
+  .toggle .sw::after{
+    content:""; position:absolute; top:3px; left:3px; width:18px; height:18px;
+    border-radius:50%; background:#fff; transition:left .15s;
+  }
+  .toggle.on .sw{background:var(--ok);}
+  .toggle.on .sw::after{left:21px;}
+  .toggle .lbl{flex:1;}
+  .toggle .lbl .sub{display:block; font-size:12px; color:var(--muted); margin-top:2px;}
+
+  /* attendance list */
+  .attend-head{display:flex; align-items:baseline; justify-content:space-between; margin:20px 2px 8px;}
+  .attend-head .section-title{margin:0;}
+  .link-btn{border:0; background:none; color:var(--accent); font-size:13px; font-weight:600; padding:0;}
+  html:not(.light) .link-btn{color:#a78bfa;}
+  .attend{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px;}
+  .attend-btn{
+    display:flex; align-items:center; gap:10px; text-align:left;
+    border:1px solid var(--line); background:var(--card); color:var(--text);
+    border-radius:12px; padding:8px 10px; font-size:14px; font-weight:600;
+  }
+  .attend-btn .avatar{width:36px; height:36px; font-size:13px;}
+  .attend-btn.boy{background:var(--boy-bg); color:var(--gender-text);}
+  .attend-btn.girl{background:var(--girl-bg); color:var(--gender-text);}
+  .attend-btn.boy .avatar{box-shadow:0 0 0 2px var(--boy);}
+  .attend-btn.girl .avatar{box-shadow:0 0 0 2px var(--girl);}
+  .attend-btn.absent{
+    background:var(--card); color:var(--muted); opacity:.55;
+    text-decoration:line-through; border-style:dashed;
+  }
+  .attend-btn.absent .avatar{box-shadow:none; filter:grayscale(1);}
+
+  .sticky-go{position:sticky; bottom:12px; margin-top:18px;}
+
+  /* result groups */
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
+  .tool-btn{
+    border:1px solid var(--line); background:var(--card); color:var(--text);
+    border-radius:12px; padding:11px 16px; font-size:15px; font-weight:600;
+  }
+  .tool-btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .tool-btn:active{filter:brightness(.92);}
+
+  .groups{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px;}
+  .group{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .group-head{
+    padding:10px 14px; font-weight:800; font-size:17px; color:#fff;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .group-head .n{font-size:12px; font-weight:600; opacity:.85;}
+  .members{padding:8px; display:flex; flex-direction:column; gap:6px;}
+  .member{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    border:2px solid transparent; background:var(--card-2); color:var(--text);
+    border-radius:12px; padding:6px 10px; font-size:15px; font-weight:600;
+  }
+  .member .avatar{width:44px; height:44px; font-size:15px;}
+  .member.boy{background:var(--boy-bg); color:var(--gender-text);}
+  .member.girl{background:var(--girl-bg); color:var(--gender-text);}
+  .member.boy .avatar{box-shadow:0 0 0 2px var(--boy);}
+  .member.girl .avatar{box-shadow:0 0 0 2px var(--girl);}
+  .member.sel{border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,58,237,.35);}
+  .member .name{flex:1; min-width:0; overflow-wrap:anywhere;}
+
+  /* saved group sets */
+  .saved{display:flex; flex-direction:column; gap:8px;}
+  .saved-row{
+    display:flex; align-items:center; gap:8px;
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:4px 4px 4px 0;
+  }
+  .saved-row .open{
+    flex:1; min-width:0; border:0; background:none; color:var(--text); text-align:left;
+    padding:10px 14px; font-size:16px; font-weight:600;
+  }
+  .saved-row .open .sub{display:block; font-size:12px; font-weight:400; color:var(--muted); margin-top:2px;}
+  .saved-row .del{
+    border:0; background:none; color:var(--muted); font-size:18px; width:40px; height:40px; border-radius:10px;
+  }
+  .saved-row .del:hover{color:var(--danger); background:var(--card-2);}
+
+  .msg{
+    text-align:center; color:var(--muted); padding:40px 10px; font-size:15px;
+  }
+
+  /* toast */
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(160%);
+    background:var(--ok); color:#fff; padding:14px 22px; border-radius:12px;
+    font-weight:600; font-size:15px; transition:transform .25s ease; z-index:50;
+    max-width:90vw; text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--danger);}
+
+  /* dialogs */
+  dialog{
+    border:0; border-radius:16px; padding:20px; width:calc(100% - 32px); max-width:460px;
+    background:var(--card); color:var(--text);
+  }
+  dialog::backdrop{background:rgba(0,0,0,.6);}
+  dialog h2{margin:0 0 6px; font-size:17px;}
+  dialog p{margin:0 0 14px; font-size:13px; color:var(--muted);}
+  dialog input{
+    width:100%; border:1px solid var(--line); background:var(--bg); color:var(--text);
+    border-radius:10px; padding:11px 12px; font-size:14px; margin-bottom:14px;
+  }
+  dialog .row{display:flex; gap:10px; justify-content:flex-end;}
+  dialog button{
+    border:0; border-radius:10px; padding:10px 16px; font-size:14px; font-weight:600;
+    background:var(--card-2); color:var(--text);
+  }
+  dialog button.primary{background:var(--accent); color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <header>
+    <button class="back" id="backBtn" hidden aria-label="Back">&#8592;</button>
+    <h1 id="title">Group Splitter</h1>
+    <button class="gear" id="gearBtn" aria-label="Settings">&#9881;</button>
+  </header>
+  <div class="crumb" id="crumb"></div>
+  <div id="view"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="settings">
+  <h2>Web App URL</h2>
+  <p>This app reads the same student list as the Discipline app. Paste the Web App URL from deploying <b>Discipline/DisciplineScript.gs</b>.</p>
+  <input id="urlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="row" style="justify-content:space-between;">
+    <button id="lockBtn">Lock app</button>
+    <span>
+      <button id="cancelSettings">Cancel</button>
+      <button class="primary" id="saveSettings">Save</button>
+    </span>
+  </div>
+</dialog>
+
+<dialog id="saveDialog">
+  <h2>Save these groups</h2>
+  <p>Give them a name so you can open them again later. Saving with the same name replaces the old set.</p>
+  <form id="saveForm" method="dialog">
+    <input id="saveName" type="text" maxlength="60" placeholder="e.g. Debate teams" autocomplete="off">
+    <div class="row">
+      <button type="button" id="cancelSave">Cancel</button>
+      <button class="primary" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* ------------------------------------------------------------------
+   CONFIG
+   Same Web App as Discipline.html — the roster comes from the
+   disciplinary spreadsheet (Sheet1: Class, Name, Photo ... Gender).
+   The PIN, URL and saved roster share Discipline's storage keys, so
+   unlocking one app unlocks the other on the same device.
+------------------------------------------------------------------ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypVEbFCfSeu1ONvARs79N_9KhE46iOh3yPO7I4wJ_IK8b6G-495X3x6aM3rnERZHk2HA/exec";
+
+const GROUP_SIZES = [2, 3, 4];
+
+/* Header colors for Group 1, 2, 3 … (repeats after the last). */
+const GROUP_COLORS = ["#7c3aed","#2563eb","#059669","#d97706","#dc2626","#0891b2","#db2777","#65a30d","#4f46e5","#ea580c"];
+
+const params = new URLSearchParams(location.search);
+if(params.get("embed") === "1") document.documentElement.classList.add("light");
+
+const state = {
+  screen: "class",     // pin -> class -> setup -> groups
+  students: [],
+  className: null,
+  size: 2,
+  mixGender: true,
+  absent: {},          // class -> [names]
+  groups: null,        // [[student, ...], ...]
+  groupsName: null,    // name of the saved set on screen, if any
+  saved: {},           // class -> [{ name, size, names, ts }]
+  sel: null,           // { g, i } — first student tapped for a swap
+  loading: false,
+  refreshing: false,
+  error: null,
+  pinError: null
+};
+
+const els = {
+  wrap: document.getElementById("wrap"),
+  view: document.getElementById("view"),
+  title: document.getElementById("title"),
+  crumb: document.getElementById("crumb"),
+  back: document.getElementById("backBtn"),
+  gear: document.getElementById("gearBtn"),
+  toast: document.getElementById("toast"),
+  dialog: document.getElementById("settings"),
+  urlInput: document.getElementById("urlInput"),
+  saveDialog: document.getElementById("saveDialog"),
+  saveName: document.getElementById("saveName")
+};
+
+function getUrl(){
+  return (store.get("disciplineUrl") || SCRIPT_URL || "").trim();
+}
+function getPin(){
+  return (store.get("disciplinePin") || "").trim();
+}
+function lockApp(){
+  store.remove("disciplinePin");
+  state.screen = "pin";
+  render();
+}
+
+/* localStorage can throw (private windows, blocked storage) — never let that break the app. */
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(_){} },
+  remove(k){ try{ localStorage.removeItem(k); }catch(_){} }
+};
+
+/* Build a request URL with the shared params + PIN attached. */
+function apiUrl(paramObj){
+  const url = getUrl();
+  const p = new URLSearchParams(paramObj);
+  p.set("pin", getPin());
+  return url + (url.includes("?") ? "&" : "?") + p.toString();
+}
+
+/* GET the script and parse JSON. A rejected PIN sends the user back
+   to the PIN screen and resolves to null. */
+async function api(paramObj){
+  const res = await fetch(apiUrl(paramObj));
+  const raw = await res.text();
+  let data;
+  try{ data = JSON.parse(raw); }
+  catch(_){
+    throw new Error("Server did not return JSON (HTTP " + res.status + "). " +
+      "This usually means the Web App is asking for a Google login. " +
+      "First 120 chars: " + raw.slice(0,120));
+  }
+  if(data.unauthorized){
+    store.remove("disciplinePin");
+    state.screen = "pin";
+    state.pinError = data.error || "Incorrect PIN.";
+    render();
+    return null;
+  }
+  if(!data.success) throw new Error(data.error || "Request failed");
+  return data;
+}
+
+/* ---------- saved data (instant load) ---------- */
+const CACHE_KEY = "disciplineRoster";        // shared with Discipline.html
+const PREFS_KEY = "groupSplitterPrefs";      // size, mix, absences, last + saved groups
+function readCache(){
+  try{ return JSON.parse(store.get(CACHE_KEY) || "null"); }catch(_){ return null; }
+}
+function writeCache(students){
+  store.set(CACHE_KEY, JSON.stringify({ ts: Date.now(), students: students }));
+}
+function loadPrefs(){
+  let p = null;
+  try{ p = JSON.parse(store.get(PREFS_KEY) || "null"); }catch(_){}
+  if(!p) return;
+  if(GROUP_SIZES.includes(p.size)) state.size = p.size;
+  if(typeof p.mixGender === "boolean") state.mixGender = p.mixGender;
+  if(p.absent && typeof p.absent === "object") state.absent = p.absent;
+  state.lastGroups = p.lastGroups || {};
+  if(p.saved && typeof p.saved === "object") state.saved = p.saved;
+}
+function savePrefs(){
+  store.set(PREFS_KEY, JSON.stringify({
+    size: state.size, mixGender: state.mixGender, absent: state.absent,
+    lastGroups: state.lastGroups || {}, saved: state.saved
+  }));
+}
+
+/* ---------- data ---------- */
+async function loadRoster(){
+  const url = getUrl();
+  if(!url){ openSettings(); return; }
+  if(!getPin()){ state.screen = "pin"; render(); return; }
+  state.error = null;
+
+  // 1. Paint immediately from the last saved list, if we have one.
+  const cached = readCache();
+  const haveCache = cached && Array.isArray(cached.students) && cached.students.length;
+  if(haveCache){
+    state.students = cached.students;
+    state.loading = false;
+    state.refreshing = true;
+    if(state.screen === "pin") state.screen = "class";
+  }else{
+    state.loading = true;
+  }
+  render();
+
+  // 2. Refresh from the server in the background.
+  try{
+    const data = await api({ mode:"roster" });
+    if(!data){ state.loading = false; state.refreshing = false; return; }
+    const fresh = data.students || [];
+    if(fresh.length){
+      state.students = fresh;
+      writeCache(fresh);
+    }else if(!haveCache){
+      state.error = "The script ran but returned 0 students. " +
+        "The tab it read is probably not the roster tab — check ROSTER_SHEET_NAME in DisciplineScript.gs.";
+    }
+  }catch(err){
+    if(haveCache){
+      toast("Showing saved list — couldn't refresh", true);
+    }else{
+      state.error = err.message;
+      state.students = [];
+    }
+  }
+  state.loading = false;
+  state.refreshing = false;
+  // Don't re-render the groups screen — that would drop a half-done swap.
+  if(state.screen !== "groups") render();
+}
+
+/* ---------- splitting ---------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* How many groups for n students at the chosen size. Group sizes never
+   differ by more than one; leftovers are folded into existing groups
+   rather than leaving someone alone (e.g. 7 in pairs -> 3,2,2 and
+   13 in fours -> 4,3,3,3). */
+function groupCount(n, size){
+  if(n <= size) return 1;
+  const smallestOk = Math.max(2, size - 1);
+  const up = Math.ceil(n / size);
+  return Math.floor(n / up) >= smallestOk ? up : Math.floor(n / size);
+}
+
+/* Deal students round-robin into groups. With "mix boys & girls" on,
+   boys are dealt first and girls continue the deal, so each gender is
+   spread as evenly as possible across the groups. */
+function makeGroups(list, size, mix){
+  const n = list.length;
+  if(!n) return [];
+  const g = groupCount(n, size);
+  const order = mix
+    ? shuffle(list.filter(s => s.gender === "boy"))
+        .concat(shuffle(list.filter(s => s.gender === "girl")))
+        .concat(shuffle(list.filter(s => s.gender !== "boy" && s.gender !== "girl")))
+    : shuffle(list);
+  const groups = Array.from({ length: g }, () => []);
+  order.forEach((s, i) => groups[i % g].push(s));
+  return shuffle(groups).map(shuffle);
+}
+
+/* Preview of the sizes, e.g. "3 groups of 4 + 1 of 3". */
+function describeSplit(n, size){
+  if(!n) return "No students present";
+  const g = groupCount(n, size);
+  const big = Math.ceil(n / g), small = Math.floor(n / g);
+  const nBig = n - small * g, nSmall = g - nBig;
+  if(big === small) return g + (g === 1 ? " group of " : " groups of ") + big;
+  return nBig + " of " + big + " + " + nSmall + " of " + small;
+}
+
+/* ---------- screens ---------- */
+function classes(){
+  const set = [];
+  state.students.forEach(s => { if(s.class && !set.includes(s.class)) set.push(s.class); });
+  return set;
+}
+function classStudents(){
+  return state.students.filter(s => s.class === state.className);
+}
+function absentList(){
+  return state.absent[state.className] || (state.absent[state.className] = []);
+}
+function presentStudents(){
+  const out = absentList();
+  return classStudents().filter(s => !out.includes(s.name));
+}
+
+function render(){
+  const locked = state.screen === "pin";
+  els.back.hidden = locked || state.screen === "class";
+  els.gear.style.visibility = locked ? "hidden" : "visible";
+  els.wrap.classList.toggle("wide", state.screen === "groups" || state.screen === "setup");
+  els.crumb.textContent =
+    locked ? "" :
+    state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
+    state.screen === "setup" ? "Pick a group size, tap anyone who is absent, then split" :
+    state.screen === "groups" ? "Tap two students to swap them" :
+    "";
+
+  if(locked) return renderPin();
+
+  if(state.loading){
+    els.title.textContent = "Loading…";
+    els.view.innerHTML = '<div class="msg">Fetching the student list for the first time…<br>' +
+      'After this it opens instantly.</div>';
+    return;
+  }
+
+  if(state.screen === "class")  return renderClasses();
+  if(state.screen === "groups") return renderGroups();
+  return renderSetup();
+}
+
+function renderPin(){
+  els.title.textContent = "Enter PIN";
+  els.view.innerHTML =
+    '<form id="pinForm" class="grid" style="margin-top:24px;">' +
+      '<input class="search" id="pinInput" type="password" inputmode="numeric" ' +
+        'autocomplete="off" placeholder="PIN" style="text-align:center; letter-spacing:6px; font-size:20px;">' +
+      (state.pinError ? '<div class="msg" style="color:var(--danger); padding:4px 0;">' + esc(state.pinError) + '</div>' : '') +
+      '<button class="action-btn" type="submit">Unlock</button>' +
+    '</form>';
+  const input = document.getElementById("pinInput");
+  input.focus({preventScroll:true});
+  document.getElementById("pinForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = input.value.trim();
+    if(!v) return;
+    store.set("disciplinePin", v);
+    state.pinError = null;
+    state.screen = "class";
+    loadRoster();
+  });
+}
+
+function renderClasses(){
+  els.title.textContent = "Choose a class";
+  const list = classes();
+  if(!list.length){
+    els.view.innerHTML =
+      '<div class="msg" style="text-align:left; word-break:break-word;">' +
+        (state.error ? esc(state.error) : "No students found.") +
+      '</div>' +
+      '<button class="tile" onclick="loadRoster()">↻&nbsp; Retry</button>';
+    return;
+  }
+  els.view.innerHTML = '<div class="grid">' + list.map(c => {
+    const n = state.students.filter(s => s.class === c).length;
+    return '<button class="tile" onclick="pickClass(\'' + esc(c) + '\')">' +
+             '<span>Class ' + esc(c) + '<span class="sub">' + n + ' students</span></span>' +
+           '</button>';
+  }).join("") + '</div>';
+}
+
+/* Sort order: boys first, then girls, then unspecified. */
+function genderRank(s){ return s.gender === "boy" ? 0 : s.gender === "girl" ? 1 : 2; }
+function genderCls(s){ return s.gender === "boy" ? " boy" : s.gender === "girl" ? " girl" : ""; }
+
+function renderSetup(){
+  els.title.textContent = "Class " + state.className;
+  const all = classStudents()
+    .sort((a,b) => (genderRank(a) - genderRank(b)) || a.name.localeCompare(b.name));
+  const out = absentList();
+  const present = presentStudents().length;
+
+  const sizes = GROUP_SIZES.map(n =>
+    '<button class="size-btn' + (state.size === n ? ' on' : '') + '" onclick="setSize(' + n + ')">' +
+      n + '<span class="sub">' + (n === 2 ? 'pairs' : n === 3 ? 'threes' : 'fours') + '</span>' +
+    '</button>').join("");
+
+  const people = all.map(s => {
+    const isOut = out.includes(s.name);
+    return '<button class="attend-btn' + (isOut ? ' absent' : genderCls(s)) + '" ' +
+             'onclick="toggleAbsent(' + state.students.indexOf(s) + ')">' +
+             avatar(s) + '<span>' + esc(s.name) + '</span>' +
+           '</button>';
+  }).join("");
+
+  const last = state.lastGroups && state.lastGroups[state.className];
+
+  const saved = savedList().map((x, i) =>
+    '<div class="saved-row">' +
+      '<button class="open" onclick="openSaved(' + i + ')">' + esc(x.name) +
+        '<span class="sub">' + x.names.length + ' groups of ' + x.size + ' · ' + esc(fmtDate(x.ts)) + '</span>' +
+      '</button>' +
+      '<button class="del" onclick="deleteSaved(' + i + ')" aria-label="Delete ' + esc(x.name) + '">🗑</button>' +
+    '</div>').join("");
+
+  els.view.innerHTML =
+    (saved ? '<div class="section-title">Saved groups</div><div class="saved">' + saved + '</div>' : '') +
+    '<div class="section-title">Group size</div>' +
+    '<div class="sizes">' + sizes + '</div>' +
+    '<div class="section-title">Options</div>' +
+    '<button class="toggle' + (state.mixGender ? ' on' : '') + '" onclick="toggleMix()">' +
+      '<span class="lbl">Mix boys and girls<span class="sub">Spread boys and girls evenly across groups</span></span>' +
+      '<span class="sw"></span>' +
+    '</button>' +
+    '<div class="attend-head">' +
+      '<div class="section-title">Present: ' + present + ' of ' + all.length + '</div>' +
+      (out.length ? '<button class="link-btn" onclick="clearAbsent()">Mark everyone present</button>' : '') +
+    '</div>' +
+    '<div class="attend">' + (people || '<div class="msg">No students in this class.</div>') + '</div>' +
+    '<div class="sticky-go">' +
+      '<button class="action-btn" onclick="doSplit()"' + (present ? '' : ' disabled') + '>' +
+        'Split into groups<span class="sub">' + esc(describeSplit(present, state.size)) + '</span>' +
+      '</button>' +
+      (last ? '<button class="tile" style="margin-top:10px; justify-content:center; font-size:15px;" onclick="showLast()">' +
+                'Show last groups for ' + esc(state.className) + '</button>' : '') +
+    '</div>';
+}
+
+function renderGroups(){
+  els.title.textContent = "Class " + state.className + " · " +
+    (state.groupsName || "groups of " + state.size);
+  const cards = state.groups.map((grp, g) => {
+    const color = GROUP_COLORS[g % GROUP_COLORS.length];
+    const members = grp.map((s, i) => {
+      const sel = state.sel && state.sel.g === g && state.sel.i === i;
+      return '<button class="member' + genderCls(s) + (sel ? ' sel' : '') + '" onclick="tapMember(' + g + ',' + i + ')">' +
+               avatar(s) + '<span class="name">' + esc(s.name) + '</span>' +
+             '</button>';
+    }).join("");
+    return '<div class="group">' +
+             '<div class="group-head" style="background:' + color + ';">Group ' + (g + 1) +
+               '<span class="n">' + grp.length + ' students</span></div>' +
+             '<div class="members">' + members + '</div>' +
+           '</div>';
+  }).join("");
+
+  els.view.innerHTML =
+    '<div class="toolbar">' +
+      '<button class="tool-btn primary" onclick="doSplit()">🔀&nbsp; Reshuffle</button>' +
+      '<button class="tool-btn" onclick="openSaveDialog()">💾&nbsp; Save as…</button>' +
+      '<button class="tool-btn" onclick="goBack()">Change size or attendance</button>' +
+    '</div>' +
+    '<div class="groups">' + cards + '</div>';
+}
+
+/* ---------- actions ---------- */
+function pickClass(c){ state.className = c; state.screen = "setup"; render(); }
+function setSize(n){ state.size = n; savePrefs(); render(); }
+function toggleMix(){ state.mixGender = !state.mixGender; savePrefs(); render(); }
+function toggleAbsent(idx){
+  const s = state.students[idx];
+  if(!s) return;
+  const out = absentList();
+  const at = out.indexOf(s.name);
+  if(at === -1) out.push(s.name); else out.splice(at, 1);
+  savePrefs();
+  render();
+}
+function clearAbsent(){ state.absent[state.className] = []; savePrefs(); render(); }
+
+function doSplit(){
+  const present = presentStudents();
+  if(!present.length) return;
+  state.groups = makeGroups(present, state.size, state.mixGender);
+  state.groupsName = null;
+  state.sel = null;
+  rememberGroups();
+  state.screen = "groups";
+  render();
+  window.scrollTo(0,0);
+}
+
+/* Keep the latest groups per class so they survive a page reload. */
+function rememberGroups(){
+  state.lastGroups = state.lastGroups || {};
+  state.lastGroups[state.className] = {
+    size: state.size,
+    names: state.groups.map(grp => grp.map(s => s.name))
+  };
+  savePrefs();
+}
+function showLast(){
+  const last = state.lastGroups && state.lastGroups[state.className];
+  if(last) showStored(last, null);
+}
+
+/* Rebuild groups from stored names. Students removed from the sheet
+   since then are dropped. */
+function showStored(set, name){
+  const byName = {};
+  classStudents().forEach(s => { byName[s.name] = s; });
+  const groups = set.names
+    .map(names => names.map(n => byName[n]).filter(Boolean))
+    .filter(grp => grp.length);
+  if(!groups.length){ toast("Those students are no longer in the list", true); return; }
+  state.groups = groups;
+  state.groupsName = name;
+  state.size = set.size;
+  state.sel = null;
+  state.screen = "groups";
+  render();
+  window.scrollTo(0,0);
+}
+
+/* ---------- saved group sets (kept on this device) ---------- */
+function savedList(){
+  return state.saved[state.className] || (state.saved[state.className] = []);
+}
+function openSaveDialog(){
+  els.saveName.value = state.groupsName || "";
+  els.saveDialog.showModal();
+  els.saveName.focus();
+}
+function saveGroupsAs(name){
+  const list = savedList();
+  const entry = {
+    name: name, size: state.size, ts: new Date().toISOString(),
+    names: state.groups.map(grp => grp.map(s => s.name))
+  };
+  const at = list.findIndex(x => x.name.toLowerCase() === name.toLowerCase());
+  if(at === -1) list.unshift(entry); else list[at] = entry;
+  state.groupsName = name;
+  savePrefs();
+  toast((at === -1 ? "Saved “" : "Updated “") + name + "”");
+  render();
+}
+function openSaved(i){
+  const x = savedList()[i];
+  if(x) showStored(x, x.name);
+}
+function deleteSaved(i){
+  const list = savedList();
+  const x = list[i];
+  if(!x || !confirm("Delete the saved groups “" + x.name + "”?")) return;
+  list.splice(i, 1);
+  savePrefs();
+  render();
+}
+
+function tapMember(g, i){
+  if(!state.sel){ state.sel = { g, i }; render(); return; }
+  const a = state.sel;
+  state.sel = null;
+  if(a.g !== g || a.i !== i){
+    const tmp = state.groups[a.g][a.i];
+    state.groups[a.g][a.i] = state.groups[g][i];
+    state.groups[g][i] = tmp;
+    rememberGroups();
+    if(a.g !== g) toast("Swapped " + firstName(tmp.name) + " and " + firstName(state.groups[a.g][a.i].name));
+  }
+  render();
+}
+
+function goBack(){
+  if(state.screen === "groups"){ state.screen = "setup"; state.sel = null; }
+  else if(state.screen === "setup"){ state.screen = "class"; state.className = null; }
+  render();
+}
+
+/* ---------- helpers ---------- */
+function firstName(n){ return (n || "").split(" ")[0]; }
+function fmtDate(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return "";
+  return d.toLocaleDateString(undefined, { day:"numeric", month:"short" });
+}
+function initials(n){ return (n||"?").split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase(); }
+function avatar(s){
+  if(s.image){
+    return '<img class="avatar" src="' + esc(s.image) + '" alt="" ' +
+      'onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'avatar\',textContent:\'' + initials(s.name) + '\'}))">';
+  }
+  return '<div class="avatar">' + initials(s.name) + '</div>';
+}
+function esc(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+let toastTimer;
+function toast(text, isErr){
+  els.toast.textContent = text;
+  els.toast.className = "toast show" + (isErr ? " err" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { els.toast.className = "toast" + (isErr ? " err" : ""); }, 2600);
+}
+
+/* ---------- dialogs ---------- */
+function openSettings(){
+  els.urlInput.value = getUrl();
+  els.dialog.showModal();
+}
+els.gear.addEventListener("click", openSettings);
+document.getElementById("cancelSettings").addEventListener("click", () => els.dialog.close());
+document.getElementById("lockBtn").addEventListener("click", () => {
+  els.dialog.close();
+  lockApp();
+});
+document.getElementById("saveSettings").addEventListener("click", () => {
+  const v = els.urlInput.value.trim();
+  if(v) store.set("disciplineUrl", v);
+  els.dialog.close();
+  loadRoster();
+});
+els.back.addEventListener("click", goBack);
+document.getElementById("cancelSave").addEventListener("click", () => els.saveDialog.close());
+document.getElementById("saveForm").addEventListener("submit", e => {
+  const name = els.saveName.value.trim();
+  if(!name){ e.preventDefault(); els.saveName.focus(); return; }
+  els.saveDialog.close();
+  saveGroupsAs(name);
+});
+
+/* ---------- go ---------- */
+loadPrefs();
+if(getPin()){
+  loadRoster();
+}else{
+  state.screen = "pin";
+  render();
+}
+</script>
+</body>
+</html>
