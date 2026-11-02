@@ -48,6 +48,11 @@ function build() {
       '        .filter(r => r[idx.subject].trim().toLowerCase() === SUBJECT.toLowerCase())\n' +
       '        .filter(r => r[idx.grade].trim().startsWith(GRADE_PREFIX))');
   rep('let path = { grade: null, subject: null, book: null };', 'let path = { subject: SUBJECT, book: null };');
+  // ?book=Impact%204 in the URL opens straight into that book (used by the lesson decks' back button)
+  rep("      document.getElementById('status').style.display = 'none';\n      render();\n    }",
+      "      const wanted = (new URLSearchParams(location.search).get('book') || '').trim().toLowerCase();\n" +
+      "      path.book = entries.map(e => e.book).find(b => b.trim().toLowerCase() === wanted) || null;\n\n" +
+      "      document.getElementById('status').style.display = 'none';\n      render();\n    }");
   cut('      if (!path.grade) {', '      if (!path.book) {');
   rep('entries.filter(e => e.grade === path.grade && e.subject === path.subject).map(e => e.book)', 'entries.map(e => e.book)');
   rep('        e.grade === path.grade && e.subject === path.subject && e.book === path.book', '        e.book === path.book');
