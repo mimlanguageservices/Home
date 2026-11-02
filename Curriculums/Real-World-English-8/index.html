@@ -851,6 +851,9 @@
         return;
       }
 
+      const wanted = (new URLSearchParams(location.search).get('book') || '').trim().toLowerCase();
+      path.book = entries.map(e => e.book).find(b => b.trim().toLowerCase() === wanted) || null;
+
       document.getElementById('status').style.display = 'none';
       render();
     }
