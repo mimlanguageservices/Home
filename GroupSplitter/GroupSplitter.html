@@ -296,6 +296,7 @@ const state = {
   mixGender: true,
   absent: {},          // class -> [names] left out; reset each time a class is opened
   groups: null,        // [[student, ...], ...]
+  individuals: [],     // students left out of the split, shown as a last "Individuals" group
   groupsName: null,    // name of the saved set on screen, if any
   saved: {},           // class -> [{ name, size, names, ts }]
   sel: null,           // { g, i } — first student tapped for a swap
@@ -627,7 +628,8 @@ function renderSetup(){
     '<div class="attend">' + (people || '<div class="msg">No students in this class.</div>') + '</div>' +
     '<div class="sticky-go">' +
       '<button class="action-btn" onclick="doSplit()"' + (present ? '' : ' disabled') + '>' +
-        'Split into groups<span class="sub">' + esc(describeSplit(present, state.size)) + '</span>' +
+        'Split into groups<span class="sub">' + esc(describeSplit(present, state.size)) +
+          (out.length ? ' + ' + out.length + ' individual' + (out.length === 1 ? '' : 's') : '') + '</span>' +
       '</button>' +
       (last ? '<button class="tile" style="margin-top:10px; justify-content:center; font-size:15px;" onclick="showLast()">' +
                 'Show last groups for ' + esc(state.className) + '</button>' : '') +
@@ -652,13 +654,26 @@ function renderGroups(){
            '</div>';
   }).join("");
 
+  // Everyone left out of the split; no size limit and not swappable.
+  const solo = state.individuals.length
+    ? '<div class="group">' +
+        '<div class="group-head" style="background:#6b7280;">Individuals' +
+          '<span class="n">' + state.individuals.length + ' students</span></div>' +
+        '<div class="members">' + state.individuals.map(s =>
+          '<div class="member' + genderCls(s) + '">' +
+            avatar(s) + '<span class="name">' + esc(s.name) + '</span>' +
+          '</div>').join("") +
+        '</div>' +
+      '</div>'
+    : '';
+
   els.view.innerHTML =
     '<div class="toolbar">' +
       '<button class="tool-btn primary" onclick="doSplit()">🔀&nbsp; Reshuffle</button>' +
       '<button class="tool-btn" onclick="openSaveDialog()">💾&nbsp; Save as…</button>' +
       '<button class="tool-btn" onclick="goBack()">Change size or attendance</button>' +
     '</div>' +
-    '<div class="groups">' + cards + '</div>';
+    '<div class="groups">' + cards + solo + '</div>';
 }
 
 /* ---------- actions ---------- */
@@ -681,6 +696,10 @@ function doSplit(){
   const present = presentStudents();
   if(!present.length) return;
   state.groups = makeGroups(present, state.size, state.mixGender);
+  const out = absentList();
+  state.individuals = classStudents()
+    .filter(s => out.includes(s.name))
+    .sort((a,b) => a.name.localeCompare(b.name));
   state.groupsName = null;
   state.sel = null;
   rememberGroups();
@@ -694,7 +713,8 @@ function rememberGroups(){
   state.lastGroups = state.lastGroups || {};
   state.lastGroups[state.className] = {
     size: state.size,
-    names: state.groups.map(grp => grp.map(s => s.name))
+    names: state.groups.map(grp => grp.map(s => s.name)),
+    individuals: state.individuals.map(s => s.name)
   };
   savePrefs();
 }
@@ -713,6 +733,7 @@ function showStored(set, name){
     .filter(grp => grp.length);
   if(!groups.length){ toast("Those students are no longer in the list", true); return; }
   state.groups = groups;
+  state.individuals = (set.individuals || []).map(n => byName[n]).filter(Boolean);
   state.groupsName = name;
   state.size = set.size;
   state.sel = null;
@@ -734,7 +755,8 @@ function saveGroupsAs(name){
   const list = savedList();
   const entry = {
     name: name, size: state.size, ts: new Date().toISOString(),
-    names: state.groups.map(grp => grp.map(s => s.name))
+    names: state.groups.map(grp => grp.map(s => s.name)),
+    individuals: state.individuals.map(s => s.name)
   };
   const at = list.findIndex(x => x.name.toLowerCase() === name.toLowerCase());
   if(at === -1) list.unshift(entry); else list[at] = entry;
