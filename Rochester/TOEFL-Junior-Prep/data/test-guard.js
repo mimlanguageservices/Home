@@ -3,19 +3,36 @@
 //   Lock:    a submitted test stays locked (score + review only) until the teacher enters the PIN.
 (function () {
   const TEACHER_PIN = '1959';   // change this to your own PIN
-  const DKEY = 'tj_draft', PKEY = 'tj_progress';
+  const DKEY = 'tj_draft', PKEY = 'tj_progress', UKEY = 'tj_unlocked';
 
   function read(k) { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch (e) { return {}; } }
   function write(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function setUnlocked(key, on) { const u = read(UKEY); if (on) u[key] = true; else delete u[key]; write(UKEY, u); }
 
   const tjDraft = {
     load: key => read(DKEY)[key] || null,
-    save: (key, v) => { const d = read(DKEY); d[key] = v; write(DKEY, d); },
+    // Submitting a retake locks the test again
+    save: (key, v) => { const d = read(DKEY); d[key] = v; write(DKEY, d); if (v.submitted || v.finished) setUnlocked(key, false); },
     clear: key => { const d = read(DKEY); delete d[key]; write(DKEY, d); }
   };
   function tjScore(key) { return read(PKEY)[key] || null; }
-  // Unlocking removes the saved answers and the score, so the retake starts fresh
-  function tjUnlock(key) { tjDraft.clear(key); const p = read(PKEY); delete p[key]; write(PKEY, p); }
+  // Timed tests keep the most recent score in c/t and the last three attempts, newest first, in h
+  function tjRecordScore(key, c, t) {
+    const p = read(PKEY), old = p[key];
+    const prev = old ? (old.h || [{ c: old.c, t: old.t, at: null }]) : [];   // scores saved before the history have no time
+    p[key] = { c, t, h: [{ c, t, at: Date.now() }].concat(prev).slice(0, 3) };
+    write(PKEY, p);
+  }
+  function tjHistoryHtml(key) {
+    const s = tjScore(key);
+    if (!s || !s.h) return '';
+    const when = at => at ? new Date(at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'earlier';
+    return '<div class="tj-hist">' + s.h.map((a, i) => `<span${i ? '' : ' class="tj-hist-latest"'}>${a.c}/${a.t} &middot; ${when(a.at)}</span>`).join('') + '</div>';
+  }
+  // Unlocking removes the saved answers so the retake starts fresh; the score stays on the menu
+  function tjUnlock(key) { tjDraft.clear(key); setUnlocked(key, true); }
+  // A test with a score and no saved answers was submitted earlier and has not been unlocked
+  function tjLocked(key) { return !!key && !tjDraft.load(key) && !!tjScore(key) && !read(UKEY)[key]; }
 
   function tjAskPin(onOk) {
     const wrap = document.createElement('div');
@@ -59,8 +76,11 @@
     .tj-locked-icon { font-size: 3rem; }
     .tj-locked h2 { margin: 6px 0 10px; }
     .tj-locked p { margin-bottom: 10px; color: #4a5568; }
-    .tj-unlock-btn { margin-top: 8px; }`;
+    .tj-unlock-btn { margin-top: 8px; }
+    .tj-hist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .tj-hist span { padding: 2px 10px; border-radius: 12px; background: #f1f5f9; color: #4a5568; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+    .tj-hist span.tj-hist-latest { background: #eef2ff; color: #4c51bf; }`;
   document.head.appendChild(css);
 
-  Object.assign(window, { tjDraft, tjScore, tjUnlock, tjAskPin, tjRetake, tjLockedHtml });
+  Object.assign(window, { tjDraft, tjScore, tjRecordScore, tjHistoryHtml, tjUnlock, tjLocked, tjAskPin, tjRetake, tjLockedHtml });
 })();

@@ -201,7 +201,7 @@ const tnum = s => s.t || (s.test ? 1 : s.test2 ? 2 : s.test3 ? 3 : 0);   // whic
     function submit() {
         if (submitted) return;
         submitted = true; clearInterval(timerId);
-        saveScore(KEY, totalCorrect(), totalQ());
+        tjRecordScore(KEY, totalCorrect(), totalQ());
         document.getElementById('score').classList.remove('low');
         cur = 0; persist(); render();
     }
@@ -213,7 +213,7 @@ const tnum = s => s.t || (s.test ? 1 : s.test2 ? 2 : s.test3 ? 3 : 0);   // whic
         cur = Math.min(draft.cur || 0, sets.length - 1);
         secondsLeft = draft.secondsLeft; started = true; submitted = !!draft.submitted;
     }
-    if (KEY && !draft && tjScore(KEY)) {
+    if (tjLocked(KEY)) {
         document.getElementById('stage').innerHTML = '<div class="pane">' + tjLockedHtml(KEY) + '</div>';
         document.getElementById('tjUnlock').onclick = () => tjRetake(KEY, location.href);
     } else {

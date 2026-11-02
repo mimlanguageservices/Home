@@ -221,7 +221,7 @@
     function submit() {
         if (submitted) return;
         submitted = true; clearInterval(timerId); closeSheet();
-        const t = totals(); save(KEY, t.c, t.n); saveTextScores();
+        const t = totals(); tjRecordScore(KEY, t.c, t.n); saveTextScores();
         document.getElementById('right').classList.remove('low');
         cur = 0; persist(); render(); document.getElementById('stage').scrollTop = 0;
     }
@@ -232,7 +232,7 @@
         Object.assign(answers, draft.answers); cur = Math.min(draft.cur || 0, texts.length - 1);
         secondsLeft = draft.secondsLeft; started = true; submitted = !!draft.submitted;
     }
-    if (KEY && !draft && tjScore(KEY)) {
+    if (tjLocked(KEY)) {
         document.getElementById('stage').innerHTML = '<div class="paper">' + tjLockedHtml(KEY) + '</div>';
         document.getElementById('bar').style.display = 'none';
         document.getElementById('tjUnlock').onclick = () => tjRetake(KEY, 'Language-Practice.html' + testQS);

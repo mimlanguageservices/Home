@@ -209,7 +209,7 @@
                 const un = qCount() - answeredCount();
                 if (un && !confirm(un + ' question(s) unanswered. Finish anyway?')) return;
                 finished = true;
-                save(KEY, correctCount(), qCount()); persist();
+                tjRecordScore(KEY, correctCount(), qCount()); persist();
             }
             const c = correctCount(), t = qCount();
             if (mode === 'practice' && answeredCount() === t) save('listening:set1', c, t);
@@ -242,7 +242,7 @@
             cur = Math.min(draft.cur || 0, Math.max(0, items.length - 1)); finished = !!draft.finished;
         }
         if (!items.length) document.getElementById('card').textContent = 'No listening items found. Run tools/generate-audio.mjs.';
-        else if (KEY && !draft && tjScore(KEY)) {
+        else if (tjLocked(KEY)) {
             document.getElementById('card').innerHTML = tjLockedHtml(KEY);
             document.getElementById('tjUnlock').onclick = () => tjRetake(KEY, 'Listening-Practice.html' + testQS);
         }

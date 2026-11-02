@@ -277,12 +277,11 @@
         const isTest = t => /[?&]test=\d/.test(t.href);
         function cardHtml(t, name) {
             const p = progress()[t.key];
-            return `<a class="test-link-card" href="${t.href}"><div><div class="tlc-name">${name || t.name}</div><div class="tlc-meta">${t.meta}</div></div><div class="tlc-arrow">${p ? '<span class="tlc-score">&#10003; ' + p.c + '/' + p.t + '</span> ' + (/:test\d*$/.test(t.key) ? tjBadgeMini(p.c, p.t) + ' ' : '') + '<button type="button" class="tlc-reset" onclick="resetScore(event, \'' + t.key + '\')">Reset</button> ' : ''}&#8594;</div></a>`;
+            return `<a class="test-link-card" href="${t.href}"><div><div class="tlc-name">${name || t.name}</div><div class="tlc-meta">${t.meta}</div>${t.key ? tjHistoryHtml(t.key) : ''}</div><div class="tlc-arrow">${p ? '<span class="tlc-score">&#10003; ' + p.c + '/' + p.t + '</span> ' + (/:test\d*$/.test(t.key) ? tjBadgeMini(p.c, p.t) + ' ' : '<button type="button" class="tlc-reset" onclick="resetScore(event, \'' + t.key + '\')">Reset</button> ') : ''}&#8594;</div></a>`;
         }
         function resetScore(e, key) {
             e.preventDefault(); e.stopPropagation();
-            // A timed test score also locks the test, so resetting it needs the teacher PIN
-            if (/:test\d*$/.test(key)) { tjAskPin(() => { tjUnlock(key); updatePracticeContent(moduleData[currentModule]); }); return; }
+            // Only practice sets have a Reset button; timed test scores stay on the menu
             if (!confirm('Reset your saved score for this? This cannot be undone.')) return;
             try { const p = progress(); delete p[key]; localStorage.setItem('tj_progress', JSON.stringify(p)); } catch (err) {}
             updatePracticeContent(moduleData[currentModule]);
