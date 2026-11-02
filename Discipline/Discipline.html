@@ -345,6 +345,9 @@ async function api(paramObj){
       "First 120 chars: " + raw.slice(0,120));
   }
   if(data.unauthorized){
+    // A temporary lockout (too many wrong PINs, from any device) is not a
+    // wrong PIN — keep the saved one so this device stays unlocked.
+    if(/too many/i.test(data.error || "")) throw new Error(data.error);
     localStorage.removeItem("disciplinePin");
     state.screen = "pin";
     state.pinError = data.error || "Incorrect PIN.";

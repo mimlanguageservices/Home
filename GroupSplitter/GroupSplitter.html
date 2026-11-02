@@ -130,6 +130,13 @@
     border-radius:12px; padding:8px 10px; font-size:14px; font-weight:600;
   }
   .attend-btn .avatar{width:36px; height:36px; font-size:13px;}
+  .attend-btn .nm{flex:1; min-width:0; overflow-wrap:anywhere;}
+  .attend-btn .chk{
+    width:22px; height:22px; border-radius:50%; flex:none;
+    background:var(--ok); color:#fff; font-size:13px; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .attend-btn.absent .chk{background:transparent; border:2px solid var(--muted);}
   .attend-btn.boy{background:var(--boy-bg); color:var(--gender-text);}
   .attend-btn.girl{background:var(--girl-bg); color:var(--gender-text);}
   .attend-btn.boy .avatar{box-shadow:0 0 0 2px var(--boy);}
@@ -271,7 +278,7 @@
    The PIN, URL and saved roster share Discipline's storage keys, so
    unlocking one app unlocks the other on the same device.
 ------------------------------------------------------------------ */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypVEbFCfSeu1ONvARs79N_9KhE46iOh3yPO7I4wJ_IK8b6G-495X3x6aM3rnERZHk2HA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQBWAAYOyRs5bKDhe5J5aZ_qLK7wzcLiAfjLwUEE51DmMYq3mw02K1AaLi9OaHRjQ9nQ/exec";
 
 const GROUP_SIZES = [2, 3, 4];
 
@@ -287,7 +294,7 @@ const state = {
   className: null,
   size: 2,
   mixGender: true,
-  absent: {},          // class -> [names]
+  absent: {},          // class -> [names] left out; reset each time a class is opened
   groups: null,        // [[student, ...], ...]
   groupsName: null,    // name of the saved set on screen, if any
   saved: {},           // class -> [{ name, size, names, ts }]
@@ -352,6 +359,9 @@ async function api(paramObj){
       "First 120 chars: " + raw.slice(0,120));
   }
   if(data.unauthorized){
+    // A temporary lockout (too many wrong PINs, from any device) is not a
+    // wrong PIN — keep the saved one so this device stays unlocked.
+    if(/too many/i.test(data.error || "")) throw new Error(data.error);
     store.remove("disciplinePin");
     state.screen = "pin";
     state.pinError = data.error || "Incorrect PIN.";
@@ -364,7 +374,7 @@ async function api(paramObj){
 
 /* ---------- saved data (instant load) ---------- */
 const CACHE_KEY = "disciplineRoster";        // shared with Discipline.html
-const PREFS_KEY = "groupSplitterPrefs";      // size, mix, absences, last + saved groups
+const PREFS_KEY = "groupSplitterPrefs";      // size, mix, last + saved groups
 function readCache(){
   try{ return JSON.parse(store.get(CACHE_KEY) || "null"); }catch(_){ return null; }
 }
@@ -377,13 +387,12 @@ function loadPrefs(){
   if(!p) return;
   if(GROUP_SIZES.includes(p.size)) state.size = p.size;
   if(typeof p.mixGender === "boolean") state.mixGender = p.mixGender;
-  if(p.absent && typeof p.absent === "object") state.absent = p.absent;
   state.lastGroups = p.lastGroups || {};
   if(p.saved && typeof p.saved === "object") state.saved = p.saved;
 }
 function savePrefs(){
   store.set(PREFS_KEY, JSON.stringify({
-    size: state.size, mixGender: state.mixGender, absent: state.absent,
+    size: state.size, mixGender: state.mixGender,
     lastGroups: state.lastGroups || {}, saved: state.saved
   }));
 }
@@ -507,7 +516,7 @@ function render(){
   els.crumb.textContent =
     locked ? "" :
     state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
-    state.screen === "setup" ? "Pick a group size, tap anyone who is absent, then split" :
+    state.screen === "setup" ? "Pick a group size, untick anyone who is out, then split" :
     state.screen === "groups" ? "Tap two students to swap them" :
     "";
 
@@ -586,7 +595,8 @@ function renderSetup(){
     const isOut = out.includes(s.name);
     return '<button class="attend-btn' + (isOut ? ' absent' : genderCls(s)) + '" ' +
              'onclick="toggleAbsent(' + state.students.indexOf(s) + ')">' +
-             avatar(s) + '<span>' + esc(s.name) + '</span>' +
+             avatar(s) + '<span class="nm">' + esc(s.name) + '</span>' +
+             '<span class="chk">' + (isOut ? '' : '✓') + '</span>' +
            '</button>';
   }).join("");
 
@@ -610,9 +620,10 @@ function renderSetup(){
       '<span class="sw"></span>' +
     '</button>' +
     '<div class="attend-head">' +
-      '<div class="section-title">Present: ' + present + ' of ' + all.length + '</div>' +
-      (out.length ? '<button class="link-btn" onclick="clearAbsent()">Mark everyone present</button>' : '') +
+      '<div class="section-title">In the groups: ' + present + ' of ' + all.length + '</div>' +
+      (out.length ? '<button class="link-btn" onclick="clearAbsent()">Select everyone</button>' : '') +
     '</div>' +
+    '<div class="crumb" style="padding-top:0;">Tap a student to leave them out (absent or not participating). Tap again to add them back.</div>' +
     '<div class="attend">' + (people || '<div class="msg">No students in this class.</div>') + '</div>' +
     '<div class="sticky-go">' +
       '<button class="action-btn" onclick="doSplit()"' + (present ? '' : ' disabled') + '>' +
@@ -651,7 +662,8 @@ function renderGroups(){
 }
 
 /* ---------- actions ---------- */
-function pickClass(c){ state.className = c; state.screen = "setup"; render(); }
+/* Opening a class always starts with everyone selected. */
+function pickClass(c){ state.className = c; state.absent[c] = []; state.screen = "setup"; render(); }
 function setSize(n){ state.size = n; savePrefs(); render(); }
 function toggleMix(){ state.mixGender = !state.mixGender; savePrefs(); render(); }
 function toggleAbsent(idx){

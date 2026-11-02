@@ -69,7 +69,7 @@ const REMOVE_PIN = '1959';
 // (Deploy -> Manage deployments -> edit -> New version -> Deploy).
 // Keep it to digits so it is easy to type on a phone; 6+ digits.
 // ------------------------------------------------------------------
-const ACCESS_PIN = '1916';
+const ACCESS_PIN = '1959';
 
 // Brute-force guard: after this many wrong PINs in the window, all
 // requests are blocked for the same window length.
