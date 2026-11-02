@@ -71,10 +71,12 @@
 <script src="data/badges.js"></script>
 <script src="data/language-texts.js"></script>
 <script src="data/load-book.js"></script>
+<script src="data/test-guard.js"></script>
 <script>
     const params = new URLSearchParams(location.search);
     const testNo = /^\d+$/.test(params.get('test') || '') ? +params.get('test') : 0;   // 0 = practice; 1 = original timed test; 2+ = extra timed tests
     const testQS = testNo ? '?test=' + testNo : '';
+    const KEY = testNo ? (testNo > 1 ? 'language:test' + testNo : 'language:test') : null;   // score key, also used for the saved draft
     const texts = window.LANGUAGE_TEXTS.filter(t => testNo >= 2 ? t.test === testNo : !t.test);
     const TEST_MINUTES = 25;                 // guide time for the full 42-question test
     const L = 'ABCD';
@@ -94,6 +96,7 @@
         return { c, n };
     }
     function answeredCount() { return Object.keys(answers).length; }
+    function persist() { if (KEY && started) tjDraft.save(KEY, { answers, cur, secondsLeft, submitted }); }
     function save(id, c, n) {
         try { const p = JSON.parse(localStorage.getItem('tj_progress')) || {}; if (!p[id] || c >= p[id].c) p[id] = { c, t: n }; localStorage.setItem('tj_progress', JSON.stringify(p)); } catch (e) {}
     }
@@ -112,7 +115,7 @@
             const got = tx.blanks.filter((bl, k) => answers[key(i, k)] !== undefined).length;
             b.className = 'tab' + (i === cur ? ' active' : '');
             b.innerHTML = (i + 1) + '. ' + tx.title + `<span class="mark">${got}/${tx.blanks.length}</span>`;
-            b.onclick = () => { closeSheet(); cur = i; render(); document.getElementById('stage').scrollTop = 0; };
+            b.onclick = () => { closeSheet(); cur = i; persist(); render(); document.getElementById('stage').scrollTop = 0; };
             el.appendChild(b);
         });
         document.getElementById('right').textContent = mode === 'test' && started && !submitted ? fmt(secondsLeft) : (feedbackOn() ? totals().c + ' / ' + totals().n : answeredCount() + ' answered');
@@ -164,10 +167,10 @@
         bar.innerHTML = h;
         bar.style.display = h ? 'flex' : 'none';
         const p = document.getElementById('prevT'), n = document.getElementById('nextT'), s = document.getElementById('submitT'), a = document.getElementById('again');
-        if (p) p.onclick = () => { closeSheet(); cur--; render(); document.getElementById('stage').scrollTop = 0; };
-        if (n) n.onclick = () => { closeSheet(); cur++; render(); document.getElementById('stage').scrollTop = 0; };
+        if (p) p.onclick = () => { closeSheet(); cur--; persist(); render(); document.getElementById('stage').scrollTop = 0; };
+        if (n) n.onclick = () => { closeSheet(); cur++; persist(); render(); document.getElementById('stage').scrollTop = 0; };
         if (s) s.onclick = () => { const un = totals().n - answeredCount(); if (!un || confirm(un + ' question(s) unanswered. Submit anyway?')) submit(); };
-        if (a) a.onclick = () => { location.href = 'Language-Practice.html' + testQS; };
+        if (a) a.onclick = () => tjRetake(KEY, 'Language-Practice.html' + testQS);   // retaking a submitted test needs the teacher PIN
         const st = document.getElementById('startTest');
         if (st) st.onclick = startTest;
     }
@@ -197,31 +200,46 @@
     function choose(t, b, j) {
         answers[key(t, b)] = j;
         if (mode === 'practice') { saveTextScores(); openSheet(t, b); }   // re-open to show feedback
-        else { closeSheet(); renderKeepScroll(); }
+        else { persist(); closeSheet(); renderKeepScroll(); }
     }
 
     function switchMode(m) {
         if (m === mode) return;
         location.href = 'Language-Practice.html' + (m === 'test' ? '?test=' + (testNo || 1) : '');
     }
-    function startTest() {
-        started = true;
+    function runTimer() {
         timerId = setInterval(() => {
-            secondsLeft--;
+            secondsLeft--; persist();
             const r = document.getElementById('right'); r.textContent = fmt(Math.max(0, secondsLeft)); r.classList.toggle('low', secondsLeft <= 300);
             if (secondsLeft <= 0) submit();
         }, 1000);
+    }
+    function startTest() {
+        started = true; persist(); runTimer();
         render();
     }
     function submit() {
         if (submitted) return;
         submitted = true; clearInterval(timerId); closeSheet();
-        const t = totals(); save(testNo > 1 ? 'language:test' + testNo : 'language:test', t.c, t.n); saveTextScores();
+        const t = totals(); save(KEY, t.c, t.n); saveTextScores();
         document.getElementById('right').classList.remove('low');
-        cur = 0; render(); document.getElementById('stage').scrollTop = 0;
+        cur = 0; persist(); render(); document.getElementById('stage').scrollTop = 0;
     }
 
-    render();
+    // Timed test: carry on from the saved draft after a reload, or show the lock if it was submitted before
+    const draft = KEY && tjDraft.load(KEY);
+    if (draft) {
+        Object.assign(answers, draft.answers); cur = Math.min(draft.cur || 0, texts.length - 1);
+        secondsLeft = draft.secondsLeft; started = true; submitted = !!draft.submitted;
+    }
+    if (KEY && !draft && tjScore(KEY)) {
+        document.getElementById('stage').innerHTML = '<div class="paper">' + tjLockedHtml(KEY) + '</div>';
+        document.getElementById('bar').style.display = 'none';
+        document.getElementById('tjUnlock').onclick = () => tjRetake(KEY, 'Language-Practice.html' + testQS);
+    } else {
+        if (started && !submitted && KEY) runTimer();
+        render();
+    }
 </script>
 </body>
 </html>

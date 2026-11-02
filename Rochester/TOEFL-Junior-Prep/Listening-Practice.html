@@ -69,10 +69,12 @@
 
     <script src="data/badges.js"></script>
     <script src="audio/listening-data.js"></script>
+    <script src="data/test-guard.js"></script>
     <script>
         const params = new URLSearchParams(location.search);
         const testNo = /^\d+$/.test(params.get('test') || '') ? +params.get('test') : 0;   // 0 = practice; 1 = original test mode; 2+ = extra timed tests
         const testQS = testNo ? '?test=' + testNo : '';
+        const KEY = testNo ? (testNo > 1 ? 'listening:test' + testNo : 'listening:test') : null;   // score key, also used for the saved draft
         const items = (window.LISTENING || []).filter(i => testNo >= 2 ? i.test === testNo : !i.test);
         let mode = testNo ? 'test' : 'practice';   // practice: replay + feedback; test: one play, no feedback
         let finished = false;                                          // test mode: true after Finish (shows feedback)
@@ -92,6 +94,8 @@
         function save(id, c, t) {
             try { const p = JSON.parse(localStorage.getItem('tj_progress')) || {}; if (!p[id] || c >= p[id].c) p[id] = { c, t }; localStorage.setItem('tj_progress', JSON.stringify(p)); } catch (e) {}
         }
+        // Test mode: keep answers and which recordings were already played, so a reload neither loses work nor allows a second listen
+        function persist() { if (KEY) tjDraft.save(KEY, { state, cur, finished }); }
 
         function renderTabs() {
             const el = document.getElementById('tabs');
@@ -162,6 +166,7 @@
             card.querySelectorAll('.mode').forEach(b => b.onclick = () => switchMode(b.dataset.m));
             card.querySelectorAll('.opt').forEach(b => b.onclick = () => {
                 state[cur].answers[+b.dataset.k] = +b.dataset.j;
+                persist();
                 const y = window.scrollY; render(true); window.scrollTo(0, y);
                 if (mode === 'practice' && items.every((x, i) => itemDone(i))) save('listening:set1', correctCount(), qCount());
             });
@@ -185,7 +190,7 @@
             audio.playbackRate = mode === 'practice' ? rate : 1;
             audio.play().then(() => {
                 state[cur].plays++;
-                if (mode === 'test') { state[cur].used = true; }
+                if (mode === 'test') { state[cur].used = true; persist(); }
                 document.getElementById('plays').textContent = mode === 'practice' ? 'Played ' + state[cur].plays + (state[cur].plays === 1 ? ' time' : ' times') : '';
                 setPlayLabel(true);
             }).catch(() => { document.getElementById('plays').textContent = 'Could not play audio. Check the audio folder.'; });
@@ -195,7 +200,7 @@
         function go(i) {
             if (i < 0 || i >= items.length) return;
             if (mode === 'test' && !audio.paused) return;   // stay until the recording ends
-            cur = i; render(); window.scrollTo(0, 0);
+            cur = i; persist(); render(); window.scrollTo(0, 0);
         }
 
         function finish() {
@@ -204,7 +209,7 @@
                 const un = qCount() - answeredCount();
                 if (un && !confirm(un + ' question(s) unanswered. Finish anyway?')) return;
                 finished = true;
-                save(testNo > 1 ? 'listening:test' + testNo : 'listening:test', correctCount(), qCount());
+                save(KEY, correctCount(), qCount()); persist();
             }
             const c = correctCount(), t = qCount();
             if (mode === 'practice' && answeredCount() === t) save('listening:set1', c, t);
@@ -214,7 +219,10 @@
                 <div class="actions"><button class="btn ghost" id="review">Review items</button><button class="btn" id="restart">Start over</button></div>`;
             renderTabs();
             document.getElementById('review').onclick = () => go(0);
-            document.getElementById('restart').onclick = () => { location.href = 'Listening-Practice.html' + testQS; };
+            document.getElementById('restart').onclick = () => {
+                if (mode === 'test') tjRetake(KEY, 'Listening-Practice.html' + testQS);   // retaking a finished test needs the teacher PIN
+                else location.href = 'Listening-Practice.html' + testQS;
+            };
         }
 
         // Swipe between items in practice mode (disabled in test mode so nothing is skipped by accident)
@@ -227,7 +235,19 @@
             if (Math.abs(dx) > 90 && Math.abs(dx) > Math.abs(dy) * 2) go(dx < 0 ? cur + 1 : cur - 1);
         }, { passive: true });
 
-        if (items.length) render(); else document.getElementById('card').textContent = 'No listening items found. Run tools/generate-audio.mjs.';
+        // Test mode: carry on from the saved draft after a reload, or show the lock if it was finished before
+        const draft = KEY && tjDraft.load(KEY);
+        if (draft) {
+            (draft.state || []).forEach((s, i) => { if (state[i]) Object.assign(state[i], s); });
+            cur = Math.min(draft.cur || 0, Math.max(0, items.length - 1)); finished = !!draft.finished;
+        }
+        if (!items.length) document.getElementById('card').textContent = 'No listening items found. Run tools/generate-audio.mjs.';
+        else if (KEY && !draft && tjScore(KEY)) {
+            document.getElementById('card').innerHTML = tjLockedHtml(KEY);
+            document.getElementById('tjUnlock').onclick = () => tjRetake(KEY, 'Listening-Practice.html' + testQS);
+        }
+        else if (finished) finish();
+        else render();
     </script>
 </body>
 </html>

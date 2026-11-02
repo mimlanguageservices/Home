@@ -68,6 +68,7 @@
 <script src="data/reading-data-5.js"></script>
 <script src="data/load-book.js"></script>
 <script src="data/language-data.js"></script>
+<script src="data/test-guard.js"></script>
 <script>
     const params = new URLSearchParams(location.search);
     const mod = params.get('m') === 'language' ? 'language' : 'reading';
@@ -92,6 +93,12 @@ const tnum = s => s.t || (s.test ? 1 : s.test2 ? 2 : s.test3 ? 3 : 0);   // whic
     let cur = Math.max(0, sets.findIndex(s => s.id === params.get('set')));
     let started = !testMode, submitted = false, secondsLeft = TEST_MINUTES * 60, timerId = null;
     const L = 'ABCD';
+    const KEY = testMode ? (testNo === '1' ? 'reading:test' : 'reading:test' + testNo) : null;   // score key, also used for the saved draft
+    function persist() {
+        if (!KEY || !started) return;
+        const answers = {}; sets.forEach(s => answers[s.id] = state[s.id].answers);
+        tjDraft.save(KEY, { answers, cur, secondsLeft, submitted });
+    }
 
     const feedbackOn = () => !testMode || submitted;
     const done = s => Object.keys(state[s.id].answers).length === s.items_().length;
@@ -111,7 +118,7 @@ const tnum = s => s.t || (s.test ? 1 : s.test2 ? 2 : s.test3 ? 3 : 0);   // whic
             if (testMode) mark = `<span class="mark">${Object.keys(state[s.id].answers).length}/${s.items_().length}</span>`;
             else { const best = prog[mod + ':' + s.id]; if (best) mark = `<span class="mark">${best.c}/${best.t}</span>`; }
             b.innerHTML = s.title + mark;
-            b.onclick = () => { cur = i; render(); };
+            b.onclick = () => { cur = i; persist(); render(); };
             el.appendChild(b);
         });
         const sc = document.getElementById('score');
@@ -139,7 +146,7 @@ const tnum = s => s.t || (s.test ? 1 : s.test2 ? 2 : s.test3 ? 3 : 0);   // whic
         const hasText = mod === 'reading';
         let q = '';
         if (testMode && submitted && cur === 0 && !st.shownTop) {}
-        if (testMode && submitted) q += `<div class="result"><div>Your test score</div><strong>${totalCorrect()} / ${totalQ()}</strong>${tjBadgeHtml(totalCorrect(), totalQ())}<div>Review each text to see explanations.</div></div>`;
+        if (testMode && submitted) q += `<div class="result"><div>Your test score</div><strong>${totalCorrect()} / ${totalQ()}</strong>${tjBadgeHtml(totalCorrect(), totalQ())}<div>Review each text to see explanations.</div><button class="btn ghost" id="retakeT">Retake test</button></div>`;
         items.forEach((it, i) => {
             const ch = st.answers[i];
             q += `<div class="q">${it.type ? `<span class="qtype">${it.type}</span>` : ''}<div class="q-text">${i + 1}. ${it.q.replace(/____/g, '&#95;&#95;&#95;&#95;&#95;')}</div>`;
@@ -166,36 +173,53 @@ const tnum = s => s.t || (s.test ? 1 : s.test2 ? 2 : s.test3 ? 3 : 0);   // whic
         stage.querySelectorAll('.opt').forEach(b => b.onclick = () => {
             const rp = document.getElementById('rightPane'), top = rp.scrollTop, sTop = stage.scrollTop;
             st.answers[+b.dataset.i] = +b.dataset.j;
-            render();
+            persist(); render();
             document.getElementById('rightPane').scrollTop = top;
             document.getElementById('stage').scrollTop = sTop;
         });
         const bind = (id, fn) => { const e = document.getElementById(id); if (e) e.onclick = fn; };
         bind('retry', () => { state[s.id] = { answers: {}, saved: false }; render(); });
         bind('nextSet', () => { cur++; render(); });
-        bind('prevT', () => { cur--; render(); });
-        bind('nextT', () => { cur++; render(); });
+        bind('prevT', () => { cur--; persist(); render(); });
+        bind('nextT', () => { cur++; persist(); render(); });
         bind('submitT', () => { const un = totalQ() - totalAnswered(); if (!un || confirm(un + ' question(s) unanswered. Submit anyway?')) submit(); });
+        bind('retakeT', () => tjRetake(KEY, location.href));   // retaking a submitted test needs the teacher PIN
         renderTabs();
     }
 
-    function startTest() {
-        started = true;
+    function runTimer() {
         timerId = setInterval(() => {
-            secondsLeft--;
+            secondsLeft--; persist();
             const sc = document.getElementById('score'); sc.textContent = fmt(Math.max(0, secondsLeft)); sc.classList.toggle('low', secondsLeft <= 300);
             if (secondsLeft <= 0) submit();
         }, 1000);
+    }
+    function startTest() {
+        started = true; persist(); runTimer();
         render();
     }
     function submit() {
         if (submitted) return;
         submitted = true; clearInterval(timerId);
-        saveScore(testNo === '1' ? 'reading:test' : 'reading:test' + testNo, totalCorrect(), totalQ());
+        saveScore(KEY, totalCorrect(), totalQ());
         document.getElementById('score').classList.remove('low');
-        cur = 0; render();
+        cur = 0; persist(); render();
     }
-    render();
+
+    // Timed test: carry on from the saved draft after a reload, or show the lock if it was submitted before
+    const draft = KEY && tjDraft.load(KEY);
+    if (draft) {
+        sets.forEach(s => { if (draft.answers && draft.answers[s.id]) state[s.id].answers = draft.answers[s.id]; });
+        cur = Math.min(draft.cur || 0, sets.length - 1);
+        secondsLeft = draft.secondsLeft; started = true; submitted = !!draft.submitted;
+    }
+    if (KEY && !draft && tjScore(KEY)) {
+        document.getElementById('stage').innerHTML = '<div class="pane">' + tjLockedHtml(KEY) + '</div>';
+        document.getElementById('tjUnlock').onclick = () => tjRetake(KEY, location.href);
+    } else {
+        if (started && !submitted && KEY) runTimer();
+        render();
+    }
 
     // Swipe left/right to change set (not during a timed test, so nothing is skipped by accident)
     let sx = 0, sy = 0;
