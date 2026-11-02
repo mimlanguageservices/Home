@@ -26,6 +26,11 @@
 //   ?mode=report&class=8A&name=...&image=...&code=1.1&situation=...
 //                      -> appends one row to the Situations tab
 //   ?mode=situations   -> returns every reported situation, newest first
+//                         (cases marked Removed are left out)
+//   ?mode=update&row=5&date=...&name=...&status=Processed
+//                      -> sets the Status of one case. status is one of
+//                         Processed / Emailed parents / Removed; Removed
+//                         also needs &removePin=<REMOVE_PIN>
 // ============================================================
 
 const SPREADSHEET_ID = '1U37diEkPAAupol2Yg0ahOAOSGKN8DkI_av6LdhP-p7I';
@@ -48,7 +53,14 @@ const SCOL_PHOTO_URL = 9;
 
 // Choices for the Status dropdown in the sheet. Edit freely — the
 // first one is what every new report starts with.
-const STATUSES = ['Reported', 'In process', 'Resolved'];
+const STATUSES = ['Reported', 'In process', 'Processed', 'Emailed parents', 'Resolved', 'Removed'];
+
+// Statuses the app's buttons can set on a case.
+const APP_STATUSES = ['Processed', 'Emailed parents', 'Removed'];
+
+// Second PIN required to mark a case as Removed. Removed rows stay in
+// the sheet (as a record) but are hidden from the app.
+const REMOVE_PIN = '1959';
 
 // ------------------------------------------------------------------
 // ACCESS PIN
@@ -76,6 +88,9 @@ function doGet(e) {
     }
     if (mode === 'situations') {
       return getSituations();
+    }
+    if (mode === 'update') {
+      return updateSituation(e);
     }
     return getRoster();
   } catch (err) {
@@ -143,9 +158,10 @@ function reportSituation(e) {
   // Lock so two phones reporting at once can't land on the same row.
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
+  let row;
   try {
     sheet.appendRow([now, className, studentName, photo, code, situation, STATUSES[0], '', image]);
-    const row = sheet.getLastRow();
+    row = sheet.getLastRow();
     sheet.getRange(row, SCOL_STATUS).setDataValidation(
       SpreadsheetApp.newDataValidation().requireValueInList(STATUSES, true).build()
     );
@@ -157,7 +173,7 @@ function reportSituation(e) {
   return respond({
     success: true,
     situation: {
-      date: now.toISOString(), class: className, name: studentName, image: image,
+      row: row, date: now.toISOString(), class: className, name: studentName, image: image,
       code: code, situation: situation, status: STATUSES[0], notes: ''
     }
   });
@@ -172,16 +188,19 @@ function getSituations() {
 
   const values = sheet.getRange(2, 1, lastRow - 1, SITUATION_HEADERS.length).getValues();
   const list = [];
-  values.forEach(function (r) {
+  values.forEach(function (r, i) {
     if (!r[2]) return; // no student name -> blank row
+    const status = String(r[SCOL_STATUS - 1] || '').trim();
+    if (status.toLowerCase() === 'removed') return;
     const d = r[SCOL_DATE - 1];
     list.push({
+      row: i + 2,
       date: d instanceof Date ? d.toISOString() : String(d || ''),
       class: String(r[1] || '').trim(),
       name: String(r[2] || '').trim(),
       code: String(r[4] || '').trim(),
       situation: String(r[5] || '').trim(),
-      status: String(r[SCOL_STATUS - 1] || '').trim(),
+      status: status,
       notes: String(r[7] || '').trim(),
       image: String(r[SCOL_PHOTO_URL - 1] || '').trim()
     });
@@ -189,6 +208,57 @@ function getSituations() {
   list.reverse(); // newest first
 
   return respond({ success: true, situations: list });
+}
+
+function updateSituation(e) {
+  const row = parseInt(e.parameter.row, 10);
+  const date = (e.parameter.date || '').toString().trim();
+  const studentName = (e.parameter.name || '').toString().trim();
+  const status = (e.parameter.status || '').toString().trim();
+
+  if (APP_STATUSES.indexOf(status) === -1) {
+    return respond({ success: false, error: 'Unknown status: ' + status });
+  }
+  if (status === 'Removed') {
+    const supplied = (e.parameter.removePin || '').toString().trim();
+    if (supplied !== REMOVE_PIN) {
+      // Wrong removal PINs count toward the same brute-force lock.
+      const cache = CacheService.getScriptCache();
+      const fails = Number(cache.get('pinFails') || 0);
+      cache.put('pinFails', String(fails + 1), LOCK_WINDOW_SECONDS);
+      return respond({ success: false, error: 'Incorrect removal PIN.' });
+    }
+  }
+
+  const sheet = getSituationsSheet();
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    if (!(row >= 2 && row <= sheet.getLastRow())) {
+      return respond({ success: false, error: 'Case not found — refresh and try again.' });
+    }
+    // Make sure the row still holds the case the app is showing (rows
+    // can move if someone sorts or deletes in the sheet).
+    const r = sheet.getRange(row, 1, 1, 3).getValues()[0];
+    const d = r[SCOL_DATE - 1];
+    // Dates are compared to the second; Sheets can round milliseconds.
+    const sameDate = d instanceof Date
+      ? Math.abs(d.getTime() - new Date(date).getTime()) < 1000
+      : String(d || '') === date;
+    if (String(r[2] || '').trim() !== studentName || !sameDate) {
+      return respond({ success: false, error: 'The sheet has changed — refresh and try again.' });
+    }
+    const cell = sheet.getRange(row, SCOL_STATUS);
+    // Refresh the dropdown first so older rows accept the new statuses.
+    cell.setDataValidation(
+      SpreadsheetApp.newDataValidation().requireValueInList(STATUSES, true).build()
+    );
+    cell.setValue(status);
+  } finally {
+    lock.releaseLock();
+  }
+
+  return respond({ success: true, row: row, status: status });
 }
 
 function getSituationsSheet() {

@@ -131,7 +131,17 @@
   }
   .pill.reported{background:var(--incident);}
   .pill.in-process{background:var(--warning);}
-  .pill.resolved{background:var(--ok);}
+  .pill.resolved, .pill.processed{background:var(--ok);}
+  .pill.emailed-parents{background:var(--boy);}
+  .sit-actions{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;}
+  .sit-actions button{
+    border:1px solid var(--line); background:transparent; color:var(--text);
+    border-radius:999px; padding:6px 11px; font-size:12px; font-weight:600;
+  }
+  .sit-actions button:active{background:var(--card-2);}
+  .sit-actions button.on{background:var(--ok); border-color:var(--ok); color:#fff;}
+  .sit-actions button.remove{color:var(--incident); border-color:var(--incident); margin-left:auto;}
+  .sit-actions button[disabled]{opacity:.5;}
 
   .filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;}
   .chip{
@@ -214,6 +224,19 @@
   </div>
 </dialog>
 
+<dialog id="removeDlg">
+  <h2>Remove situation?</h2>
+  <div id="removeBody"></div>
+  <p>Enter the removal PIN. The case is hidden from the app but kept in the spreadsheet.</p>
+  <p id="removeErr" style="color:var(--incident);" hidden></p>
+  <input id="removePin" type="password" inputmode="numeric" autocomplete="off" placeholder="Removal PIN"
+    style="text-align:center; letter-spacing:6px; font-size:18px;">
+  <div class="row">
+    <button id="removeCancel">Cancel</button>
+    <button class="danger" id="removeOk">Remove</button>
+  </div>
+</dialog>
+
 <script>
 /* ------------------------------------------------------------------
    CONFIG
@@ -265,7 +288,9 @@ const state = {
   situations: null,    // null = never loaded
   sitLoading: false,
   sitError: null,
-  sitFilter: "Open"
+  sitFilter: "Open",
+  sitBusy: null,       // index of the case being updated
+  removeIdx: null      // case awaiting the removal PIN
 };
 
 const els = {
@@ -279,7 +304,12 @@ const els = {
   urlInput: document.getElementById("urlInput"),
   confirm: document.getElementById("confirm"),
   confirmBody: document.getElementById("confirmBody"),
-  confirmOk: document.getElementById("confirmOk")
+  confirmOk: document.getElementById("confirmOk"),
+  removeDlg: document.getElementById("removeDlg"),
+  removeBody: document.getElementById("removeBody"),
+  removePin: document.getElementById("removePin"),
+  removeOk: document.getElementById("removeOk"),
+  removeErr: document.getElementById("removeErr")
 };
 
 function getUrl(){
@@ -432,6 +462,37 @@ async function submitReport(){
   els.confirmOk.textContent = "Confirm";
 }
 
+/* Set the status of one case: Processed / Emailed parents / Removed.
+   Resolves to true on success, or an error message. */
+async function updateSituation(idx, status, removePin){
+  const x = (state.situations || [])[idx];
+  if(!x || state.sitBusy !== null) return "Busy — try again.";
+  if(!x.row){
+    toast("Redeploy DisciplineScript.gs to enable this", true);
+    return "Redeploy DisciplineScript.gs to enable this.";
+  }
+  state.sitBusy = idx;
+  render();
+  let ok = "Not saved.";
+  try{
+    const params = { mode:"update", row:x.row, date:x.date, name:x.name, status:status };
+    if(removePin) params.removePin = removePin;
+    const data = await api(params);
+    if(data){
+      if(status === "Removed") state.situations.splice(idx, 1);
+      else x.status = status;
+      toast(status + " — " + firstName(x.name));
+      ok = true;
+    }
+  }catch(err){
+    toast("Not saved: " + err.message, true);
+    ok = err.message;
+  }
+  state.sitBusy = null;
+  render();
+  return ok;
+}
+
 /* ---------- screens ---------- */
 function classes(){
   const set = [];
@@ -566,8 +627,9 @@ function renderReport(){
   window.scrollTo(0,0);
 }
 
-/* "Open" = anything not yet Resolved. */
-function isResolved(x){ return (x.status || "").toLowerCase() === "resolved"; }
+/* "Open" = anything not yet Processed, Emailed parents or Resolved. */
+const RESOLVED_STATUSES = ["processed", "emailed parents", "resolved"];
+function isResolved(x){ return RESOLVED_STATUSES.includes((x.status || "").toLowerCase()); }
 
 function renderSituations(){
   els.title.textContent = "Situations";
@@ -593,6 +655,12 @@ function renderSituations(){
 
   const cards = shown.map(x => {
     const st = x.status || "Reported";
+    const idx = all.indexOf(x);
+    const busy = state.sitBusy !== null ? ' disabled' : '';
+    const act = (label) =>
+      '<button class="' + (st === label ? 'on' : '') + '"' + busy +
+        ' onclick="updateSituation(' + idx + ',\'' + label + '\')">' +
+        (st === label ? '✓ ' : '') + label + '</button>';
     return '<div class="sit-card">' +
              avatar(x) +
              '<div class="body">' +
@@ -600,12 +668,17 @@ function renderSituations(){
                '<div class="what"><b>' + esc(x.code) + '</b> ' + esc(x.situation) + '</div>' +
                '<div class="when">' + esc(fmtDate(x.date)) + '</div>' +
                (x.notes ? '<div class="notes">' + esc(x.notes) + '</div>' : '') +
+               '<div class="sit-actions">' +
+                 act("Processed") + act("Emailed parents") +
+                 '<button class="remove"' + busy + ' onclick="askRemove(' + idx + ')">Remove</button>' +
+               '</div>' +
              '</div>' +
              '<span class="pill ' + slug(st) + '">' + esc(st) + '</span>' +
            '</div>';
   }).join("");
 
-  els.crumb.textContent = state.sitLoading ? "Updating…" : "Status is updated in the Situations tab of the spreadsheet";
+  els.crumb.textContent = state.sitLoading ? "Updating…" :
+    state.sitBusy !== null ? "Saving…" : "Mark each case Processed or Emailed parents to resolve it";
   els.view.innerHTML =
     '<div class="filters">' +
       chip("Open", open.length) + chip("Resolved", all.length - open.length) + chip("All", all.length) +
@@ -644,6 +717,37 @@ function askConfirm(code){
       '<b style="color:var(--incident);">' + esc(item.code) + '</b> ' + esc(item.label) +
     '</p>';
   els.confirm.showModal();
+}
+
+function askRemove(idx){
+  const x = (state.situations || [])[idx];
+  if(!x) return;
+  state.removeIdx = idx;
+  els.removeBody.innerHTML =
+    '<div class="profile" style="background:var(--bg); margin-bottom:12px;">' + avatar(x) +
+      '<div><div class="name">' + esc(x.name) + '</div>' +
+      '<div class="status"><b>' + esc(x.code) + '</b> ' + esc(x.situation) + '</div></div>' +
+    '</div>';
+  els.removePin.value = "";
+  els.removeErr.hidden = true;
+  els.removeDlg.showModal();
+  els.removePin.focus();
+}
+
+async function confirmRemove(){
+  const pin = els.removePin.value.trim();
+  if(!pin || state.removeIdx === null) return;
+  els.removeOk.disabled = true;
+  els.removeOk.textContent = "Removing…";
+  const ok = await updateSituation(state.removeIdx, "Removed", pin);
+  els.removeOk.disabled = false;
+  els.removeOk.textContent = "Remove";
+  if(ok === true){ state.removeIdx = null; els.removeDlg.close(); return; }
+  if(state.screen === "pin"){ els.removeDlg.close(); return; } // app PIN was rejected
+  els.removeErr.textContent = ok;
+  els.removeErr.hidden = false;
+  els.removePin.value = "";
+  els.removePin.focus();
 }
 
 /* ---------- helpers ---------- */
@@ -698,6 +802,13 @@ document.getElementById("confirmCancel").addEventListener("click", () => {
 });
 els.confirmOk.addEventListener("click", submitReport);
 els.confirm.addEventListener("cancel", e => { if(state.sending) e.preventDefault(); });
+document.getElementById("removeCancel").addEventListener("click", () => {
+  if(els.removeOk.disabled) return;
+  state.removeIdx = null;
+  els.removeDlg.close();
+});
+els.removeOk.addEventListener("click", confirmRemove);
+els.removePin.addEventListener("keydown", e => { if(e.key === "Enter") confirmRemove(); });
 els.back.addEventListener("click", goBack);
 
 /* Old 3-strike flags are no longer used. */
