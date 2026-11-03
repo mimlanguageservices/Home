@@ -756,6 +756,7 @@
       <button class="sidebar-link" id="nav-circle-time">Circle Time</button>
       <button class="sidebar-link" id="nav-processing">Processing</button>
       <button class="sidebar-link" id="nav-group-splitter">Group Splitter</button>
+      <button class="sidebar-link" id="nav-seating">Seating Arrangement</button>
       <button class="sidebar-link" id="nav-kanban">Kanban</button>
     </div>
   </nav>
@@ -778,6 +779,10 @@
 
   <div class="group-splitter-wrap" id="group-splitter" style="display:none">
     <iframe id="group-splitter-frame" title="Group Splitter"></iframe>
+  </div>
+
+  <div class="group-splitter-wrap" id="seating" style="display:none">
+    <iframe id="seating-frame" title="Seating Arrangement"></iframe>
   </div>
 
   <div class="kanban-wrap" id="kanban" style="display:none">
@@ -966,6 +971,7 @@
       document.getElementById('nav-circle-time').classList.toggle('active', view === 'circle-time');
       document.getElementById('nav-processing').classList.toggle('active', view === 'processing-letters' || view === 'processing-category');
       document.getElementById('nav-group-splitter').classList.toggle('active', view === 'group-splitter');
+      document.getElementById('nav-seating').classList.toggle('active', view === 'seating');
       document.getElementById('nav-kanban').classList.toggle('active', view === 'kanban');
     }
 
@@ -977,6 +983,7 @@
       document.getElementById('resource-list').style.display = 'none';
       document.getElementById('letter-stage').style.display = 'none';
       document.getElementById('group-splitter').style.display = 'none';
+      document.getElementById('seating').style.display = 'none';
       document.getElementById('kanban').style.display = 'none';
     }
 
@@ -1500,6 +1507,21 @@
       document.getElementById('group-splitter').style.display = '';
     }
 
+    function goToSeating() {
+      view = 'seating';
+      setActiveNav();
+      document.body.classList.remove('tv-mode');
+      document.getElementById('page-title').textContent = 'Seating Arrangement';
+      document.getElementById('subtitle').textContent = 'Plan where students sit, in a circle or at tables';
+      setCornerVideo(null);
+
+      hideAllPanels();
+      // Load once and keep it, so the plan stays put when switching views.
+      const frame = document.getElementById('seating-frame');
+      if (!frame.getAttribute('src')) frame.src = '../SeatingArrangement/SeatingArrangement.html?embed=1';
+      document.getElementById('seating').style.display = '';
+    }
+
     function goToKanban() {
       view = 'kanban';
       setActiveNav();
@@ -1791,6 +1813,7 @@
     document.getElementById('nav-circle-time').onclick = () => goToResourcePage('circle-time');
     document.getElementById('nav-processing').onclick = goToProcessing;
     document.getElementById('nav-group-splitter').onclick = goToGroupSplitter;
+    document.getElementById('nav-seating').onclick = goToSeating;
     document.getElementById('nav-kanban').onclick = goToKanban;
     document.getElementById('kanban-clear').onclick = clearKanban;
 

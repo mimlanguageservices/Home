@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1f2933">
+<title>Seating Arrangement</title>
+<style>
+  :root{
+    --bg:#111827; --card:#1f2937; --card-2:#273244;
+    --text:#f3f4f6; --muted:#9ca3af; --line:#374151;
+    --accent:#7c3aed; --danger:#dc2626; --ok:#059669;
+    --boy:#2563eb; --girl:#db2777;
+    --boy-bg:#cfe4ff; --boy-bg-2:#b4d4ff;
+    --girl-bg:#ffd9ec; --girl-bg-2:#ffc2e0;
+    --gender-text:#1f2937;
+    --floor:#1a2332; --board:#14532d; --wood:#c9a46c; --wood-edge:#a07c45;
+  }
+  /* Light look when embedded in the Curriculums site (?embed=1). */
+  html.light{
+    --bg:#f0f4f8; --card:#ffffff; --card-2:#f1f5f9;
+    --text:#1e293b; --muted:#64748b; --line:#e2e8f0;
+    --floor:#f8fafc;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  button{font-family:inherit; cursor:pointer;}
+  .wrap{max-width:520px; margin:0 auto; padding:16px;}
+  .wrap.wide{max-width:1200px;}
+
+  header{
+    display:flex; align-items:center; gap:10px;
+    padding:6px 2px 14px;
+  }
+  header .back{
+    border:0; background:var(--card); color:var(--text);
+    width:38px; height:38px; border-radius:10px; font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--line);
+  }
+  header .back[hidden]{display:none;}
+  header h1{font-size:17px; margin:0; font-weight:600; flex:1;}
+  header .gear{
+    border:0; background:transparent; color:var(--muted);
+    font-size:20px; width:38px; height:38px;
+  }
+  .crumb{color:var(--muted); font-size:13px; padding:0 2px 12px;}
+
+  .grid{display:flex; flex-direction:column; gap:12px;}
+
+  .tile{
+    border:0; text-align:left; width:100%;
+    background:var(--card); color:var(--text);
+    border-radius:14px; padding:18px 16px; font-size:18px; font-weight:600;
+    display:flex; align-items:center; gap:14px;
+    border:1px solid var(--line);
+  }
+  .tile:active{background:var(--card-2);}
+  .tile .sub{display:block; font-size:13px; font-weight:400; color:var(--muted); margin-top:2px;}
+
+  .avatar{
+    width:64px; height:64px; border-radius:50%; object-fit:cover;
+    background:var(--card-2); flex:none;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; color:var(--muted);
+  }
+
+  .search{
+    width:100%; border:1px solid var(--line); background:var(--card);
+    color:var(--text); border-radius:12px; padding:12px 14px; font-size:16px; margin-bottom:12px;
+  }
+  .search::placeholder{color:var(--muted);}
+
+  .action-btn{
+    border:0; width:100%; color:#fff; background:var(--accent);
+    border-radius:16px; padding:22px 18px; font-size:22px; font-weight:700;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .action-btn .sub{font-size:13px; font-weight:500; opacity:.85;}
+  .action-btn:active{filter:brightness(.9);}
+  .action-btn[disabled]{opacity:.45;}
+
+  .section-title{
+    font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted); margin:20px 2px 8px;
+  }
+  .section-title:first-child{margin-top:0;}
+
+  /* setup pickers */
+  .sizes{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  .sizes.two{grid-template-columns:repeat(2,1fr);}
+  .sizes.three{grid-template-columns:repeat(3,1fr);}
+  .size-btn{
+    border:1px solid var(--line); background:var(--card); color:var(--text);
+    border-radius:14px; padding:14px 6px; font-size:28px; font-weight:800;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+  }
+  .size-btn.small{font-size:16px; font-weight:700; padding:12px 6px;}
+  .size-btn .sub{font-size:12px; font-weight:500; color:var(--muted);}
+  .size-btn.on{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .size-btn.on .sub{color:#fff; opacity:.85;}
+  .size-btn[disabled]{opacity:.4;}
+
+  .toggle{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    border:1px solid var(--line); background:var(--card); color:var(--text);
+    border-radius:12px; padding:12px 14px; font-size:15px; margin-bottom:8px;
+  }
+  .toggle .sw{
+    width:42px; height:24px; border-radius:999px; background:var(--line);
+    position:relative; flex:none; transition:background .15s;
+  }
+  .toggle .sw::after{
+    content:""; position:absolute; top:3px; left:3px; width:18px; height:18px;
+    border-radius:50%; background:#fff; transition:left .15s;
+  }
+  .toggle.on .sw{background:var(--ok);}
+  .toggle.on .sw::after{left:21px;}
+  .toggle .lbl{flex:1;}
+  .toggle .lbl .sub{display:block; font-size:12px; color:var(--muted); margin-top:2px;}
+
+  .stepper{
+    display:flex; align-items:center; gap:12px;
+    border:1px solid var(--line); background:var(--card);
+    border-radius:12px; padding:8px 8px 8px 14px; font-size:15px;
+  }
+  .stepper .lbl{flex:1;}
+  .stepper .lbl .sub{display:block; font-size:12px; color:var(--muted); margin-top:2px;}
+  .stepper button{
+    width:40px; height:40px; border-radius:10px; font-size:22px; font-weight:700;
+    border:1px solid var(--line); background:var(--card-2); color:var(--text);
+  }
+  .stepper .val{min-width:28px; text-align:center; font-size:20px; font-weight:800;}
+
+  .sticky-go{position:sticky; bottom:12px; margin-top:18px;}
+
+  /* plan screen */
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .tool-btn{
+    border:1px solid var(--line); background:var(--card); color:var(--text);
+    border-radius:12px; padding:10px 14px; font-size:14px; font-weight:600;
+  }
+  .tool-btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .tool-btn.danger{color:var(--danger);}
+  .tool-btn:active{filter:brightness(.92);}
+
+  .selbar{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-height:46px;
+    background:var(--card-2); border:1px solid var(--line); border-radius:12px;
+    padding:6px 8px 6px 14px; margin-bottom:10px; font-size:14px;
+  }
+  .selbar .what{flex:1; min-width:140px; font-weight:600;}
+  .selbar .hint{flex:1; color:var(--muted); font-weight:400;}
+  .selbar .tool-btn{padding:7px 12px; font-size:13px;}
+
+  /* The room: 100 units wide x 75 tall, where 1 unit = 1cqw of the room. */
+  .room{
+    position:relative; width:100%; aspect-ratio:4/3; container-type:inline-size;
+    background:var(--floor); border:2px solid var(--line); border-radius:14px;
+    overflow:hidden; user-select:none; -webkit-user-select:none;
+  }
+  .board{
+    position:absolute; left:20cqw; right:20cqw; top:0; height:4cqw;
+    background:var(--board); color:#dcfce7; border-radius:0 0 1cqw 1cqw;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.8cqw; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+  }
+  .item{
+    position:absolute; transform:translate(-50%,-50%);
+    touch-action:none; cursor:grab;
+  }
+  .item.dragging{cursor:grabbing; z-index:20; opacity:.85;}
+  .item.sel{z-index:10;}
+
+  .seat{
+    width:calc(var(--s) * 1cqw); height:calc(var(--s) * 1.25cqw);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    gap:calc(var(--s) * .04cqw);
+  }
+  .seat .avatar{
+    width:calc(var(--s) * .78cqw); height:calc(var(--s) * .78cqw);
+    font-size:calc(var(--s) * .26cqw); background:var(--card-2);
+    border:calc(var(--s) * .05cqw) solid var(--card);
+  }
+  .seat.boy .avatar{box-shadow:0 0 0 calc(var(--s) * .06cqw) var(--boy);}
+  .seat.girl .avatar{box-shadow:0 0 0 calc(var(--s) * .06cqw) var(--girl);}
+  .seat .nm{
+    max-width:calc(var(--s) * 1.5cqw); padding:0 calc(var(--s) * .06cqw);
+    border-radius:calc(var(--s) * .08cqw);
+    font-size:calc(var(--s) * .2cqw); font-weight:700; line-height:1.15;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    background:var(--card); color:var(--text);
+  }
+  .seat.boy .nm{background:var(--boy-bg); color:var(--gender-text);}
+  .seat.girl .nm{background:var(--girl-bg); color:var(--gender-text);}
+  .seat.empty .avatar{
+    background:transparent; border:calc(var(--s) * .05cqw) dashed var(--muted);
+    color:var(--muted); font-size:calc(var(--s) * .4cqw); font-weight:400;
+  }
+  .seat.empty .nm{background:transparent; color:var(--muted); font-weight:600;}
+  .seat.sel .avatar{outline:calc(var(--s) * .08cqw) solid var(--accent); outline-offset:calc(var(--s) * .06cqw);}
+  .room.picking .seat.empty .avatar{border-color:var(--accent); color:var(--accent);}
+
+  .table{
+    background:var(--wood); border:.3cqw solid var(--wood-edge); border-radius:1cqw;
+    display:flex; align-items:center; justify-content:center;
+    color:rgba(60,40,10,.75); font-weight:800; font-size:calc(var(--s) * .3cqw);
+  }
+  .table.sel{outline:.5cqw solid var(--accent);}
+
+  .teacher{
+    background:var(--accent); color:#fff; border-radius:1cqw;
+    display:flex; align-items:center; justify-content:center; gap:.6cqw;
+    font-weight:700; font-size:1.7cqw; white-space:nowrap; overflow:hidden;
+    box-shadow:0 .3cqw .8cqw rgba(0,0,0,.25);
+  }
+  .teacher.sel{outline:.5cqw solid #fbbf24;}
+
+  .passage{
+    border-radius:.6cqw; color:var(--muted);
+    background:repeating-linear-gradient(45deg, rgba(148,163,184,.22) 0 1cqw, rgba(148,163,184,.08) 1cqw 2cqw);
+    border:.2cqw dashed rgba(148,163,184,.6);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4cqw; font-weight:700; letter-spacing:.15em; text-transform:uppercase; overflow:hidden;
+  }
+  .passage.vert span{writing-mode:vertical-rl;}
+  .passage.sel{outline:.5cqw solid var(--accent);}
+
+  /* students without a seat */
+  .tray{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px;}
+  .chip{
+    display:flex; align-items:center; gap:10px; text-align:left;
+    border:2px solid transparent; background:var(--card); color:var(--text);
+    border-radius:12px; padding:6px 10px; font-size:14px; font-weight:600;
+  }
+  .chip .avatar{width:36px; height:36px; font-size:13px;}
+  .chip .nm{flex:1; min-width:0; overflow-wrap:anywhere;}
+  .chip.boy{background:var(--boy-bg); color:var(--gender-text);}
+  .chip.girl{background:var(--girl-bg); color:var(--gender-text);}
+  .chip.boy .avatar{box-shadow:0 0 0 2px var(--boy);}
+  .chip.girl .avatar{box-shadow:0 0 0 2px var(--girl);}
+  .chip.on{border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,58,237,.35);}
+
+  /* saved plans */
+  .saved{display:flex; flex-direction:column; gap:8px;}
+  .saved-row{
+    display:flex; align-items:center; gap:8px;
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:4px 4px 4px 0;
+  }
+  .saved-row .open{
+    flex:1; min-width:0; border:0; background:none; color:var(--text); text-align:left;
+    padding:10px 14px; font-size:16px; font-weight:600;
+  }
+  .saved-row .open .sub{display:block; font-size:12px; font-weight:400; color:var(--muted); margin-top:2px;}
+  .saved-row .del{
+    border:0; background:none; color:var(--muted); font-size:18px; width:40px; height:40px; border-radius:10px;
+  }
+  .saved-row .del:hover{color:var(--danger); background:var(--card-2);}
+
+  .msg{
+    text-align:center; color:var(--muted); padding:40px 10px; font-size:15px;
+  }
+
+  /* toast */
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(calc(100% + 40px));
+    background:var(--ok); color:#fff; padding:14px 22px; border-radius:12px;
+    font-weight:600; font-size:15px; transition:transform .25s ease; z-index:50;
+    max-width:90vw; text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--danger);}
+
+  /* dialogs */
+  dialog{
+    border:0; border-radius:16px; padding:20px; width:calc(100% - 32px); max-width:460px;
+    background:var(--card); color:var(--text);
+  }
+  dialog::backdrop{background:rgba(0,0,0,.6);}
+  dialog h2{margin:0 0 6px; font-size:17px;}
+  dialog p{margin:0 0 14px; font-size:13px; color:var(--muted);}
+  dialog input{
+    width:100%; border:1px solid var(--line); background:var(--bg); color:var(--text);
+    border-radius:10px; padding:11px 12px; font-size:14px; margin-bottom:14px;
+  }
+  dialog .row{display:flex; gap:10px; justify-content:flex-end;}
+  dialog button{
+    border:0; border-radius:10px; padding:10px 16px; font-size:14px; font-weight:600;
+    background:var(--card-2); color:var(--text);
+  }
+  dialog button.primary{background:var(--accent); color:#fff;}
+
+  .print-title{display:none;}
+  @media print{
+    :root, html.light{
+      --bg:#fff; --card:#fff; --card-2:#f1f5f9; --text:#111; --muted:#555; --line:#ccc; --floor:#fff;
+    }
+    body{background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    header, .crumb, .toolbar, .selbar, .no-print, .toast{display:none !important;}
+    .wrap{max-width:none; padding:0;}
+    .print-title{display:block; font-size:18px; font-weight:700; margin:0 0 8px;}
+    .room{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <header>
+    <button class="back" id="backBtn" hidden aria-label="Back">&#8592;</button>
+    <h1 id="title">Seating Arrangement</h1>
+    <button class="gear" id="gearBtn" aria-label="Settings">&#9881;</button>
+  </header>
+  <div class="crumb" id="crumb"></div>
+  <div id="view"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="settings">
+  <h2>Web App URL</h2>
+  <p>This app reads the same student list as the Discipline app. Paste the Web App URL from deploying <b>Discipline/DisciplineScript.gs</b>.</p>
+  <input id="urlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="row" style="justify-content:space-between;">
+    <button id="lockBtn">Lock app</button>
+    <span>
+      <button id="cancelSettings">Cancel</button>
+      <button class="primary" id="saveSettings">Save</button>
+    </span>
+  </div>
+</dialog>
+
+<dialog id="saveDialog">
+  <h2>Save this seating plan</h2>
+  <p>Give it a name so you can open it again later. Saving with the same name replaces the old plan.</p>
+  <form id="saveForm" method="dialog">
+    <input id="saveName" type="text" maxlength="60" placeholder="e.g. Term 2 circle" autocomplete="off">
+    <div class="row">
+      <button type="button" id="cancelSave">Cancel</button>
+      <button class="primary" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* ------------------------------------------------------------------
+   CONFIG
+   Same Web App as Discipline.html and GroupSplitter.html — the roster
+   comes from the disciplinary spreadsheet (Sheet1: Class, Name, Photo
+   ... Gender). The PIN, URL and saved roster share Discipline's
+   storage keys, so unlocking one app unlocks the others on this device.
+------------------------------------------------------------------ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQBWAAYOyRs5bKDhe5J5aZ_qLK7wzcLiAfjLwUEE51DmMYq3mw02K1AaLi9OaHRjQ9nQ/exec";
+
+const TABLE_SIZES = [2, 3, 4, 5, 6];
+
+/* Room coordinates: 100 units wide x 75 tall (4:3). 1 unit = 1cqw. */
+const ROOM_W = 100, ROOM_H = 75;
+
+/* Table seat geometry, in multiples of the seat size S. */
+const SEAT_PITCH = 1.1;   // centre-to-centre distance along a table
+const TABLE_DEPTH = 0.55; // table height
+const SEAT_OFF = 0.92;    // table centre to seat centre
+
+const params = new URLSearchParams(location.search);
+if(params.get("embed") === "1") document.documentElement.classList.add("light");
+
+const state = {
+  screen: "class",     // pin -> class -> setup -> plan
+  students: [],
+  className: null,
+  layout: "groups",    // "circle" | "groups"
+  size: 4,             // seats per table
+  teacher: "front",    // "front" | "circle" | "none"
+  passages: true,
+  extra: 0,            // extra empty seats
+  mixGender: true,
+  plan: null,          // { layout, size, seat, items:[...] }
+  planName: null,      // name of the saved plan on screen, if any
+  saved: {},           // class -> [{ name, ts, plan }]
+  lastPlans: {},       // class -> plan
+  sel: null,           // id of the selected item in the room
+  pick: null,          // name of a student from the tray, waiting for a seat
+  loading: false,
+  refreshing: false,
+  error: null,
+  pinError: null
+};
+
+const els = {
+  wrap: document.getElementById("wrap"),
+  view: document.getElementById("view"),
+  title: document.getElementById("title"),
+  crumb: document.getElementById("crumb"),
+  back: document.getElementById("backBtn"),
+  gear: document.getElementById("gearBtn"),
+  toast: document.getElementById("toast"),
+  dialog: document.getElementById("settings"),
+  urlInput: document.getElementById("urlInput"),
+  saveDialog: document.getElementById("saveDialog"),
+  saveName: document.getElementById("saveName")
+};
+
+function getUrl(){
+  return (store.get("disciplineUrl") || SCRIPT_URL || "").trim();
+}
+function getPin(){
+  return (store.get("disciplinePin") || "").trim();
+}
+function lockApp(){
+  store.remove("disciplinePin");
+  state.screen = "pin";
+  render();
+}
+
+/* localStorage can throw (private windows, blocked storage) — never let that break the app. */
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(_){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(_){} },
+  remove(k){ try{ localStorage.removeItem(k); }catch(_){} }
+};
+
+/* Build a request URL with the shared params + PIN attached. */
+function apiUrl(paramObj){
+  const url = getUrl();
+  const p = new URLSearchParams(paramObj);
+  p.set("pin", getPin());
+  return url + (url.includes("?") ? "&" : "?") + p.toString();
+}
+
+/* GET the script and parse JSON. A rejected PIN sends the user back
+   to the PIN screen and resolves to null. */
+async function api(paramObj){
+  const res = await fetch(apiUrl(paramObj));
+  const raw = await res.text();
+  let data;
+  try{ data = JSON.parse(raw); }
+  catch(_){
+    throw new Error("Server did not return JSON (HTTP " + res.status + "). " +
+      "This usually means the Web App is asking for a Google login. " +
+      "First 120 chars: " + raw.slice(0,120));
+  }
+  if(data.unauthorized){
+    // A temporary lockout (too many wrong PINs, from any device) is not a
+    // wrong PIN — keep the saved one so this device stays unlocked.
+    if(/too many/i.test(data.error || "")) throw new Error(data.error);
+    store.remove("disciplinePin");
+    state.screen = "pin";
+    state.pinError = data.error || "Incorrect PIN.";
+    render();
+    return null;
+  }
+  if(!data.success) throw new Error(data.error || "Request failed");
+  return data;
+}
+
+/* ---------- saved data (instant load) ---------- */
+const CACHE_KEY = "disciplineRoster";        // shared with Discipline.html
+const PREFS_KEY = "seatingPrefs";            // setup choices, last + saved plans
+function readCache(){
+  try{ return JSON.parse(store.get(CACHE_KEY) || "null"); }catch(_){ return null; }
+}
+function writeCache(students){
+  store.set(CACHE_KEY, JSON.stringify({ ts: Date.now(), students: students }));
+}
+function loadPrefs(){
+  let p = null;
+  try{ p = JSON.parse(store.get(PREFS_KEY) || "null"); }catch(_){}
+  if(!p) return;
+  if(p.layout === "circle" || p.layout === "groups") state.layout = p.layout;
+  if(TABLE_SIZES.includes(p.size)) state.size = p.size;
+  if(["front","circle","none"].includes(p.teacher)) state.teacher = p.teacher;
+  if(typeof p.passages === "boolean") state.passages = p.passages;
+  if(Number.isInteger(p.extra) && p.extra >= 0) state.extra = p.extra;
+  if(typeof p.mixGender === "boolean") state.mixGender = p.mixGender;
+  if(p.lastPlans && typeof p.lastPlans === "object") state.lastPlans = p.lastPlans;
+  if(p.saved && typeof p.saved === "object") state.saved = p.saved;
+}
+function savePrefs(){
+  store.set(PREFS_KEY, JSON.stringify({
+    layout: state.layout, size: state.size, teacher: state.teacher,
+    passages: state.passages, extra: state.extra, mixGender: state.mixGender,
+    lastPlans: state.lastPlans, saved: state.saved
+  }));
+}
+
+/* ---------- data ---------- */
+async function loadRoster(){
+  const url = getUrl();
+  if(!url){ openSettings(); return; }
+  if(!getPin()){ state.screen = "pin"; render(); return; }
+  state.error = null;
+
+  // 1. Paint immediately from the last saved list, if we have one.
+  const cached = readCache();
+  const haveCache = cached && Array.isArray(cached.students) && cached.students.length;
+  if(haveCache){
+    state.students = cached.students;
+    state.loading = false;
+    state.refreshing = true;
+    if(state.screen === "pin") state.screen = "class";
+  }else{
+    state.loading = true;
+  }
+  render();
+
+  // 2. Refresh from the server in the background.
+  try{
+    const data = await api({ mode:"roster" });
+    if(!data){ state.loading = false; state.refreshing = false; return; }
+    const fresh = data.students || [];
+    if(fresh.length){
+      state.students = fresh;
+      writeCache(fresh);
+    }else if(!haveCache){
+      state.error = "The script ran but returned 0 students. " +
+        "The tab it read is probably not the roster tab — check ROSTER_SHEET_NAME in DisciplineScript.gs.";
+    }
+  }catch(err){
+    if(haveCache){
+      toast("Showing saved list — couldn't refresh", true);
+    }else{
+      state.error = err.message;
+      state.students = [];
+    }
+  }
+  state.loading = false;
+  state.refreshing = false;
+  // Don't re-render the plan screen — that would drop a half-done swap.
+  if(state.screen !== "plan") render();
+}
+
+/* ---------- building a plan ---------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+function uid(){ return "i" + Math.random().toString(36).slice(2, 9); }
+
+/* Merge two lists so each is spread evenly through the result,
+   e.g. 6 boys + 3 girls -> B B G B B G B B G. */
+function interleave(a, b){
+  if(Math.random() < 0.5) [a, b] = [b, a];
+  const out = [];
+  let i = 0, j = 0;
+  while(i < a.length || j < b.length){
+    const fa = a.length ? i / a.length : 1, fb = b.length ? j / b.length : 1;
+    if(j >= b.length || (i < a.length && fa <= fb)) out.push(a[i++]);
+    else out.push(b[j++]);
+  }
+  return out;
+}
+function byGender(list){
+  return {
+    boys: shuffle(list.filter(s => s.gender === "boy")),
+    girls: shuffle(list.filter(s => s.gender === "girl")),
+    other: shuffle(list.filter(s => s.gender !== "boy" && s.gender !== "girl"))
+  };
+}
+
+function teacherDesk(){
+  return { id: uid(), t: "teacher", x: 50, y: 10, w: 16, h: 5 };
+}
+
+/* Seats evenly round an oval. "In the circle" puts the teacher at the
+   top of the ring; passages leave a gap at the bottom with a walkway
+   to the back wall. */
+function circlePlan(n){
+  const teacherIn = state.teacher === "circle";
+  const m = n + state.extra;
+  const slots = Math.max(1, m + (teacherIn ? 1 : 0) + (state.passages ? 1 : 0));
+  const cx = 50, cy = 44, rx = 42, ry = 27;
+  const perim = Math.PI * (3 * (rx + ry) - Math.sqrt((3 * rx + ry) * (rx + 3 * ry)));
+  // Seats are taller than wide, so leave more room than the arc spacing alone suggests.
+  const S = clamp(perim / slots * 0.68, 3, 10);
+  const gapAt = state.passages ? Math.round(slots / 2) : -1;
+  const items = [];
+  for(let k = 0; k < slots; k++){
+    const a = -Math.PI / 2 + 2 * Math.PI * k / slots;
+    const x = cx + rx * Math.cos(a), y = cy + ry * Math.sin(a);
+    if(teacherIn && k === 0) items.push({ id: uid(), t: "teacher", x, y, w: S * 2, h: S * 1.1 });
+    else if(k === gapAt) items.push({ id: uid(), t: "passage", x, y: (y + ROOM_H) / 2, w: S * 1.1, h: ROOM_H - y });
+    else items.push({ id: uid(), t: "seat", x, y, s: null });
+  }
+  if(state.teacher === "front") items.push(teacherDesk());
+  return { layout: "circle", size: state.size, seat: S, items };
+}
+
+/* Tables of `size` seats laid out in the grid that gives the biggest
+   seats. Passages run between the table columns and across the front. */
+function groupsPlan(n){
+  const size = state.size;
+  const tables = Math.max(1, Math.ceil((n + state.extra) / size));
+  const footW = Math.ceil(size / 2) * SEAT_PITCH + 0.3;
+  const footH = 2 * SEAT_OFF + 1.25;
+  const front = state.teacher === "none" ? 8 : 17;
+  let best = null;
+  for(let c = 1; c <= tables; c++){
+    const r = Math.ceil(tables / c);
+    const cellW = 96 / c, cellH = (ROOM_H - 1 - front) / r;
+    const S = Math.min(cellW * 0.8 / footW, cellH * 0.9 / footH, 10);
+    if(!best || S > best.S) best = { c, r, cellW, cellH, S };
+  }
+  const items = [];
+  if(state.passages){
+    const gw = clamp(best.cellW - footW * best.S, 1.5, 5) * 0.7;
+    for(let c = 1; c < best.c; c++){
+      items.push({ id: uid(), t: "passage", x: 2 + best.cellW * c, y: (front - 2 + ROOM_H) / 2, w: gw, h: ROOM_H - front + 2 });
+    }
+    items.push({ id: uid(), t: "passage", x: 50, y: front - 2, w: ROOM_W, h: 2.5 });
+  }
+  // Keep every row on the same columns so tables stay clear of the passages.
+  for(let i = 0; i < tables; i++){
+    const r = Math.floor(i / best.c), c = i % best.c;
+    const x = 2 + best.cellW * (c + 0.5);
+    const y = front + best.cellH * (r + 0.5);
+    const tbl = { id: uid(), t: "table", x, y, n: size, no: i + 1 };
+    items.push(tbl);
+    for(let k = 0; k < size; k++) items.push({ id: uid(), t: "seat", tb: tbl.id, k, s: null });
+  }
+  if(state.teacher !== "none") items.push(teacherDesk());
+  return { layout: "groups", size, seat: best.S, items };
+}
+
+/* Put the class into the plan's seats. Tables are dealt round-robin
+   (boys first, then girls, so both are spread across tables). Loose
+   seats are filled in order round the room with any empty seats spread
+   out; with mixing on, boys and girls alternate. Anyone who doesn't fit
+   is left in the "not seated" tray. */
+function assignSeats(plan){
+  const seats = plan.items.filter(it => it.t === "seat");
+  seats.forEach(st => { st.s = null; });
+  const tableIds = new Set(plan.items.filter(it => it.t === "table").map(it => it.id));
+  const tableSeats = shuffle([...tableIds])
+    .map(id => shuffle(seats.filter(st => st.tb === id)))
+    .filter(l => l.length);
+  const loose = seats.filter(st => !tableIds.has(st.tb));
+  const g = byGender(classStudents());
+  let rest;
+
+  if(tableSeats.length){
+    const order = state.mixGender ? g.boys.concat(g.girls, g.other) : shuffle(g.boys.concat(g.girls, g.other));
+    const fill = tableSeats.map(() => 0);
+    let t = 0;
+    rest = [];
+    order.forEach(stu => {
+      let tries = 0;
+      while(tries < tableSeats.length && fill[t] >= tableSeats[t].length){ t = (t + 1) % tableSeats.length; tries++; }
+      if(tries >= tableSeats.length){ rest.push(stu); return; }
+      tableSeats[t][fill[t]++].s = stu.name;
+      t = (t + 1) % tableSeats.length;
+    });
+  }else{
+    rest = state.mixGender ? interleave(interleave(g.boys, g.girls), g.other) : shuffle(g.boys.concat(g.girls, g.other));
+  }
+
+  // Loose seats in order round their centre, starting at the top.
+  if(loose.length && rest.length){
+    const cx = loose.reduce((a, st) => a + st.x, 0) / loose.length;
+    const cy = loose.reduce((a, st) => a + st.y, 0) / loose.length;
+    const ang = st => (Math.atan2(st.y - cy, st.x - cx) + Math.PI * 2.5) % (Math.PI * 2);
+    loose.sort((a, b) => ang(a) - ang(b));
+    const n = Math.min(rest.length, loose.length);
+    for(let i = 0; i < n; i++) loose[Math.floor(i * loose.length / n)].s = rest[i].name;
+  }
+}
+
+function describePlan(n){
+  const m = n + state.extra;
+  if(!m) return "No students in this class";
+  if(state.layout === "circle"){
+    return m + " seats in a circle" + (state.teacher === "circle" ? " + teacher" : "");
+  }
+  const t = Math.ceil(m / state.size);
+  const empty = t * state.size - n;
+  return t + (t === 1 ? " table" : " tables") + " of " + state.size +
+    (empty ? " · " + empty + " empty seat" + (empty === 1 ? "" : "s") : "");
+}
+
+/* Where an item sits. Table seats follow their table: the first half
+   along the top edge, the rest along the bottom. */
+function itemPos(it){
+  if(it.t === "seat" && it.tb){
+    const tbl = findItem(it.tb);
+    if(tbl){
+      const S = state.plan.seat;
+      const top = Math.ceil(tbl.n / 2);
+      const row = it.k < top ? 0 : 1;
+      const idx = row ? it.k - top : it.k;
+      const cnt = row ? tbl.n - top : top;
+      return {
+        x: tbl.x + (idx - (cnt - 1) / 2) * SEAT_PITCH * S,
+        y: tbl.y + (row ? 1 : -1) * SEAT_OFF * S
+      };
+    }
+  }
+  return { x: it.x, y: it.y };
+}
+function findItem(id){ return state.plan.items.find(it => it.id === id); }
+
+/* ---------- screens ---------- */
+function classes(){
+  const set = [];
+  state.students.forEach(s => { if(s.class && !set.includes(s.class)) set.push(s.class); });
+  return set;
+}
+function classStudents(){
+  return state.students.filter(s => s.class === state.className);
+}
+
+function render(){
+  const locked = state.screen === "pin";
+  els.back.hidden = locked || state.screen === "class";
+  els.gear.style.visibility = locked ? "hidden" : "visible";
+  els.wrap.classList.toggle("wide", state.screen === "plan" || state.screen === "setup");
+  els.crumb.textContent =
+    locked ? "" :
+    state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
+    state.screen === "setup" ? "Choose how the room is set out, then create the plan" :
+    state.screen === "plan" ? "Tap two seats to swap · drag anything to move it" :
+    "";
+
+  if(locked) return renderPin();
+
+  if(state.loading){
+    els.title.textContent = "Loading…";
+    els.view.innerHTML = '<div class="msg">Fetching the student list for the first time…<br>' +
+      'After this it opens instantly.</div>';
+    return;
+  }
+
+  if(state.screen === "class") return renderClasses();
+  if(state.screen === "plan")  return renderPlan();
+  return renderSetup();
+}
+
+function renderPin(){
+  els.title.textContent = "Enter PIN";
+  els.view.innerHTML =
+    '<form id="pinForm" class="grid" style="margin-top:24px;">' +
+      '<input class="search" id="pinInput" type="password" inputmode="numeric" ' +
+        'autocomplete="off" placeholder="PIN" style="text-align:center; letter-spacing:6px; font-size:20px;">' +
+      (state.pinError ? '<div class="msg" style="color:var(--danger); padding:4px 0;">' + esc(state.pinError) + '</div>' : '') +
+      '<button class="action-btn" type="submit">Unlock</button>' +
+    '</form>';
+  const input = document.getElementById("pinInput");
+  input.focus({preventScroll:true});
+  document.getElementById("pinForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = input.value.trim();
+    if(!v) return;
+    store.set("disciplinePin", v);
+    state.pinError = null;
+    state.screen = "class";
+    loadRoster();
+  });
+}
+
+function renderClasses(){
+  els.title.textContent = "Choose a class";
+  const list = classes();
+  if(!list.length){
+    els.view.innerHTML =
+      '<div class="msg" style="text-align:left; word-break:break-word;">' +
+        (state.error ? esc(state.error) : "No students found.") +
+      '</div>' +
+      '<button class="tile" onclick="loadRoster()">↻&nbsp; Retry</button>';
+    return;
+  }
+  els.view.innerHTML = '<div class="grid">' + list.map((c, i) => {
+    const n = state.students.filter(s => s.class === c).length;
+    return '<button class="tile" onclick="pickClass(' + i + ')">' +
+             '<span>Class ' + esc(c) + '<span class="sub">' + n + ' students</span></span>' +
+           '</button>';
+  }).join("") + '</div>';
+}
+
+function renderSetup(){
+  els.title.textContent = "Class " + state.className;
+  const n = classStudents().length;
+  const circle = state.layout === "circle";
+
+  const layouts =
+    '<button class="size-btn small' + (circle ? ' on' : '') + '" onclick="setLayout(\'circle\')">⭕&nbsp; Circle' +
+      '<span class="sub">Everyone round one ring</span></button>' +
+    '<button class="size-btn small' + (!circle ? ' on' : '') + '" onclick="setLayout(\'groups\')">▦&nbsp; Groups' +
+      '<span class="sub">Students at tables</span></button>';
+
+  const sizes = TABLE_SIZES.map(k =>
+    '<button class="size-btn' + (state.size === k ? ' on' : '') + '" onclick="setSize(' + k + ')">' +
+      k + '<span class="sub">per table</span>' +
+    '</button>').join("");
+
+  const teacherOpts = [
+    ["front", "Front desk"],
+    ["circle", "In the circle"],
+    ["none", "No teacher"]
+  ].map(([v, label]) => {
+    const disabled = v === "circle" && !circle;
+    const on = state.teacher === v || (v === "front" && state.teacher === "circle" && !circle);
+    return '<button class="size-btn small' + (on ? ' on' : '') + '"' + (disabled ? ' disabled' : '') +
+      ' onclick="setTeacher(\'' + v + '\')">' + label + '</button>';
+  }).join("");
+
+  const saved = savedList().map((x, i) =>
+    '<div class="saved-row">' +
+      '<button class="open" onclick="openSaved(' + i + ')">' + esc(x.name) +
+        '<span class="sub">' + (x.plan.layout === "circle" ? "Circle" : "Tables of " + x.plan.size) +
+          ' · ' + esc(fmtDate(x.ts)) + '</span>' +
+      '</button>' +
+      '<button class="del" onclick="deleteSaved(' + i + ')" aria-label="Delete ' + esc(x.name) + '">🗑</button>' +
+    '</div>').join("");
+
+  const last = state.lastPlans[state.className];
+
+  els.view.innerHTML =
+    (saved ? '<div class="section-title">Saved seating plans</div><div class="saved">' + saved + '</div>' : '') +
+    '<div class="section-title">Layout</div>' +
+    '<div class="sizes two">' + layouts + '</div>' +
+    (circle ? '' : '<div class="section-title">Table size</div><div class="sizes">' + sizes + '</div>') +
+    '<div class="section-title">Teacher</div>' +
+    '<div class="sizes three">' + teacherOpts + '</div>' +
+    '<div class="section-title">Options</div>' +
+    '<button class="toggle' + (state.passages ? ' on' : '') + '" onclick="togglePassages()">' +
+      '<span class="lbl">Passages<span class="sub">' +
+        (circle ? 'Leave a gap in the circle with a walkway to the back' : 'Leave walkways between the tables and across the front') +
+      '</span></span><span class="sw"></span>' +
+    '</button>' +
+    '<button class="toggle' + (state.mixGender ? ' on' : '') + '" onclick="toggleMix()">' +
+      '<span class="lbl">Mix boys and girls<span class="sub">' +
+        (circle ? 'Alternate boys and girls round the circle' : 'Spread boys and girls evenly across tables') +
+      '</span></span><span class="sw"></span>' +
+    '</button>' +
+    '<div class="stepper">' +
+      '<span class="lbl">Extra empty seats<span class="sub">For visitors, new students or spacing</span></span>' +
+      '<button onclick="setExtra(-1)" aria-label="Fewer">−</button>' +
+      '<span class="val">' + state.extra + '</span>' +
+      '<button onclick="setExtra(1)" aria-label="More">+</button>' +
+    '</div>' +
+    '<div class="sticky-go">' +
+      '<button class="action-btn" onclick="createPlan()"' + (n + state.extra ? '' : ' disabled') + '>' +
+        'Create seating plan<span class="sub">' + n + ' students · ' + esc(describePlan(n)) + '</span>' +
+      '</button>' +
+      (last ? '<button class="tile" style="margin-top:10px; justify-content:center; font-size:15px;" onclick="showLast()">' +
+                'Open last plan for ' + esc(state.className) + '</button>' : '') +
+    '</div>';
+}
+
+/* First names on the seats; add a surname initial when two students
+   in the class share a first name. */
+function seatLabels(){
+  const list = classStudents();
+  const count = {};
+  list.forEach(s => { const f = firstName(s.name); count[f] = (count[f] || 0) + 1; });
+  const out = {};
+  list.forEach(s => {
+    const parts = s.name.split(" ");
+    const f = parts[0];
+    out[s.name] = count[f] > 1 && parts[1] ? f + " " + parts[1][0] + "." : f;
+  });
+  return out;
+}
+
+function renderPlan(){
+  const plan = state.plan;
+  const heading = "Class " + state.className + " · " +
+    (state.planName || (plan.layout === "circle" ? "Circle" : "Tables of " + plan.size));
+  els.title.textContent = heading;
+
+  const byName = {};
+  classStudents().forEach(s => { byName[s.name] = s; });
+  const labels = seatLabels();
+  const seated = new Set(plan.items.filter(it => it.t === "seat" && byName[it.s]).map(it => it.s));
+  const unseated = classStudents().filter(s => !seated.has(s.name)).sort((a, b) => a.name.localeCompare(b.name));
+  const hasTeacher = plan.items.some(it => it.t === "teacher");
+  const rank = { passage: 0, table: 1, seat: 2, teacher: 3 };
+  const items = plan.items.slice().sort((a, b) => rank[a.t] - rank[b.t]);
+
+  els.view.innerHTML =
+    '<div class="toolbar">' +
+      '<button class="tool-btn primary" onclick="reshuffle()">🔀&nbsp; Reshuffle students</button>' +
+      '<button class="tool-btn" onclick="openSaveDialog()">💾&nbsp; Save as…</button>' +
+      '<button class="tool-btn" onclick="window.print()">🖨&nbsp; Print</button>' +
+      '<button class="tool-btn" onclick="addSeat()">＋ Empty seat</button>' +
+      (plan.layout === "groups" ? '<button class="tool-btn" onclick="addTable()">＋ Table</button>' : '') +
+      '<button class="tool-btn" onclick="addPassage()">＋ Passage</button>' +
+      (hasTeacher ? '' : '<button class="tool-btn" onclick="addTeacher()">＋ Teacher</button>') +
+      '<button class="tool-btn" onclick="resizeSeats(1/1.1)" aria-label="Smaller seats">A−</button>' +
+      '<button class="tool-btn" onclick="resizeSeats(1.1)" aria-label="Bigger seats">A+</button>' +
+      '<button class="tool-btn" onclick="goBack()">Change layout</button>' +
+    '</div>' +
+    '<div class="selbar">' + selbarHtml(byName) + '</div>' +
+    '<div class="print-title">' + esc(heading) + '</div>' +
+    '<div class="room' + (state.pick ? ' picking' : '') + '" id="room" style="--s:' + plan.seat.toFixed(2) + ';">' +
+      '<div class="board">Board</div>' +
+      items.map(it => itemHtml(it, byName, labels)).join("") +
+    '</div>' +
+    '<div class="no-print">' +
+      '<div class="section-title">Not seated: ' + unseated.length + '</div>' +
+      (unseated.length
+        ? '<div class="crumb" style="padding-top:0;">Tap a student, then tap a seat to put them there.</div>' +
+          '<div class="tray">' + unseated.map(s =>
+            '<button class="chip' + genderCls(s) + (state.pick === s.name ? ' on' : '') + '" ' +
+              'onclick="pickStudent(' + state.students.indexOf(s) + ')">' +
+              avatar(s) + '<span class="nm">' + esc(s.name) + '</span></button>').join("") + '</div>'
+        : '<div class="crumb" style="padding-top:0;">Everyone in ' + esc(state.className) + ' has a seat.</div>') +
+    '</div>';
+
+  wireRoom();
+}
+
+function itemHtml(it, byName, labels){
+  const p = itemPos(it);
+  const S = state.plan.seat;
+  let style = 'left:' + (p.x / ROOM_W * 100).toFixed(3) + '%;top:' + (p.y / ROOM_H * 100).toFixed(3) + '%;';
+  const sel = state.sel === it.id ? ' sel' : '';
+
+  if(it.t === "seat"){
+    const s = byName[it.s];
+    if(!s){
+      return '<div class="item seat empty' + sel + '" data-id="' + it.id + '" style="' + style + '">' +
+               '<div class="avatar">+</div><div class="nm">Empty</div></div>';
+    }
+    return '<div class="item seat' + genderCls(s) + sel + '" data-id="' + it.id + '" style="' + style + '" title="' + esc(s.name) + '">' +
+             avatar(s) + '<div class="nm">' + esc(labels[s.name] || firstName(s.name)) + '</div></div>';
+  }
+  if(it.t === "table"){
+    const top = Math.ceil(it.n / 2);
+    style += 'width:' + (top * SEAT_PITCH * S).toFixed(2) + 'cqw;height:' + (TABLE_DEPTH * S).toFixed(2) + 'cqw;';
+    return '<div class="item table' + sel + '" data-id="' + it.id + '" style="' + style + '">' + (it.no || "") + '</div>';
+  }
+  style += 'width:' + it.w.toFixed(2) + 'cqw;height:' + it.h.toFixed(2) + 'cqw;';
+  if(it.t === "teacher"){
+    style += 'font-size:' + Math.min(1.7, it.w * 0.15).toFixed(2) + 'cqw;';
+    return '<div class="item teacher' + sel + '" data-id="' + it.id + '" style="' + style + '">🧑‍🏫' +
+             '<span>Teacher</span></div>';
+  }
+  return '<div class="item passage' + (it.h > it.w ? ' vert' : '') + sel + '" data-id="' + it.id + '" style="' + style + '">' +
+           (Math.max(it.w, it.h) >= 12 ? '<span>Passage</span>' : '') + '</div>';
+}
+
+function selbarHtml(byName){
+  const it = state.sel && findItem(state.sel);
+  if(state.pick){
+    return '<span class="what">Seat ' + esc(state.pick) + ' — tap a seat</span>' +
+           '<button class="tool-btn" onclick="clearSel()">Cancel</button>';
+  }
+  if(!it){
+    return '<span class="hint">Tap a seat, table, passage or the teacher to change it. ' +
+           'Drag to move. Tap two seats to swap.</span>';
+  }
+  if(it.t === "seat"){
+    const s = byName[it.s];
+    return '<span class="what">' + (s ? esc(s.name) + ' — tap another seat to swap' : 'Empty seat — tap a student to move them here') + '</span>' +
+           (s ? '<button class="tool-btn" onclick="unseat()">Remove from seat</button>' : '') +
+           '<button class="tool-btn danger" onclick="deleteSel()">Delete seat</button>' +
+           '<button class="tool-btn" onclick="clearSel()">Done</button>';
+  }
+  if(it.t === "table"){
+    return '<span class="what">Table ' + (it.no || "") + '</span>' +
+           '<button class="tool-btn danger" onclick="deleteSel()">Delete table</button>' +
+           '<button class="tool-btn" onclick="clearSel()">Done</button>';
+  }
+  if(it.t === "teacher"){
+    return '<span class="what">Teacher</span>' +
+           '<button class="tool-btn danger" onclick="deleteSel()">Remove teacher</button>' +
+           '<button class="tool-btn" onclick="clearSel()">Done</button>';
+  }
+  return '<span class="what">Passage</span>' +
+         '<button class="tool-btn" onclick="rotatePassage()">⟳ Turn</button>' +
+         '<button class="tool-btn" onclick="stretchPassage(1.25)">Longer</button>' +
+         '<button class="tool-btn" onclick="stretchPassage(0.8)">Shorter</button>' +
+         '<button class="tool-btn" onclick="widenPassage(1.25)">Wider</button>' +
+         '<button class="tool-btn" onclick="widenPassage(0.8)">Narrower</button>' +
+         '<button class="tool-btn danger" onclick="deleteSel()">Delete</button>' +
+         '<button class="tool-btn" onclick="clearSel()">Done</button>';
+}
+
+/* ---------- dragging + tapping in the room ---------- */
+let drag = null;
+
+function wireRoom(){
+  const room = document.getElementById("room");
+  room.addEventListener("pointerdown", e => {
+    const el = e.target.closest(".item");
+    if(!el){
+      // Tapping the floor clears whatever was selected.
+      if(state.sel || state.pick) clearSel();
+      return;
+    }
+    e.preventDefault();
+    const it = findItem(el.dataset.id);
+    if(!it) return;
+    // Dragging a table seat moves the whole table.
+    const target = (it.t === "seat" && it.tb && findItem(it.tb)) || it;
+    el.setPointerCapture(e.pointerId);
+    drag = {
+      id: it.id, target, el, moved: false,
+      sx: e.clientX, sy: e.clientY, ox: target.x, oy: target.y,
+      unit: room.clientWidth / ROOM_W
+    };
+  });
+  room.addEventListener("pointermove", e => {
+    if(!drag) return;
+    const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if(!drag.moved && Math.hypot(dx, dy) < 6) return;
+    if(!drag.moved){ drag.moved = true; drag.el.classList.add("dragging"); }
+    drag.target.x = clamp(drag.ox + dx / drag.unit, 0, ROOM_W);
+    drag.target.y = clamp(drag.oy + dy / drag.unit, 0, ROOM_H);
+    placeEl(drag.target);
+    if(drag.target.t === "table"){
+      state.plan.items.filter(x => x.tb === drag.target.id).forEach(placeEl);
+    }
+  });
+  const end = e => {
+    if(!drag) return;
+    const d = drag;
+    drag = null;
+    d.el.classList.remove("dragging");
+    if(d.moved){ rememberPlan(); return; }
+    if(e.type === "pointerup") tapItem(d.id);
+  };
+  room.addEventListener("pointerup", end);
+  room.addEventListener("pointercancel", end);
+}
+
+function placeEl(it){
+  const el = document.querySelector('.room [data-id="' + it.id + '"]');
+  if(!el) return;
+  const p = itemPos(it);
+  el.style.left = (p.x / ROOM_W * 100).toFixed(3) + "%";
+  el.style.top = (p.y / ROOM_H * 100).toFixed(3) + "%";
+}
+
+function tapItem(id){
+  const it = findItem(id);
+  if(!it) return;
+  if(it.t === "seat" && state.pick){
+    it.s = state.pick;          // anyone already there goes back to the tray
+    state.pick = null;
+    state.sel = null;
+    rememberPlan();
+  }else if(it.t === "seat" && state.sel && state.sel !== id && findItem(state.sel) && findItem(state.sel).t === "seat"){
+    const a = findItem(state.sel);
+    [a.s, it.s] = [it.s, a.s];
+    state.sel = null;
+    rememberPlan();
+  }else{
+    state.sel = state.sel === id ? null : id;
+  }
+  render();
+}
+
+/* ---------- actions ---------- */
+function pickClass(i){
+  state.className = classes()[i];
+  state.screen = "setup";
+  render();
+}
+function setLayout(v){
+  state.layout = v;
+  if(v === "groups" && state.teacher === "circle") state.teacher = "front";
+  savePrefs(); render();
+}
+function setSize(n){ state.size = n; savePrefs(); render(); }
+function setTeacher(v){ state.teacher = v; savePrefs(); render(); }
+function togglePassages(){ state.passages = !state.passages; savePrefs(); render(); }
+function toggleMix(){ state.mixGender = !state.mixGender; savePrefs(); render(); }
+function setExtra(d){ state.extra = clamp(state.extra + d, 0, 20); savePrefs(); render(); }
+
+function createPlan(){
+  const n = classStudents().length;
+  state.plan = state.layout === "circle" ? circlePlan(n) : groupsPlan(n);
+  assignSeats(state.plan);
+  state.planName = null;
+  state.sel = null;
+  state.pick = null;
+  rememberPlan();
+  state.screen = "plan";
+  render();
+  window.scrollTo(0,0);
+}
+
+/* New seat order, same furniture. */
+function reshuffle(){
+  assignSeats(state.plan);
+  state.sel = null;
+  state.pick = null;
+  rememberPlan();
+  render();
+}
+
+function addSeat(){
+  const it = { id: uid(), t: "seat", x: 50 + (Math.random() * 10 - 5), y: 40 + (Math.random() * 10 - 5), s: null };
+  state.plan.items.push(it);
+  state.sel = it.id;
+  rememberPlan();
+  render();
+  toast("Seat added — drag it into place");
+}
+function addTable(){
+  const tables = state.plan.items.filter(it => it.t === "table");
+  const no = tables.reduce((m, t) => Math.max(m, t.no || 0), 0) + 1;
+  const tbl = { id: uid(), t: "table", x: 50, y: 45, n: state.plan.size, no };
+  state.plan.items.push(tbl);
+  for(let k = 0; k < tbl.n; k++) state.plan.items.push({ id: uid(), t: "seat", tb: tbl.id, k, s: null });
+  state.sel = tbl.id;
+  rememberPlan();
+  render();
+  toast("Table added — drag it into place");
+}
+function addPassage(){
+  const it = { id: uid(), t: "passage", x: 50, y: 45, w: 3.5, h: 40 };
+  state.plan.items.push(it);
+  state.sel = it.id;
+  rememberPlan();
+  render();
+}
+function addTeacher(){
+  const it = teacherDesk();
+  state.plan.items.push(it);
+  state.sel = it.id;
+  rememberPlan();
+  render();
+}
+function resizeSeats(f){
+  state.plan.seat = clamp(state.plan.seat * f, 3, 14);
+  rememberPlan();
+  render();
+}
+
+function pickStudent(idx){
+  const s = state.students[idx];
+  if(!s) return;
+  const sel = state.sel && findItem(state.sel);
+  if(sel && sel.t === "seat"){
+    sel.s = s.name;
+    state.sel = null;
+    state.pick = null;
+    rememberPlan();
+  }else{
+    state.pick = state.pick === s.name ? null : s.name;
+    state.sel = null;
+  }
+  render();
+}
+function clearSel(){ state.sel = null; state.pick = null; render(); }
+function unseat(){
+  const it = findItem(state.sel);
+  if(it) it.s = null;
+  state.sel = null;
+  rememberPlan();
+  render();
+}
+function deleteSel(){
+  const it = findItem(state.sel);
+  if(!it) return;
+  state.plan.items = state.plan.items.filter(x => x.id !== it.id && x.tb !== it.id);
+  state.sel = null;
+  rememberPlan();
+  render();
+}
+function rotatePassage(){
+  const it = findItem(state.sel);
+  if(!it) return;
+  [it.w, it.h] = [it.h, it.w];
+  it.w = Math.min(it.w, ROOM_W); it.h = Math.min(it.h, ROOM_H);
+  rememberPlan(); render();
+}
+function stretchPassage(f){
+  const it = findItem(state.sel);
+  if(!it) return;
+  if(it.w >= it.h) it.w = clamp(it.w * f, 3, ROOM_W);
+  else it.h = clamp(it.h * f, 3, ROOM_H);
+  rememberPlan(); render();
+}
+function widenPassage(f){
+  const it = findItem(state.sel);
+  if(!it) return;
+  if(it.w >= it.h) it.h = clamp(it.h * f, 1, 20);
+  else it.w = clamp(it.w * f, 1, 20);
+  rememberPlan(); render();
+}
+
+/* Keep the latest plan per class so it survives a page reload. */
+function rememberPlan(){
+  state.lastPlans[state.className] = state.plan;
+  savePrefs();
+}
+function showLast(){
+  const last = state.lastPlans[state.className];
+  if(last) showStored(last, null);
+}
+function showStored(plan, name){
+  state.plan = JSON.parse(JSON.stringify(plan));
+  state.planName = name;
+  state.sel = null;
+  state.pick = null;
+  state.lastPlans[state.className] = state.plan;
+  savePrefs();
+  state.screen = "plan";
+  render();
+  window.scrollTo(0,0);
+}
+
+/* ---------- saved plans (kept on this device) ---------- */
+function savedList(){
+  return state.saved[state.className] || (state.saved[state.className] = []);
+}
+function openSaveDialog(){
+  els.saveName.value = state.planName || "";
+  els.saveDialog.showModal();
+  els.saveName.focus();
+}
+function savePlanAs(name){
+  const list = savedList();
+  const entry = { name: name, ts: new Date().toISOString(), plan: JSON.parse(JSON.stringify(state.plan)) };
+  const at = list.findIndex(x => x.name.toLowerCase() === name.toLowerCase());
+  if(at === -1) list.unshift(entry); else list[at] = entry;
+  state.planName = name;
+  savePrefs();
+  toast((at === -1 ? "Saved “" : "Updated “") + name + "”");
+  render();
+}
+function openSaved(i){
+  const x = savedList()[i];
+  if(x) showStored(x.plan, x.name);
+}
+function deleteSaved(i){
+  const list = savedList();
+  const x = list[i];
+  if(!x || !confirm("Delete the saved seating plan “" + x.name + "”?")) return;
+  list.splice(i, 1);
+  savePrefs();
+  render();
+}
+
+function goBack(){
+  if(state.screen === "plan"){ state.screen = "setup"; state.sel = null; state.pick = null; }
+  else if(state.screen === "setup"){ state.screen = "class"; state.className = null; }
+  render();
+}
+
+/* ---------- helpers ---------- */
+function genderCls(s){ return s.gender === "boy" ? " boy" : s.gender === "girl" ? " girl" : ""; }
+function firstName(n){ return (n || "").split(" ")[0]; }
+function fmtDate(iso){
+  const d = new Date(iso);
+  if(isNaN(d)) return "";
+  return d.toLocaleDateString(undefined, { day:"numeric", month:"short" });
+}
+function initials(n){ return (n||"?").split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase(); }
+function avatar(s){
+  if(s.image){
+    return '<img class="avatar" src="' + esc(s.image) + '" alt="" draggable="false" ' +
+      'onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'avatar\',textContent:\'' + initials(s.name) + '\'}))">';
+  }
+  return '<div class="avatar">' + initials(s.name) + '</div>';
+}
+function esc(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+let toastTimer;
+function toast(text, isErr){
+  els.toast.textContent = text;
+  els.toast.className = "toast show" + (isErr ? " err" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { els.toast.className = "toast" + (isErr ? " err" : ""); }, 2600);
+}
+
+/* ---------- dialogs ---------- */
+function openSettings(){
+  els.urlInput.value = getUrl();
+  els.dialog.showModal();
+}
+els.gear.addEventListener("click", openSettings);
+document.getElementById("cancelSettings").addEventListener("click", () => els.dialog.close());
+document.getElementById("lockBtn").addEventListener("click", () => {
+  els.dialog.close();
+  lockApp();
+});
+document.getElementById("saveSettings").addEventListener("click", () => {
+  const v = els.urlInput.value.trim();
+  if(v) store.set("disciplineUrl", v);
+  els.dialog.close();
+  loadRoster();
+});
+els.back.addEventListener("click", goBack);
+document.getElementById("cancelSave").addEventListener("click", () => els.saveDialog.close());
+document.getElementById("saveForm").addEventListener("submit", e => {
+  const name = els.saveName.value.trim();
+  if(!name){ e.preventDefault(); els.saveName.focus(); return; }
+  els.saveDialog.close();
+  savePlanAs(name);
+});
+
+/* ---------- go ---------- */
+loadPrefs();
+if(getPin()){
+  loadRoster();
+}else{
+  state.screen = "pin";
+  render();
+}
+</script>
+</body>
+</html>
