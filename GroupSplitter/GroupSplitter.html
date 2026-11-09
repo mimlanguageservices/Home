@@ -282,6 +282,9 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQBWAAYOyRs5bKDhe5J
 
 const GROUP_SIZES = [2, 3, 4];
 
+/* "Split the whole class" options: number of groups -> label. */
+const SPLIT_COUNTS = { 2: { sym: "½", label: "halves" }, 3: { sym: "⅓", label: "thirds" }, 4: { sym: "¼", label: "quarters" } };
+
 /* Header colors for Group 1, 2, 3 … (repeats after the last). */
 const GROUP_COLORS = ["#7c3aed","#2563eb","#059669","#d97706","#dc2626","#0891b2","#db2777","#65a30d","#4f46e5","#ea580c"];
 
@@ -293,6 +296,7 @@ const state = {
   students: [],
   className: null,
   size: 2,
+  count: null,         // 2/3/4 = split the class into halves/thirds/quarters instead of by size
   mixGender: true,
   absent: {},          // class -> [names] left out; reset each time a class is opened
   groups: null,        // [[student, ...], ...]
@@ -387,13 +391,14 @@ function loadPrefs(){
   try{ p = JSON.parse(store.get(PREFS_KEY) || "null"); }catch(_){}
   if(!p) return;
   if(GROUP_SIZES.includes(p.size)) state.size = p.size;
+  if(SPLIT_COUNTS[p.count]) state.count = p.count;
   if(typeof p.mixGender === "boolean") state.mixGender = p.mixGender;
   state.lastGroups = p.lastGroups || {};
   if(p.saved && typeof p.saved === "object") state.saved = p.saved;
 }
 function savePrefs(){
   store.set(PREFS_KEY, JSON.stringify({
-    size: state.size, mixGender: state.mixGender,
+    size: state.size, count: state.count, mixGender: state.mixGender,
     lastGroups: state.lastGroups || {}, saved: state.saved
   }));
 }
@@ -465,13 +470,19 @@ function groupCount(n, size){
   return Math.floor(n / up) >= smallestOk ? up : Math.floor(n / size);
 }
 
+/* Number of groups: a fixed count (halves/thirds/quarters) when one is
+   chosen, never more groups than students; otherwise worked out from size. */
+function numGroups(n, size, count){
+  return count ? Math.min(count, n) : groupCount(n, size);
+}
+
 /* Deal students round-robin into groups. With "mix boys & girls" on,
    boys are dealt first and girls continue the deal, so each gender is
    spread as evenly as possible across the groups. */
-function makeGroups(list, size, mix){
+function makeGroups(list, size, mix, count){
   const n = list.length;
   if(!n) return [];
-  const g = groupCount(n, size);
+  const g = numGroups(n, size, count);
   const order = mix
     ? shuffle(list.filter(s => s.gender === "boy"))
         .concat(shuffle(list.filter(s => s.gender === "girl")))
@@ -483,13 +494,18 @@ function makeGroups(list, size, mix){
 }
 
 /* Preview of the sizes, e.g. "3 groups of 4 + 1 of 3". */
-function describeSplit(n, size){
+function describeSplit(n, size, count){
   if(!n) return "No students present";
-  const g = groupCount(n, size);
+  const g = numGroups(n, size, count);
   const big = Math.ceil(n / g), small = Math.floor(n / g);
   const nBig = n - small * g, nSmall = g - nBig;
   if(big === small) return g + (g === 1 ? " group of " : " groups of ") + big;
   return nBig + " of " + big + " + " + nSmall + " of " + small;
+}
+
+/* "groups of 3" or "halves" — used in titles and saved-set rows. */
+function splitLabel(size, count){
+  return SPLIT_COUNTS[count] ? SPLIT_COUNTS[count].label : "groups of " + size;
 }
 
 /* ---------- screens ---------- */
@@ -517,7 +533,7 @@ function render(){
   els.crumb.textContent =
     locked ? "" :
     state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
-    state.screen === "setup" ? "Pick a group size, untick anyone who is out, then split" :
+    state.screen === "setup" ? "Pick a group size or a split, untick anyone who is out, then split" :
     state.screen === "groups" ? "Tap two students to swap them" :
     "";
 
@@ -588,8 +604,13 @@ function renderSetup(){
   const present = presentStudents().length;
 
   const sizes = GROUP_SIZES.map(n =>
-    '<button class="size-btn' + (state.size === n ? ' on' : '') + '" onclick="setSize(' + n + ')">' +
+    '<button class="size-btn' + (!state.count && state.size === n ? ' on' : '') + '" onclick="setSize(' + n + ')">' +
       n + '<span class="sub">' + (n === 2 ? 'pairs' : n === 3 ? 'threes' : 'fours') + '</span>' +
+    '</button>').join("");
+
+  const splits = Object.keys(SPLIT_COUNTS).map(Number).map(n =>
+    '<button class="size-btn' + (state.count === n ? ' on' : '') + '" onclick="setCount(' + n + ')">' +
+      SPLIT_COUNTS[n].sym + '<span class="sub">' + SPLIT_COUNTS[n].label + '</span>' +
     '</button>').join("");
 
   const people = all.map(s => {
@@ -606,7 +627,7 @@ function renderSetup(){
   const saved = savedList().map((x, i) =>
     '<div class="saved-row">' +
       '<button class="open" onclick="openSaved(' + i + ')">' + esc(x.name) +
-        '<span class="sub">' + x.names.length + ' groups of ' + x.size + ' · ' + esc(fmtDate(x.ts)) + '</span>' +
+        '<span class="sub">' + (x.count ? 'Split into ' + splitLabel(x.size, x.count) : x.names.length + ' groups of ' + x.size) + ' · ' + esc(fmtDate(x.ts)) + '</span>' +
       '</button>' +
       '<button class="del" onclick="deleteSaved(' + i + ')" aria-label="Delete ' + esc(x.name) + '">🗑</button>' +
     '</div>').join("");
@@ -615,6 +636,8 @@ function renderSetup(){
     (saved ? '<div class="section-title">Saved groups</div><div class="saved">' + saved + '</div>' : '') +
     '<div class="section-title">Group size</div>' +
     '<div class="sizes">' + sizes + '</div>' +
+    '<div class="section-title">Split the whole class</div>' +
+    '<div class="sizes">' + splits + '</div>' +
     '<div class="section-title">Options</div>' +
     '<button class="toggle' + (state.mixGender ? ' on' : '') + '" onclick="toggleMix()">' +
       '<span class="lbl">Mix boys and girls<span class="sub">Spread boys and girls evenly across groups</span></span>' +
@@ -628,7 +651,7 @@ function renderSetup(){
     '<div class="attend">' + (people || '<div class="msg">No students in this class.</div>') + '</div>' +
     '<div class="sticky-go">' +
       '<button class="action-btn" onclick="doSplit()"' + (present ? '' : ' disabled') + '>' +
-        'Split into groups<span class="sub">' + esc(describeSplit(present, state.size)) +
+        'Split into groups<span class="sub">' + esc(describeSplit(present, state.size, state.count)) +
           (out.length ? ' + ' + out.length + ' individual' + (out.length === 1 ? '' : 's') : '') + '</span>' +
       '</button>' +
       (last ? '<button class="tile" style="margin-top:10px; justify-content:center; font-size:15px;" onclick="showLast()">' +
@@ -638,7 +661,7 @@ function renderSetup(){
 
 function renderGroups(){
   els.title.textContent = "Class " + state.className + " · " +
-    (state.groupsName || "groups of " + state.size);
+    (state.groupsName || splitLabel(state.size, state.count));
   const cards = state.groups.map((grp, g) => {
     const color = GROUP_COLORS[g % GROUP_COLORS.length];
     const members = grp.map((s, i) => {
@@ -679,7 +702,8 @@ function renderGroups(){
 /* ---------- actions ---------- */
 /* Opening a class always starts with everyone selected. */
 function pickClass(c){ state.className = c; state.absent[c] = []; state.screen = "setup"; render(); }
-function setSize(n){ state.size = n; savePrefs(); render(); }
+function setSize(n){ state.size = n; state.count = null; savePrefs(); render(); }
+function setCount(n){ state.count = n; savePrefs(); render(); }
 function toggleMix(){ state.mixGender = !state.mixGender; savePrefs(); render(); }
 function toggleAbsent(idx){
   const s = state.students[idx];
@@ -695,7 +719,7 @@ function clearAbsent(){ state.absent[state.className] = []; savePrefs(); render(
 function doSplit(){
   const present = presentStudents();
   if(!present.length) return;
-  state.groups = makeGroups(present, state.size, state.mixGender);
+  state.groups = makeGroups(present, state.size, state.mixGender, state.count);
   const out = absentList();
   state.individuals = classStudents()
     .filter(s => out.includes(s.name))
@@ -712,7 +736,7 @@ function doSplit(){
 function rememberGroups(){
   state.lastGroups = state.lastGroups || {};
   state.lastGroups[state.className] = {
-    size: state.size,
+    size: state.size, count: state.count,
     names: state.groups.map(grp => grp.map(s => s.name)),
     individuals: state.individuals.map(s => s.name)
   };
@@ -736,6 +760,7 @@ function showStored(set, name){
   state.individuals = (set.individuals || []).map(n => byName[n]).filter(Boolean);
   state.groupsName = name;
   state.size = set.size;
+  state.count = set.count || null;
   state.sel = null;
   state.screen = "groups";
   render();
@@ -754,7 +779,7 @@ function openSaveDialog(){
 function saveGroupsAs(name){
   const list = savedList();
   const entry = {
-    name: name, size: state.size, ts: new Date().toISOString(),
+    name: name, size: state.size, count: state.count, ts: new Date().toISOString(),
     names: state.groups.map(grp => grp.map(s => s.name)),
     individuals: state.individuals.map(s => s.name)
   };
