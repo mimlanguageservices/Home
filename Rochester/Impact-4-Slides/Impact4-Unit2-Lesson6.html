@@ -306,6 +306,8 @@
         .pr-in { animation: prIn .45s ease both; display: block; position: relative; flex: 1; min-height: 0; }
         @keyframes prIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
         .pr-img { float: right; width: 210px; height: 150px; object-fit: cover; border-radius: 14px; margin: 0 0 10px 18px; box-shadow: 0 4px 12px rgba(0,0,0,.22); }
+        .pr-video { margin-top: 12px; height: 270px; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 14px; overflow: hidden; background: #000; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
+        .pr-video iframe { width: 100%; height: 100%; border: 0; display: block; }
         .pr-emoji { display: flex; align-items: center; justify-content: center; font-size: 4.6rem; background: #e0f2fe; box-shadow: none; }
         .pr-num { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: #1a202c; color: #fff; font-weight: 800; font-size: 1.4rem; margin-right: 14px; flex-shrink: 0; }
         .pr-title { display: flex; align-items: center; font-size: 2rem; font-weight: 800; color: #1a202c; line-height: 1.15; }
@@ -528,6 +530,7 @@
         .m .pr-best { position: static; margin-top: 14px; }
         .m .pr-img { width: 38%; height: auto; aspect-ratio: 4 / 3; margin-left: 12px; }
         .m .pr-list { columns: 1; }
+        .m .pr-video { height: auto; width: 100%; }
         .m .pr-list li { font-size: 1.4rem; }
         .m .pause-video { flex-direction: column; align-items: stretch; gap: 10px; }
         .m .pv-frame { width: 100%; }
@@ -1019,7 +1022,7 @@
         </div>
 
         <!-- ============ ACTIVE PAUSE (7 min): spin the wheel. Reference code: U2.6/active-pause ============ -->
-        <div class="slide" id="slide-active-pause" data-seg="pause" data-notes="<b class='h'>Active pause &middot; 7 min</b>Press <b>SPIN</b>: the wheel picks one of 10 activities at random and shows how to run it. Everyone stands. The 7-minute timer starts by itself when this slide opens - when it ends, three slow breaths and back to seats.<br><br><b>Music</b> Click the video at the bottom to play the music (it never starts by itself; it stops when you leave the slide).<br><br><b>Your choice of activity</b> Click any section of the wheel instead of the SPIN button: the wheel spins exactly as normal but lands on the section you clicked. There is no pointer or highlight on the wheel, so students will not notice.<br><br><b>Choice</b> If the class really cannot do the activity (not enough space, too noisy), they may spin once more. Anyone may choose a low-impact version (step in place, raise the hands) or the calm option, with no explanation needed.<div class='ct'><b>Choice Theory:</b> Fun and Survival - the body needs to move. Freedom - students choose how big to move. Belonging - partner and group activities (Mirror Challenge, Rock-Paper-Scissors, Follow the Leader) build connection.</div>">
+        <div class="slide" id="slide-active-pause" data-seg="pause" data-notes="<b class='h'>Active pause &middot; 7 min</b>Press <b>SPIN</b>: the wheel picks one of 10 activities at random and shows how to run it. Everyone stands. The 7-minute timer starts by itself when this slide opens - when it ends, three slow breaths and back to seats.<br><br><b>Music</b> Click the video at the bottom to play the music (it never starts by itself; it stops when you leave the slide). If the wheel lands on <b>Subway Surfers</b>, play the video on the result card instead: students run, jump, duck and dodge along with the chase on screen.<br><br><b>Your choice of activity</b> Click any section of the wheel instead of the SPIN button: the wheel spins exactly as normal but lands on the section you clicked. There is no pointer or highlight on the wheel, so students will not notice.<br><br><b>Choice</b> If the class really cannot do the activity (not enough space, too noisy), they may spin once more. Anyone may choose a low-impact version (step in place, raise the hands) or the calm option, with no explanation needed.<div class='ct'><b>Choice Theory:</b> Fun and Survival - the body needs to move. Freedom - students choose how big to move. Belonging - partner and group activities (Mirror Challenge, Rock-Paper-Scissors) build connection.</div>">
             <div class="slide-label">Active Pause <span class="seg-chip pause">7 min</span></div>
             <div class="slide-inner" style="padding:100px 60px 84px;"><div class="fit-wrap"><div class="center-col" style="max-width:none;">
                 <div class="pause-layout">
@@ -1249,6 +1252,8 @@
             var pv = document.getElementById('pauseVideo');
             var onPause = el && el.id === 'slide-active-pause';
             if (pv) { if (onPause && !pv.getAttribute('src')) pv.setAttribute('src', pv.dataset.src); if (!onPause && pv.getAttribute('src')) pv.removeAttribute('src'); }
+            var av = document.querySelector('#pauseResult iframe');   // activity video (Subway Surfers): stop when leaving, reload when back
+            if (av) { if (onPause && !av.getAttribute('src')) av.setAttribute('src', av.dataset.src); if (!onPause && av.getAttribute('src')) av.removeAttribute('src'); }
         }
 
         window.addEventListener('resize', function () { fitSlide(document.getElementById(slideOrder[currentIndex])); });
@@ -1466,12 +1471,10 @@
             "img": "img/pause-5.jpg"
           },
           {
-            "name": "Follow the Leader Relay",
-            "short": "Follow the Leader",
-            "desc": "Divide the class into small groups. One student leads the group through movements for 30 seconds before passing leadership to another student.",
-            "note": "Leaders can choose side steps, arm swings, knee raises, or dance moves. Students can remain in place if the classroom is small.",
-            "best": "Leadership, collaboration, and student choice.",
-            "emoji": "👥"
+            "name": "Subway Surfers",
+            "short": "Subway Surfers",
+            "desc": "Play the video. Everyone stands and runs in place, following the chase on screen: jump over obstacles, duck down low, and step left or right to dodge.",
+            "video": "https://www.youtube.com/embed/VSWR6oIVjR4?rel=0"
           },
           {
             "name": "Stretch and Reset",
@@ -1560,6 +1563,7 @@
             var title = mk('div', 'pr-title'); title.appendChild(mk('span', 'pr-num', String(k + 1))); title.appendChild(mk('span', '', act.name)); wrap.appendChild(title);
             if (act.tag) wrap.appendChild(mk('div', 'pr-tag', act.tag));
             wrap.appendChild(mk('div', 'pr-desc', act.desc));
+            if (act.video) { var vf = mk('div', 'pr-video'), ifr = document.createElement('iframe'); ifr.src = ifr.dataset.src = act.video; ifr.title = act.name; ifr.allow = 'encrypted-media; picture-in-picture'; ifr.referrerPolicy = 'strict-origin-when-cross-origin'; ifr.allowFullscreen = true; vf.appendChild(ifr); wrap.appendChild(vf); }
             if (act.listTitle) wrap.appendChild(mk('div', 'pr-lt', act.listTitle));
             if (act.list) { var ul = mk('ul', 'pr-list'); act.list.forEach(function (x) { ul.appendChild(mk('li', '', x)); }); wrap.appendChild(ul); }
             if (act.note) wrap.appendChild(mk('div', 'pr-note', act.note));
