@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1f2933">
+<title>Email Parents</title>
+<style>
+  :root{
+    --bg:#111827; --card:#1f2937; --card-2:#273244;
+    --text:#f3f4f6; --muted:#9ca3af; --line:#374151;
+    --warning:#d97706; --move:#7c3aed; --incident:#dc2626;
+    --ok:#059669; --mail:#2563eb;
+    --boy:#2563eb; --girl:#db2777;
+    --boy-bg:#cfe4ff; --boy-bg-2:#b4d4ff;
+    --girl-bg:#ffd9ec; --girl-bg-2:#ffc2e0;
+    --gender-text:#1f2937;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:520px; margin:0 auto; padding:16px;}
+
+  header{display:flex; align-items:center; gap:10px; padding:6px 2px 14px;}
+  header .back{
+    border:0; background:var(--card); color:var(--text);
+    width:38px; height:38px; border-radius:10px; font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  header .back[hidden]{display:none;}
+  header h1{font-size:17px; margin:0; font-weight:600; flex:1;}
+  header .gear{border:0; background:transparent; color:var(--muted); font-size:20px; width:38px; height:38px;}
+  .crumb{color:var(--muted); font-size:13px; padding:0 2px 12px;}
+
+  .grid{display:flex; flex-direction:column; gap:12px;}
+
+  .tile{
+    text-align:left; width:100%;
+    background:var(--card); color:var(--text);
+    border-radius:14px; padding:18px 16px; font-size:18px; font-weight:600;
+    display:flex; align-items:center; gap:14px;
+    border:1px solid var(--line);
+  }
+  .tile:active{background:var(--card-2);}
+  .tile .sub{display:block; font-size:13px; font-weight:400; color:var(--muted); margin-top:2px;}
+
+  .student-row{
+    display:flex; align-items:center; gap:14px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:12px 14px; width:100%; text-align:left; color:var(--text);
+  }
+  .student-row:active{background:var(--card-2);}
+  .student-row.boy{background:var(--boy-bg); color:var(--gender-text);}
+  .student-row.girl{background:var(--girl-bg); color:var(--gender-text);}
+  .student-row.boy:active{background:var(--boy-bg-2);}
+  .student-row.girl:active{background:var(--girl-bg-2);}
+  .student-row.boy .avatar{box-shadow:0 0 0 2px var(--boy);}
+  .student-row.girl .avatar{box-shadow:0 0 0 2px var(--girl);}
+  .student-row .name{flex:1; font-weight:600; font-size:16px;}
+  .student-row .mail{font-size:12px; font-weight:600; opacity:.7; white-space:nowrap;}
+  .student-row .mail.none{color:var(--incident); opacity:1;}
+  .avatar{
+    width:64px; height:64px; border-radius:50%; object-fit:cover;
+    background:var(--card-2); flex:none;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; color:var(--muted);
+  }
+
+  .search, .field, textarea.field{
+    width:100%; border:1px solid var(--line); background:var(--card);
+    color:var(--text); border-radius:12px; padding:12px 14px; font-size:16px; margin-bottom:12px;
+    font-family:inherit;
+  }
+  .search::placeholder, .field::placeholder{color:var(--muted);}
+  textarea.field{min-height:120px; resize:vertical; line-height:1.4;}
+  textarea.field.tall{min-height:300px;}
+  .claude-btn{
+    border:1px solid var(--move); background:transparent; color:#c4b5fd; width:100%;
+    border-radius:14px; padding:14px; font-size:16px; font-weight:700; margin-bottom:16px;
+  }
+  .claude-btn:active{background:var(--card-2);}
+  .claude-btn[disabled]{opacity:.45;}
+  .hint{font-size:13px; color:var(--warning); margin:-6px 2px 14px;}
+  details.english{margin-bottom:16px;}
+  details.english summary{color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; padding:4px 2px 10px;}
+  label.lbl{display:block; font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:0 2px 6px;}
+
+  .profile{
+    display:flex; align-items:center; gap:14px; margin-bottom:16px;
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px;
+  }
+  .profile .avatar{width:56px; height:56px; font-size:20px;}
+  .profile .name{font-size:18px; font-weight:700;}
+  .profile .status{font-size:13px; color:var(--muted); margin-top:3px; word-break:break-all;}
+  .profile .status.none{color:var(--incident);}
+
+  .preview{
+    background:#fff; color:#1f2937; border-radius:12px; padding:14px 16px;
+    font-size:14px; line-height:1.5; white-space:pre-wrap; word-break:break-word; margin-bottom:16px;
+  }
+  .preview .subj{font-weight:700; border-bottom:1px solid #e5e7eb; padding-bottom:8px; margin-bottom:10px; white-space:normal;}
+
+  .action-btn{
+    border:0; width:100%; color:#fff; background:var(--mail);
+    border-radius:16px; padding:20px 18px; font-size:20px; font-weight:700;
+  }
+  .action-btn.move{background:var(--move);}
+  .action-btn:active{filter:brightness(.9);}
+  .action-btn[disabled]{opacity:.45;}
+  .link-btn{
+    border:0; background:transparent; color:var(--muted); width:100%;
+    padding:14px; font-size:14px; text-decoration:underline;
+  }
+
+  .msg{text-align:center; color:var(--muted); padding:40px 10px; font-size:15px;}
+
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(120%);
+    background:var(--ok); color:#fff; padding:14px 22px; border-radius:12px;
+    font-weight:600; font-size:15px; transition:transform .25s ease; z-index:50;
+    max-width:90vw; text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.err{background:var(--incident);}
+
+  dialog{
+    border:0; border-radius:16px; padding:20px; width:calc(100% - 32px); max-width:460px;
+    background:var(--card); color:var(--text);
+  }
+  dialog::backdrop{background:rgba(0,0,0,.6);}
+  dialog h2{margin:0 0 6px; font-size:17px;}
+  dialog p{margin:0 0 14px; font-size:13px; color:var(--muted);}
+  dialog input{
+    width:100%; border:1px solid var(--line); background:var(--bg); color:var(--text);
+    border-radius:10px; padding:11px 12px; font-size:14px; margin-bottom:14px;
+  }
+  dialog .row{display:flex; gap:10px; justify-content:flex-end;}
+  dialog button{
+    border:0; border-radius:10px; padding:10px 16px; font-size:14px; font-weight:600;
+    background:var(--card-2); color:var(--text);
+  }
+  dialog button.primary{background:var(--mail); color:#fff;}
+  dialog button[disabled]{opacity:.5;}
+  #confirm h2{font-size:20px; text-align:center; margin-bottom:14px;}
+  #confirm .profile{background:var(--bg); margin-bottom:14px;}
+  #confirm .row button{flex:1; padding:14px; font-size:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="back" id="backBtn" hidden aria-label="Back">&#8592;</button>
+    <h1 id="title">Email Parents</h1>
+    <button class="gear" id="gearBtn" aria-label="Settings">&#9881;</button>
+  </header>
+  <div class="crumb" id="crumb"></div>
+  <div id="view"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="settings">
+  <h2>Settings</h2>
+  <p>Web App URL from deploying <b>DisciplineScript.gs</b>.</p>
+  <input id="urlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+  <p>Your name — used to sign off every email and as the sender name.</p>
+  <input id="sigInput" type="text" placeholder="e.g. Mr. Meadows">
+  <div class="row" style="justify-content:space-between;">
+    <button id="lockBtn">Lock app</button>
+    <span>
+      <button id="cancelSettings">Cancel</button>
+      <button class="primary" id="saveSettings">Save</button>
+    </span>
+  </div>
+</dialog>
+
+<dialog id="confirm">
+  <h2>Send this email?</h2>
+  <div id="confirmBody"></div>
+  <div class="row">
+    <button id="confirmCancel">Cancel</button>
+    <button class="primary" id="confirmOk">Send</button>
+  </div>
+</dialog>
+
+<script>
+/* ------------------------------------------------------------------
+   CONFIG — same Web App as Discipline.html.
+------------------------------------------------------------------ */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHwhyBdwJw1_0cngDoQTkzzpdogEWle_PhEWGs70JKbcEIqFnldRp1T4XZHu2SBkog5w/exec";
+
+/* The email itself is written by Claude, inside DisciplineScript.gs
+   (see CLAUDE_PROMPT there). This page sends your short note, shows the
+   Spanish email that comes back for you to check and edit, then sends it. */
+
+const state = {
+  screen: "class",     // pin | class | student | compose
+  students: [],
+  className: null,
+  studentIdx: null,
+  loading: false,
+  refreshing: false,
+  error: null,
+  pinError: null,
+  query: "",
+  message: "",         // the teacher's short note
+  draft: null,         // { subject, body, english_subject, english_body } from Claude
+  draftFrom: "",       // the note the current draft was written from
+  drafting: false,
+  sending: false
+};
+
+const els = {
+  view: document.getElementById("view"),
+  title: document.getElementById("title"),
+  crumb: document.getElementById("crumb"),
+  back: document.getElementById("backBtn"),
+  gear: document.getElementById("gearBtn"),
+  toast: document.getElementById("toast"),
+  dialog: document.getElementById("settings"),
+  urlInput: document.getElementById("urlInput"),
+  sigInput: document.getElementById("sigInput"),
+  confirm: document.getElementById("confirm"),
+  confirmBody: document.getElementById("confirmBody"),
+  confirmOk: document.getElementById("confirmOk")
+};
+
+/* URL and PIN share storage keys with Discipline.html, so unlocking one
+   unlocks the other when both are served from the same site. */
+function store(k, v){ try{ v === undefined ? localStorage.removeItem(k) : localStorage.setItem(k, v); }catch(_){} }
+function load(k){ try{ return localStorage.getItem(k) || ""; }catch(_){ return ""; } }
+function getUrl(){ return (load("disciplineUrl") || SCRIPT_URL || "").trim(); }
+function getPin(){ return load("disciplinePin").trim(); }
+/* Signature on every email. Change it in ⚙ settings on a device, or here. */
+const DEFAULT_SIGNATURE = "Jerome Meadows";
+function getSig(){ return load("parentEmailSignature").trim() || DEFAULT_SIGNATURE; }
+
+async function api(paramObj){
+  const url = getUrl();
+  const params = new URLSearchParams(paramObj);
+  params.set("pin", getPin());
+  const res = await fetch(url + (url.includes("?") ? "&" : "?") + params.toString());
+  const raw = await res.text();
+  let data;
+  try{ data = JSON.parse(raw); }
+  catch(_){
+    throw new Error("Server did not return JSON (HTTP " + res.status + "). " +
+      "The Web App may be asking for a Google login.");
+  }
+  if(data.unauthorized){
+    if(/too many/i.test(data.error || "")) throw new Error(data.error);
+    store("disciplinePin");
+    state.screen = "pin";
+    state.pinError = data.error || "Incorrect PIN.";
+    render();
+    return null;
+  }
+  if(!data.success) throw new Error(data.error || "Request failed");
+  return data;
+}
+
+/* ---------- roster (cached for instant load) ---------- */
+const CACHE_KEY = "parentEmailRoster";
+function readCache(){ try{ return JSON.parse(load(CACHE_KEY) || "null"); }catch(_){ return null; } }
+
+async function loadRoster(){
+  if(!getUrl()){ openSettings(); return; }
+  if(!getPin()){ state.screen = "pin"; render(); return; }
+  state.error = null;
+  const cached = readCache();
+  const haveCache = cached && Array.isArray(cached.students) && cached.students.length;
+  if(haveCache){
+    state.students = cached.students;
+    state.refreshing = true;
+    if(state.screen === "pin") state.screen = "class";
+  }else{
+    state.loading = true;
+  }
+  render();
+  try{
+    const data = await api({ mode:"roster" });
+    if(data){
+      const fresh = data.students || [];
+      if(fresh.length){
+        state.students = fresh;
+        store(CACHE_KEY, JSON.stringify({ ts: Date.now(), students: fresh }));
+        if(!fresh.some(s => "motherName" in s)){
+          toast("Redeploy DisciplineScript.gs to load parent emails", true);
+        }
+      }else if(!haveCache){
+        state.error = "The script returned 0 students — check ROSTER_SHEET_NAME in DisciplineScript.gs.";
+      }
+    }
+  }catch(err){
+    if(haveCache) toast("Showing saved list — couldn't refresh", true);
+    else{ state.error = err.message; state.students = []; }
+  }
+  state.loading = false;
+  state.refreshing = false;
+  // Don't re-render over a half-written message.
+  if(state.screen !== "compose") render();
+}
+
+/* ---------- screens ---------- */
+function classes(){
+  const set = [];
+  state.students.forEach(s => { if(s.class && !set.includes(s.class)) set.push(s.class); });
+  return set;
+}
+
+function render(){
+  const locked = state.screen === "pin";
+  els.back.hidden = locked || state.screen === "class";
+  els.gear.style.visibility = locked ? "hidden" : "visible";
+  els.crumb.textContent =
+    locked ? "" :
+    state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
+    state.screen === "student" ? "Tap a student to write to their parents" + (state.refreshing ? "   ·   updating…" : "") :
+    state.screen === "compose" ? "Write a short note — Claude turns it into a kind email in Spanish" : "";
+
+  if(locked) return renderPin();
+  if(state.loading){
+    els.title.textContent = "Loading…";
+    els.view.innerHTML = '<div class="msg">Fetching the student list…</div>';
+    return;
+  }
+  if(state.screen === "class")   return renderClasses();
+  if(state.screen === "compose") return renderCompose();
+  return renderStudents();
+}
+
+function renderPin(){
+  els.title.textContent = "Enter PIN";
+  els.view.innerHTML =
+    '<form id="pinForm" class="grid" style="margin-top:24px;">' +
+      '<input class="search" id="pinInput" type="password" inputmode="numeric" ' +
+        'autocomplete="off" placeholder="PIN" style="text-align:center; letter-spacing:6px; font-size:20px;">' +
+      (state.pinError ? '<div class="msg" style="color:var(--incident); padding:4px 0;">' + esc(state.pinError) + '</div>' : '') +
+      '<button class="action-btn move" type="submit">Unlock</button>' +
+    '</form>';
+  const input = document.getElementById("pinInput");
+  input.focus({preventScroll:true});
+  document.getElementById("pinForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = input.value.trim();
+    if(!v) return;
+    store("disciplinePin", v);
+    state.pinError = null;
+    state.screen = "class";
+    loadRoster();
+  });
+}
+
+function renderClasses(){
+  els.title.textContent = "Email parents";
+  const list = classes();
+  if(!list.length){
+    els.view.innerHTML =
+      '<div class="msg" style="text-align:left; word-break:break-word;">' +
+        (state.error ? esc(state.error) : "No students found.") + '</div>' +
+      '<button class="tile" onclick="loadRoster()">↻&nbsp; Retry</button>';
+    return;
+  }
+  els.view.innerHTML = '<div class="grid">' + list.map(c => {
+    const kids = state.students.filter(s => s.class === c);
+    const missing = kids.filter(s => !s.parentEmail).length;
+    return '<button class="tile" onclick="pickClass(\'' + esc(c) + '\')">' +
+             '<span>Class ' + esc(c) + '<span class="sub">' + kids.length + ' students' +
+               (missing ? ' · ' + missing + ' without parent email' : '') + '</span></span>' +
+           '</button>';
+  }).join("") + '</div>';
+}
+
+function genderRank(s){ return s.gender === "boy" ? 0 : s.gender === "girl" ? 1 : 2; }
+
+function renderStudents(){
+  els.title.textContent = "Class " + state.className;
+  const roster = state.students
+    .filter(s => s.class === state.className)
+    .filter(s => s.name.toLowerCase().includes(state.query.toLowerCase()))
+    .sort((a,b) => (genderRank(a) - genderRank(b)) || a.name.localeCompare(b.name));
+
+  const rows = roster.map(s => {
+    const idx = state.students.indexOf(s);
+    const g = s.gender === "boy" ? " boy" : s.gender === "girl" ? " girl" : "";
+    return '<button class="student-row' + g + '" onclick="pickStudent(' + idx + ')">' +
+             avatar(s) +
+             '<span class="name">' + esc(s.name) + '</span>' +
+             (s.parentEmail ? '<span class="mail">✉</span>' : '<span class="mail none">No email</span>') +
+           '</button>';
+  }).join("");
+
+  els.view.innerHTML =
+    '<input class="search" id="q" placeholder="Search name…" value="' + esc(state.query) + '">' +
+    '<div class="grid">' + (rows || '<div class="msg">No matches.</div>') + '</div>';
+  const q = document.getElementById("q");
+  q.addEventListener("input", e => { state.query = e.target.value; renderStudents(); });
+  if(!skipSearchFocus){
+    q.focus({preventScroll:true});
+    q.setSelectionRange(q.value.length, q.value.length);
+  }
+  skipSearchFocus = false;
+}
+
+function renderCompose(){
+  const s = state.students[state.studentIdx];
+  const d = state.draft;
+  els.title.textContent = "Write to parents";
+  els.view.innerHTML =
+    '<div class="profile">' + avatar(s) +
+      '<div style="min-width:0;"><div class="name">' + esc(s.name) + '</div>' +
+      (s.parentEmail
+        ? recipients(s)
+        : '<div class="status none">No parent email in the sheet for this student.</div>') +
+    '</div></div>' +
+    '<label class="lbl" for="msgBox">Your message</label>' +
+    '<textarea class="field" id="msgBox" placeholder="e.g. Today ' + esc(firstName(s.name)) +
+      ' was repeatedly disruptive during the lesson. Could you please talk with them about it at home?">' +
+      esc(state.message) + '</textarea>' +
+    '<button class="claude-btn" id="draftBtn"></button>' +
+    (d ?
+      '<div class="hint" id="staleHint" hidden>Your message changed — tap Rewrite to update the email.</div>' +
+      '<label class="lbl" for="subj">Subject (Spanish)</label>' +
+      '<input class="field" id="subj" value="' + esc(d.subject) + '">' +
+      '<label class="lbl" for="bodyBox">Email (Spanish) — edit anything before sending</label>' +
+      '<textarea class="field tall" id="bodyBox">' + esc(d.body) + '</textarea>' +
+      '<details class="english"><summary>English version (for you to check)</summary>' +
+        '<div class="preview"><div class="subj">' + esc(d.english_subject || "") + '</div>' +
+        esc(d.english_body || "") + '</div>' +
+      '</details>'
+      : '') +
+    '<button class="action-btn" id="sendBtn">Send email</button>' +
+    '<button class="link-btn" id="mailtoBtn">Open in my mail app instead</button>';
+
+  const box = document.getElementById("msgBox");
+  box.addEventListener("input", e => { state.message = e.target.value; updateCompose(); });
+  document.getElementById("draftBtn").addEventListener("click", writeDraft);
+  if(d){
+    document.getElementById("subj").addEventListener("input", e => { d.subject = e.target.value; updateCompose(); });
+    document.getElementById("bodyBox").addEventListener("input", e => { d.body = e.target.value; updateCompose(); });
+  }
+  document.getElementById("sendBtn").addEventListener("click", askConfirm);
+  document.getElementById("mailtoBtn").addEventListener("click", openMailto);
+  updateCompose();
+  if(!d){ window.scrollTo(0,0); box.focus({preventScroll:true}); }
+}
+
+function canSend(s){
+  const d = state.draft;
+  return !!(s && s.parentEmail && d && d.subject.trim() && d.body.trim() && !state.drafting);
+}
+
+function updateCompose(){
+  const s = state.students[state.studentIdx];
+  const btn = document.getElementById("draftBtn");
+  btn.disabled = state.drafting || !state.message.trim();
+  btn.textContent = state.drafting ? "Claude is writing…" :
+    state.draft ? "↻ Rewrite with Claude" : "✨ Write email with Claude";
+  const stale = document.getElementById("staleHint");
+  if(stale) stale.hidden = state.message.trim() === state.draftFrom.trim();
+  const ok = canSend(s);
+  document.getElementById("sendBtn").disabled = !ok;
+  document.getElementById("mailtoBtn").disabled = !ok;
+}
+
+/* Ask the script (and through it, Claude) to write the email. */
+async function writeDraft(){
+  const s = state.students[state.studentIdx];
+  const note = state.message.trim();
+  if(!s || !note || state.drafting) return;
+  if(state.draft && state.draftFrom.trim() === note &&
+     !confirm("Write a fresh version? Any edits you made to the email will be replaced.")) return;
+  state.drafting = true;
+  updateCompose();
+  try{
+    const data = await api({ mode:"draft", class:s.class || "", name:s.name, message:note, sender:getSig() });
+    if(data){
+      if(!data.draft) throw new Error("the Apps Script is out of date — redeploy DisciplineScript.gs");
+      state.draft = data.draft;
+      state.draftFrom = note;
+    }
+  }catch(err){
+    toast("Couldn't write the email: " + err.message, true);
+  }
+  state.drafting = false;
+  if(state.screen === "compose"){
+    render();
+    const body = document.getElementById("bodyBox");
+    if(body) body.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+}
+
+/* ---------- actions ---------- */
+let skipSearchFocus = false;
+function pickClass(c){ state.className = c; state.query = ""; state.screen = "student"; render(); }
+function pickStudent(idx){
+  state.studentIdx = idx;
+  state.message = "";
+  state.draft = null;
+  state.draftFrom = "";
+  state.screen = "compose";
+  render();
+}
+function goBack(){
+  if(state.screen === "compose"){
+    if(state.drafting) return;
+    if((state.message.trim() || state.draft) && !confirm("Discard this message?")) return;
+    state.screen = "student"; state.studentIdx = null; skipSearchFocus = true;
+  }else if(state.screen === "student"){ state.screen = "class"; state.className = null; }
+  render();
+}
+
+function askConfirm(){
+  const s = state.students[state.studentIdx];
+  if(!canSend(s)) return;
+  els.confirmBody.innerHTML =
+    '<div class="profile">' + avatar(s) +
+      '<div style="min-width:0;"><div class="name">' + esc(s.name) + '</div>' +
+      recipients(s) + '</div>' +
+    '</div>';
+  els.confirm.showModal();
+}
+
+async function sendEmail(){
+  const s = state.students[state.studentIdx];
+  if(!canSend(s) || state.sending) return;
+  state.sending = true;
+  els.confirmOk.disabled = true;
+  els.confirmOk.textContent = "Sending…";
+  try{
+    const data = await api({
+      mode:"email", class:s.class || "", name:s.name,
+      subject:state.draft.subject.trim(), body:state.draft.body.trim(), sender:getSig(),
+      note:state.message.trim()
+    });
+    els.confirm.close();
+    if(data){
+      if(!data.to) throw new Error("the Apps Script is out of date — redeploy DisciplineScript.gs");
+      toast("Sent to " + firstName(s.name) + "'s parents");
+      state.message = "";
+      state.draft = null;
+      state.screen = "student";
+      state.studentIdx = null;
+      skipSearchFocus = true;
+      render();
+    }
+  }catch(err){
+    els.confirm.close();
+    toast("Not sent: " + err.message, true);
+  }
+  state.sending = false;
+  els.confirmOk.disabled = false;
+  els.confirmOk.textContent = "Send";
+}
+
+/* Fallback: hand the email to the device's own mail app (not logged). */
+function openMailto(){
+  const s = state.students[state.studentIdx];
+  if(!canSend(s)) return;
+  const to = s.parentEmail.split(/\s*,\s*/).map(encodeURIComponent).join(",");
+  location.href = "mailto:" + to +
+    "?subject=" + encodeURIComponent(state.draft.subject.trim()) +
+    "&body=" + encodeURIComponent(state.draft.body.trim());
+}
+
+/* ---------- helpers ---------- */
+/* "Mother: … / Father: …" lines; falls back to the combined list for an
+   older script that only sends parentEmail. */
+function recipients(s){
+  const line = (who, v) => '<div class="status">' + who + ': ' +
+    (v ? esc(v) : '<span style="opacity:.6;">none</span>') + '</div>';
+  if(!("motherEmail" in s)) return line("To", s.parentEmail);
+  const who = (role, name) => role + (name ? " (" + esc(name) + ")" : "");
+  return line(who("Mother", s.motherName), s.motherEmail) +
+         line(who("Father", s.fatherName), s.fatherEmail);
+}
+function firstName(n){ return (n || "").split(" ")[0]; }
+function initials(n){ return (n||"?").split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase(); }
+function avatar(s){
+  if(s.image){
+    return '<img class="avatar" src="' + esc(s.image) + '" alt="" ' +
+      'onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'avatar\',textContent:\'' + initials(s.name) + '\'}))">';
+  }
+  return '<div class="avatar">' + initials(s.name) + '</div>';
+}
+function esc(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+let toastTimer;
+function toast(text, isErr){
+  els.toast.textContent = text;
+  els.toast.className = "toast show" + (isErr ? " err" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { els.toast.className = "toast" + (isErr ? " err" : ""); }, 2800);
+}
+
+/* ---------- dialogs ---------- */
+function openSettings(){
+  els.urlInput.value = getUrl();
+  els.sigInput.value = getSig();
+  els.dialog.showModal();
+}
+els.gear.addEventListener("click", openSettings);
+document.getElementById("cancelSettings").addEventListener("click", () => els.dialog.close());
+document.getElementById("lockBtn").addEventListener("click", () => {
+  els.dialog.close();
+  store("disciplinePin");
+  state.screen = "pin";
+  render();
+});
+document.getElementById("saveSettings").addEventListener("click", () => {
+  const v = els.urlInput.value.trim();
+  if(v) store("disciplineUrl", v);
+  store("parentEmailSignature", els.sigInput.value.trim());
+  els.dialog.close();
+  if(state.screen === "compose") render();
+  else loadRoster();
+});
+document.getElementById("confirmCancel").addEventListener("click", () => { if(!state.sending) els.confirm.close(); });
+els.confirmOk.addEventListener("click", sendEmail);
+els.confirm.addEventListener("cancel", e => { if(state.sending) e.preventDefault(); });
+els.back.addEventListener("click", goBack);
+
+/* ---------- go ---------- */
+if(getPin()) loadRoster();
+else { state.screen = "pin"; render(); }
+</script>
+</body>
+</html>
