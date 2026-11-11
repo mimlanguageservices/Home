@@ -164,12 +164,6 @@
     background:var(--floor); border:2px solid var(--line); border-radius:14px;
     overflow:hidden; user-select:none; -webkit-user-select:none;
   }
-  .board{
-    position:absolute; left:20cqw; right:20cqw; top:0; height:4cqw;
-    background:var(--board); color:#dcfce7; border-radius:0 0 1cqw 1cqw;
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.8cqw; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
-  }
   .item{
     position:absolute; transform:translate(-50%,-50%);
     touch-action:none; cursor:grab;
@@ -231,6 +225,46 @@
   .passage.vert span{writing-mode:vertical-rl;}
   .passage.sel{outline:.5cqw solid var(--accent);}
 
+  /* seat letters (A–Z layout) */
+  .seat .ltr{
+    position:absolute; top:0; left:0; z-index:1;
+    width:calc(var(--s) * .34cqw); height:calc(var(--s) * .34cqw); border-radius:50%;
+    background:var(--accent); color:#fff; font-weight:800; font-size:calc(var(--s) * .21cqw);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 calc(var(--s) * .03cqw) var(--floor);
+  }
+  .seat.teach .avatar{background:var(--accent); color:#fff; font-size:calc(var(--s) * .4cqw); box-shadow:0 0 0 calc(var(--s) * .06cqw) #fbbf24;}
+  .seat.teach .nm{background:var(--accent); color:#fff;}
+  .chip.teach{background:var(--accent); color:#fff;}
+  .chip.teach .avatar{background:rgba(255,255,255,.2); font-size:20px; box-shadow:0 0 0 2px #fbbf24;}
+  .seat.empty.lettered .avatar{font-weight:800; font-size:calc(var(--s) * .34cqw); color:var(--text);}
+  .seat.drop .avatar{outline:calc(var(--s) * .1cqw) solid var(--ok); outline-offset:calc(var(--s) * .04cqw);}
+
+  /* door + TV */
+  .door, .tv{
+    display:flex; align-items:center; justify-content:center; gap:.4cqw;
+    font-weight:700; overflow:hidden; white-space:nowrap; letter-spacing:.08em; text-transform:uppercase;
+  }
+  .door{
+    background:#8b5a2b; border:.25cqw solid #5c3a1a; border-radius:.4cqw;
+    color:#fff3e0; font-size:1.2cqw;
+  }
+  .tv{
+    background:#0b0f19; border:.45cqw solid #4b5563; border-radius:.6cqw;
+    color:#93c5fd; font-size:1.5cqw; box-shadow:0 .3cqw .8cqw rgba(0,0,0,.3);
+  }
+  .door.vert span, .tv.vert span{writing-mode:vertical-rl;}
+  .door.sel, .tv.sel{outline:.5cqw solid var(--accent);}
+
+  /* room + student list side by side on wide screens */
+  .stage{display:grid; grid-template-columns:1fr; gap:14px; align-items:start;}
+  @media (min-width:900px){
+    .stage{grid-template-columns:1fr 250px;}
+    .stage .side{position:sticky; top:12px; max-height:calc(100vh - 24px); overflow:auto;}
+    .stage .side .section-title{margin-top:0;}
+    .stage .side .tray{grid-template-columns:1fr;}
+  }
+
   /* students without a seat */
   .tray{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px;}
   .chip{
@@ -245,6 +279,12 @@
   .chip.boy .avatar{box-shadow:0 0 0 2px var(--boy);}
   .chip.girl .avatar{box-shadow:0 0 0 2px var(--girl);}
   .chip.on{border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,58,237,.35);}
+  .tray .chip{touch-action:none; cursor:grab;}
+  .chip.lifted{opacity:.35;}
+  .chip.ghost{
+    position:fixed; z-index:60; pointer-events:none; margin:0;
+    transform:translate(-50%,-50%) scale(1.05); box-shadow:0 10px 28px rgba(0,0,0,.45);
+  }
 
   /* saved plans */
   .saved{display:flex; flex-direction:column; gap:8px;}
@@ -305,6 +345,7 @@
     .wrap{max-width:none; padding:0;}
     .print-title{display:block; font-size:18px; font-weight:700; margin:0 0 8px;}
     .room{break-inside:avoid;}
+    .stage{display:block;}
   }
 </style>
 </head>
@@ -357,6 +398,8 @@
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQBWAAYOyRs5bKDhe5J5aZ_qLK7wzcLiAfjLwUEE51DmMYq3mw02K1AaLi9OaHRjQ9nQ/exec";
 
 const TABLE_SIZES = [2, 3, 4, 5, 6];
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const LETTER_ROWS = [7, 7, 6, 6];   // A–Z seat rows, front to back
 
 /* Room coordinates: 100 units wide x 75 tall (4:3). 1 unit = 1cqw. */
 const ROOM_W = 100, ROOM_H = 75;
@@ -373,7 +416,7 @@ const state = {
   screen: "class",     // pin -> class -> setup -> plan
   students: [],
   className: null,
-  layout: "groups",    // "circle" | "groups"
+  layout: "lettered",  // "lettered" | "circle" | "groups"
   size: 4,             // seats per table
   teacher: "front",    // "front" | "circle" | "none"
   passages: true,
@@ -471,7 +514,7 @@ function loadPrefs(){
   let p = null;
   try{ p = JSON.parse(store.get(PREFS_KEY) || "null"); }catch(_){}
   if(!p) return;
-  if(p.layout === "circle" || p.layout === "groups") state.layout = p.layout;
+  if(["lettered","circle","groups"].includes(p.layout)) state.layout = p.layout;
   if(TABLE_SIZES.includes(p.size)) state.size = p.size;
   if(["front","circle","none"].includes(p.teacher)) state.teacher = p.teacher;
   if(typeof p.passages === "boolean") state.passages = p.passages;
@@ -570,6 +613,56 @@ function byGender(list){
 function teacherDesk(){
   return { id: uid(), t: "teacher", x: 50, y: 10, w: 16, h: 5 };
 }
+function newDoor(){ return { id: uid(), t: "door", x: 98.6, y: 64, w: 2.4, h: 11 }; }
+function newTv(){ return { id: uid(), t: "tv", x: 50, y: 3.2, w: 16, h: 4.5 }; }
+
+/* The teacher can sit in a seat like a student; the seat stores this name. */
+const TEACHER = "__teacher__";
+function teacherSeated(){ return state.plan.items.some(it => it.t === "seat" && it.s === TEACHER); }
+
+/* Put someone in a seat. Whoever was there goes back to the list, nobody
+   ends up in two seats, and seating the teacher clears away the desk. */
+function seatPerson(seat, name){
+  state.plan.items.forEach(x => { if(x.t === "seat" && x.s === name) x.s = null; });
+  seat.s = name;
+  if(name === TEACHER) state.plan.items = state.plan.items.filter(x => x.t !== "teacher");
+}
+
+/* Door and TV for a new plan: keep wherever they were in this class's
+   last plan, since the room itself doesn't change. */
+function fixtures(){
+  const last = state.lastPlans[state.className];
+  const old = last && Array.isArray(last.items) ? last.items.filter(it => it.t === "door" || it.t === "tv") : [];
+  if(old.length) return old.map(it => Object.assign({}, it, { id: uid() }));
+  return [newDoor(), newTv()];
+}
+
+/* 26 free-standing seats lettered A–Z in rows, A at the front left.
+   They start empty so students can be dragged into them. */
+function letteredPlan(){
+  const front = state.teacher === "none" ? 8 : 17;
+  const rowH = (ROOM_H - 2 - front) / LETTER_ROWS.length;
+  const colW = 96 / Math.max(...LETTER_ROWS);
+  const S = Math.min(colW * 0.72, rowH * 0.85 / 1.25, 10);
+  const items = [];
+  let i = 0;
+  LETTER_ROWS.forEach((cnt, r) => {
+    const y = front + rowH * (r + 0.5);
+    for(let c = 0; c < cnt; c++){
+      items.push({ id: uid(), t: "seat", x: 50 + (c - (cnt - 1) / 2) * colW, y, s: null, l: LETTERS[i++] });
+    }
+  });
+  if(state.teacher !== "none") items.push(teacherDesk());
+  items.push(...fixtures());
+  return { layout: "lettered", size: state.size, seat: S, items };
+}
+function nextLetter(){
+  const used = new Set(state.plan.items.filter(it => it.t === "seat" && it.l).map(it => it.l));
+  return LETTERS.find(l => !used.has(l)) || null;
+}
+function layoutName(plan){
+  return plan.layout === "circle" ? "Circle" : plan.layout === "lettered" ? "Seats A–Z" : "Tables of " + plan.size;
+}
 
 /* Seats evenly round an oval. "In the circle" puts the teacher at the
    top of the ring; passages leave a gap at the bottom with a walkway
@@ -592,6 +685,7 @@ function circlePlan(n){
     else items.push({ id: uid(), t: "seat", x, y, s: null });
   }
   if(state.teacher === "front") items.push(teacherDesk());
+  items.push(...fixtures());
   return { layout: "circle", size: state.size, seat: S, items };
 }
 
@@ -628,6 +722,7 @@ function groupsPlan(n){
     for(let k = 0; k < size; k++) items.push({ id: uid(), t: "seat", tb: tbl.id, k, s: null });
   }
   if(state.teacher !== "none") items.push(teacherDesk());
+  items.push(...fixtures());
   return { layout: "groups", size, seat: best.S, items };
 }
 
@@ -637,7 +732,8 @@ function groupsPlan(n){
    out; with mixing on, boys and girls alternate. Anyone who doesn't fit
    is left in the "not seated" tray. */
 function assignSeats(plan){
-  const seats = plan.items.filter(it => it.t === "seat");
+  // A seated teacher keeps their chair; everyone else is reshuffled.
+  const seats = plan.items.filter(it => it.t === "seat" && it.s !== TEACHER);
   seats.forEach(st => { st.s = null; });
   const tableIds = new Set(plan.items.filter(it => it.t === "table").map(it => it.id));
   const tableSeats = shuffle([...tableIds])
@@ -663,6 +759,12 @@ function assignSeats(plan){
     rest = state.mixGender ? interleave(interleave(g.boys, g.girls), g.other) : shuffle(g.boys.concat(g.girls, g.other));
   }
 
+  // Lettered seats fill in order A, B, C…
+  if(plan.layout === "lettered"){
+    loose.sort((a, b) => (a.l || "~").localeCompare(b.l || "~"));
+    loose.forEach((st, i) => { if(rest[i]) st.s = rest[i].name; });
+    return;
+  }
   // Loose seats in order round their centre, starting at the top.
   if(loose.length && rest.length){
     const cx = loose.reduce((a, st) => a + st.x, 0) / loose.length;
@@ -675,6 +777,10 @@ function assignSeats(plan){
 }
 
 function describePlan(n){
+  if(state.layout === "lettered"){
+    return LETTERS.length + " seats lettered A–Z" +
+      (n > LETTERS.length ? " · add " + (n - LETTERS.length) + " more seats on the next screen" : "");
+  }
   const m = n + state.extra;
   if(!m) return "No students in this class";
   if(state.layout === "circle"){
@@ -726,7 +832,7 @@ function render(){
     locked ? "" :
     state.screen === "class" ? (state.refreshing ? "Updating list…" : "") :
     state.screen === "setup" ? "Choose how the room is set out, then create the plan" :
-    state.screen === "plan" ? "Tap two seats to swap · drag anything to move it" :
+    state.screen === "plan" ? "Drag students onto seats · tap two seats to swap · drag anything to move it" :
     "";
 
   if(locked) return renderPin();
@@ -788,11 +894,15 @@ function renderSetup(){
   els.title.textContent = "Class " + state.className;
   const n = classStudents().length;
   const circle = state.layout === "circle";
+  const lettered = state.layout === "lettered";
+  const groups = state.layout === "groups";
 
   const layouts =
+    '<button class="size-btn small' + (lettered ? ' on' : '') + '" onclick="setLayout(\'lettered\')">🔤&nbsp; Seats A–Z' +
+      '<span class="sub">26 lettered seats you can move</span></button>' +
     '<button class="size-btn small' + (circle ? ' on' : '') + '" onclick="setLayout(\'circle\')">⭕&nbsp; Circle' +
       '<span class="sub">Everyone round one ring</span></button>' +
-    '<button class="size-btn small' + (!circle ? ' on' : '') + '" onclick="setLayout(\'groups\')">▦&nbsp; Groups' +
+    '<button class="size-btn small' + (groups ? ' on' : '') + '" onclick="setLayout(\'groups\')">▦&nbsp; Groups' +
       '<span class="sub">Students at tables</span></button>';
 
   const sizes = TABLE_SIZES.map(k =>
@@ -814,7 +924,7 @@ function renderSetup(){
   const saved = savedList().map((x, i) =>
     '<div class="saved-row">' +
       '<button class="open" onclick="openSaved(' + i + ')">' + esc(x.name) +
-        '<span class="sub">' + (x.plan.layout === "circle" ? "Circle" : "Tables of " + x.plan.size) +
+        '<span class="sub">' + esc(layoutName(x.plan)) +
           ' · ' + esc(fmtDate(x.ts)) + '</span>' +
       '</button>' +
       '<button class="del" onclick="deleteSaved(' + i + ')" aria-label="Delete ' + esc(x.name) + '">🗑</button>' +
@@ -825,29 +935,32 @@ function renderSetup(){
   els.view.innerHTML =
     (saved ? '<div class="section-title">Saved seating plans</div><div class="saved">' + saved + '</div>' : '') +
     '<div class="section-title">Layout</div>' +
-    '<div class="sizes two">' + layouts + '</div>' +
-    (circle ? '' : '<div class="section-title">Table size</div><div class="sizes">' + sizes + '</div>') +
+    '<div class="sizes three">' + layouts + '</div>' +
+    (groups ? '<div class="section-title">Table size</div><div class="sizes">' + sizes + '</div>' : '') +
     '<div class="section-title">Teacher</div>' +
     '<div class="sizes three">' + teacherOpts + '</div>' +
     '<div class="section-title">Options</div>' +
+    (lettered ? '' :
     '<button class="toggle' + (state.passages ? ' on' : '') + '" onclick="togglePassages()">' +
       '<span class="lbl">Passages<span class="sub">' +
         (circle ? 'Leave a gap in the circle with a walkway to the back' : 'Leave walkways between the tables and across the front') +
       '</span></span><span class="sw"></span>' +
-    '</button>' +
+    '</button>') +
     '<button class="toggle' + (state.mixGender ? ' on' : '') + '" onclick="toggleMix()">' +
       '<span class="lbl">Mix boys and girls<span class="sub">' +
-        (circle ? 'Alternate boys and girls round the circle' : 'Spread boys and girls evenly across tables') +
+        (lettered ? 'Alternate boys and girls when filling seats randomly' :
+         circle ? 'Alternate boys and girls round the circle' : 'Spread boys and girls evenly across tables') +
       '</span></span><span class="sw"></span>' +
     '</button>' +
+    (lettered ? '' :
     '<div class="stepper">' +
       '<span class="lbl">Extra empty seats<span class="sub">For visitors, new students or spacing</span></span>' +
       '<button onclick="setExtra(-1)" aria-label="Fewer">−</button>' +
       '<span class="val">' + state.extra + '</span>' +
       '<button onclick="setExtra(1)" aria-label="More">+</button>' +
-    '</div>' +
+    '</div>') +
     '<div class="sticky-go">' +
-      '<button class="action-btn" onclick="createPlan()"' + (n + state.extra ? '' : ' disabled') + '>' +
+      '<button class="action-btn" onclick="createPlan()"' + (lettered || n + state.extra ? '' : ' disabled') + '>' +
         'Create seating plan<span class="sub">' + n + ' students · ' + esc(describePlan(n)) + '</span>' +
       '</button>' +
       (last ? '<button class="tile" style="margin-top:10px; justify-content:center; font-size:15px;" onclick="showLast()">' +
@@ -872,8 +985,7 @@ function seatLabels(){
 
 function renderPlan(){
   const plan = state.plan;
-  const heading = "Class " + state.className + " · " +
-    (state.planName || (plan.layout === "circle" ? "Circle" : "Tables of " + plan.size));
+  const heading = "Class " + state.className + " · " + (state.planName || layoutName(plan));
   els.title.textContent = heading;
 
   const byName = {};
@@ -882,17 +994,22 @@ function renderPlan(){
   const seated = new Set(plan.items.filter(it => it.t === "seat" && byName[it.s]).map(it => it.s));
   const unseated = classStudents().filter(s => !seated.has(s.name)).sort((a, b) => a.name.localeCompare(b.name));
   const hasTeacher = plan.items.some(it => it.t === "teacher");
-  const rank = { passage: 0, table: 1, seat: 2, teacher: 3 };
-  const items = plan.items.slice().sort((a, b) => rank[a.t] - rank[b.t]);
+  const rank = { passage: 0, door: 0, tv: 1, table: 1, seat: 2, teacher: 3 };
+  const items = plan.items.slice().sort((a, b) => (rank[a.t] || 0) - (rank[b.t] || 0));
+  const lettered = plan.layout === "lettered";
+  const showTeacher = !teacherSeated();
 
   els.view.innerHTML =
     '<div class="toolbar">' +
-      '<button class="tool-btn primary" onclick="reshuffle()">🔀&nbsp; Reshuffle students</button>' +
+      '<button class="tool-btn primary" onclick="reshuffle()">🔀&nbsp; ' + (lettered ? 'Fill seats randomly' : 'Reshuffle students') + '</button>' +
+      '<button class="tool-btn" onclick="clearSeats()">Empty all seats</button>' +
       '<button class="tool-btn" onclick="openSaveDialog()">💾&nbsp; Save as…</button>' +
       '<button class="tool-btn" onclick="window.print()">🖨&nbsp; Print</button>' +
-      '<button class="tool-btn" onclick="addSeat()">＋ Empty seat</button>' +
+      '<button class="tool-btn" onclick="addSeat()">＋ Seat</button>' +
       (plan.layout === "groups" ? '<button class="tool-btn" onclick="addTable()">＋ Table</button>' : '') +
       '<button class="tool-btn" onclick="addPassage()">＋ Passage</button>' +
+      '<button class="tool-btn" onclick="addDoor()">＋ Door</button>' +
+      '<button class="tool-btn" onclick="addTv()">＋ TV</button>' +
       (hasTeacher ? '' : '<button class="tool-btn" onclick="addTeacher()">＋ Teacher</button>') +
       '<button class="tool-btn" onclick="resizeSeats(1/1.1)" aria-label="Smaller seats">A−</button>' +
       '<button class="tool-btn" onclick="resizeSeats(1.1)" aria-label="Bigger seats">A+</button>' +
@@ -900,22 +1017,29 @@ function renderPlan(){
     '</div>' +
     '<div class="selbar">' + selbarHtml(byName) + '</div>' +
     '<div class="print-title">' + esc(heading) + '</div>' +
-    '<div class="room' + (state.pick ? ' picking' : '') + '" id="room" style="--s:' + plan.seat.toFixed(2) + ';">' +
-      '<div class="board">Board</div>' +
-      items.map(it => itemHtml(it, byName, labels)).join("") +
-    '</div>' +
-    '<div class="no-print">' +
-      '<div class="section-title">Not seated: ' + unseated.length + '</div>' +
-      (unseated.length
-        ? '<div class="crumb" style="padding-top:0;">Tap a student, then tap a seat to put them there.</div>' +
-          '<div class="tray">' + unseated.map(s =>
-            '<button class="chip' + genderCls(s) + (state.pick === s.name ? ' on' : '') + '" ' +
-              'onclick="pickStudent(' + state.students.indexOf(s) + ')">' +
-              avatar(s) + '<span class="nm">' + esc(s.name) + '</span></button>').join("") + '</div>'
-        : '<div class="crumb" style="padding-top:0;">Everyone in ' + esc(state.className) + ' has a seat.</div>') +
+    '<div class="stage">' +
+      '<div class="room' + (state.pick ? ' picking' : '') + '" id="room" style="--s:' + plan.seat.toFixed(2) + ';">' +
+        items.map(it => itemHtml(it, byName, labels)).join("") +
+      '</div>' +
+      '<div class="side no-print">' +
+        '<div class="section-title">Not seated: ' + unseated.length + '</div>' +
+        (unseated.length || showTeacher
+          ? '<div class="crumb" style="padding-top:0;">Drag a student or the teacher onto a seat — or tap them, then tap a seat.</div>' +
+            '<div class="tray">' +
+            (showTeacher
+              ? '<button class="chip teach' + (state.pick === TEACHER ? ' on' : '') + '" data-idx="-1">' +
+                  '<div class="avatar">🧑‍🏫</div><span class="nm">Teacher</span></button>'
+              : '') +
+            unseated.map(s =>
+              '<button class="chip' + genderCls(s) + (state.pick === s.name ? ' on' : '') + '" ' +
+                'data-idx="' + state.students.indexOf(s) + '">' +
+                avatar(s) + '<span class="nm">' + esc(s.name) + '</span></button>').join("") + '</div>'
+          : '<div class="crumb" style="padding-top:0;">Everyone in ' + esc(state.className) + ' has a seat.</div>') +
+      '</div>' +
     '</div>';
 
   wireRoom();
+  wireTray();
 }
 
 function itemHtml(it, byName, labels){
@@ -926,11 +1050,19 @@ function itemHtml(it, byName, labels){
 
   if(it.t === "seat"){
     const s = byName[it.s];
-    if(!s){
-      return '<div class="item seat empty' + sel + '" data-id="' + it.id + '" style="' + style + '">' +
-               '<div class="avatar">+</div><div class="nm">Empty</div></div>';
+    const ltr = it.l ? '<div class="ltr">' + esc(it.l) + '</div>' : '';
+    if(it.s === TEACHER){
+      return '<div class="item seat teach' + sel + '" data-id="' + it.id + '" style="' + style + '" title="' +
+               (it.l ? esc(it.l) + ': ' : '') + 'Teacher">' + ltr +
+               '<div class="avatar">🧑‍🏫</div><div class="nm">Teacher</div></div>';
     }
-    return '<div class="item seat' + genderCls(s) + sel + '" data-id="' + it.id + '" style="' + style + '" title="' + esc(s.name) + '">' +
+    if(!s){
+      return '<div class="item seat empty' + (it.l ? ' lettered' : '') + sel + '" data-id="' + it.id + '" style="' + style + '">' +
+               '<div class="avatar">' + (it.l ? esc(it.l) : '+') + '</div><div class="nm">Empty</div></div>';
+    }
+    return '<div class="item seat' + genderCls(s) + sel + '" data-id="' + it.id + '" style="' + style + '" title="' +
+             (it.l ? esc(it.l) + ': ' : '') + esc(s.name) + '">' +
+             (it.l ? '<div class="ltr">' + esc(it.l) + '</div>' : '') +
              avatar(s) + '<div class="nm">' + esc(labels[s.name] || firstName(s.name)) + '</div></div>';
   }
   if(it.t === "table"){
@@ -944,6 +1076,11 @@ function itemHtml(it, byName, labels){
     return '<div class="item teacher' + sel + '" data-id="' + it.id + '" style="' + style + '">🧑‍🏫' +
              '<span>Teacher</span></div>';
   }
+  if(it.t === "door" || it.t === "tv"){
+    const vert = it.h > it.w;
+    const label = it.t === "door" ? (vert ? '<span>Door</span>' : '🚪<span>Door</span>') : (vert ? '<span>TV</span>' : '📺<span>TV</span>');
+    return '<div class="item ' + it.t + (vert ? ' vert' : '') + sel + '" data-id="' + it.id + '" style="' + style + '">' + label + '</div>';
+  }
   return '<div class="item passage' + (it.h > it.w ? ' vert' : '') + sel + '" data-id="' + it.id + '" style="' + style + '">' +
            (Math.max(it.w, it.h) >= 12 ? '<span>Passage</span>' : '') + '</div>';
 }
@@ -951,16 +1088,17 @@ function itemHtml(it, byName, labels){
 function selbarHtml(byName){
   const it = state.sel && findItem(state.sel);
   if(state.pick){
-    return '<span class="what">Seat ' + esc(state.pick) + ' — tap a seat</span>' +
+    return '<span class="what">Seat ' + (state.pick === TEACHER ? 'the teacher' : esc(state.pick)) + ' — tap a seat</span>' +
            '<button class="tool-btn" onclick="clearSel()">Cancel</button>';
   }
   if(!it){
-    return '<span class="hint">Tap a seat, table, passage or the teacher to change it. ' +
+    return '<span class="hint">Tap a seat, door, TV or anything else in the room to change it. ' +
            'Drag to move. Tap two seats to swap.</span>';
   }
   if(it.t === "seat"){
-    const s = byName[it.s];
-    return '<span class="what">' + (s ? esc(s.name) + ' — tap another seat to swap' : 'Empty seat — tap a student to move them here') + '</span>' +
+    const s = it.s === TEACHER ? { name: "Teacher" } : byName[it.s];
+    const tag = it.l ? 'Seat ' + esc(it.l) + ' · ' : '';
+    return '<span class="what">' + tag + (s ? esc(s.name) + ' — tap another seat to swap' : 'Empty — tap a student to move them here') + '</span>' +
            (s ? '<button class="tool-btn" onclick="unseat()">Remove from seat</button>' : '') +
            '<button class="tool-btn danger" onclick="deleteSel()">Delete seat</button>' +
            '<button class="tool-btn" onclick="clearSel()">Done</button>';
@@ -973,6 +1111,14 @@ function selbarHtml(byName){
   if(it.t === "teacher"){
     return '<span class="what">Teacher</span>' +
            '<button class="tool-btn danger" onclick="deleteSel()">Remove teacher</button>' +
+           '<button class="tool-btn" onclick="clearSel()">Done</button>';
+  }
+  if(it.t === "door" || it.t === "tv"){
+    return '<span class="what">' + (it.t === "door" ? "Door" : "TV") + '</span>' +
+           '<button class="tool-btn" onclick="rotatePassage()">⟳ Turn</button>' +
+           '<button class="tool-btn" onclick="stretchPassage(1.2)">Bigger</button>' +
+           '<button class="tool-btn" onclick="stretchPassage(1/1.2)">Smaller</button>' +
+           '<button class="tool-btn danger" onclick="deleteSel()">Delete</button>' +
            '<button class="tool-btn" onclick="clearSel()">Done</button>';
   }
   return '<span class="what">Passage</span>' +
@@ -1020,17 +1166,123 @@ function wireRoom(){
     if(drag.target.t === "table"){
       state.plan.items.filter(x => x.tb === drag.target.id).forEach(placeEl);
     }
+    // The teacher's desk can be dropped onto a chair: show which one.
+    if(drag.target.t === "teacher"){
+      const seat = seatUnder(drag.el, e.clientX, e.clientY);
+      if(seat !== drag.over){
+        if(drag.over) drag.over.classList.remove("drop");
+        if(seat) seat.classList.add("drop");
+        drag.over = seat;
+      }
+    }
   });
   const end = e => {
     if(!drag) return;
     const d = drag;
     drag = null;
     d.el.classList.remove("dragging");
+    if(d.over) d.over.classList.remove("drop");
+    if(d.moved && d.target.t === "teacher" && d.over && e.type === "pointerup"){
+      const seat = findItem(d.over.dataset.id);
+      if(seat){
+        seatPerson(seat, TEACHER);  // also removes the desk
+        state.sel = null;
+        rememberPlan();
+        render();
+        return;
+      }
+    }
     if(d.moved){ rememberPlan(); return; }
     if(e.type === "pointerup") tapItem(d.id);
   };
   room.addEventListener("pointerup", end);
   room.addEventListener("pointercancel", end);
+}
+
+/* ---------- dragging students from the list onto seats ---------- */
+let chipDrag = null;
+
+/* Seat under the pointer, looking past the element being dragged. */
+function seatUnder(el, x, y){
+  const v = el.style.visibility;
+  el.style.visibility = "hidden";
+  const seat = seatAt(x, y);
+  el.style.visibility = v;
+  return seat;
+}
+function seatAt(x, y){
+  const el = document.elementFromPoint(x, y);
+  return el ? el.closest(".room .seat") : null;
+}
+function wireTray(){
+  document.querySelectorAll(".tray .chip").forEach(chip => {
+    chip.addEventListener("pointerdown", e => {
+      if(e.button > 0) return;
+      e.preventDefault();
+      chip.setPointerCapture(e.pointerId);
+      chipDrag = { idx: +chip.dataset.idx, chip, sx: e.clientX, sy: e.clientY, x: e.clientX, y: e.clientY, ghost: null, over: null };
+    });
+    chip.addEventListener("pointermove", e => {
+      const d = chipDrag;
+      if(!d || d.chip !== chip) return;
+      d.x = e.clientX; d.y = e.clientY;
+      if(!d.ghost){
+        if(Math.hypot(d.x - d.sx, d.y - d.sy) < 6) return;
+        d.ghost = chip.cloneNode(true);
+        d.ghost.classList.add("ghost");
+        d.ghost.classList.remove("on");
+        d.ghost.style.width = chip.offsetWidth + "px";
+        document.body.appendChild(d.ghost);
+        chip.classList.add("lifted");
+        autoScroll(d);
+      }
+      moveGhost(d);
+    });
+    const end = e => {
+      const d = chipDrag;
+      if(!d || d.chip !== chip) return;
+      chipDrag = null;
+      if(!d.ghost){
+        if(e.type === "pointerup") pickStudent(d.idx);
+        return;
+      }
+      d.ghost.remove();
+      chip.classList.remove("lifted");
+      if(d.over) d.over.classList.remove("drop");
+      const it = e.type === "pointerup" && d.over && findItem(d.over.dataset.id);
+      const name = d.idx === -1 ? TEACHER : (state.students[d.idx] || {}).name;
+      if(it && name){
+        seatPerson(it, name);
+        state.pick = null;
+        state.sel = null;
+        rememberPlan();
+        render();
+      }
+    };
+    chip.addEventListener("pointerup", end);
+    chip.addEventListener("pointercancel", end);
+  });
+}
+function moveGhost(d){
+  d.ghost.style.left = d.x + "px";
+  d.ghost.style.top = d.y + "px";
+  const seat = seatAt(d.x, d.y);
+  if(seat !== d.over){
+    if(d.over) d.over.classList.remove("drop");
+    if(seat) seat.classList.add("drop");
+    d.over = seat;
+  }
+}
+/* Scroll the page while a student is held near the top or bottom edge,
+   so the room can be reached when it's off screen. */
+function autoScroll(d){
+  if(chipDrag !== d) return;
+  const edge = 70;
+  let v = 0;
+  if(d.y < edge) v = -(edge - d.y) / 3;
+  else if(d.y > innerHeight - edge) v = (d.y - (innerHeight - edge)) / 3;
+  if(v){ window.scrollBy(0, v); moveGhost(d); }
+  requestAnimationFrame(() => autoScroll(d));
 }
 
 function placeEl(it){
@@ -1045,7 +1297,7 @@ function tapItem(id){
   const it = findItem(id);
   if(!it) return;
   if(it.t === "seat" && state.pick){
-    it.s = state.pick;          // anyone already there goes back to the tray
+    seatPerson(it, state.pick);
     state.pick = null;
     state.sel = null;
     rememberPlan();
@@ -1068,7 +1320,7 @@ function pickClass(i){
 }
 function setLayout(v){
   state.layout = v;
-  if(v === "groups" && state.teacher === "circle") state.teacher = "front";
+  if(v !== "circle" && state.teacher === "circle") state.teacher = "front";
   savePrefs(); render();
 }
 function setSize(n){ state.size = n; savePrefs(); render(); }
@@ -1079,8 +1331,9 @@ function setExtra(d){ state.extra = clamp(state.extra + d, 0, 20); savePrefs(); 
 
 function createPlan(){
   const n = classStudents().length;
-  state.plan = state.layout === "circle" ? circlePlan(n) : groupsPlan(n);
-  assignSeats(state.plan);
+  state.plan = state.layout === "lettered" ? letteredPlan() : state.layout === "circle" ? circlePlan(n) : groupsPlan(n);
+  // Lettered seats start empty, ready for students to be dragged in.
+  if(state.layout !== "lettered") assignSeats(state.plan);
   state.planName = null;
   state.sel = null;
   state.pick = null;
@@ -1099,13 +1352,39 @@ function reshuffle(){
   render();
 }
 
+function clearSeats(){
+  if(!confirm("Take every student out of their seat?")) return;
+  state.plan.items.forEach(it => { if(it.t === "seat") it.s = null; });
+  state.sel = null;
+  state.pick = null;
+  rememberPlan();
+  render();
+}
 function addSeat(){
   const it = { id: uid(), t: "seat", x: 50 + (Math.random() * 10 - 5), y: 40 + (Math.random() * 10 - 5), s: null };
+  const l = state.plan.layout === "lettered" ? nextLetter() : null;
+  if(l) it.l = l;
   state.plan.items.push(it);
   state.sel = it.id;
   rememberPlan();
   render();
-  toast("Seat added — drag it into place");
+  toast((l ? "Seat " + l : "Seat") + " added — drag it into place");
+}
+function addDoor(){
+  const it = newDoor();
+  state.plan.items.push(it);
+  state.sel = it.id;
+  rememberPlan();
+  render();
+  toast("Door added — drag it into place");
+}
+function addTv(){
+  const it = newTv();
+  state.plan.items.push(it);
+  state.sel = it.id;
+  rememberPlan();
+  render();
+  toast("TV added — drag it into place");
 }
 function addTable(){
   const tables = state.plan.items.filter(it => it.t === "table");
@@ -1139,16 +1418,16 @@ function resizeSeats(f){
 }
 
 function pickStudent(idx){
-  const s = state.students[idx];
-  if(!s) return;
+  const name = idx === -1 ? TEACHER : (state.students[idx] || {}).name;
+  if(!name) return;
   const sel = state.sel && findItem(state.sel);
   if(sel && sel.t === "seat"){
-    sel.s = s.name;
+    seatPerson(sel, name);
     state.sel = null;
     state.pick = null;
     rememberPlan();
   }else{
-    state.pick = state.pick === s.name ? null : s.name;
+    state.pick = state.pick === name ? null : name;
     state.sel = null;
   }
   render();
