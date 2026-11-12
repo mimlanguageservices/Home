@@ -147,6 +147,7 @@
   }
   .tool-btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
   .tool-btn.danger{color:var(--danger);}
+  .tool-btn.on{background:var(--accent); border-color:var(--accent); color:#fff;}
   .tool-btn:active{filter:brightness(.92);}
 
   .selbar{
@@ -163,6 +164,13 @@
     position:relative; width:100%; aspect-ratio:4/3; container-type:inline-size;
     background:var(--floor); border:2px solid var(--line); border-radius:14px;
     overflow:hidden; user-select:none; -webkit-user-select:none;
+  }
+  /* Snap-to-grid guide lines, one every GRID units (40 across, 30 down). */
+  .room.grid{
+    background-image:
+      linear-gradient(to right, var(--line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size:calc(100% / 40) calc(100% / 30);
   }
   .item{
     position:absolute; transform:translate(-50%,-50%);
@@ -344,7 +352,7 @@
     header, .crumb, .toolbar, .selbar, .no-print, .toast{display:none !important;}
     .wrap{max-width:none; padding:0;}
     .print-title{display:block; font-size:18px; font-weight:700; margin:0 0 8px;}
-    .room{break-inside:avoid;}
+    .room{break-inside:avoid; background-image:none;}
     .stage{display:block;}
   }
 </style>
@@ -403,6 +411,7 @@ const LETTER_ROWS = [7, 7, 6, 6];   // A–Z seat rows, front to back
 
 /* Room coordinates: 100 units wide x 75 tall (4:3). 1 unit = 1cqw. */
 const ROOM_W = 100, ROOM_H = 75;
+const GRID = 2.5;         // snap-to-grid step (must match the .room.grid lines)
 
 /* Table seat geometry, in multiples of the seat size S. */
 const SEAT_PITCH = 1.1;   // centre-to-centre distance along a table
@@ -422,7 +431,8 @@ const state = {
   passages: true,
   extra: 0,            // extra empty seats
   mixGender: true,
-  plan: null,          // { layout, size, seat, items:[...] }
+  snap: false,         // dragged items land on the grid
+  plan: null,         // { layout, size, seat, items:[...] }
   planName: null,      // name of the saved plan on screen, if any
   saved: {},           // class -> [{ name, ts, plan }]
   lastPlans: {},       // class -> plan
@@ -520,13 +530,14 @@ function loadPrefs(){
   if(typeof p.passages === "boolean") state.passages = p.passages;
   if(Number.isInteger(p.extra) && p.extra >= 0) state.extra = p.extra;
   if(typeof p.mixGender === "boolean") state.mixGender = p.mixGender;
+  if(typeof p.snap === "boolean") state.snap = p.snap;
   if(p.lastPlans && typeof p.lastPlans === "object") state.lastPlans = p.lastPlans;
   if(p.saved && typeof p.saved === "object") state.saved = p.saved;
 }
 function savePrefs(){
   store.set(PREFS_KEY, JSON.stringify({
     layout: state.layout, size: state.size, teacher: state.teacher,
-    passages: state.passages, extra: state.extra, mixGender: state.mixGender,
+    passages: state.passages, extra: state.extra, mixGender: state.mixGender, snap: state.snap,
     lastPlans: state.lastPlans, saved: state.saved
   }));
 }
@@ -998,6 +1009,7 @@ function renderPlan(){
   const items = plan.items.slice().sort((a, b) => (rank[a.t] || 0) - (rank[b.t] || 0));
   const lettered = plan.layout === "lettered";
   const showTeacher = !teacherSeated();
+  const looseSeats = plan.items.filter(it => it.t === "seat" && !it.tb).length;
 
   els.view.innerHTML =
     '<div class="toolbar">' +
@@ -1013,12 +1025,14 @@ function renderPlan(){
       (hasTeacher ? '' : '<button class="tool-btn" onclick="addTeacher()">＋ Teacher</button>') +
       '<button class="tool-btn" onclick="resizeSeats(1/1.1)" aria-label="Smaller seats">A−</button>' +
       '<button class="tool-btn" onclick="resizeSeats(1.1)" aria-label="Bigger seats">A+</button>' +
+      '<button class="tool-btn' + (state.snap ? ' on' : '') + '" onclick="toggleSnap()">▦&nbsp; Snap to grid</button>' +
+      (looseSeats >= 3 ? '<button class="tool-btn" onclick="arrangeCircle()">⭕&nbsp; Arrange in circle</button>' : '') +
       '<button class="tool-btn" onclick="goBack()">Change layout</button>' +
     '</div>' +
     '<div class="selbar">' + selbarHtml(byName) + '</div>' +
     '<div class="print-title">' + esc(heading) + '</div>' +
     '<div class="stage">' +
-      '<div class="room' + (state.pick ? ' picking' : '') + '" id="room" style="--s:' + plan.seat.toFixed(2) + ';">' +
+      '<div class="room' + (state.pick ? ' picking' : '') + (state.snap ? ' grid' : '') + '" id="room" style="--s:' + plan.seat.toFixed(2) + ';">' +
         items.map(it => itemHtml(it, byName, labels)).join("") +
       '</div>' +
       '<div class="side no-print">' +
@@ -1160,8 +1174,8 @@ function wireRoom(){
     const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
     if(!drag.moved && Math.hypot(dx, dy) < 6) return;
     if(!drag.moved){ drag.moved = true; drag.el.classList.add("dragging"); }
-    drag.target.x = clamp(drag.ox + dx / drag.unit, 0, ROOM_W);
-    drag.target.y = clamp(drag.oy + dy / drag.unit, 0, ROOM_H);
+    drag.target.x = clamp(snap(drag.ox + dx / drag.unit), 0, ROOM_W);
+    drag.target.y = clamp(snap(drag.oy + dy / drag.unit), 0, ROOM_H);
     placeEl(drag.target);
     if(drag.target.t === "table"){
       state.plan.items.filter(x => x.tb === drag.target.id).forEach(placeEl);
@@ -1411,6 +1425,68 @@ function addTeacher(){
   rememberPlan();
   render();
 }
+function snap(v){ return state.snap ? Math.round(v / GRID) * GRID : v; }
+function toggleSnap(){ state.snap = !state.snap; savePrefs(); render(); }
+
+/* Space the free-standing seats evenly round an oval that fills the room,
+   leaving space for the teacher's desk and TV, with seats as big as fit. Seats
+   keep their order (A, B, C… or round the room). Lettered seats turn so
+   I faces the teacher; otherwise the ring starts at the top. Table seats
+   are left alone. */
+function arrangeCircle(){
+  const seats = state.plan.items.filter(it => it.t === "seat" && !it.tb);
+  if(seats.length < 3) return;
+  const desk = state.plan.items.find(it => it.t === "teacher");
+  const lettered = seats.every(s => s.l);
+  if(lettered) seats.sort((a, b) => a.l.localeCompare(b.l));
+  else{
+    const cx0 = seats.reduce((a, s) => a + s.x, 0) / seats.length, cy0 = seats.reduce((a, s) => a + s.y, 0) / seats.length;
+    const top = s => (Math.atan2(s.y - cy0, s.x - cx0) + Math.PI * 2.5) % (Math.PI * 2);   // clockwise from the top
+    seats.sort((a, b) => top(a) - top(b));
+  }
+
+  // Ring size depends on seat size and seat size on ring length, so settle it in a few passes.
+  let S = state.plan.seat, ring;
+  for(let pass = 0; pass < 4; pass++){
+    const mx = S * 0.6 + 1, my = S * 0.85 + 1;   // seat half-width / half-height incl. name
+    let top = my, bottom = ROOM_H - my;
+    // Keep clear of the teacher's desk and any TV standing along the front or back wall.
+    state.plan.items.filter(it => it.t === "teacher" || it.t === "tv").forEach(it => {
+      if(it.y < ROOM_H / 3) top = Math.max(top, it.y + it.h / 2 + my + 1);
+      if(it.y > ROOM_H * 2 / 3) bottom = Math.min(bottom, it.y - it.h / 2 - my - 1);
+    });
+    ring = { cx: ROOM_W / 2, cy: (top + bottom) / 2, rx: ROOM_W / 2 - mx, ry: (bottom - top) / 2 };
+    const p = Math.PI * (3 * (ring.rx + ring.ry) - Math.sqrt((3 * ring.rx + ring.ry) * (ring.rx + 3 * ring.ry)));
+    S = clamp(p / seats.length / 1.2, 3, 10);
+  }
+  const { cx, cy, rx, ry } = ring;
+
+  // Where the ring starts: the seat facing the teacher (I) points at the desk, else the top.
+  const anchor = lettered ? Math.max(0, seats.findIndex(s => s.l === "I")) : 0;
+  const aim = desk || { x: cx, y: 0 };
+  const tAim = Math.atan2((aim.y - cy) / ry, (aim.x - cx) / rx);
+
+  // Equal spacing along the oval's edge, not equal angles, so seats don't bunch at the ends.
+  const N = 720, pts = [], len = [0];
+  for(let i = 0; i <= N; i++){
+    const t = tAim + 2 * Math.PI * i / N;
+    pts.push({ x: cx + rx * Math.cos(t), y: cy + ry * Math.sin(t) });
+    if(i) len.push(len[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+  }
+  const step = len[N] / seats.length;
+  let j = 0;
+  for(let k = 0; k < seats.length; k++){
+    const s = seats[(anchor + k) % seats.length];
+    while(j < N && len[j] < k * step) j++;
+    s.x = pts[j].x; s.y = pts[j].y;
+  }
+  state.plan.seat = S;
+  state.sel = null;
+  rememberPlan();
+  render();
+  toast("Seats arranged in a circle — drag any seat to adjust");
+}
+
 function resizeSeats(f){
   state.plan.seat = clamp(state.plan.seat * f, 3, 14);
   rememberPlan();
