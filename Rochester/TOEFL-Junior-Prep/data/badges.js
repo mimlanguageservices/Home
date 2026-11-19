@@ -25,10 +25,23 @@
     return `<svg viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true"><path d="M18 12H8v4c0 7 5 12 12 12M46 12h10v4c0 7-5 12-12 12" fill="none" stroke="${b.color}" stroke-width="4" stroke-linecap="round"/><path d="M18 8h28v14c0 9-6 16-14 16s-14-7-14-16V8z" fill="${b.color}"/><path d="M25 13v9c0 4 2 7 5 8" stroke="#fff" stroke-opacity=".55" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="29" y="38" width="6" height="10" fill="${b.color}"/><rect x="20" y="48" width="24" height="8" rx="2" fill="${b.color}"/></svg>`;
   }
 
-  // Large badge for a result screen
+  // Section points out of 300 (100% = 300); below 282 is shown in red
+  const POINTS_MAX = 300, POINTS_TARGET = 282;
+  function tjPoints(correct, total) { return total ? Math.round((correct / total) * POINTS_MAX) : 0; }
+  function tjPointsHtml(correct, total) {
+    const pts = tjPoints(correct, total), low = pts < POINTS_TARGET;
+    return `<div class="tj-points${low ? ' low' : ''}"><span class="tj-points-num">${pts}</span> / ${POINTS_MAX} points</div>`
+      + (low ? `<div class="tj-points-msg">Aim for more than ${POINTS_TARGET} points in each section.</div>` : '');
+  }
+  function tjPointsMini(correct, total) {
+    const pts = tjPoints(correct, total);
+    return `<span class="tj-points-mini${pts < POINTS_TARGET ? ' low' : ''}">${pts} pts</span>`;
+  }
+
+  // Large badge for a result screen (with the points out of 300 above it)
   function tjBadgeHtml(correct, total) {
     const b = tjBadge(correct, total);
-    return `<div class="tj-badge" style="background:${b.bg};color:${b.text}"><div class="tj-badge-icon">${icon(b, 84)}</div><div class="tj-badge-body"><div class="tj-badge-name">${b.name}</div><div class="tj-badge-pct">${b.pct}% &middot; ${correct} / ${total}</div><div class="tj-badge-msg">${b.msg}</div></div></div>
+    return tjPointsHtml(correct, total) + `<div class="tj-badge" style="background:${b.bg};color:${b.text}"><div class="tj-badge-icon">${icon(b, 84)}</div><div class="tj-badge-body"><div class="tj-badge-name">${b.name}</div><div class="tj-badge-pct">${b.pct}% &middot; ${correct} / ${total}</div><div class="tj-badge-msg">${b.msg}</div></div></div>
         <div class="tj-badge-key">Mastery: above 90% &middot; Advanced: above 85% &middot; Competent: above 79%</div>`;
   }
 
@@ -46,8 +59,15 @@
     .tj-badge-msg { font-size: 0.95rem; line-height: 1.4; }
     .tj-badge-key { font-size: 0.78rem; color: #718096; margin-top: 6px; }
     .tj-mini { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 6px; border-radius: 14px; font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+    .tj-points { margin: 10px 0 2px; font-size: 1.1rem; font-weight: 600; color: #38a169; }
+    .tj-points-num { font-size: 2rem; font-weight: 700; }
+    .tj-points.low { color: #e53e3e; }
+    .tj-points-msg { margin: 4px auto 0; padding: 8px 14px; max-width: 480px; border-radius: 12px; background: #fff5f5; color: #c53030; font-weight: 600; font-size: 0.95rem; }
+    .tj-points-mini { font-size: 0.85rem; font-weight: 700; color: #38a169; white-space: nowrap; }
+    .tj-points-mini.low { color: #e53e3e; }
     @media (max-width: 480px) { .tj-badge { flex-direction: column; text-align: center; } }`;
   document.head.appendChild(css);
 
   window.tjBadge = tjBadge; window.tjBadgeHtml = tjBadgeHtml; window.tjBadgeMini = tjBadgeMini;
+  window.tjPoints = tjPoints; window.tjPointsMini = tjPointsMini;
 })();

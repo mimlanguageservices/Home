@@ -17,17 +17,21 @@
   };
   function tjScore(key) { return read(PKEY)[key] || null; }
   // Timed tests keep the most recent score in c/t and the last three attempts, newest first, in h
-  function tjRecordScore(key, c, t) {
+  // `extra` is stored with the attempt, e.g. a full test's { pts, max: 900, sec: [...] }
+  function tjRecordScore(key, c, t, extra) {
     const p = read(PKEY), old = p[key];
     const prev = old ? (old.h || [{ c: old.c, t: old.t, at: null }]) : [];   // scores saved before the history have no time
-    p[key] = { c, t, h: [{ c, t, at: Date.now() }].concat(prev).slice(0, 3) };
+    const attempt = Object.assign({ c, t }, extra);
+    p[key] = Object.assign({}, attempt, { h: [Object.assign({ at: Date.now() }, attempt)].concat(prev).slice(0, 3) });
     write(PKEY, p);
   }
+  // Points for a saved score: its own pts/max (full tests) or out of 300 (one section)
+  function tjScorePts(s) { return s.max ? s.pts + '/' + s.max : tjPoints(s.c, s.t) + '/300'; }
   function tjHistoryHtml(key) {
     const s = tjScore(key);
     if (!s || !s.h) return '';
     const when = at => at ? new Date(at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'earlier';
-    return '<div class="tj-hist">' + s.h.map((a, i) => `<span${i ? '' : ' class="tj-hist-latest"'}>${a.c}/${a.t} &middot; ${when(a.at)}</span>`).join('') + '</div>';
+    return '<div class="tj-hist">' + s.h.map((a, i) => `<span${i ? '' : ' class="tj-hist-latest"'}>${a.c}/${a.t} &middot; ${a.max ? a.pts + '/' + a.max : tjPoints(a.c, a.t)} pts &middot; ${when(a.at)}</span>`).join('') + '</div>';
   }
   // Unlocking removes the saved answers so the retake starts fresh; the score stays on the menu
   function tjUnlock(key) { tjDraft.clear(key); setUnlocked(key, true); }
@@ -57,7 +61,7 @@
   // Shown when a test was submitted earlier (on this iPad) and has not been unlocked
   function tjLockedHtml(key) {
     const s = tjScore(key);
-    return `<div class="tj-locked"><div class="tj-locked-icon">&#128274;</div><h2>Test completed</h2>${s ? `<p>Your score: <b>${s.c} / ${s.t}</b></p>` : ''}
+    return `<div class="tj-locked"><div class="tj-locked-icon">&#128274;</div><h2>Test completed</h2>${s ? `<p>Your score: <b>${s.c} / ${s.t}</b> &middot; <b>${tjScorePts(s).replace('/', ' / ')} points</b></p>` : ''}
       <p>This test is locked. To take it again, ask your teacher to unlock it.</p><button type="button" class="tj-unlock-btn" id="tjUnlock">Teacher unlock</button></div>`;
   }
 
@@ -82,5 +86,5 @@
     .tj-hist span.tj-hist-latest { background: #eef2ff; color: #4c51bf; }`;
   document.head.appendChild(css);
 
-  Object.assign(window, { tjDraft, tjScore, tjRecordScore, tjHistoryHtml, tjUnlock, tjLocked, tjAskPin, tjRetake, tjLockedHtml });
+  Object.assign(window, { tjDraft, tjScore, tjScorePts, tjRecordScore, tjHistoryHtml, tjUnlock, tjLocked, tjAskPin, tjRetake, tjLockedHtml });
 })();

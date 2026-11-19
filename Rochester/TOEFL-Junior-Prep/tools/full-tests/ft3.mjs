@@ -1,0 +1,157 @@
+// Full 60 minute Test 3 content. The CORRECT option is written first; pos gives the letter it moves to (see build-full-tests.mjs).
+const L = [
+  { id: 'F3-01', type: 'Teacher instructions · science teacher', pos: 'C',
+    turns: [['Ms. Rivera', `We have about ten minutes left, so let's start cleaning up. Pour the colored water into the big sink at the back, not the small sinks at your tables, because those drains get blocked easily. Rinse your test tubes and put them upside down on the drying rack. Finally, wipe your table with a wet paper towel. Nobody leaves until I've checked that every table is clean.`]],
+    questions: [{ q: `Why should students NOT use the small sinks?`, o: [`Their drains get blocked easily`, `They are only for washing hands`, `They have no water`, `The teacher is using them`], why: `"Not the small sinks at your tables, because those drains get blocked easily."` }] },
+  { id: 'F3-02', type: 'School announcement', pos: 'A',
+    turns: [['Announcer', `Good afternoon. This is a reminder that we will have a fire drill tomorrow at ten thirty. When you hear the alarm, stop what you are doing, leave your bags in the classroom and follow your teacher to the soccer field. Walk, don't run, and stay silent so you can hear instructions. Teachers will take attendance on the field. The drill should take about fifteen minutes.`]],
+    questions: [{ q: `What should students do with their bags during the drill?`, o: [`Leave them in the classroom`, `Take them to the soccer field`, `Give them to their teacher`, `Put them next to the door`], why: `"Leave your bags in the classroom and follow your teacher to the soccer field."` }] },
+  { id: 'F3-03', type: 'Short talk · history teacher', pos: 'D',
+    turns: [['Mr. Ortiz', `On Thursday, when we visit the National Museum, each of you will get a worksheet with ten questions. You'll find the answers on the signs next to the objects, so read carefully. You can work with a partner, but each person must hand in their own worksheet. Anyone who finishes early can visit the gift shop with Ms. Grant, but only after showing me the completed worksheet.`]],
+    questions: [{ q: `What must students do before they visit the gift shop?`, o: [`Show the teacher their finished worksheet`, `Find a partner`, `Buy a ticket`, `Read every sign in the museum`], why: `"Only after showing me the completed worksheet."` }] },
+  { id: 'F3-04', type: 'Short talk · PE teacher', pos: 'B',
+    turns: [['Coach Silva', `Next week, everyone will take a swimming test. Don't worry, it isn't about speed. You just need to swim from one side of the pool to the other without stopping, and then float on your back for one minute. If you can't do it yet, that's fine. You'll join a beginners' group on Fridays until you're ready to try again.`]],
+    questions: [{ q: `What will happen to students who do not pass the test?`, o: [`They will join a beginners' group`, `They will have to swim faster`, `They will not be allowed in the pool`, `They will repeat the test the same day`], why: `"You'll join a beginners' group on Fridays until you're ready to try again."` }] },
+  { id: 'F3-05', type: 'Short talk · English teacher', pos: 'B',
+    turns: [['Ms. Park', `For your next book report, you can choose any novel from the list on the board, or you can suggest a different book. If you want to read something that isn't on the list, please show it to me by Friday, so I can check that it's the right level. The report should be about two pages long, and it's due at the end of the month.`]],
+    questions: [{ q: `What should students do if they want to read a book that is not on the list?`, o: [`Show it to the teacher by Friday`, `Write a longer report`, `Choose a book from the library`, `Read two books instead`], why: `"Please show it to me by Friday, so I can check that it's the right level."` }] },
+  { id: 'F3-06', type: 'Short talk · principal', pos: 'C',
+    turns: [['Mr. Hale', `I want to talk about phones. Starting next week, phones must stay in your lockers during class time. You can use them at lunch and after school. We're making this change because many teachers have told me that students are distracted by messages during lessons. If your family needs to contact you urgently, they can call the school office, and we will find you right away.`]],
+    questions: [{ q: `Why is the school making this change?`, o: [`Phones distract students during lessons`, `Phones are often stolen`, `Families call students too often`, `The lockers are too small`], why: `"Many teachers have told me that students are distracted by messages during lessons."` }] },
+  { id: 'F3-07', type: 'Conversation · two friends', pos: 'ADB',
+    turns: [['Maya', `So, are we still going to the park this afternoon?`], ['Leo', `I don't know. Have you looked outside? It's starting to rain.`],
+      ['Maya', `Oh no. The forecast said it would be sunny all day.`], ['Leo', `Well, it was wrong. What about going to the movies instead? There's a new animated film at the mall.`],
+      ['Maya', `I'd like that, but I only have ten thousand pesos. Is that enough?`], ['Leo', `Tickets are cheaper on Wednesdays, only eight thousand. So you'll even have money left for popcorn. Well, maybe a small one.`],
+      ['Maya', `Ha! Okay. Let's meet at the entrance of the mall at three.`], ['Leo', `Perfect. And if the weather's nice, we can go to the park next weekend.`]],
+    questions: [
+      { q: `Why do the friends change their plans?`, o: [`It started to rain`, `The park is closed`, `Maya has no money`, `The movie is very popular`], why: `"Have you looked outside? It's starting to rain."` },
+      { q: `Why can Maya afford the movie?`, o: [`Tickets are cheaper on Wednesdays`, `Leo will pay for her`, `She has a discount card`, `The movie is free`], why: `"Tickets are cheaper on Wednesdays, only eight thousand."` },
+      { q: `Where will they meet?`, o: [`At the entrance of the mall`, `At the park`, `At Maya's house`, `Inside the movie theater`], why: `"Let's meet at the entrance of the mall at three."` }] },
+  { id: 'F3-08', type: 'Conversation · student and office clerk', pos: 'CAD',
+    turns: [['Sofia', `Excuse me. I think I left my jacket in the gym yesterday. Has anyone brought it here?`], ['Clerk', `Let me check the lost and found box. What does it look like?`],
+      ['Sofia', `It's dark blue with a white zipper, and my name is written inside the collar.`], ['Clerk', `Hmm, I see two blue jackets, but neither has a name inside. Are you sure you wrote it?`],
+      ['Sofia', `Yes, my mom always does. Maybe someone took it by mistake.`], ['Clerk', `That happens a lot. Here's what I'll do. I'll put a note in tomorrow's morning announcements asking students to check their jackets. And you should come back on Friday.`],
+      ['Sofia', `Thank you. Should I also ask the PE teacher?`], ['Clerk', `Good idea. Sometimes things stay in the gym storage room.`]],
+    questions: [
+      { q: `What is Sofia looking for?`, o: [`Her jacket`, `Her gym bag`, `Her school ID`, `Her PE uniform`], why: `"I think I left my jacket in the gym yesterday."` },
+      { q: `Why are the jackets in the box not Sofia's?`, o: [`They don't have her name inside`, `They are the wrong color`, `They are too big`, `They have no zipper`], why: `"I see two blue jackets, but neither has a name inside."` },
+      { q: `What will the clerk do?`, o: [`Ask students to check their jackets in the announcements`, `Call Sofia's mother`, `Give Sofia one of the blue jackets`, `Look in the gym storage room`], why: `"I'll put a note in tomorrow's morning announcements asking students to check their jackets."` }] },
+  { id: 'F3-09', type: 'Academic talk · geography', pos: 'BCAD',
+    turns: [['Ms. Grant', `Here in Colombia, in the Serranía de la Macarena in the department of Meta, there is a river that many people call the most beautiful in the world. Its name is Caño Cristales, but it is also known as the river of five colors.`],
+      ['Ms. Grant', `The water itself isn't colored. In fact, it's extremely clear. The colors come from a plant that grows on the rocks at the bottom of the river. When there's the right amount of water and sunlight, this plant turns bright red and pink. Together with yellow sand, green moss, blue water and black rocks, it creates a rainbow under the surface.`],
+      ['Ms. Grant', `But you can't see the colors all year. In the dry season, there's too little water, and the plant stops growing. In the heaviest part of the rainy season, the water is too deep and fast for enough sunlight to reach the plant. The best time to visit is usually between June and November. To protect the river, visitors must go with a local guide, and sunscreen and insect repellent are not allowed in the water, because the chemicals can harm the plant.`]],
+    questions: [
+      { q: `What is the talk mainly about?`, o: [`Why a Colombian river looks colorful at certain times`, `How rivers are formed in mountains`, `Where to buy colorful plants`, `Why the Meta region is dry`], why: `The talk explains Caño Cristales, where its colors come from and when they can be seen.` },
+      { q: `Where do the red colors come from?`, o: [`A plant growing on the rocks`, `Colored water from the mountains`, `Red sand at the bottom`, `Minerals inside the rocks`], why: `"The colors come from a plant that grows on the rocks at the bottom of the river."` },
+      { q: `Why can't the colors be seen in the heaviest part of the rainy season?`, o: [`Not enough sunlight reaches the plant through the deep, fast water`, `The plant dies in the rain`, `The river is closed to visitors`, `Sand covers the plant`], why: `"The water is too deep and fast for enough sunlight to reach the plant."` },
+      { q: `Why are sunscreen and insect repellent not allowed in the water?`, o: [`Their chemicals can harm the plant`, `They make the water less clear`, `They are dangerous for swimmers`, `They attract insects`], why: `"The chemicals can harm the plant."` }] },
+  { id: 'F3-10', type: 'Academic talk · biology', pos: 'DABC',
+    turns: [['Mr. Hale', `Every year, billions of birds fly thousands of kilometers between their summer and winter homes. Some small birds that spend the summer in North America fly all the way to Colombia and beyond. And many of them make this trip alone, at night, for the very first time. So how do they find their way?`],
+      ['Mr. Hale', `Scientists have found that birds use several tools at once. During the day, they use the position of the sun, like a compass. At night, many birds use the stars. In one famous experiment, young birds were raised in a planetarium, a building where the stars are shown on the ceiling. When the scientists changed the position of the stars, the birds changed the direction they tried to fly.`],
+      ['Mr. Hale', `Birds can also sense the Earth's magnetic field, something humans can't feel at all. And as they get closer to home, they recognize landmarks like rivers, coastlines and mountains. Some birds may even use smell. Because they have so many tools, a cloudy night doesn't stop them. If one tool doesn't work, they use another.`]],
+    questions: [
+      { q: `What is the talk mainly about?`, o: [`How migrating birds find their way`, `Why birds fly south in winter`, `How birds build their nests`, `What birds eat on long trips`], why: `The talk explains the different tools birds use to navigate.` },
+      { q: `What did the planetarium experiment show?`, o: [`Birds use the stars to choose a direction`, `Birds cannot fly at night`, `Birds prefer to fly in groups`, `Birds remember the buildings they see`], why: `When the stars were moved, the birds changed direction.` },
+      { q: `What can birds sense that humans cannot?`, o: [`The Earth's magnetic field`, `The position of the sun`, `Rivers and coastlines`, `The smell of flowers`], why: `"Birds can also sense the Earth's magnetic field, something humans can't feel at all."` },
+      { q: `Why doesn't a cloudy night stop migrating birds?`, o: [`They can use another tool when one does not work`, `They never fly at night`, `Clouds help them see the stars`, `They wait for the sun to come out`], why: `"If one tool doesn't work, they use another."` }] }
+];
+
+const G = [
+  { id: 'F3G1', title: 'A Letter to a Pen Pal', kind: 'Letter', pos: 'DACB',
+    text: `Dear Emma,\n\nThank you for your last letter. I loved {1} about your trip to London! Here in Chía, the weather {2} very rainy lately, so I have been spending a lot of time indoors. I started learning the guitar last month, and I can already play three songs. My teacher says I learn {3} than most of his students. Next time, could you send me a photo of your school? I'd like to see {4} it looks like.\n\nYour friend,\nDaniel`,
+    blanks: [
+      { o: [`reading`, `to reading`, `read`, `reads`], why: `"Love" can be followed by the -ing form: "loved reading".` },
+      { o: [`has been`, `is been`, `was being`, `have been`], why: `"Lately" goes with the present perfect, and "the weather" is singular.` },
+      { o: [`faster`, `more fast`, `fastest`, `the fastest`], why: `"Than" needs a comparative. "Fast" becomes "faster".` },
+      { o: [`what`, `how`, `which`, `that`], why: `We say "see what it looks like". "How it looks like" is not correct.` }] },
+  { id: 'F3G2', title: 'Science Fair Rules', kind: 'Notice', pos: 'BADCA',
+    text: `The annual science fair will take place on May 15 in the school gym. All projects must be registered {1} April 30. Students may work alone or in pairs, but groups of three or more {2}. Every project must include a poster and a short report {3} the question, the experiment and the results. Projects {4} use fire or dangerous chemicals will not be accepted. Prizes will be given to the three best projects, and the winners will represent our school at the city competition, {5} will be held in June.`,
+    blanks: [
+      { o: [`by`, `until`, `since`, `during`], why: `"By April 30" means no later than that date.` },
+      { o: [`are not allowed`, `do not allow`, `not allowed`, `are not allowing`], why: `Groups receive the action, so we need the passive "are not allowed".` },
+      { o: [`explaining`, `explains`, `explained by`, `to explaining`], why: `"A report explaining..." = a report that explains.` },
+      { o: [`that`, `what`, `who`, `where`], why: `"That" begins a relative clause about things (projects).` },
+      { o: [`which`, `where`, `what`, `when`], why: `", which" refers to the city competition and is the subject of "will be held".` }] },
+  { id: 'F3G3', title: 'Running Late', kind: 'Text message', pos: 'CBDA',
+    text: `Hi Mom! The bus is stuck in traffic, so I'll probably be about twenty minutes late. There was an accident on the highway, but don't worry, nobody {1} hurt. I'm sitting next to Sara, {2} lives near us, so we'll walk home together from the bus stop. Can you leave the key {3} the flowerpot? I forgot mine this morning. I'll text you again {4} I get off the bus.\nLove, Ana`,
+    blanks: [
+      { o: [`was`, `were`, `is being`, `has`], why: `"Nobody" is singular, and the accident is in the past: "nobody was hurt".` },
+      { o: [`who`, `which`, `whose`, `whom`], why: `"Who" refers to a person and is the subject of "lives".` },
+      { o: [`under`, `between`, `among`, `through`], why: `The key goes below the flowerpot: "under".` },
+      { o: [`as soon as`, `as long as`, `so that`, `even if`], why: `"As soon as" means immediately when.` }] },
+  { id: 'F3G4', title: 'Talent Show Auditions', kind: 'Announcement', pos: 'ADCBDA',
+    text: `Do you sing, dance, play an instrument or tell jokes? Then the school talent show is looking {1} you! Auditions will be held next Monday and Tuesday in the music room from 3:00 to 5:00 p.m. Each act can be {2} longer than three minutes. You can perform alone or with a group of up to five people. If you need a piano or a microphone, please tell Mr. Hale in advance so he can {3} them ready. Students who are chosen will practice every Thursday {4} the night of the show. The show itself will be on June 2, and tickets {5} at the school office. All the money raised will be used to buy {6} instruments for the music department.`,
+    blanks: [
+      { o: [`for`, `at`, `after`, `to`], why: `"Look for" means search for.` },
+      { o: [`no`, `not`, `none`, `nothing`], why: `"No longer than" means not more than.` },
+      { o: [`get`, `getting`, `to get`, `got`], why: `After "can" we use the base form.` },
+      { o: [`until`, `by`, `since`, `while`], why: `"Until" shows that the practice continues up to that night.` },
+      { o: [`will be sold`, `will sell them`, `are sold by`, `have sold`], why: `Tickets receive the action: the passive "will be sold".` },
+      { o: [`new`, `news`, `newly`, `newer than`], why: `An adjective ("new") describes the noun "instruments".` }] },
+  { id: 'F3G5', title: "Grandma's Recipe", kind: 'Part of a short story', pos: 'CBDACBA',
+    text: `Every December, my grandmother made buñuelos for the whole family. Nobody else knew the recipe; she said she kept it in her head. When she got sick last year, I was worried that the recipe {1} forever. So one afternoon, I sat beside her bed with a notebook and asked her to teach me. "You can't learn it from a notebook," she laughed. "You have to {2} it with your hands." The next day, she sat in the kitchen and told me what to do, step by step. I mixed the cheese and the flour {3} the dough felt soft. My first buñuelos were {4} hard that my brother joked he could play soccer with them. But I kept trying. By the fourth batch, they were round, golden and light. My grandmother tasted one and said nothing for a long time. Then she smiled. "Now," she said, "the recipe has two homes." This December, I {5} the buñuelos for the first time. Grandma is better now, and she will sit next to me, {6} sure I don't forget anything. I'm not nervous, because I know the recipe is not only in my notebook. It's in my hands, {7}.`,
+    blanks: [
+      { o: [`would be lost`, `will be lost`, `was losing`, `has lost`], why: `A future idea seen from the past uses "would", and the recipe receives the action: "would be lost".` },
+      { o: [`feel`, `feeling`, `to feel`, `felt`], why: `After "have to" we use the base form.` },
+      { o: [`until`, `since`, `unless`, `although`], why: `"Until" means up to the moment when the dough felt soft.` },
+      { o: [`so`, `such`, `too`, `very`], why: `"So" + adjective + "that" shows a result.` },
+      { o: [`am going to make`, `made`, `have made`, `was making`], why: `This December is in the future, so we use "be going to".` },
+      { o: [`making`, `makes`, `to making`, `made`], why: `The -ing form adds a second action happening at the same time.` },
+      { o: [`too`, `either`, `neither`, `also`], why: `"Too" at the end of a positive sentence means "as well".` }] },
+  { id: 'F3G6', title: 'Why Do Leaves Change Color?', kind: 'Magazine article', pos: 'DBCADCAB',
+    text: `In many parts of the world, autumn turns forests into a sea of red, orange and yellow. But {1} do leaves change color? The answer has to do with a substance called chlorophyll. Chlorophyll is {2} makes leaves green, and it helps trees turn sunlight into food. In spring and summer, leaves are full of chlorophyll. As autumn arrives, the days become shorter and colder, and trees start {3} for winter. They stop making chlorophyll, and the green color slowly disappears. When it is gone, other colors that {4} in the leaf all along, such as yellow and orange, finally become visible. Red is different. Some trees produce red substances only in autumn, especially when the days are sunny and the nights are cool. This is why the colors are brighter in some years {5} in others. In Colombia, most trees do not change color like this, {6} the country is close to the equator and does not have four seasons. Instead, many trees here lose {7} leaves during the dry season. So if you want to see the famous autumn colors, you will have to travel {8} north or far south.`,
+    blanks: [
+      { o: [`why`, `what`, `which`, `where`], why: `The article goes on to give the reason, so the question is "why".` },
+      { o: [`what`, `which`, `that`, `who`], why: `"What" means "the thing that": chlorophyll is the thing that makes leaves green.` },
+      { o: [`preparing`, `to preparing`, `prepare`, `prepared`], why: `"Start" can be followed by the -ing form.` },
+      { o: [`have been`, `has been`, `are being`, `were be`], why: `"All along" (from the start until now) uses the present perfect; "colors" is plural.` },
+      { o: [`than`, `then`, `as`, `that`], why: `"Brighter ... than" is a comparison.` },
+      { o: [`because`, `although`, `unless`, `so`], why: `The second part gives the reason.` },
+      { o: [`their`, `its`, `there`, `they're`], why: `"Their" shows that the leaves belong to the trees (plural).` },
+      { o: [`far`, `much`, `very`, `too`], why: `"Far north" means a long way to the north.` }] }
+];
+
+const R = [
+  { id: 'F3R1', title: 'The New Student Bus Card', kind: 'Notice', level: 'A2-B1', pos: 'ACBDB',
+    text: [
+      `Students between 10 and 18 years old can now travel on all city buses for half price with the new Student Bus Card. The card works on every route, Monday to Saturday.`,
+      `How to apply: Fill in the form on the city transport website, and upload a recent photo and a letter from your school showing that you are a student. Cards are ready about ten days after you apply. You must pick up your card in person at the Central Station office and show an ID.`,
+      `Rules: The card has your name and photo and can only be used by you. If someone else uses your card, it will be cancelled. You can add money to the card at any station or in the city transport app. On Sundays and public holidays, the student price does not apply, and you will pay the normal price.`,
+      `Lost your card? Report it immediately in the app, so no one else can use your money. A new card costs 8,000 pesos.`],
+    questions: [
+      { type: `Purpose`, q: `What is the main purpose of the notice?`, o: [`To explain how students can get a cheaper bus card`, `To announce new bus routes`, `To ask students to stop using buses`, `To sell tickets for a school trip`], why: `The notice explains the half-price Student Bus Card, how to apply and the rules.` },
+      { type: `Detail`, q: `What must students upload with the form?`, o: [`A photo and a letter from their school`, `Their parents' ID`, `Money for their first trip`, `A copy of their report card`], why: `"Upload a recent photo and a letter from your school."` },
+      { type: `Detail`, q: `Where can students get their card?`, o: [`At the Central Station office`, `At their school`, `By mail`, `In the app`], why: `"You must pick up your card in person at the Central Station office."` },
+      { type: `Inference`, q: `How much will a student pay for a bus ride on a Sunday?`, o: [`The normal price`, `Half price`, `Nothing`, `Double the normal price`], why: `"On Sundays and public holidays, the student price does not apply."` },
+      { type: `Detail`, q: `What should a student do if the card is lost?`, o: [`Report it in the app right away`, `Wait ten days`, `Borrow a friend's card`, `Buy a new card at school`], why: `"Report it immediately in the app, so no one else can use your money."` }] },
+  { id: 'F3R2', title: 'The Broken Telescope', kind: 'Narrative', level: 'B1', pos: 'DACBAC',
+    text: [
+      `For his twelfth birthday, Tomás received a telescope from his uncle, who worked at the planetarium in Bogotá. It was old and heavy, but Tomás loved it more than anything he owned. Every clear night, he carried it up to the roof of his building to look at the Moon and the planets.`,
+      `One evening in March, his little sister Lina wanted to see Jupiter. She grabbed the telescope before Tomás could stop her, and it fell to the floor with a terrible crack. One of the lenses was broken. Lina burst into tears, and Tomás was so angry that he couldn't speak.`,
+      `That night, he lay awake thinking. He remembered how excited Lina had been, and how she had asked him every day for a week when she could look through the telescope. He realized that she hadn't wanted to break it; she had wanted to share the thing he loved.`,
+      `The next morning, Tomás called his uncle. "Can lenses be replaced?" he asked. His uncle laughed. "Old telescopes are like old friends," he said. "They can always be fixed. Bring it on Saturday, and bring your sister, too."`,
+      `That Saturday, Tomás and Lina spent the whole afternoon at the planetarium, learning how lenses work and helping their uncle put in a new one. That night, the first thing they looked at together was Jupiter. Lina counted four tiny moons around it. "You can borrow the telescope whenever you want," Tomás told her. "Just ask me first."`],
+    questions: [
+      { type: `Detail`, q: `Who gave Tomás the telescope?`, o: [`His uncle`, `His parents`, `His sister`, `A teacher at school`], why: `Paragraph 1: "Tomás received a telescope from his uncle."` },
+      { type: `Detail`, q: `How was the telescope broken?`, o: [`Lina dropped it`, `Tomás dropped it on the roof`, `It fell from a window`, `His uncle sat on it`], why: `Lina grabbed it and it fell to the floor.` },
+      { type: `Vocabulary`, q: `The phrase "burst into tears" in paragraph 2 is closest in meaning to`, o: [`suddenly started crying`, `started laughing`, `ran away quickly`, `became very angry`], why: `Lina suddenly began to cry after the telescope broke.` },
+      { type: `Inference`, q: `What did Tomás realize during the night?`, o: [`Lina only wanted to share something he loved`, `The telescope was too old to use`, `His uncle would be angry`, `Jupiter could not be seen in March`], why: `Paragraph 3: "she had wanted to share the thing he loved."` },
+      { type: `Inference`, q: `What does the uncle mean when he says "Old telescopes are like old friends"?`, o: [`Problems with them can be fixed`, `They are better than new ones`, `They should be given to friends`, `They are very expensive`], why: `He adds, "They can always be fixed."` },
+      { type: `Detail`, q: `What did Tomás and Lina do at the planetarium?`, o: [`They helped put in a new lens`, `They bought a new telescope`, `They watched a movie about Jupiter`, `They gave a talk about the Moon`], why: `Paragraph 5: they helped their uncle put in a new lens.` }] },
+  { id: 'F3R3', title: 'The First Vaccine', kind: 'Academic (history of science)', level: 'B1-B2', pos: 'BDACDBA',
+    text: [
+      `For centuries, smallpox was one of the most feared diseases in the world. It caused fever and painful spots all over the body, and it killed about three out of every ten people who caught it. Those who survived were often left with deep scars.`,
+      `In the 1790s, an English doctor named Edward Jenner noticed something interesting. Milkmaids, the women who milked cows on farms, often caught a mild disease called cowpox from the animals. Cowpox caused only a few spots and went away quickly. And strangely, milkmaids who had had cowpox almost never caught smallpox.`,
+      `In 1796, Jenner decided to test his idea. He took material from a cowpox spot on the hand of a milkmaid named Sarah Nelmes and put it into a small cut on the arm of an eight-year-old boy, James Phipps. The boy became slightly ill but recovered in a few days. Weeks later, Jenner exposed him to smallpox. James did not get sick. His body had learned to protect itself.`,
+      `Jenner called his method "vaccination," from vacca, the Latin word for cow. The idea spread around the world. Over the next two centuries, vaccination programs became so successful that in 1980, the World Health Organization announced that smallpox had disappeared completely. It was the first human disease ever to be eliminated.`],
+    questions: [
+      { type: `Main idea`, q: `What is the passage mainly about?`, o: [`How the first vaccine was developed and what it achieved`, `Why milkmaids worked on farms`, `How cows catch diseases`, `Why smallpox causes scars`], why: `The passage tells the story of Jenner's vaccine and how it ended smallpox.` },
+      { type: `Detail`, q: `What did Jenner notice about milkmaids?`, o: [`Those who had had cowpox rarely caught smallpox`, `They were often sick with smallpox`, `They never caught any diseases`, `They had deep scars on their hands`], why: `Paragraph 2: "milkmaids who had had cowpox almost never caught smallpox."` },
+      { type: `Vocabulary`, q: `The word "mild" in paragraph 2 is closest in meaning to`, o: [`not serious`, `very dangerous`, `long-lasting`, `common`], why: `Cowpox caused only a few spots and went away quickly.` },
+      { type: `Detail`, q: `What happened when James Phipps was exposed to smallpox?`, o: [`He did not get sick`, `He became very sick but recovered`, `He caught cowpox again`, `He died a few weeks later`], why: `Paragraph 3: "James did not get sick."` },
+      { type: `Reference`, q: `The word "His" in paragraph 3 ("His body had learned...") refers to`, o: [`James Phipps`, `Edward Jenner`, `the cow`, `a doctor in London`], why: `It was the boy's body that had learned to protect itself.` },
+      { type: `Detail`, q: `Where does the word "vaccination" come from?`, o: [`The Latin word for cow`, `The name of a milkmaid`, `The name of Jenner's town`, `The Latin word for disease`], why: `Paragraph 4: "from vacca, the Latin word for cow."` },
+      { type: `Inference`, q: `What can be inferred about smallpox today?`, o: [`People no longer catch it`, `It is still common on farms`, `It can be cured with cowpox`, `Scientists are still looking for a vaccine`], why: `In 1980 it was announced that smallpox had disappeared completely.` }] }
+];
+
+export default { id: 3, L, G, R };

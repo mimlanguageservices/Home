@@ -1,0 +1,158 @@
+// Full 60 minute Test 4 content. The CORRECT option is written first; pos gives the letter it moves to (see build-full-tests.mjs).
+const L = [
+  { id: 'F4-01', type: 'Teacher instructions · math teacher', pos: 'D',
+    turns: [['Ms. Grant', `Tomorrow's test has two parts. In the first part, you may not use a calculator, so please leave it in your bag. When you hand in part one, I'll give you part two, and then you can take your calculator out. Bring two sharp pencils and an eraser. Pens are not allowed, because I want to see your work clearly if you change an answer.`]],
+    questions: [{ q: `When can students use their calculators?`, o: [`After they hand in part one`, `During the whole test`, `Only in the first part`, `Never during the test`], why: `"When you hand in part one, I'll give you part two, and then you can take your calculator out."` }] },
+  { id: 'F4-02', type: 'School announcement', pos: 'B',
+    turns: [['Announcer', `Attention, eighth graders. Your yearbook photos will be taken this Wednesday in the library, not on Thursday as we said before. The photographer will start with class 8A at nine o'clock. Please wear your school uniform, not your sports clothes. If you are absent on Wednesday, there will be one more chance on the following Monday.`]],
+    questions: [{ q: `What has changed about the yearbook photos?`, o: [`The day they will be taken`, `The place they will be taken`, `The clothes students should wear`, `The name of the photographer`], why: `"This Wednesday ... not on Thursday as we said before."` }] },
+  { id: 'F4-03', type: 'Short talk · art teacher', pos: 'C',
+    turns: [['Ms. Park', `Your clay animals look great, but they're not ready to be painted yet. Clay needs about a week to dry completely. If you paint it while it's still wet inside, the paint will crack when the clay dries. So today, we'll put them on the top shelf, and next Thursday we'll paint them. In the meantime, start sketching the colors you want to use.`]],
+    questions: [{ q: `Why must students wait before painting their clay animals?`, o: [`The paint will crack if the clay is still wet`, `The paint has not arrived yet`, `The shelf is full`, `The teacher will be absent`], why: `"If you paint it while it's still wet inside, the paint will crack when the clay dries."` }] },
+  { id: 'F4-04', type: 'Short talk · music teacher', pos: 'A',
+    turns: [['Mr. Hale', `I've noticed that some of you are leaving your instruments on the floor of the music room after class. Please don't do that. Someone could step on a violin or trip over a trumpet case. From now on, every instrument goes back in its case, and every case goes on the shelf with your name on it. If your case is broken, tell me, and I'll find you a new one.`]],
+    questions: [{ q: `What does the teacher want students to do from now on?`, o: [`Put their instruments in their cases on the shelf`, `Take their instruments home every day`, `Buy new cases`, `Leave their instruments next to the door`], why: `"Every instrument goes back in its case, and every case goes on the shelf with your name on it."` }] },
+  { id: 'F4-05', type: 'Short talk · librarian', pos: 'C',
+    turns: [['Librarian', `Starting this week, the library has two areas. The tables near the windows are now a quiet zone, for students who need to read or study alone. Please don't talk there at all. If you're working on a group project, you can use the round tables near the computers, where talking in a low voice is fine. This way, everyone can find a place that works for them.`]],
+    questions: [{ q: `Where should students go to work on a group project?`, o: [`To the round tables near the computers`, `To the tables near the windows`, `To the quiet zone`, `To the classroom next door`], why: `"If you're working on a group project, you can use the round tables near the computers."` }] },
+  { id: 'F4-06', type: 'Teacher instructions · science teacher', pos: 'B',
+    turns: [['Ms. Rivera', `Each of you now has a bean plant in a cup. For the next two weeks, you'll keep a plant journal. Every morning, measure the height of your plant in centimeters and write it in your journal. Also write one sentence about how it looks. Water it only on Mondays, Wednesdays and Fridays. Too much water is just as bad as too little.`]],
+    questions: [{ q: `How often should students water their plants?`, o: [`Three times a week`, `Every morning`, `Once a week`, `Twice a day`], why: `"Water it only on Mondays, Wednesdays and Fridays."` }] },
+  { id: 'F4-07', type: 'Conversation · two students', pos: 'BDA',
+    turns: [['Mateo', `Valeria, have you heard from Daniela? She wasn't in class today.`], ['Valeria', `She texted me. She has a bad cold and will probably be out until Thursday.`],
+      ['Mateo', `Oh no. Our presentation is on Wednesday! She was going to talk about the history part.`], ['Valeria', `I know. But she sent me her notes and the slides last night, so we have everything we need.`],
+      ['Mateo', `Okay. Then one of us has to learn her part. Can you do it? You're better at history than me.`], ['Valeria', `Fine, but then you have to write the questions for the end of the presentation.`],
+      ['Mateo', `Deal. And let's ask Mr. Ortiz if Daniela can present her part separately when she comes back, so she still gets a grade.`], ['Valeria', `Good idea. Let's talk to him after lunch.`]],
+    questions: [
+      { q: `What is the students' problem?`, o: [`A group member is sick before their presentation`, `They lost their slides`, `Their presentation was canceled`, `Their teacher is absent`], why: `Daniela has a bad cold and the presentation is on Wednesday.` },
+      { q: `What will Valeria do?`, o: [`Present the history part`, `Write the questions`, `Visit Daniela at home`, `Make new slides`], why: `Mateo asks her to learn Daniela's history part and she agrees.` },
+      { q: `Why do they want to talk to Mr. Ortiz?`, o: [`To ask if Daniela can present her part later`, `To ask for more time`, `To change their topic`, `To get Daniela's notes`], why: `"Let's ask Mr. Ortiz if Daniela can present her part separately when she comes back."` }] },
+  { id: 'F4-08', type: 'Phone conversation · student and bike shop', pos: 'ACD',
+    turns: [['Shop assistant', `Good morning, Rueda Libre Bike Shop.`], ['Leo', `Hi. I'm calling about my bike. I brought it in on Monday because the brakes weren't working. Is it ready?`],
+      ['Shop assistant', `Let me check. What's your name?`], ['Leo', `Leo Martínez.`],
+      ['Shop assistant', `Yes, here it is. The brakes are fixed, but our mechanic also noticed that your back tire is very worn. It could get a hole soon.`], ['Leo', `Oh. How much would a new tire cost?`],
+      ['Shop assistant', `Forty thousand pesos, including the work. We could have it ready by this afternoon.`], ['Leo', `Hmm, I only have thirty thousand with me. Can I pay the rest on Saturday?`],
+      ['Shop assistant', `That's fine. We'll change the tire, and you can pick up the bike today after four.`]],
+    questions: [
+      { q: `Why did Leo take his bike to the shop?`, o: [`The brakes were not working`, `The tire had a hole`, `The chain was broken`, `He wanted to sell it`], why: `"I brought it in on Monday because the brakes weren't working."` },
+      { q: `What did the mechanic notice?`, o: [`The back tire is very worn`, `The brakes need new parts`, `The seat is too low`, `The bike is too small for Leo`], why: `"Our mechanic also noticed that your back tire is very worn."` },
+      { q: `What will Leo probably do on Saturday?`, o: [`Pay the rest of the money`, `Pick up his bike`, `Buy a new bike`, `Bring his bike back to fix the brakes`], why: `He picks up the bike today and asks to pay the rest on Saturday.` }] },
+  { id: 'F4-09', type: 'Academic talk · astronomy', pos: 'CABD',
+    turns: [['Mr. Hale', `Look at the Moon on different nights, and it seems to change shape. Sometimes it's a full circle, sometimes a half, and sometimes just a thin smile. Many people think this happens because the Earth's shadow covers part of the Moon. But that's not true.`],
+      ['Mr. Hale', `The Moon doesn't make its own light. We see it because sunlight reflects off its surface. At every moment, half of the Moon is lit by the Sun, just as half of the Earth is in daytime. As the Moon travels around the Earth, which takes about twenty-nine and a half days, we see different amounts of that lit half.`],
+      ['Mr. Hale', `When the Moon is between the Earth and the Sun, the lit side faces away from us, and we can hardly see the Moon at all. We call that a new moon. When the Earth is between the Sun and the Moon, we see the whole lit side: a full moon. The Earth's shadow only falls on the Moon during a lunar eclipse, and that happens just a few times a year.`]],
+    questions: [
+      { q: `What is the talk mainly about?`, o: [`Why the Moon seems to change shape`, `How the Moon was formed`, `Why the Moon makes its own light`, `How to watch a lunar eclipse`], why: `The talk explains the real reason for the Moon's phases.` },
+      { q: `What common belief does the speaker say is wrong?`, o: [`That the Earth's shadow causes the Moon's phases`, `That the Moon travels around the Earth`, `That sunlight reflects off the Moon`, `That half of the Moon is always lit`], why: `"Many people think this happens because the Earth's shadow covers part of the Moon. But that's not true."` },
+      { q: `How long does the Moon take to go around the Earth?`, o: [`About twenty-nine and a half days`, `About one week`, `Exactly one year`, `About twenty-four hours`], why: `"Which takes about twenty-nine and a half days."` },
+      { q: `What happens during a new moon?`, o: [`The lit side of the Moon faces away from Earth`, `The Earth's shadow covers the Moon`, `The Moon stops reflecting light`, `The Moon is behind the Earth`], why: `"When the Moon is between the Earth and the Sun, the lit side faces away from us."` }] },
+  { id: 'F4-10', type: 'Academic talk · history', pos: 'DCAB',
+    turns: [['Mr. Ortiz', `Before 1914, a ship sailing from New York to San Francisco had to travel all the way around the southern tip of South America. The trip was more than twenty thousand kilometers long and could take months. Then the Panama Canal opened, and the journey became less than half as long.`],
+      ['Mr. Ortiz', `Building the canal was extremely difficult. A French company tried first, in the 1880s, but it gave up after thousands of workers died, mainly from diseases like malaria and yellow fever, which are spread by mosquitoes. When the United States took over the project in 1904, doctors drained swamps and used nets and screens to control the mosquitoes. Only then could the work continue safely.`],
+      ['Mr. Ortiz', `Another challenge was the land itself. Panama is not flat, so engineers built a system of locks. Locks are like giant water elevators. A ship enters a chamber, the gates close, and water flows in until the ship has risen about twenty-six meters to a lake in the middle of the country. On the other side, more locks lower it back down to the ocean. Today, more than twelve thousand ships pass through the canal every year.`]],
+    questions: [
+      { q: `What is the talk mainly about?`, o: [`How and why the Panama Canal was built`, `Why ships travel to San Francisco`, `How mosquitoes spread disease`, `The history of New York's port`], why: `The talk explains why the canal was needed and the problems in building it.` },
+      { q: `Why did the French company give up?`, o: [`Thousands of workers died from diseases`, `It ran out of water`, `The United States stopped it`, `The ships were too large`], why: `"It gave up after thousands of workers died, mainly from diseases like malaria and yellow fever."` },
+      { q: `What does the speaker compare locks to?`, o: [`Giant water elevators`, `Bridges over the ocean`, `Large swimming pools`, `Mountain roads`], why: `"Locks are like giant water elevators."` },
+      { q: `What can be inferred about the canal?`, o: [`It saves ships a lot of time`, `It is no longer used today`, `It was finished by the French`, `It goes through flat land`], why: `The journey became less than half as long, and thousands of ships still use it.` }] }
+];
+
+const G = [
+  { id: 'F4G1', title: 'An Email to a Coach', kind: 'Email', pos: 'BCAD',
+    text: `Dear Coach Silva,\n\nI'm sorry, but I won't be able to come to practice on Wednesday. My family is traveling to Cartagena for my cousin's wedding, and we {1} until Sunday night. I know the tournament is next week, so I {2} extra at home. Could you tell me {3} drills I should practice? I don't want my team {4} because of me.\n\nThank you,\nMartín`,
+    blanks: [
+      { o: [`won't be back`, `wasn't back`, `haven't been back`, `aren't being back`], why: `A future fact: "won't be back until Sunday night".` },
+      { o: [`will train`, `trained`, `have trained`, `was training`], why: `This is a decision about the future: "will train".` },
+      { o: [`which`, `who`, `whose`, `whom`], why: `"Which drills" asks about things. "Who" and "whom" are for people.` },
+      { o: [`to lose`, `losing`, `lose`, `lost`], why: `"Want someone to do something" uses the infinitive.` }] },
+  { id: 'F4G2', title: 'Zoo Visitor Rules', kind: 'Notice', pos: 'DABCB',
+    text: `Thank you for visiting the Santa Cruz Zoo. Please read these rules before you begin your visit. Feeding the animals is strictly {1}, because human food can make them sick. Stay on the marked paths at all times, and do not climb {2} the fences. In the Butterfly House, please move slowly and quietly {3} you don't frighten the butterflies. Drones and loud music are not permitted anywhere in the zoo. The zoo closes at 5:00 p.m., but the last tickets are sold an hour {4}. If you see an animal {5} seems sick or hurt, please tell a member of staff immediately.`,
+    blanks: [
+      { o: [`forbidden`, `forbid`, `forbidding`, `forbids`], why: `"Is forbidden" is passive: feeding is not allowed.` },
+      { o: [`over`, `above`, `across from`, `up to`], why: `"Climb over" means go from one side to the other by climbing.` },
+      { o: [`so that`, `in case`, `even if`, `as if`], why: `"So that" gives the purpose: to avoid frightening them.` },
+      { o: [`earlier`, `more early`, `earliest`, `the earlier`], why: `"An hour earlier" = an hour before 5:00. "More early" is not correct.` },
+      { o: [`that`, `what`, `whose`, `where`], why: `"That" begins a relative clause about the animal and is the subject of "seems".` }] },
+  { id: 'F4G3', title: 'Movie Night', kind: 'Text message', pos: 'ACDB',
+    text: `Hi everyone! Movie night is at my place on Friday. My dad said we can use the big TV in the living room, {1} we clean up afterward. Bring a blanket if you want, because it gets cold at night. I'll make popcorn, but could someone bring drinks? We still {2} which movie to watch, so send me your ideas. Please arrive {3} 7:00. The movie starts at 7:30, and we don't want {4} the beginning!\nSofía`,
+    blanks: [
+      { o: [`as long as`, `as soon as`, `even though`, `unless`], why: `"As long as" means "on the condition that".` },
+      { o: [`haven't decided`, `didn't decide`, `don't decided`, `aren't decide`], why: `"Still" + present perfect negative: the decision has not happened yet.` },
+      { o: [`before`, `until`, `since`, `during`], why: `They should come before the movie starts.` },
+      { o: [`to miss`, `missing`, `miss`, `missed`], why: `"Want" is followed by "to" + verb.` }] },
+  { id: 'F4G4', title: 'Sports Day', kind: 'Announcement', pos: 'CDABAC',
+    text: `Our annual Sports Day will take place next Friday on the school field. There will be no regular classes that day; {1}, every student will compete for one of four teams: Red, Blue, Green or Yellow. Your homeroom teacher {2} you which team you are on by Wednesday. Events include relay races, tug-of-war and a three-legged race, and there will also be games for students {3} prefer not to run. Please wear your team color and bring a hat and sunscreen. Water stations will be set up around the field, so there is no need {4} drinks from home. Parents are welcome {5} and cheer. At the end of the day, the team with the {6} points will receive the Sports Day Cup.`,
+    blanks: [
+      { o: [`instead`, `otherwise`, `although`, `unless`], why: `"Instead" means in place of regular classes.` },
+      { o: [`will tell`, `tells`, `told`, `has told`], why: `"By Wednesday" is in the future: "will tell".` },
+      { o: [`who`, `which`, `whose`, `what`], why: `"Who" refers to people (students) and is the subject of "prefer".` },
+      { o: [`to bring`, `bringing`, `bring`, `brought`], why: `"There is no need to do something" uses the infinitive.` },
+      { o: [`to come`, `coming`, `come`, `came`], why: `"Be welcome to do something" uses the infinitive.` },
+      { o: [`most`, `more`, `much`, `many`], why: `"The most points" is a superlative: more than every other team.` }] },
+  { id: 'F4G5', title: 'The Speech', kind: 'Part of a short story', pos: 'ADBCADB',
+    text: `Pablo hated speaking in front of people. Whenever a teacher asked him a question in class, his face {1} red and his voice disappeared. So when he was chosen to give the welcome speech at the school's anniversary, he wanted to hide. "I can't do it," he told his older sister, Carolina. "Everyone will laugh at me." Carolina thought for a moment. "When I was your age, I was {2} nervous as you are," she said. "Do you know what helped me? I practiced in front of our dog, Bruno, every night." Pablo laughed, but that evening he tried it. Bruno listened {3}, wagging his tail. The next night, Pablo practiced in front of Bruno and Carolina. Then in front of his whole family. Each time, his voice became a little stronger. On the day of the anniversary, Pablo walked onto the stage. Three hundred faces looked up at him. His hands were shaking, but he took a deep breath and imagined {4} talking to Bruno. When he finished, the audience clapped loudly. Afterward, the principal shook his hand. "That's the best speech I {5} in years," she said. Pablo smiled. He still did not love public speaking, {6} he knew now that he could do it. And Bruno got an extra treat that night {7} his help.`,
+    blanks: [
+      { o: [`turned`, `was turning to`, `has turned`, `turns into`], why: `A repeated past action: past simple "turned".` },
+      { o: [`as`, `so`, `such`, `more`], why: `"As + adjective + as" makes an equal comparison.` },
+      { o: [`patiently`, `patient`, `patience`, `patients`], why: `An adverb describes how Bruno listened.` },
+      { o: [`he was`, `he is`, `was he`, `is he`], why: `Reported thought in the past keeps statement word order: "imagined he was".` },
+      { o: [`have heard`, `hear`, `am hearing`, `was hearing`], why: `"In years" (up to now) uses the present perfect.` },
+      { o: [`but`, `so`, `because`, `or`], why: `"But" shows a contrast.` },
+      { o: [`for`, `by`, `with`, `from`], why: `"A treat for his help" = as a reward for it.` }] },
+  { id: 'F4G6', title: "The World's Slowest Mammal", kind: 'Magazine article', pos: 'BCDABDCA',
+    text: `Sloths are famous for being slow. They move so little that a sloth may stay in the same tree {1} several days. But being slow is not laziness; it is a clever way {2} survive. Sloths eat mostly leaves, which contain very {3} energy. To live on such a poor diet, a sloth's body works very slowly. Its stomach can take up to a month to digest a single meal! Because they move slowly and {4} make noise, sloths are hard for predators like eagles and jaguars to notice. Their fur helps them hide, too. Tiny green plants called algae grow in it, {5} the sloth the same color as the leaves around it. Sloths come down from their trees only about once a week, usually to go to the bathroom. This is the most dangerous moment of their week, {6} they cannot move quickly on the ground. Surprisingly, sloths are excellent swimmers. In water, they can move three times faster {7} on land. So the next time someone calls you a sloth, you can tell them that being slow {8} be a smart choice!`,
+    blanks: [
+      { o: [`for`, `since`, `during`, `while`], why: `"For" + a period of time (several days).` },
+      { o: [`to`, `for`, `of`, `by`], why: `"A way to do something" uses the infinitive.` },
+      { o: [`little`, `few`, `less`, `a lot of`], why: `"Energy" is uncountable, so we use "little". "Few" is for plural nouns.` },
+      { o: [`rarely`, `rare`, `rarer`, `rarity`], why: `An adverb ("rarely") describes how often they make noise.` },
+      { o: [`making`, `makes`, `made`, `to making`], why: `The -ing form shows the result of the algae growing: "making the sloth green".` },
+      { o: [`because`, `although`, `unless`, `if`], why: `The second part gives the reason it is dangerous.` },
+      { o: [`than`, `then`, `as`, `that`], why: `"Faster than" is a comparison.` },
+      { o: [`can`, `must to`, `should to`, `ought`], why: `"Can" + base verb shows possibility. "Must to" and "should to" are not correct.` }] }
+];
+
+const R = [
+  { id: 'F4R1', title: 'Discovery Science Center: Visitor Information', kind: 'Notice', level: 'A2-B1', pos: 'CABDA',
+    text: [
+      `Welcome to the Discovery Science Center! We are open Tuesday to Sunday from 9:00 a.m. to 6:00 p.m. We are closed on Mondays, except on public holidays.`,
+      `Tickets: Students 12,000 pesos · Adults 18,000 pesos · Children under 5 free. School groups of 20 or more students receive a 25% discount if they book at least two weeks in advance.`,
+      `Don't miss: the Earthquake Room, where you can feel what a real earthquake is like (minimum age 8); the Planet Dome, with shows every hour on the hour; and the Water Lab, where you can build your own dam. Please note that the Water Lab is closed for repairs until March 15.`,
+      `Free audio guides are available in Spanish and English at the information desk. You will need to leave an ID card, which will be returned when you bring the audio guide back.`],
+    questions: [
+      { type: `Detail`, q: `When is the science center closed?`, o: [`On Mondays that are not public holidays`, `On Sundays`, `On every public holiday`, `Every weekend`], why: `"We are closed on Mondays, except on public holidays."` },
+      { type: `Detail`, q: `How can a school group get a discount?`, o: [`By booking at least two weeks before the visit`, `By visiting on a Monday`, `By bringing fewer than 20 students`, `By buying tickets at the information desk`], why: `Groups of 20 or more get 25% off "if they book at least two weeks in advance."` },
+      { type: `Inference`, q: `Who could NOT go into the Earthquake Room?`, o: [`A six-year-old child`, `A ten-year-old student`, `A teacher`, `A teenager`], why: `The minimum age is 8.` },
+      { type: `Vocabulary`, q: `The phrase "in advance" in paragraph 2 is closest in meaning to`, o: [`before`, `later`, `quickly`, `together`], why: `Groups must book before the visit.` },
+      { type: `Detail`, q: `What must visitors do to get an audio guide?`, o: [`Leave an ID card at the information desk`, `Pay an extra fee`, `Speak English`, `Book it online`], why: `"You will need to leave an ID card." The guides are free.` }] },
+  { id: 'F4R2', title: 'What the Attic Was Hiding', kind: 'Narrative', level: 'B1', pos: 'BDCADB',
+    text: [
+      `It rained for the whole first week of the vacation, and Natalia was bored. She had read all her books, finished every puzzle and watched more TV than her parents usually allowed. "Why don't you help me clean the attic?" her grandfather suggested. Natalia sighed, but she followed him up the narrow stairs.`,
+      `The attic was dusty and dark, full of old furniture and boxes. In one corner, under a sheet, Natalia found a wooden box with a small lock. "What's in here?" she asked. Her grandfather's eyes widened. "I thought I had lost that forever," he said quietly. He searched his pockets and, after a long time, found a tiny key on his key ring.`,
+      `Inside the box were dozens of letters tied with a red ribbon, and an old black-and-white photograph of a young man and woman standing in front of a train. "That's me," her grandfather said, "and that's your grandmother, the day we met. I was a train conductor, and she was traveling to visit her sister in Santa Marta."`,
+      `For the rest of the afternoon, they sat on the attic floor while he read the letters aloud. They were letters he and her grandmother had written to each other for two years before they got married. Natalia laughed at the funny parts and became quiet at the sad ones.`,
+      `When the rain finally stopped, Natalia didn't even notice. "Can we read more tomorrow?" she asked. Her grandfather smiled. "We can read them all," he said. "Your grandmother would have liked that."`],
+    questions: [
+      { type: `Detail`, q: `Why was Natalia bored?`, o: [`It had rained all week and she had nothing left to do`, `Her grandfather would not play with her`, `She had no books`, `Her parents did not let her watch TV`], why: `Paragraph 1: it rained all week and she had already read, done puzzles and watched TV.` },
+      { type: `Vocabulary`, q: `The phrase "eyes widened" in paragraph 2 means his eyes`, o: [`opened more in surprise`, `closed slowly`, `filled with tears`, `looked away`], why: `He was surprised to see a box he thought he had lost.` },
+      { type: `Detail`, q: `How did the grandfather open the box?`, o: [`With a tiny key on his key ring`, `He broke the lock`, `Natalia found the key in the attic`, `The box was not locked`], why: `He "found a tiny key on his key ring."` },
+      { type: `Detail`, q: `Where did Natalia's grandparents first meet?`, o: [`On a train trip`, `At a wedding in Santa Marta`, `At her sister's house`, `At school`], why: `He was a train conductor and she was traveling by train.` },
+      { type: `Inference`, q: `What can be inferred about Natalia's grandmother?`, o: [`She is no longer alive`, `She lives in Santa Marta`, `She is angry about the letters`, `She works as a train conductor`], why: `"Your grandmother would have liked that" suggests she has died.` },
+      { type: `Inference`, q: `Why didn't Natalia notice that the rain had stopped?`, o: [`She was very interested in the letters`, `She was asleep`, `The attic had no windows`, `She was still bored`], why: `She was so involved in the letters that she wanted to read more the next day.` }] },
+  { id: 'F4R3', title: "Colombia's Disappearing Glaciers", kind: 'Academic (geography)', level: 'B1-B2', pos: 'ACDBCAD',
+    text: [
+      `It may be surprising, but Colombia, a country close to the equator, has glaciers: large bodies of ice that stay frozen all year. They are found only on the highest mountains, around 4,800 meters above sea level or higher, where the air is cold enough for snow and ice to last.`,
+      `Unfortunately, these glaciers are melting fast. In the middle of the 1800s, Colombia had fourteen glaciers. Today, only six remain, including those on the Sierra Nevada de Santa Marta, the Sierra Nevada del Cocuy and the Nevado del Ruiz. Scientists estimate that the country has lost about nine-tenths of its glacier ice since then, and some of the remaining glaciers could disappear in the next few decades.`,
+      `The main cause is rising temperatures. As the climate warms, more ice melts each year than new snow can replace. Dark dust and ash, sometimes from volcanoes, can also cover the ice. Because dark surfaces absorb more sunlight than white ones, this makes the ice melt even faster.`,
+      `Losing the glaciers is about more than losing beautiful views. Glaciers slowly release water into rivers and into the páramos, the high wetlands that supply drinking water to many Colombian towns and cities. Scientists are now carefully measuring the remaining glaciers, so that communities can plan for a future with less ice.`],
+    questions: [
+      { type: `Main idea`, q: `What is the passage mainly about?`, o: [`Why Colombia's glaciers are shrinking and why that matters`, `How to climb Colombia's highest mountains`, `Why it snows near the equator`, `How volcanoes are formed`], why: `The passage explains how fast the glaciers are melting, why, and what this means for water.` },
+      { type: `Detail`, q: `Where are Colombia's glaciers found?`, o: [`Only on the highest mountains`, `Near the coast`, `In the páramos`, `In every department`], why: `Paragraph 1: they are found only on the highest mountains.` },
+      { type: `Detail`, q: `How many glaciers does Colombia have today?`, o: [`Six`, `Fourteen`, `Nine`, `None`], why: `"Today, only six remain."` },
+      { type: `Vocabulary`, q: `The word "replace" in paragraph 3 is closest in meaning to`, o: [`take the place of`, `melt`, `measure`, `cover`], why: `New snow cannot make up for all the ice that melts.` },
+      { type: `Detail`, q: `Why does dark dust make the ice melt faster?`, o: [`Dark surfaces absorb more sunlight`, `The dust is hotter than the ice`, `The dust comes from volcanoes`, `The dust stops snow from falling`], why: `"Dark surfaces absorb more sunlight than white ones."` },
+      { type: `Inference`, q: `What could happen to some towns if the glaciers disappear?`, o: [`They could have less drinking water`, `They could get more snow`, `They could have more tourists`, `They could become colder`], why: `Glaciers feed the rivers and páramos that supply drinking water.` },
+      { type: `Purpose`, q: `Why does the author mention the páramos?`, o: [`To explain how glaciers help supply water to people`, `To describe a popular tourist place`, `To give an example of a glacier`, `To show where volcanoes are`], why: `The páramos carry glacier water to towns and cities.` }] }
+];
+
+export default { id: 4, L, G, R };

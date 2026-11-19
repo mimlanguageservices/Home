@@ -1,0 +1,157 @@
+// Full 60 minute Test 5 content. The CORRECT option is written first; pos gives the letter it moves to (see build-full-tests.mjs).
+const L = [
+  { id: 'F5-01', type: 'Teacher instructions · homeroom teacher', pos: 'A',
+    turns: [['Ms. Grant', `Tomorrow is our trip to the botanical garden. We'll leave at eight and come back around three. There's no restaurant at the garden, so you need to bring your own lunch. Please don't bring anything in glass bottles, because they can break on the bus. Also, the garden doesn't have many trash cans, so bring a plastic bag to take your trash home with you.`]],
+    questions: [{ q: `Why should students bring a plastic bag?`, o: [`To take their trash home`, `To carry plants from the garden`, `To keep their lunch cold`, `To sit on the grass`], why: `"Bring a plastic bag to take your trash home with you."` }] },
+  { id: 'F5-02', type: 'School announcement', pos: 'C',
+    turns: [['Announcer', `Good morning, everyone. Next Friday, the library is holding its first book swap. Bring up to three books you have already read, and you can exchange them for books that other students bring. All books must be in good condition, with no missing pages. Books for very young children won't be accepted, because this event is for students in grades six to nine.`]],
+    questions: [{ q: `What can students do at the book swap?`, o: [`Exchange books they have read for other books`, `Buy books at a low price`, `Meet a famous author`, `Return library books late without paying`], why: `"Bring up to three books you have already read, and you can exchange them for books that other students bring."` }] },
+  { id: 'F5-03', type: 'Short talk · coach', pos: 'B',
+    turns: [['Coach Silva', `Good news, team. Our new uniforms have arrived! They're blue and white, and each one has your number on the back. Please try yours on today and tell me by Friday if it's the wrong size. After Friday, I can't change them. And remember, the uniforms are only for games, not for practice, so please keep them clean and bring them back after every match.`]],
+    questions: [{ q: `What must players do by Friday?`, o: [`Say if their uniform is the wrong size`, `Wash their uniforms`, `Pay for their uniforms`, `Choose their numbers`], why: `"Tell me by Friday if it's the wrong size. After Friday, I can't change them."` }] },
+  { id: 'F5-04', type: 'Short talk · science teacher', pos: 'D',
+    turns: [['Ms. Rivera', `As you can see, we now have our own weather station on the school roof. It measures the temperature, the rain and the wind speed every fifteen minutes and sends the information to this computer. Each week, two students will be in charge of reading the data and writing a short weather report for the school newspaper. I'll put the schedule on the door, so you know when it's your turn.`]],
+    questions: [{ q: `What will two students do each week?`, o: [`Write a weather report for the school newspaper`, `Repair the weather station`, `Climb onto the roof`, `Measure the temperature by hand`], why: `They will read the data and write a short weather report for the school newspaper.` }] },
+  { id: 'F5-05', type: 'Short talk · homeroom teacher', pos: 'B',
+    turns: [['Mr. Ortiz', `Your report cards will be ready next Tuesday. This year, they won't be printed. Instead, your parents will receive an email with a link and a password. If your parents don't have an email address, or if they don't receive the message, please let me know before Tuesday, and I'll print a copy for them. Parent-teacher meetings will be on Thursday afternoon.`]],
+    questions: [{ q: `What should students do if their parents do not have an email address?`, o: [`Tell the teacher before Tuesday`, `Go to the meeting on Thursday`, `Print the report card at home`, `Create a new password`], why: `"Please let me know before Tuesday, and I'll print a copy for them."` }] },
+  { id: 'F5-06', type: 'Teacher instructions · computer teacher', pos: 'C',
+    turns: [['Mr. Hale', `Today you'll create a new password for your school account. A good password has at least ten characters and mixes letters, numbers and symbols. Don't use your name, your birthday or the name of your pet, because those are easy to guess. And never share your password with a friend, even your best friend. If you forget it, come and see me, and I'll reset it.`]],
+    questions: [{ q: `Why shouldn't students use their birthday as a password?`, o: [`It is easy to guess`, `It is too long`, `It has no letters`, `The computer does not accept numbers`], why: `"Don't use your name, your birthday or the name of your pet, because those are easy to guess."` }] },
+  { id: 'F5-07', type: 'Conversation · two friends', pos: 'DAB',
+    turns: [['Maya', `Leo, what are you doing on Saturday morning?`], ['Leo', `Nothing much. Why?`],
+      ['Maya', `I'm volunteering at the animal shelter near the park. They need people to walk the dogs and clean the cages. Do you want to come?`], ['Leo', `I'd love to, but I'm a little afraid of big dogs.`],
+      ['Maya', `That's okay. You could help with the cats instead. They need someone to play with them and give them their food.`], ['Leo', `That sounds perfect. Do we need to bring anything?`],
+      ['Maya', `Just old clothes. And you need a form signed by your parents, because we're under sixteen.`], ['Leo', `No problem. I'll ask my mom tonight.`]],
+    questions: [
+      { q: `What does Maya invite Leo to do?`, o: [`Volunteer at an animal shelter`, `Adopt a dog`, `Go running in the park`, `Buy food for his cat`], why: `"I'm volunteering at the animal shelter near the park. Do you want to come?"` },
+      { q: `Why is Leo unsure at first?`, o: [`He is afraid of big dogs`, `He is busy on Saturday`, `He doesn't like cats`, `He has no old clothes`], why: `"I'm a little afraid of big dogs."` },
+      { q: `Why does Leo need a form signed by his parents?`, o: [`He is under sixteen`, `He wants to adopt a cat`, `The shelter is far away`, `He will miss a class`], why: `"You need a form signed by your parents, because we're under sixteen."` }] },
+  { id: 'F5-08', type: 'Conversation · student and teacher', pos: 'CDA',
+    turns: [['Valeria', `Ms. Park, do you have a minute? I wanted to ask about the debate team.`], ['Ms. Park', `Of course, Valeria. Are you thinking of joining?`],
+      ['Valeria', `Yes, but I'm not sure I'm good enough. I get nervous when I speak in front of people.`], ['Ms. Park', `Almost everyone does at first. That's actually one of the reasons the team exists: to help students become more confident.`],
+      ['Valeria', `How often do you meet?`], ['Ms. Park', `Every Tuesday after school, for an hour and a half. Before a competition, we sometimes add a Saturday practice.`],
+      ['Valeria', `And do I have to try out?`], ['Ms. Park', `No tryouts. Just come next Tuesday and watch. If you like it, you can join.`]],
+    questions: [
+      { q: `Why is Valeria unsure about joining the debate team?`, o: [`She gets nervous speaking in front of people`, `She has no time on Tuesdays`, `She failed the tryouts`, `She doesn't like arguing`], why: `"I get nervous when I speak in front of people."` },
+      { q: `When does the team sometimes practice on Saturdays?`, o: [`Before a competition`, `Every week`, `During vacations`, `When Tuesday is a holiday`], why: `"Before a competition, we sometimes add a Saturday practice."` },
+      { q: `What does Ms. Park suggest that Valeria do?`, o: [`Come and watch next Tuesday`, `Practice speaking at home`, `Try out on Saturday`, `Talk to the other members first`], why: `"Just come next Tuesday and watch."` }] },
+  { id: 'F5-09', type: 'Academic talk · biology', pos: 'ADCB',
+    turns: [['Ms. Rivera', `Camels can survive in deserts where temperatures go above forty-five degrees and there may be no water for weeks. Many people believe that a camel's hump is full of water. In fact, it's full of fat. When food is hard to find, the camel's body uses this fat for energy. A hungry camel's hump can even become soft and fall to one side.`],
+      ['Ms. Rivera', `So how do camels manage without water? First, when they do find water, they can drink an enormous amount very quickly, around a hundred liters in about ten minutes. Second, they lose very little water. Their bodies can heat up during the day without sweating, and then cool down at night. Their noses also catch moisture from the air they breathe out.`],
+      ['Ms. Rivera', `Camels have other desert tools, too. Long eyelashes and nostrils that can close protect them from sandstorms. Wide, soft feet keep them from sinking into the sand. And their tough mouths let them eat thorny plants that most other animals avoid.`]],
+    questions: [
+      { q: `What is the talk mainly about?`, o: [`How camels are able to survive in the desert`, `Why deserts are so hot`, `How people use camels`, `How to ride a camel`], why: `The talk describes the hump, water use and other features that help camels survive.` },
+      { q: `What is inside a camel's hump?`, o: [`Fat`, `Water`, `Muscle`, `Air`], why: `"Many people believe that a camel's hump is full of water. In fact, it's full of fat."` },
+      { q: `How do camels lose very little water?`, o: [`They don't sweat during the day, and their noses catch moisture`, `They sleep all day`, `They drink only at night`, `They always stay in the shade`], why: `Their bodies heat up without sweating, and their noses catch moisture from their breath.` },
+      { q: `Why don't camels sink into the sand?`, o: [`They have wide, soft feet`, `They walk very fast`, `Their humps make them lighter`, `They have very long legs`], why: `"Wide, soft feet keep them from sinking into the sand."` }] },
+  { id: 'F5-10', type: 'Academic talk · history', pos: 'BCDA',
+    turns: [['Mr. Ortiz', `Think of French fries, potato chips or a bowl of ajiaco. Potatoes are now one of the most important foods in the world. But for most of history, people outside South America had never seen one. The potato was first grown in the Andes, near Lake Titicaca, between Peru and Bolivia, about eight thousand years ago.`],
+      ['Mr. Ortiz', `The people of the Andes developed thousands of different kinds of potatoes, in many colors and shapes. They also found a clever way to store them. They left the potatoes outside on freezing nights and then stepped on them during the sunny days to squeeze out the water. The result, called chuño, could be kept for years without going bad.`],
+      ['Mr. Ortiz', `In the 1500s, Spanish sailors brought potatoes to Europe. At first, many Europeans didn't trust them. Some thought they caused disease, and others grew the plants only as decoration in their gardens. But farmers slowly discovered that potatoes grew well in cold places and produced more food from the same land than wheat. Within two hundred years, potatoes had become a basic food in many European countries.`]],
+    questions: [
+      { q: `What is the talk mainly about?`, o: [`The history of the potato and how it spread`, `How to cook French fries`, `Why Lake Titicaca is famous`, `How farmers grow wheat`], why: `The talk goes from the first potatoes in the Andes to their arrival in Europe.` },
+      { q: `Where were potatoes first grown?`, o: [`In the Andes, near Lake Titicaca`, `In Spain`, `On the Colombian coast`, `In northern Europe`], why: `"The potato was first grown in the Andes, near Lake Titicaca."` },
+      { q: `What was chuño?`, o: [`Potatoes dried so they could be stored`, `A kind of potato soup`, `A colorful wild potato`, `A tool for planting potatoes`], why: `Frozen at night and squeezed in the sun, chuño could be kept for years.` },
+      { q: `Why did European farmers finally accept potatoes?`, o: [`Potatoes grew well in cold places and gave a lot of food`, `The king ordered them to`, `Potatoes looked nice in gardens`, `Wheat had disappeared`], why: `"Potatoes grew well in cold places and produced more food from the same land than wheat."` }] }
+];
+
+const G = [
+  { id: 'F5G1', title: 'A Thank-You Letter', kind: 'Letter', pos: 'DBAC',
+    text: `Dear Grandma,\n\nThank you so much for the sweater you sent me for my birthday. It fits perfectly, and the color is my favorite! I {1} it every day since it arrived, because it has been so cold in Bogotá this month. Mom says you {2} it by hand last month. I can't believe it took you {3} three weeks! I'm saving some money from my birthday, and I hope {4} you in Pasto during the December vacation.\n\nWith love,\nAndrés`,
+    blanks: [
+      { o: [`have worn`, `wear`, `am wearing`, `wore`], why: `"Since it arrived" (up to now) uses the present perfect.` },
+      { o: [`made`, `have made`, `are making`, `make`], why: `"Last month" is a finished time: past simple.` },
+      { o: [`almost`, `most`, `mostly`, `the most`], why: `"Almost" means nearly: nearly three weeks.` },
+      { o: [`to visit`, `visiting`, `visit`, `visited`], why: `"Hope" is followed by "to" + verb.` }] },
+  { id: 'F5G2', title: 'Ciclovía Sundays', kind: 'Notice', pos: 'CADBA',
+    text: `Every Sunday and public holiday, from 7:00 a.m. to 2:00 p.m., Bogotá {1} more than 100 kilometers of its main roads to cars. During these hours, the streets belong to cyclists, runners, skaters and walkers. Anyone can join, and it is completely {2}. Please ride on the right side of the road and slow down {3} you pass people on foot. Children under twelve should ride with an adult. Along the route, you will find stations {4} you can put air in your tires or buy something to drink. Remember that the roads open to cars again at 2:00 p.m. sharp, {5} please leave the route before then.`,
+    blanks: [
+      { o: [`closes`, `close`, `closing`, `is closed`], why: `The subject "Bogotá" is singular and does the action: "closes".` },
+      { o: [`free`, `freely`, `freedom`, `freeing`], why: `After "is completely" we need an adjective: "free".` },
+      { o: [`when`, `what`, `which`, `unless`], why: `"When" means at the time that you pass them.` },
+      { o: [`where`, `which`, `who`, `when`], why: `"Where" introduces information about a place (stations).` },
+      { o: [`so`, `but`, `because`, `although`], why: `"So" shows the result: leave before 2:00.` }] },
+  { id: 'F5G3', title: 'Lost Dog', kind: 'Text message', pos: 'BDCA',
+    text: `Hi Tomás, have you seen my dog, Kiwi? She ran out of the house this morning when the gardener {1} the gate open. She's small and brown with a red collar. She's very friendly but gets scared {2} she hears loud noises. If you see her, please don't chase her. Just call me, and I'll come right away. My mom and I {3} for her for two hours already, and we're getting really worried. Thanks, and please share this with anyone {4} lives near the park!\nValentina`,
+    blanks: [
+      { o: [`left`, `leaves`, `has left`, `was leaving it`], why: `A finished action this morning: past simple "left".` },
+      { o: [`whenever`, `wherever`, `whatever`, `however`], why: `"Whenever" means every time that.` },
+      { o: [`have been looking`, `are looking`, `looked`, `were looked`], why: `An action that started in the past and is still going on ("for two hours already").` },
+      { o: [`who`, `which`, `whose`, `what`], why: `"Who" refers to people and is the subject of "lives".` }] },
+  { id: 'F5G4', title: 'Charity Fun Run', kind: 'Announcement', pos: 'ACBDAD',
+    text: `On Saturday, May 18, our school will hold its first Charity Fun Run to raise money for the children's hospital in Chía. Students can choose to run or walk 3 or 5 kilometers around the park next to the school. To take part, you {1} sign up with your PE teacher by May 10. Each runner should ask family members and neighbors {2} a small amount of money for every kilometer they complete. You do not have to be fast {3} part; walking is perfectly fine! The race begins at 8:00 a.m., but please arrive by 7:30, so that we can give you your number. Every participant will receive a T-shirt, {4} was designed by students in the eighth-grade art class. All the money {5} will be used to buy books and games for the children's ward. Let's see {6} much we can raise together!`,
+    blanks: [
+      { o: [`need to`, `needs to`, `need`, `are needing`], why: `"You need to" + verb. "Needs" is for he/she/it.` },
+      { o: [`to give`, `giving`, `give`, `gave`], why: `"Ask someone to do something" uses the infinitive.` },
+      { o: [`to take`, `taking`, `take`, `took`], why: `"To" + verb shows purpose: in order to take part.` },
+      { o: [`which`, `who`, `what`, `where`], why: `", which" adds information about a thing (the T-shirt).` },
+      { o: [`raised`, `raising`, `raises`, `to raise`], why: `"The money raised" = the money that is raised (passive meaning).` },
+      { o: [`how`, `what`, `which`, `so`], why: `"How much" asks about an amount.` }] },
+  { id: 'F5G5', title: 'The Stray Dog', kind: 'Part of a short story', pos: 'DCABDBC',
+    text: `The dog appeared outside Camila's school on a cold Monday in June. It was thin and dirty, and one of its ears {1} torn. Every day after class, Camila shared part of her sandwich with it. She named it Lucky, although it did not seem very lucky. Her parents said she {2} keep it. "We live in a small apartment," her father explained. "A dog needs space to run." Camila understood, but she could not stop {3} about Lucky. One afternoon, she noticed a sign on the door of the animal clinic across the street: "Volunteers needed to walk dogs." She went in and told the vet about Lucky. The vet, {4} name was Dr. Pardo, came outside with her and examined Lucky carefully. "He's not sick, just hungry and tired," she said. "We have a program that finds homes for dogs like him." Two weeks later, Lucky was adopted by an older man who lived on a farm {5} the city. He sent Camila a photo of Lucky running through a green field. Camila still walks dogs at the clinic every Saturday. "Maybe I couldn't keep Lucky," she says, "but I helped him find a better life than I {6} have given him. And now I help other dogs {7}."`,
+    blanks: [
+      { o: [`was`, `were`, `has`, `is being`], why: `"One of its ears" is singular, and the story is in the past.` },
+      { o: [`couldn't`, `mustn't to`, `didn't can`, `can't to`], why: `Reported speech in the past: "couldn't keep". The other forms are not correct.` },
+      { o: [`thinking`, `to thinking`, `think`, `thought`], why: `"Stop doing something" = no longer do it. She kept thinking about Lucky.` },
+      { o: [`whose`, `who`, `which`, `that`], why: `"Whose" shows possession: the vet's name.` },
+      { o: [`outside`, `out`, `outer`, `without`], why: `"Outside the city" = not in the city.` },
+      { o: [`could`, `can`, `will`, `may`], why: `"Could have given" talks about something that was possible in the past but did not happen.` },
+      { o: [`as well`, `as good`, `as much`, `as far`], why: `"As well" at the end of a sentence means "too".` }] },
+  { id: 'F5G6', title: 'Why Do We Get Goosebumps?', kind: 'Magazine article', pos: 'ABDCADBC',
+    text: `Have you ever listened to a beautiful song and felt the hair on your arms stand up? Those tiny bumps on your skin {1} goosebumps, because they look like the skin of a goose after its feathers have been removed. Goosebumps appear when tiny muscles at the base of each hair {2}, pulling the hair up. This usually happens when we are cold or {3} we feel strong emotions, like fear or excitement. Scientists believe goosebumps are a leftover from our ancient ancestors, {4} had much more hair than we do. When their hair stood up, it trapped a layer of warm air next to the skin, which helped them stay warm. It also made them look bigger, which could scare {5} enemies. You can see the same thing today when a frightened cat puffs up its fur. For humans, goosebumps are no longer very useful, {6} we do not have enough hair to keep warm this way. However, a recent study found that the same muscles may help hair grow, so goosebumps might not be completely useless {7} all. They are {8} example of how our bodies still carry clues to our past.`,
+    blanks: [
+      { o: [`are called`, `call`, `are calling`, `have called`], why: `The bumps receive the name: passive "are called".` },
+      { o: [`tighten`, `tightens`, `tightening`, `to tighten`], why: `The subject "muscles" is plural, so the verb has no -s.` },
+      { o: [`when`, `what`, `which`, `where`], why: `"When" introduces a time: when we feel strong emotions.` },
+      { o: [`who`, `which`, `whose`, `whom`], why: `"Who" refers to people (our ancestors) and is the subject of "had".` },
+      { o: [`their`, `they`, `them`, `theirs`], why: `A possessive adjective goes before a noun: "their enemies".` },
+      { o: [`because`, `although`, `unless`, `so that`], why: `The second part gives the reason.` },
+      { o: [`after`, `at`, `in`, `for`], why: `"After all" means in the end, despite what we thought.` },
+      { o: [`one more`, `one many`, `more one`, `many one`], why: `"One more example" means an additional example.` }] }
+];
+
+const R = [
+  { id: 'F5R1', title: 'Photography Contest: My Neighborhood', kind: 'Notice', level: 'A2-B1', pos: 'DBCAB',
+    text: [
+      `Show us your neighborhood through your camera! This year's school photography contest is open to all students in grades 6 to 9. Photos can show people, places, animals or nature, as long as they were taken in the area where you live.`,
+      `Rules: Each student may send a maximum of two photos. Photos can be taken with a phone or a camera, but they must not be changed with filters or editing apps. Every photo needs a title and one sentence explaining why you chose it. If a photo shows a person's face, you must have that person's permission.`,
+      `How to enter: Email your photos to the art department by October 20. Write your name, your grade and the title of each photo in the email.`,
+      `Prizes: The winner will receive a new camera, and the ten best photos will be shown in the school entrance during the parents' meeting in November.`],
+    questions: [
+      { type: `Main idea`, q: `What is the notice mainly about?`, o: [`A photography contest for students`, `A photography class`, `A trip around the neighborhood`, `A new camera store`], why: `It gives the rules, how to enter and the prizes for a photo contest.` },
+      { type: `Detail`, q: `How many photos can each student send?`, o: [`Two`, `One`, `Three`, `Ten`], why: `"Each student may send a maximum of two photos."` },
+      { type: `Detail`, q: `What must a student do if a photo shows someone's face?`, o: [`Get that person's permission`, `Use a filter`, `Write the person's name`, `Send the photo to the person`], why: `"You must have that person's permission."` },
+      { type: `Inference`, q: `Which photo would NOT be accepted?`, o: [`A photo changed with a filter app`, `A photo taken with a phone`, `A photo of a dog in the student's street`, `A photo of a park near the student's house`], why: `Photos "must not be changed with filters or editing apps."` },
+      { type: `Detail`, q: `Where will the best photos be shown?`, o: [`In the school entrance`, `In a museum`, `On the school website`, `In a newspaper`], why: `"The ten best photos will be shown in the school entrance."` }] },
+  { id: 'F5R2', title: 'Lost in the Fog', kind: 'Narrative', level: 'B1', pos: 'ACDBCA',
+    text: [
+      `The hike to the top of the mountain was supposed to take three hours. Daniel, his older cousin Felipe and Felipe's friend Juan left early in the morning, when the sky was blue and the path was easy to see.`,
+      `They reached the top just before noon and ate their sandwiches while looking at the valley below. But as they started walking back down, a thick fog rolled in. Within minutes, they could see only a few meters in front of them. The path, which had been so clear that morning, seemed to disappear.`,
+      `"Let's keep going," said Juan. "I'm sure it's this way." But Daniel remembered something his scout leader had told him: if you get lost, stay where you are. "Wait," he said. "If we walk in the wrong direction, we'll get even more lost. We should stay together and wait for the fog to lift."`,
+      `Felipe agreed. They sat close together on a large rock, put on their jackets and shared the last of their water. Daniel used his phone's compass to check which direction the town was in, and Felipe sent a message to his mother with their location, just in case.`,
+      `An hour later, the fog cleared as quickly as it had appeared. They saw that the path was only twenty meters away, but Juan's direction would have taken them toward a steep cliff. "I guess the youngest one was the smartest today," Felipe said, patting Daniel on the back.`],
+    questions: [
+      { type: `Detail`, q: `What was the weather like when the boys started the hike?`, o: [`Clear and sunny`, `Foggy`, `Rainy`, `Very windy`], why: `"The sky was blue and the path was easy to see."` },
+      { type: `Vocabulary`, q: `The phrase "rolled in" in paragraph 2 is closest in meaning to`, o: [`arrived`, `went away`, `became lighter`, `turned into rain`], why: `The fog came and covered the mountain.` },
+      { type: `Detail`, q: `What advice did Daniel remember?`, o: [`Stay where you are if you get lost`, `Always bring extra water`, `Follow the oldest person`, `Walk down quickly before dark`], why: `"If you get lost, stay where you are."` },
+      { type: `Detail`, q: `What did Felipe do while they waited?`, o: [`He sent their location to his mother`, `He used his phone's compass`, `He went to look for the path`, `He called the police`], why: `"Felipe sent a message to his mother with their location." Daniel used the compass.` },
+      { type: `Inference`, q: `What would probably have happened if they had followed Juan?`, o: [`They could have been in danger near a cliff`, `They would have reached the town faster`, `They would have found the path`, `They would have met other hikers`], why: `"Juan's direction would have taken them toward a steep cliff."` },
+      { type: `Inference`, q: `Why does Felipe call Daniel "the smartest"?`, o: [`His decision to wait kept them safe`, `He knew the path best`, `He had the best phone`, `He reached the top first`], why: `Waiting instead of walking toward the cliff kept them safe.` }] },
+  { id: 'F5R3', title: 'Tiny Birds, Huge Energy', kind: 'Academic (science)', level: 'B1-B2', pos: 'BDACDBC',
+    text: [
+      `Hummingbirds are the smallest birds in the world. The bee hummingbird of Cuba weighs less than two grams, about the same as a small coin. Yet these tiny birds have some of the most amazing bodies in the animal kingdom. Colombia has more kinds of hummingbirds than almost any other country in the world.`,
+      `To stay in the air in front of a flower, a hummingbird beats its wings up to eighty times per second. It is the only bird that can fly backward. All this movement requires a huge amount of energy. A hummingbird's heart can beat more than a thousand times a minute, and the bird must eat almost constantly, visiting hundreds of flowers every day to drink their sugary nectar.`,
+      `This creates a problem at night. A hummingbird cannot eat while it sleeps, and without food, it could use up all its energy before morning. To survive, it enters a special state called torpor. Its body temperature drops by up to twenty degrees, and its heartbeat slows down dramatically. In torpor, the bird saves a large part of its energy. In the morning, it takes about twenty minutes to warm up again before it can fly.`,
+      `Hummingbirds are also important for plants. As they drink nectar, pollen sticks to their heads and beaks, and they carry it to the next flower. Many flowers in the Andes are shaped like long tubes that only hummingbirds can reach, so these plants depend on them completely.`],
+    questions: [
+      { type: `Main idea`, q: `What is the passage mainly about?`, o: [`The special features of hummingbirds and how they survive`, `Why Colombia has so many birds`, `How flowers make nectar`, `Where to see birds in Cuba`], why: `The passage describes their size, energy, torpor and role in pollination.` },
+      { type: `Detail`, q: `What can hummingbirds do that no other bird can do?`, o: [`Fly backward`, `Drink nectar`, `Sleep at night`, `Visit many flowers`], why: `"It is the only bird that can fly backward."` },
+      { type: `Detail`, q: `Why must hummingbirds eat almost constantly?`, o: [`Their movement uses a huge amount of energy`, `They are very large birds`, `They store food for the winter`, `They must feed their young all day`], why: `Paragraph 2: all this movement requires a huge amount of energy.` },
+      { type: `Vocabulary`, q: `The word "dramatically" in paragraph 3 is closest in meaning to`, o: [`a lot`, `a little`, `slowly`, `loudly`], why: `The heartbeat slows down very much.` },
+      { type: `Detail`, q: `What happens to a hummingbird in torpor?`, o: [`Its temperature and heartbeat go down`, `It flies to a warmer place`, `It drinks more nectar`, `It sleeps inside a flower`], why: `"Its body temperature drops ... and its heartbeat slows down."` },
+      { type: `Reference`, q: `The word "it" in paragraph 3 ("it takes about twenty minutes to warm up") refers to`, o: [`the bird`, `the morning`, `the energy`, `the heartbeat`], why: `The bird needs about twenty minutes to warm up before it can fly.` },
+      { type: `Inference`, q: `What would probably happen to some Andean flowers if hummingbirds disappeared?`, o: [`Their pollen would not be carried to other flowers`, `They would grow shorter tubes at once`, `They would produce more nectar`, `They would change color`], why: `"These plants depend on them completely" to carry pollen.` }] }
+];
+
+export default { id: 5, L, G, R };

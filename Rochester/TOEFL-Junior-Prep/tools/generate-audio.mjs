@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(here, '..', 'audio');
 const data = JSON.parse(await fs.readFile(path.join(here, 'listening-scripts.json'), 'utf8'));
-for (const extra of ['listening-scripts-2.json', 'listening-scripts-bt.json']) {
+for (const extra of ['listening-scripts-2.json', 'listening-scripts-bt.json', 'listening-scripts-ft.json']) {
   const more = JSON.parse(await fs.readFile(path.join(here, extra), 'utf8'));
   Object.assign(data.voices, more.voices);
   data.items.push(...more.items);
