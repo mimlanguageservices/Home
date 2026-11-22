@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Learn Skills - Rochester</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #2d3748; -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+        .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+        .topbar { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px max(20px, env(safe-area-inset-right)) 10px max(20px, env(safe-area-inset-left)); background: rgba(255,255,255,0.96); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .back { min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 12px; background: #eef2ff; color: #4c51bf; font-weight: 600; text-decoration: none; touch-action: manipulation; }
+        .topbar h1 { font-size: 1.15rem; font-weight: 700; text-align: center; }
+        .right { min-width: 110px; text-align: right; font-weight: 700; color: #4c51bf; font-variant-numeric: tabular-nums; }
+        .jump { flex: 0 0 auto; display: flex; gap: 8px; overflow-x: auto; padding: 12px max(16px, env(safe-area-inset-left)); -webkit-overflow-scrolling: touch; }
+        .jump a { flex: 0 0 auto; min-height: 40px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 20px; background: rgba(255,255,255,0.25); color: #fff; font-weight: 600; font-size: 0.9rem; text-decoration: none; white-space: nowrap; touch-action: manipulation; }
+        .stage { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; padding: 0 max(16px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+        .paper { max-width: 860px; margin: 0 auto 18px; background: #fff; border-radius: 20px; padding: 26px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); scroll-margin-top: 12px; }
+        .paper h2 { font-size: 1.3rem; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .num { flex: 0 0 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 0.95rem; }
+        .sub { color: #718096; margin-bottom: 16px; line-height: 1.6; }
+        .lead { font-size: 1.1rem; line-height: 1.7; }
+        .kicker { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #818cf8; margin-bottom: 6px; }
+        mark { background: #fef3c7; color: #92400e; font-weight: 700; padding: 0 3px; border-radius: 4px; }
+        /* 1. explanation */
+        .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .rule { border: 2px solid #e2e8f0; border-radius: 16px; padding: 16px; }
+        .rule .w { font-size: 1.4rem; font-weight: 700; color: #4c51bf; }
+        .rule p { margin: 6px 0 10px; line-height: 1.5; }
+        .rule ul { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+        .rule li { padding: 6px 10px; border-radius: 10px; background: #f5f7ff; font-size: 0.92rem; font-weight: 600; color: #4a5568; }
+        .rule .ex { font-size: 0.98rem; color: #2d3748; font-style: italic; }
+        .tip { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: #ecfeff; color: #155e75; line-height: 1.6; }
+        /* 2. examples */
+        .examples { display: flex; flex-direction: column; gap: 10px; }
+        .example { padding: 12px 16px; border-left: 4px solid #a5b4fc; background: #f8fafc; border-radius: 0 12px 12px 0; }
+        .example .s { font-size: 1.08rem; }
+        .example .n { margin-top: 4px; color: #718096; font-size: 0.92rem; }
+        /* 3. mistakes */
+        .mistake { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+        .mistake .bad, .mistake .good { padding: 12px 14px; border-radius: 12px; font-size: 1.02rem; line-height: 1.4; }
+        .mistake .bad { background: #fff5f5; color: #9b2c2c; text-decoration: line-through; text-decoration-color: rgba(197,48,48,0.5); }
+        .mistake .good { background: #f0fff4; color: #276749; font-weight: 600; }
+        .mistake .bad::before { content: "\2717  "; text-decoration: none; display: inline-block; margin-right: 4px; }
+        .mistake .good::before { content: "\2713  "; margin-right: 4px; }
+        .mistake .mwhy { grid-column: 1 / -1; color: #4a5568; font-size: 0.92rem; padding: 0 4px; }
+        /* 4. guided */
+        .gitem { padding: 14px 0; border-bottom: 1px solid #edf2f7; }
+        .gitem:last-child { border-bottom: 0; }
+        .gs { font-size: 1.1rem; line-height: 1.8; margin-bottom: 8px; }
+        .gap { display: inline-block; min-width: 76px; padding: 0 10px; border-bottom: 3px solid #a5b4fc; text-align: center; font-weight: 700; color: #4c51bf; }
+        .gap.right { border-color: #38a169; color: #276749; background: #f0fff4; border-radius: 6px 6px 0 0; }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { min-height: 44px; padding: 0 18px; border: 2px solid #c7d2fe; border-radius: 22px; background: #fff; color: #4c51bf; font: 600 1rem 'Inter', sans-serif; touch-action: manipulation; cursor: pointer; }
+        .chip.wrong { border-color: #fc8181; background: #fff5f5; color: #c53030; }
+        .chip.right { border-color: #38a169; background: #38a169; color: #fff; }
+        .chip[disabled] { cursor: default; }
+        .chip.wrong[disabled] { opacity: 0.6; }
+        .hint { margin-top: 8px; font-size: 0.92rem; color: #c53030; font-weight: 600; }
+        /* 5. TOEFL */
+        .q { margin-bottom: 22px; }
+        .q-text { font-weight: 600; font-size: 1.06rem; margin-bottom: 8px; line-height: 1.45; }
+        .opt { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; margin: 8px 0; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 14px; background: #fff; color: inherit; font: 500 1rem 'Inter', sans-serif; text-align: left; touch-action: manipulation; cursor: pointer; }
+        .opt .letter { flex: 0 0 32px; height: 32px; border-radius: 50%; background: #eef2ff; color: #4c51bf; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .opt.right { border-color: #38a169; background: #f0fff4; }
+        .opt.right .letter { background: #38a169; color: #fff; }
+        .opt.wrong { border-color: #e53e3e; background: #fff5f5; }
+        .opt.wrong .letter { background: #e53e3e; color: #fff; }
+        .opt[disabled] { cursor: default; }
+        .why { margin-top: 8px; padding: 10px 14px; border-radius: 12px; background: #fffbea; color: #744210; font-size: 0.95rem; line-height: 1.5; }
+        /* 6. challenge */
+        .cbody { font-size: 1.08rem; line-height: 2.2; }
+        .blank { display: inline-flex; align-items: center; justify-content: center; min-width: 76px; min-height: 40px; padding: 0 12px; margin: 0 2px; border: 2px dashed #a5b4fc; border-radius: 10px; background: #eef2ff; color: #4c51bf; font: 700 1rem 'Inter', sans-serif; vertical-align: middle; touch-action: manipulation; cursor: pointer; }
+        .blank.chosen { border-style: solid; background: #f5f7ff; }
+        .blank.right { border: 2px solid #38a169; background: #f0fff4; color: #276749; }
+        .blank.wrong { border: 2px solid #e53e3e; background: #fff5f5; color: #9b2c2c; }
+        .blank.active { box-shadow: 0 0 0 3px rgba(102,126,234,0.4); }
+        .cwhy { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+        .cwhy div { padding: 10px 14px; border-radius: 12px; background: #fffbea; color: #744210; font-size: 0.95rem; line-height: 1.5; }
+        .cwhy div.ok { background: #f0fff4; color: #276749; }
+        .btn { min-height: 52px; padding: 0 24px; border: 0; border-radius: 14px; font-family: inherit; font-size: 1rem; font-weight: 600; touch-action: manipulation; cursor: pointer; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn.ghost { background: #eef2ff; color: #4c51bf; }
+        .btn[disabled] { opacity: 0.4; cursor: default; }
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+        .score { margin-top: 14px; font-weight: 700; color: #4c51bf; }
+        .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: #fff; border-radius: 22px 22px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.25); padding: 16px max(20px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); transform: translateY(105%); transition: transform 0.25s ease; max-height: 70vh; overflow-y: auto; }
+        .sheet.open { transform: translateY(0); }
+        .sheet-inner { max-width: 760px; margin: 0 auto; }
+        .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 700; }
+        .close { min-height: 44px; min-width: 44px; border: 0; border-radius: 12px; background: #eef2ff; color: #4c51bf; font-size: 1.2rem; touch-action: manipulation; cursor: pointer; }
+        .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .opts .opt { margin: 0; }
+        /* summary */
+        .summary { text-align: center; }
+        .summary strong { display: block; font-size: 2.6rem; color: #4c51bf; margin: 4px 0; }
+        .summary p { color: #4a5568; line-height: 1.6; }
+        @media (max-width: 700px) { .rules, .mistake { grid-template-columns: 1fr; } .opts { grid-template-columns: 1fr; } .paper { padding: 18px; } .topbar h1 { font-size: 1rem; } .right { min-width: 60px; } }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="topbar">
+        <a class="back" href="TOEFL-Junior-Prep.html#learn">&#8592; Back</a>
+        <h1 id="title">Learn Skills</h1>
+        <div class="right" id="right"></div>
+    </div>
+    <nav class="jump" id="jump"></nav>
+    <div class="stage" id="stage"></div>
+</div>
+<div class="sheet" id="sheet"><div class="sheet-inner" id="sheetInner"></div></div>
+
+<script src="data/lessons.js"></script>
+<script>
+    // One mini lesson from data/lessons.js: explanation, examples, common mistakes, guided practice (word bank),
+    // TOEFL-style questions and a challenge paragraph. The practice score is saved as learn:<lesson id>.
+    const params = new URLSearchParams(location.search);
+    const id = params.get('l') || '';
+    const LS = (window.LESSONS || {})[id];
+    const LT = 'ABCD';
+    const PKEY = 'tj_progress';
+    // guided[i] = { tries, done }; toefl[i] = chosen option; challenge = chosen options + whether checked
+    const st = { guided: [], toefl: [], ch: {}, checked: false, chScore: null };
+    let openBlank = null;
+
+    const SECTIONS = [['explain', 'Explanation'], ['examples', 'Examples'], ['mistakes', 'Common mistakes'], ['guided', 'Guided practice'], ['toefl', 'TOEFL practice'], ['challenge', 'Challenge']];
+    const head = (n, key, sub) => `<h2><span class="num">${n}</span>${SECTIONS[n - 1][1]}</h2>${sub ? `<p class="sub">${sub}</p>` : ''}`;
+
+    function save(c, t) {
+        try { const p = JSON.parse(localStorage.getItem(PKEY)) || {}; const k = 'learn:' + id; if (!p[k] || c >= p[k].c) p[k] = { c, t }; localStorage.setItem(PKEY, JSON.stringify(p)); } catch (e) {}
+    }
+    const total = () => LS.guided.items.length + LS.toefl.length + LS.challenge.blanks.length;
+    function score() {
+        const g = st.guided.filter(x => x && x.done && x.tries === 0).length;   // right on the first try
+        const t = LS.toefl.filter((q, i) => st.toefl[i] === q.a).length;
+        return g + t + (st.chScore || 0);
+    }
+    const finished = () => LS.guided.items.every((x, i) => st.guided[i] && st.guided[i].done) && LS.toefl.every((q, i) => st.toefl[i] !== undefined) && st.checked;
+    function updateScore() {
+        const done = finished();
+        document.getElementById('right').textContent = done ? score() + ' / ' + total() : '';
+        if (done) save(score(), total());
+        const sm = document.getElementById('summary');
+        if (sm) sm.innerHTML = done ? `<div class="kicker">Lesson complete</div><strong>${score()} / ${total()}</strong><p>${score() === total() ? 'Perfect! You know how to use these words.' : score() >= total() * 0.75 ? 'Great work. Read the explanations for any you missed.' : 'Good effort. Read the explanation again and try the practice once more.'}</p><div class="actions" style="justify-content:center"><button class="btn ghost" id="again">Practice again</button><a class="btn" href="TOEFL-Junior-Prep.html#learn">Back to Learn Skills</a></div>`
+            : `<p>Finish the guided practice, the TOEFL practice and the challenge to see your score.</p>`;
+        const again = document.getElementById('again');
+        if (again) again.onclick = () => { st.guided = []; st.toefl = []; st.ch = {}; st.checked = false; st.chScore = null; render(); document.getElementById('stage').scrollTop = 0; };
+    }
+
+    // ---------- sections ----------
+    function explainHtml() {
+        return `<section class="paper" id="explain"><div class="kicker">${LS.group}</div>${head(1)}<p class="lead" style="margin-bottom:16px">${LS.intro}</p>
+            <div class="rules">${LS.rules.map(r => `<div class="rule"><div class="w">${r.word}</div><p>${r.meaning}</p><ul>${r.patterns.map(p => `<li>${p}</li>`).join('')}</ul><div class="ex">${r.example}</div></div>`).join('')}</div>
+            <div class="tip">${LS.tip}</div></section>`;
+    }
+    function examplesHtml() {
+        return `<section class="paper" id="examples">${head(2)}<div class="examples">${LS.examples.map(e => `<div class="example"><div class="s">${e.s}</div><div class="n">${e.note}</div></div>`).join('')}</div></section>`;
+    }
+    function mistakesHtml() {
+        return `<section class="paper" id="mistakes">${head(3, 0, 'Each pair shows a mistake students often make and the correct sentence.')}${LS.mistakes.map(m => `<div class="mistake"><div class="bad">${m.wrong}</div><div class="good">${m.right}</div><div class="mwhy">${m.why}</div></div>`).join('')}</section>`;
+    }
+    function guidedHtml() {
+        const bank = LS.guided.bank;
+        return `<section class="paper" id="guided">${head(4, 0, 'Tap the word that completes each sentence: ' + bank.map(w => '<b>' + w + '</b>').join(' · ') + '. If you are wrong, try again.')}
+            ${LS.guided.items.map((it, i) => {
+                const g = st.guided[i] || { tries: 0, done: false, wrong: [] };
+                const gap = `<span class="gap${g.done ? ' right' : ''}">${g.done ? it.a : '&nbsp;'}</span>`;
+                return `<div class="gitem"><div class="gs">${i + 1}. ${it.s.replace('___', gap)}</div><div class="chips">${bank.map(w => {
+                    const cls = g.done && w === it.a ? ' right' : g.wrong.includes(w) ? ' wrong' : '';
+                    return `<button class="chip${cls}" data-i="${i}" data-w="${w}" ${g.done || g.wrong.includes(w) ? 'disabled' : ''}>${w}</button>`;
+                }).join('')}</div>${g.done ? `<div class="why">${g.tries === 0 ? 'Correct! ' : 'Yes! '}${it.why}</div>` : g.wrong.length ? '<div class="hint">Not quite. Try another word.</div>' : ''}</div>`;
+            }).join('')}</section>`;
+    }
+    function toeflHtml() {
+        return `<section class="paper" id="toefl">${head(5, 0, 'Choose the word or words that best complete each sentence. You have one try for each question.')}
+            ${LS.toefl.map((q, i) => {
+                const ch = st.toefl[i];
+                return `<div class="q"><div class="q-text">${i + 1}. ${q.q.replace('___', '<span class="gap">&nbsp;</span>')}</div>${q.o.map((o, j) => {
+                    let cls = 'opt';
+                    if (ch !== undefined) { if (j === q.a) cls += ' right'; else if (j === ch) cls += ' wrong'; }
+                    return `<button class="${cls}" data-q="${i}" data-j="${j}" ${ch !== undefined ? 'disabled' : ''}><span class="letter">${LT[j]}</span><span>${o}</span></button>`;
+                }).join('')}${ch !== undefined ? `<div class="why">${ch === q.a ? 'Correct! ' : 'Not quite. '}${q.why}</div>` : ''}</div>`;
+            }).join('')}</section>`;
+    }
+    function challengeHtml() {
+        const c = LS.challenge;
+        const body = c.text.replace(/\{(\d+)\}/g, (m, n) => {
+            const b = +n - 1, a = st.ch[b];
+            let cls = 'blank', label = n;
+            if (a !== undefined) { label = c.blanks[b].o[a]; cls += ' chosen'; if (st.checked) cls += a === c.blanks[b].a ? ' right' : ' wrong'; }
+            if (openBlank === b) cls += ' active';
+            return `<button class="${cls}" data-b="${b}">${label}</button>`;
+        });
+        const all = c.blanks.every((x, b) => st.ch[b] !== undefined);
+        let h = `<section class="paper" id="challenge">${head(6, 0, 'Tap each numbered blank and choose the best answer. When every blank is filled, press Check.')}<div class="kicker">${c.title}</div><div class="cbody">${body}</div>`;
+        if (st.checked) h += `<div class="score">${st.chScore} / ${c.blanks.length} correct</div><div class="cwhy">${c.blanks.map((x, b) => `<div class="${st.ch[b] === x.a ? 'ok' : ''}"><b>${b + 1}. ${x.o[x.a]}</b>: ${x.why}</div>`).join('')}</div><div class="actions"><button class="btn ghost" id="retryCh">Try the challenge again</button></div>`;
+        else h += `<div class="actions"><button class="btn" id="checkCh" ${all ? '' : 'disabled'}>Check</button></div>`;
+        return h + '</section>';
+    }
+
+    function render() {
+        const stage = document.getElementById('stage'), top = stage.scrollTop;
+        stage.innerHTML = explainHtml() + examplesHtml() + mistakesHtml() + guidedHtml() + toeflHtml() + challengeHtml() + '<section class="paper summary" id="summary"></section>';
+        stage.scrollTop = top;
+        stage.querySelectorAll('.chip').forEach(b => b.onclick = () => {
+            const i = +b.dataset.i, w = b.dataset.w, it = LS.guided.items[i];
+            const g = st.guided[i] || (st.guided[i] = { tries: 0, done: false, wrong: [] });
+            if (w === it.a) g.done = true; else { g.tries++; g.wrong.push(w); }
+            render();
+        });
+        stage.querySelectorAll('.opt[data-q]').forEach(b => b.onclick = () => { st.toefl[+b.dataset.q] = +b.dataset.j; render(); });
+        stage.querySelectorAll('.blank').forEach(b => b.onclick = () => { if (!st.checked) openSheet(+b.dataset.b); });
+        const ck = document.getElementById('checkCh');
+        if (ck) ck.onclick = () => { st.checked = true; st.chScore = LS.challenge.blanks.filter((x, b) => st.ch[b] === x.a).length; render(); };
+        const rc = document.getElementById('retryCh');
+        if (rc) rc.onclick = () => { st.ch = {}; st.checked = false; st.chScore = null; render(); };
+        updateScore();
+    }
+
+    function openSheet(b) {
+        const bl = LS.challenge.blanks[b], a = st.ch[b];
+        openBlank = b;
+        let h = `<div class="sheet-head"><span>Blank ${b + 1}</span><button class="close" id="closeSheet">&#10005;</button></div><div class="opts">`;
+        bl.o.forEach((o, j) => { h += `<button class="opt${a === j ? ' right' : ''}" data-j="${j}"><span class="letter">${LT[j]}</span><span>${o}</span></button>`; });
+        document.getElementById('sheetInner').innerHTML = h + '</div>';
+        document.getElementById('sheet').classList.add('open');
+        document.getElementById('closeSheet').onclick = closeSheet;
+        document.querySelectorAll('#sheetInner .opt').forEach(el => el.onclick = () => { st.ch[b] = +el.dataset.j; closeSheet(); });
+        render();
+    }
+    function closeSheet() { openBlank = null; document.getElementById('sheet').classList.remove('open'); render(); }
+
+    if (!LS) document.getElementById('stage').innerHTML = '<section class="paper">This lesson is not ready yet.</section>';
+    else {
+        document.getElementById('title').textContent = LS.title;
+        document.title = LS.title + ' - Learn Skills';
+        document.getElementById('jump').innerHTML = SECTIONS.map(([k, n], i) => `<a href="#${k}">${i + 1}. ${n}</a>`).join('');
+        render();
+    }
+</script>
+</body>
+</html>

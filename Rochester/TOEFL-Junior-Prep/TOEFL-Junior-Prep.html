@@ -71,6 +71,18 @@
         .placeholder-icon { font-size: 4rem; }
         .placeholder-panel h3 { font-size: 1.6rem; color: #2d3748; font-weight: 600; }
         .placeholder-panel p { max-width: 500px; color: #4a5568; font-size: 1.05rem; line-height: 1.7; }
+        .learn-group { width: 100%; max-width: 760px; margin: 0 auto 26px; }
+        .learn-group h3 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #155e75; margin: 0 0 10px 4px; }
+        .learn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+        .learn-card { min-height: 64px; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 12px 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .learn-card b { font-size: 1rem; font-weight: 600; color: #2d3748; }
+        .learn-card span { font-size: 0.78rem; font-weight: 600; color: #a0aec0; }
+        a.learn-card.ready { text-decoration: none; border: 2px solid #22d3ee; touch-action: manipulation; }
+        a.learn-card.ready span { color: #0e7490; }
+        @media (hover: hover) { a.learn-card.ready:hover { background: #ecfeff; } }
+        a.learn-card.ready.perfect { background: #38a169; border-color: #2f855a; }
+        a.learn-card.ready.perfect b, a.learn-card.ready.perfect span { color: #fff; }
+        @media (hover: hover) { a.learn-card.ready.perfect:hover { background: #2f855a; } }
         .test-link-list { display: flex; flex-direction: column; gap: 14px; padding: 0; width: 100%; max-width: 600px; margin: 0 auto; align-self: center; }
         .test-link-card { min-height: 72px; touch-action: manipulation; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; text-decoration: none; color: #2d3748; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.25s ease; }
         .test-link-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2); border-color: #a5b4fc; }
@@ -196,6 +208,7 @@
             <div class="navigation" id="navigation">
                 <div class="nav-item active" id="navPractice" onclick="showSection('practice')">Practice Skills</div>
                 <div class="nav-item" id="navTest" onclick="showSection('test')">Take Test</div>
+                <div class="nav-item" id="navLearn" onclick="showSection('learn')" hidden>Learn Skills</div>
                 <div class="nav-item" id="navFull" onclick="showSection('full')" hidden>60 Minute Tests</div>
             </div>
 
@@ -205,6 +218,11 @@
                     <p class="module-text" id="moduleText"></p>
                     <div class="map-row" hidden><a class="course-map-link" href="Course-Map.html">View the 12-week Course Map</a></div>
                     <div class="placeholder-panel" id="practiceContent"></div>
+                </div>
+                <div class="section" id="learn">
+                    <h2>Learn Skills: Language Form &amp; Meaning</h2>
+                    <p class="module-text">The grammar and vocabulary points that appear most often in Language Form &amp; Meaning questions. Tap a highlighted topic to start its lesson; more lessons are coming soon.</p>
+                    <div id="learnContent"></div>
                 </div>
                 <div class="section" id="full">
                     <h2>60 Minute Tests</h2>
@@ -231,6 +249,7 @@
     <script src="data/load-book.js"></script>
     <script src="audio/listening-data.js"></script>
     <script src="data/full-tests.js"></script>
+    <script src="data/lessons.js"></script>
     <script src="data/test-guard.js"></script>
     <script>
         // Timed tests are found from the data: a reading text belongs to a test via test/test2/test3/t, a language text or listening item via .test
@@ -260,6 +279,27 @@
             full:      { name: 'Full Tests', icon: '&#9201;', text: 'Complete TOEFL Junior tests with all three sections.',   // only one menu item: 60 Minute Tests
                 tests: (window.FULL_TESTS || []).map(ft => ({ name: '60 Minute Test ' + ft.id, meta: 'Listening · Language · Reading · 3 × ' + ft.minutes + ' minutes · score out of 900', href: 'Full-Test.html?test=' + ft.id, key: 'full:test' + ft.id })) }
         };
+        // Learn Skills (Language Form & Meaning): the most common question points, as placeholders until the lessons are written
+        const LEARN_TOPICS = [
+            ['Verbs and voice', ['Verb tenses', 'Subject–verb agreement', 'Infinitives and gerunds', 'Active and passive voice']],
+            ['Sentence structure', ['Relative clauses', 'Conditional sentences', 'Modal verbs', 'Noun clauses', 'Word order']],
+            ['Words and word forms', ['Parts of speech', 'Word forms', 'Pronouns and possessives', 'Adjectives and adverbs', 'Articles and determiners']],
+            ['Connecting and comparing', ['Prepositions', 'Conjunctions', 'Comparatives and superlatives', 'Linking expressions', 'Too, enough, so and such']],
+            ['Vocabulary', ['Synonyms and antonyms', 'Collocations', 'Phrasal verbs', 'Word families', 'Context clues']]
+        ];
+        const lessonId = t => t.toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');   // "Too, enough, so and such" -> too-enough-so-and-such
+        function learnCard(t) {
+            const id = lessonId(t);
+            if (!(window.LESSONS || {})[id]) return `<div class="learn-card"><b>${t}</b><span>Lesson coming soon</span></div>`;
+            const p = progress()['learn:' + id];
+            const perfect = p && p.c === p.t;   // finished with 100%: the card turns green
+            return `<a class="learn-card ready${perfect ? ' perfect' : ''}" href="Lesson.html?l=${id}"><b>${t}</b><span>${perfect ? '&#10003; Completed ' + p.c + '/' + p.t : p ? '&#10003; ' + p.c + '/' + p.t + ' · Practice again' : 'Start lesson &#8594;'}</span></a>`;
+        }
+        function renderLearn() {
+            document.getElementById('learnContent').innerHTML = LEARN_TOPICS.map(([group, topics]) =>
+                `<div class="learn-group"><h3>${group}</h3><div class="learn-grid">${topics.map(learnCard).join('')}</div></div>`).join('');
+        }
+
         function progress() { try { return JSON.parse(localStorage.getItem('tj_progress')) || {}; } catch (e) { return {}; } }
         let currentModule = 'listening';
 
@@ -270,6 +310,7 @@
             document.getElementById('navPractice').hidden = full;
             document.getElementById('navTest').hidden = full;
             document.getElementById('navFull').hidden = !full;
+            document.getElementById('navLearn').hidden = module !== 'language';   // Learn Skills is only in Language Form & Meaning
             showSection(full ? 'full' : 'practice');
             document.getElementById('loadingScreen').classList.add('hidden');
             document.getElementById('appContainer').classList.add('visible');
@@ -319,6 +360,7 @@
             fill('practiceContent', all.filter(t => !isTest(t)), null, 'Practice sets for this module will appear here.');
             fill('testContent', all.filter(isTest), t => 'Test ' + t.href.match(/test=(\d+)/)[1] + ' &middot; ' + data.name, 'Tests for this module will appear here.');
             fill('fullContent', moduleData.full.tests, null, 'Full 60 minute tests will appear here.');
+            renderLearn();
         }
 
         function toggleNav() {
@@ -332,6 +374,7 @@
             document.getElementById('navPractice').classList.toggle('active', id === 'practice');
             document.getElementById('navTest').classList.toggle('active', id === 'test');
             document.getElementById('navFull').classList.toggle('active', id === 'full');
+            document.getElementById('navLearn').classList.toggle('active', id === 'learn');
             if (document.getElementById('navigation').classList.contains('open')) toggleNav();
         }
 
@@ -356,6 +399,8 @@
         // stop double-tap zoom on iOS
         let lastTap = 0;
         document.addEventListener('touchend', e => { const n = Date.now(); if (n - lastTap < 300) e.preventDefault(); lastTap = n; }, { passive: false });
+        // Coming back from a lesson (TOEFL-Junior-Prep.html#learn): reopen Language Form & Meaning on Learn Skills
+        if (location.hash === '#learn') { startModule('language'); showSection('learn'); history.replaceState(null, '', location.pathname + location.search); }
     </script>
 </body>
 </html>
