@@ -66,6 +66,7 @@
         .content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; background: rgba(255, 255, 255, 0.95); }
         .section { display: none; flex: 1; padding: 40px 40px calc(40px + env(safe-area-inset-bottom)); overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; height: 100%; }
         .section.active { display: flex; flex-direction: column; }
+        .section:focus, .section:target { outline: none; }
         .section h2 { color: #2d3748; margin-bottom: 30px; font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: -0.5px; }
         .placeholder-panel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; }
         .placeholder-icon { font-size: 4rem; }
@@ -80,9 +81,9 @@
         a.learn-card.ready { text-decoration: none; border: 2px solid #22d3ee; touch-action: manipulation; }
         a.learn-card.ready span { color: #0e7490; }
         @media (hover: hover) { a.learn-card.ready:hover { background: #ecfeff; } }
-        a.learn-card.ready.perfect { background: #38a169; border-color: #2f855a; }
-        a.learn-card.ready.perfect b, a.learn-card.ready.perfect span { color: #fff; }
-        @media (hover: hover) { a.learn-card.ready.perfect:hover { background: #2f855a; } }
+        a.learn-card.ready.done { background: #38a169; border-color: #2f855a; }
+        a.learn-card.ready.done b, a.learn-card.ready.done span { color: #fff; }
+        @media (hover: hover) { a.learn-card.ready.done:hover { background: #2f855a; } }
         .test-link-list { display: flex; flex-direction: column; gap: 14px; padding: 0; width: 100%; max-width: 600px; margin: 0 auto; align-self: center; }
         .test-link-card { min-height: 72px; touch-action: manipulation; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; text-decoration: none; color: #2d3748; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.25s ease; }
         .test-link-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2); border-color: #a5b4fc; }
@@ -292,8 +293,8 @@
             const id = lessonId(t);
             if (!(window.LESSONS || {})[id]) return `<div class="learn-card"><b>${t}</b><span>Lesson coming soon</span></div>`;
             const p = progress()['learn:' + id];
-            const perfect = p && p.c === p.t;   // finished with 100%: the card turns green
-            return `<a class="learn-card ready${perfect ? ' perfect' : ''}" href="Lesson.html?l=${id}"><b>${t}</b><span>${perfect ? '&#10003; Completed ' + p.c + '/' + p.t : p ? '&#10003; ' + p.c + '/' + p.t + ' · Practice again' : 'Start lesson &#8594;'}</span></a>`;
+            // A finished lesson (any score) turns solid green, so students can see which lessons are left; 100% also gets a star
+            return `<a class="learn-card ready${p ? ' done' : ''}" href="Lesson.html?l=${id}"><b>${t}</b><span>${p ? '&#10003; Completed · ' + p.c + '/' + p.t + (p.c === p.t ? ' &#9733;' : '') : 'Start lesson &#8594;'}</span></a>`;
         }
         function renderLearn() {
             document.getElementById('learnContent').innerHTML = LEARN_TOPICS.map(([group, topics]) =>
@@ -322,7 +323,13 @@
         function hideShare() { document.getElementById('shareScreen').classList.remove('show'); }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') hideShare(); });
 
+        // While Learn Skills is open the address ends in #learn, so coming back from a lesson (Back button or Safari's back gesture) reopens it
+        function setLearnHash(on) {
+            if (on && location.hash !== '#learn') history.replaceState(null, '', location.pathname + location.search + '#learn');
+            else if (!on && location.hash === '#learn') history.replaceState(null, '', location.pathname + location.search);
+        }
         function showLoadingScreen() {
+            setLearnHash(false);
             document.getElementById('appContainer').classList.remove('visible');
             setTimeout(() => { document.getElementById('loadingScreen').classList.remove('hidden'); }, 300);
         }
@@ -375,6 +382,7 @@
             document.getElementById('navTest').classList.toggle('active', id === 'test');
             document.getElementById('navFull').classList.toggle('active', id === 'full');
             document.getElementById('navLearn').classList.toggle('active', id === 'learn');
+            setLearnHash(id === 'learn');
             if (document.getElementById('navigation').classList.contains('open')) toggleNav();
         }
 
@@ -400,7 +408,9 @@
         let lastTap = 0;
         document.addEventListener('touchend', e => { const n = Date.now(); if (n - lastTap < 300) e.preventDefault(); lastTap = n; }, { passive: false });
         // Coming back from a lesson (TOEFL-Junior-Prep.html#learn): reopen Language Form & Meaning on Learn Skills
-        if (location.hash === '#learn') { startModule('language'); showSection('learn'); history.replaceState(null, '', location.pathname + location.search); }
+        if (location.hash === '#learn') { startModule('language'); showSection('learn'); }
+        // Safari's back gesture shows the page from memory: refresh the cards so new scores and finished lessons appear
+        window.addEventListener('pageshow', e => { if (e.persisted) updatePracticeContent(moduleData[currentModule]); });
     </script>
 </body>
 </html>
