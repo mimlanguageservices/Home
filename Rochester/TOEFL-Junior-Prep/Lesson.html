@@ -158,7 +158,7 @@
         return `<section class="paper" id="examples">${head(2)}<div class="examples">${LS.examples.map(e => `<div class="example"><div class="s">${e.s}</div><div class="n">${e.note}</div></div>`).join('')}</div></section>`;
     }
     function mistakesHtml() {
-        return `<section class="paper" id="mistakes">${head(3, 0, 'Each pair shows a mistake students often make and the correct sentence.')}${LS.mistakes.map(m => `<div class="mistake"><div class="bad">${m.wrong}</div><div class="good">${m.right}</div><div class="mwhy">${m.why}</div></div>`).join('')}</section>`;
+        return `<section class="paper" id="mistakes">${head(3, 0, LS.mistakesIntro || 'Each pair shows a mistake students often make and the correct sentence.')}${LS.mistakes.map(m => `<div class="mistake"><div class="bad">${m.wrong}</div><div class="good">${m.right}</div><div class="mwhy">${m.why}</div></div>`).join('')}</section>`;
     }
     function guidedHtml() {
         const bank = LS.guided.bank;
@@ -185,7 +185,7 @@
     }
     function challengeHtml() {
         const c = LS.challenge;
-        const body = c.text.replace(/\{(\d+)\}/g, (m, n) => {
+        const body = c.text.replace(/\n/g, '<br>').replace(/\{(\d+)\}/g, (m, n) => {   // line breaks for letters and emails
             const b = +n - 1, a = st.ch[b];
             let cls = 'blank', label = n;
             if (a !== undefined) { label = c.blanks[b].o[a]; cls += ' chosen'; if (st.checked) cls += a === c.blanks[b].a ? ' right' : ' wrong'; }
